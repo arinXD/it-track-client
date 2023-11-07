@@ -1,5 +1,5 @@
 'use client';
-import { Navbar, Sidebar } from '@/app/components';
+import { Navbar, Sidebar } from '../components';
 import { useState, useEffect } from 'react';
 import React from 'react';
 
@@ -19,7 +19,7 @@ const Page = () => {
                         </svg>
                     </button>
                     <div>
-                        <p>คัดเลือกแทรค</p>
+                        <p>Teacher</p>
                     </div>
                 </section>
             </main>

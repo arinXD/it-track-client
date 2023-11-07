@@ -19,7 +19,7 @@ const Page = () => {
                         </svg>
                     </button>
                     <div>
-                        <p>คัดเลือกแทรค</p>
+                        <p>หาความเหมาะสมในอาชีพ</p>
                     </div>
                 </section>
             </main>

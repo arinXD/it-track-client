@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import './globals.css'
 import AuthProvider from './components/Authprovider'
-
 export default function RootLayout({
     children
 }) {

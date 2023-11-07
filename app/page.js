@@ -1,21 +1,31 @@
-import Image from 'next/image'
+// 'use client';
+// import { useState, useEffect } from 'react';
 import { TablePagination } from './components'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
+import React from 'react';
+import prisma from './db';
 
-async function getData() {
-    const res = await fetch("http://localhost:4000/users", { next: { revalidate: 3600 } })
-    const data = await res.json()
-
-    if (!res.ok) {
-        return [{ "message": "cant fetch" }]
+async function getDataPrisma() {
+    try {
+        const data = await prisma.user.findMany({
+            select: {
+                id: true,
+                email: true,
+                name: true,
+            },
+        });
+        if (data.length == 0) return [{ id: 1, "ข้อมูล": "ไม่มีข้อมูล" }]
+        return data;
+    } catch (error) {
+        console.error("Error fetching data from the database:", error);
+        return ([{ "ข้อมูล": "ไม่พบข้อมูล" }])
     }
-
-    return data.users
 }
 
-export default async function Home() {
-    const users = await getData()
+const Home = async () => {
+    const users = await getDataPrisma()
+
     return (
         <>
             <header>
@@ -31,12 +41,29 @@ export default async function Home() {
                         </svg>
                     </button>
                     <div>
-                        <div>
+                        {(users.length > 0) ?
                             <TablePagination data={users} />
-                        </div>
+                            : <p className='text-center'>Loading .....</p>}
                     </div>
                 </section>
             </main>
         </>
     )
 }
+
+export default Home;
+// const getData = async function (resource) {
+//     const res = await fetch(`http://localhost:4000/${resource}`, { next: { revalidate: 3600 } })
+//     const data = await res.json()
+//     console.log(res);
+//     if (!res.ok) {
+//         setUsers([{ "ข้อมูล": "ไม่พบข้อมูล" }])
+//         return
+//     }
+//     setUsers(data[resource])
+// }
+// const [users, setUsers] = useState([])
+
+// useEffect(() => {
+//     getData('posts')
+// }, [])

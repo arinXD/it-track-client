@@ -1,13 +1,16 @@
 "use client"
 import { useState, useEffect } from "react";
+import React from 'react';
+import { BiSearch } from 'react-icons/bi'
 
-export default function TablePagination(props) {
+const TablePagination = (props) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [data, setData] = useState(props.data);
     const [filteredData, setFilteredData] = useState(props.data);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
     const columns = Object.keys(props.data[0]);
+    // const columns = ['id', "email", 'name']
 
     function handleSearch(query) {
         setSearchQuery(query);
@@ -36,17 +39,20 @@ export default function TablePagination(props) {
 
         <div className="max-w-screen-xl mx-auto">
             <div className="flex justify-end">
+                <div className="rounded-e-none py-2 px-3 text-sm mb-3 text-gray-900 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <BiSearch className="w-5 h-5 text-white" />
+                </div>
                 <input
                     type="search"
                     id="search"
-                    className="p-4 pl-10 text-sm mb-3 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Search"
+                    className="rounded-s-none pl-0 py-2 px-4 text-sm mb-3 text-gray-900 rounded-lg bg-gray-50 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Search..."
                     value={searchQuery}
-                    style={{ width: '30%' }}
+                    style={{ width: '25%' }}
                     onChange={(e) => handleSearch(e.target.value)}
                 />
             </div>
-            <table className="h-[305px] overflow-hidden w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <table className="overflow-hidden w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead className="text-xs bg-gray-50 dark:bg-gray-700">
                     <tr>
                         {columns.map((column, index) => (
@@ -60,7 +66,7 @@ export default function TablePagination(props) {
                     {totalItems > 0 ? (
                         currentData.map((e) => (
                             <tr
-                                key={ e.id }
+                                key={e.id}
                                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-700 dark:hover-bg-gray-600"
                             >
                                 {columns.map((column, index) => (
@@ -68,7 +74,7 @@ export default function TablePagination(props) {
                                         key={index}
                                         className={index === 0 ? "px-6 py-4 font-medium text-white whitespace-nowrap" : "text-white px-6 py-4"}
                                     >
-                                        { e[column] }
+                                        {e[column]}
                                     </td>
                                 ))}
                             </tr>
@@ -182,3 +188,5 @@ export default function TablePagination(props) {
         </div>
     );
 }
+
+export default TablePagination

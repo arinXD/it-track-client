@@ -5,64 +5,23 @@ import { useSession, signIn, signOut } from "next-auth/react"
 import Image from 'next/image'
 import { BiLogOut } from 'react-icons/bi';
 
-const Navbar = () => {
-    const getUser = () => {
-        const { data: session } = useSession();
-        if (session && session.user) {
-            return (
-                <div className='relative flex justify-center items-center gap-2'>
-                    <Image
-                        onClick={toggleProfile}
-                        className='rounded-full active:scale-90'
-                        src={session?.user?.image}
-                        width={40} height={40}
-                        alt="user image"
-                    />
-                    <div className={`${profileToggle? "block":"hidden"} rounded absolute border w-[280px] p-4 top-[41px] right-0 bg-white`}>
-                        <div className="flex gap-4 items-start mb-3 border-b pb-3">
-                            <Image
-                                className='rounded-full'
-                                src={session?.user?.image}
-                                width={45} height={45}
-                                alt="user image"
-                            />
-                            <div className='w-full'>
-                                <div>{session.user.name}</div>
-                                <div className='text-sm text-gray-500'>{session.user.email}</div>
-                                <div className='mt-2'>
-                                    <Link href={"/"} className='text-sm text-blue-500'>ดูโปรไฟล์</Link>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='flex gap-3 cursor-pointer' onClick={() => signOut()}>
-                            <BiLogOut className='w-6 h-6'/>
-                            <button className=''>Sign out</button>
-                        </div>
-                    </div>
-                </div>
-            )
-        }
-        return (
-            <button onClick={() => signIn()} className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded active:scale-90'>
-                เข้าสู่ระบบ
-            </button>
-        )
-    }
 
+const Navbar = () => {
+    const { data:session } = useSession();
     const [profileToggle, setProfileToggle] = useState(false)
 
     const toggleProfile = () => {
-        setTimeout(()=>{
-            if(profileToggle){
+        setTimeout(() => {
+            if (profileToggle) {
                 setProfileToggle(false)
-            }else{
+            } else {
                 setProfileToggle(true)
             }
         }, 50)
     }
-    useEffect(()=>{
-        window.onclick = ()=>{
-            if(profileToggle){
+    useEffect(() => {
+        window.onclick = () => {
+            if (profileToggle) {
                 setProfileToggle(false)
             }
         }
@@ -110,7 +69,42 @@ const Navbar = () => {
                     </div>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                         <div className="relative ml-3">
-                            {getUser()}
+                            {(session) ?
+                                <div className='relative flex justify-center items-center gap-2'>
+                                    <Image
+                                        onClick={toggleProfile}
+                                        className='rounded-full active:scale-90 cursor-pointer'
+                                        src={session?.user?.image}
+                                        width={40} height={40}
+                                        alt="user image"
+                                    />
+                                    <div className={`${profileToggle ? "block" : "hidden"} rounded absolute border w-[280px] p-4 top-[41px] right-0 bg-white`}>
+                                        <div className="flex gap-4 items-start mb-3 border-b pb-3">
+                                            <Image
+                                                className='rounded-full'
+                                                src={session?.user?.image}
+                                                width={45} height={45}
+                                                alt="user image"
+                                            />
+                                            <div className='w-full'>
+                                                <div>{session.user.name}</div>
+                                                <div className='text-sm text-gray-500'>{session.user.email}</div>
+                                                <div className='mt-2'>
+                                                    <Link href={"/"} className='text-sm text-blue-500'>ดูโปรไฟล์</Link>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='flex gap-3 cursor-pointer' onClick={() => signOut()}>
+                                            <BiLogOut className='w-6 h-6' />
+                                            <button className=''>Sign out</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                :
+                                <button onClick={() => signIn()} className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded active:scale-90'>
+                                    เข้าสู่ระบบ
+                                </button>
+                            }
                         </div>
                     </div>
                 </div>
