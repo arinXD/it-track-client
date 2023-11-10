@@ -1,13 +1,22 @@
 'use client';
-import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useSession, signIn, signOut } from "next-auth/react"
 import Image from 'next/image'
 import { BiLogOut } from 'react-icons/bi';
+import Link from 'next/link';
+// import SignIn from './SignIn';
 
+// const closeOnOverlayClick = (e) => {
+//     if (e.target.id === 'default-modal') {
+//         setDisplaySignIn(false);
+//     }
+// };
+// const closeModal = ()=>{
+//     setDisplaySignIn(false);
+// }
 
 const Navbar = () => {
-    const { data:session } = useSession();
+    const { data: session } = useSession();
     const [profileToggle, setProfileToggle] = useState(false)
 
     const toggleProfile = () => {
@@ -101,16 +110,16 @@ const Navbar = () => {
                                     </div>
                                 </div>
                                 :
-                                <button onClick={() => signIn()} className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded active:scale-90'>
-                                    เข้าสู่ระบบ
-                                </button>
+                                <div>
+                                    <button onClick={() => signIn()} className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded active:scale-90'>
+                                        เข้าสู่ระบบ
+                                    </button>
+                                </div>
                             }
                         </div>
                     </div>
                 </div>
             </div>
-
-
             <div className="sm:hidden" id="mobile-menu">
                 <div className="space-y-1 px-2 pb-3 pt-2">
 
@@ -121,8 +130,22 @@ const Navbar = () => {
                 </div>
             </div>
         </nav>
-
     )
 }
 
 export default Navbar
+{/* <!-- Sign up modal -->
+<div id="default-modal" aria-hidden="true"
+    onClick={closeOnOverlayClick}
+    className={`${(displaySignIn) ? "fixed" : "hidden"} z-10 bg-gray-800 bg-opacity-50 top-0 left-0 right-0 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%)] max-h-full`}>
+    <div
+        id='wrap'
+        style={{ transform: 'translate(-50%, -50%)' }}
+        className="z-20 top-[50%] left-[50%] absolute w-full max-w-lg max-h-full bg-gray-800 border-gray-700 rounded-lg">
+        <!-- Modal content -->
+        <div className="relative z-30 rounded-lg shadow">
+            <!-- Modal body -->
+            <SignIn closeModal={closeModal} />
+        </div>
+    </div>
+</div> */}
