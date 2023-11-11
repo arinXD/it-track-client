@@ -11,7 +11,7 @@ import { SignUp } from '@/app/components';
 
 
 const Page = () => {
-    const username = useRef(null)
+    const email = useRef(null)
     const pass = useRef(null)
 
     const [displaySignUp, setDisplaySignUp] = useState(false)
@@ -32,15 +32,15 @@ const Page = () => {
         setEmptyEmail(false)
         setEmptyPass(false)
         event.preventDefault()
-        // console.log(username.current.value, pass.current.value);
-        if (!username) setEmptyEmail(true)
+        // console.log(email.current.value, pass.current.value);
+        if (!email) setEmptyEmail(true)
         if (!pass) setEmptyPass(true)
-        if (!(username && pass)) {
+        if (!(email && pass)) {
             setError("กรุณากรอกข้อมูลผู้ใช้ให้ครบ")
             return
         }
         const result = await signIn("credentials", {
-            username: username.current.value,
+            email: email.current.value,
             password: pass.current.value,
             redirect: false,
             callbackUrl: "/",
@@ -114,8 +114,8 @@ const Page = () => {
                                 type="email"
                                 name="email"
                                 id="email"
-                                ref={username}
-                                autoComplete="username"
+                                ref={email}
+                                autoComplete="email"
                                 className={`${(emptyEmail) ? 'border-2 border-red-500' : 'border border-gray-400'} bg-gray-50 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 focus:outline-none`}
                                 placeholder="อีเมล" />
                         </div>

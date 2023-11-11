@@ -135,7 +135,8 @@ export default function SignUp(props) {
                                 <label className='text-sm text-gray-600'>รหัสประจำตัวนักศึกษามหาวิทยาลัยขอนแก่น</label>
                                 <div className='inline-block ms-1'>
                                     <AiFillQuestionCircle
-                                        onClick={() => setDisplayTips(!displayTips)}
+                                        onMouseOver={() => setDisplayTips(true)}
+                                        onMouseOut={() => setDisplayTips(false)}
                                         className='cursor-pointer' />
                                     {displayTips ?
                                         <div className='absolute z-50'>

@@ -1,13 +1,14 @@
 import { Navbar, Sidebar, TablePagination } from "../components";
-
+import axios from "axios";
 async function fetchData() {
     try {
-        const result = await fetch(
-            "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province.json"
+        const result = await axios.get(
+            "http://localhost:4000/api/test"
         )
-        const jsonData = await result.json();
-        return jsonData
+        const data = result.data.data
+        return data
     } catch (error) {
+        console.log(error);
         return [{ "ข้อมูล": "ไม่มี" }]
     }
 }

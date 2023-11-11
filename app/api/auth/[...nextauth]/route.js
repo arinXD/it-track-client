@@ -7,16 +7,17 @@ const handler = NextAuth({
         CredentialsProvider({
             name: "Credentials",
             credentials: {
-                username: { label: "Username", type: "text" },
+                email: { label: "Username", type: "text" },
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials, req) {
-                const res = await fetch("https://www.melivecode.com/api/login", {
+                const res = await fetch("http://localhost:4000/api/auth/student/signin", {
                     method: 'POST',
                     body: JSON.stringify(credentials),
                     headers: { "Content-Type": "application/json" }
                 })
                 const response = await res.json()
+                console.log(response);
                 if (res.ok && response) {
                     const userData = response.user
                     const user = {
@@ -34,7 +35,7 @@ const handler = NextAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         })
     ],
-    pages:{
+    pages: {
         signIn: "/auth/sign-in"
     }
 

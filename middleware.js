@@ -25,8 +25,9 @@ export default withAuth(
                 url.pathname = '/permission/kku.ac.th'
                 return NextResponse.redirect(url)
             }
+        } else {
+            return NextResponse.next()
         }
-        return NextResponse.redirect(new URL("/", req.url))
     },
     {
         callbacks: {
@@ -44,6 +45,5 @@ export const config = {
     matcher: [
         "/student/:path*",
         "/teacher/:path*",
-        "/auth/:path*"
     ]
 }
