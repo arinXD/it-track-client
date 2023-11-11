@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const {nextui} = require("@nextui-org/react")
+const { nextui } = require("@nextui-org/react")
 module.exports = {
     content: [
         './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -31,5 +31,6 @@ module.exports = {
     plugins: [
         require("daisyui"),
         nextui(),
+        require('tailwindcss-animated'),
     ],
 }

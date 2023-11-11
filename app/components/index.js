@@ -3,9 +3,11 @@ import Navbar from "./Navbar"
 import Sidebar from "./Sidebar"
 import TablePagination from "./TablePagination"
 import SignUp from "./SignUp"
+import HomePage from "./HomePage"
 
-export{
+export {
     AuthProvider,
+    HomePage,
     Navbar,
     Sidebar,
     TablePagination,

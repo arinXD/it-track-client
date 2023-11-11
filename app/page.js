@@ -1,21 +1,15 @@
-// 'use client';
-// import { useState, useEffect } from 'react';
-import { TablePagination } from './components'
-import Navbar from './components/Navbar'
-import Sidebar from './components/Sidebar'
-import React from 'react';
+import { Navbar, Sidebar, HomePage } from './components'
 
-async function getDataPrisma() {
+import React from 'react';
+import axios from 'axios';
+
+async function getData() {
     try {
-        const data = await prisma.user.findMany({
-            select: {
-                id: true,
-                email: true,
-                name: true,
-            },
-        });
+        const res = await axios.get("http://localhost:4000/api/posts")
+        const data = res.data.data
         if (data.length == 0) return [{ id: 1, "ข้อมูล": "ไม่มีข้อมูล" }]
-        return data;
+
+        return data
     } catch (error) {
         console.error("Error fetching data from the database:", error);
         return ([{ "ข้อมูล": "ไม่พบข้อมูล" }])
@@ -23,8 +17,8 @@ async function getDataPrisma() {
 }
 
 const Home = async () => {
-    const users = await getDataPrisma()
-
+    const rootData = await getData()
+    // console.log(rootData);
     return (
         <>
             <header>
@@ -39,30 +33,11 @@ const Home = async () => {
                             <path clipRule="evenodd" fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
                         </svg>
                     </button>
-                    <div>
-                        {(users.length > 0) ?
-                            <TablePagination data={users} />
-                            : <p className='text-center'>Loading .....</p>}
-                    </div>
-                </section>
-            </main>
+                    <HomePage data={rootData} />
+                </section >
+            </main >
         </>
     )
 }
 
 export default Home;
-// const getData = async function (resource) {
-//     const res = await fetch(`http://localhost:4000/${resource}`, { next: { revalidate: 3600 } })
-//     const data = await res.json()
-//     console.log(res);
-//     if (!res.ok) {
-//         setUsers([{ "ข้อมูล": "ไม่พบข้อมูล" }])
-//         return
-//     }
-//     setUsers(data[resource])
-// }
-// const [users, setUsers] = useState([])
-
-// useEffect(() => {
-//     getData('posts')
-// }, [])
