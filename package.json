@@ -21,6 +21,7 @@
     "eslint-config-next": "14.0.0",
     "framer-motion": "^10.16.4",
     "iron-session": "^6.3.1",
+    "limiter": "^2.1.0",
     "mysql2": "^3.6.3",
     "next": "14.0.0",
     "next-auth": "^4.24.4",

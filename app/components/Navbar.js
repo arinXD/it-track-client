@@ -4,21 +4,10 @@ import { useSession, signIn, signOut } from "next-auth/react"
 import Image from 'next/image'
 import { BiLogOut } from 'react-icons/bi';
 import Link from 'next/link';
-// import SignIn from './SignIn';
-
-// const closeOnOverlayClick = (e) => {
-//     if (e.target.id === 'default-modal') {
-//         setDisplaySignIn(false);
-//     }
-// };
-// const closeModal = ()=>{
-//     setDisplaySignIn(false);
-// }
 
 const Navbar = () => {
     const { data: session } = useSession();
     const [profileToggle, setProfileToggle] = useState(false)
-
     const toggleProfile = () => {
         setTimeout(() => {
             if (profileToggle) {
@@ -82,7 +71,7 @@ const Navbar = () => {
                                 <div className='relative flex justify-center items-center gap-2'>
                                     <Image
                                         onClick={toggleProfile}
-                                        className='rounded-full active:scale-90 cursor-pointer'
+                                        className='rounded-full border-1 border-slate-300 active:scale-90 cursor-pointer'
                                         src={session?.user?.image}
                                         width={40} height={40}
                                         alt="user image"
@@ -90,7 +79,7 @@ const Navbar = () => {
                                     <div className={`${profileToggle ? "block" : "hidden"} rounded absolute border w-[280px] p-4 top-[41px] right-0 bg-white`}>
                                         <div className="flex gap-4 items-start mb-3 border-b pb-3">
                                             <Image
-                                                className='rounded-full'
+                                                className='rounded-full border-1 border-slate-300'
                                                 src={session?.user?.image}
                                                 width={45} height={45}
                                                 alt="user image"

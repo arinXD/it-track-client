@@ -7,7 +7,7 @@ import { BiHomeAlt2 } from 'react-icons/bi';
 const Sidebar = () => {
     const url = usePathname();
     const links = [
-        { link: "/", label: "หน้าหลัก", icon: <BiHomeAlt2 className='w-6 h-6'/> },
+        { link: "/", label: "หน้าหลัก", icon: <BiHomeAlt2 className='w-6 h-6' /> },
         {
             link: "/student/tracks",
             label: "คัดเลือกความเชี่ยวชาญ",
@@ -36,6 +36,18 @@ const Sidebar = () => {
             link: "/pro",
             label: "ทดสอบ API",
         },
+        {
+            link: "/student",
+            label: "นักศึกษา",
+        },
+        {
+            link: "/teacher",
+            label: "อาจารย์",
+        },
+        {
+            link: "/admin",
+            label: "เจ้าหน้าที่",
+        },
     ]
     return (
         <>
@@ -45,7 +57,7 @@ const Sidebar = () => {
                         {links.map(link => (
                             <li key={link.link}>
                                 <Link href={link.link}
-                                    className={ url== link.link ? "bg-blue-500 font-bold text-white py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group" : "py-3 flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-500 hover:text-white group" }
+                                    className={url == link.link ? "bg-blue-500 font-bold text-white py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group" : "py-3 flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-500 hover:text-white group"}
                                 >
                                     {/* <svg className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
                                         <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />

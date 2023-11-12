@@ -1,13 +1,5 @@
 import { NextResponse } from "next/server";
 
-// const mysql = require('mysql2');
-
-// const con = mysql.createConnection({
-//     host: 'localhost',
-//     user: 'root',
-//     database: 'it_track'
-// })
-
 export async function GET() {
     return NextResponse.json({ ping: "pong" });
 }

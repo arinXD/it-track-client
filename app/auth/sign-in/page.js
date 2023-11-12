@@ -32,7 +32,6 @@ const Page = () => {
         setEmptyEmail(false)
         setEmptyPass(false)
         event.preventDefault()
-        // console.log(email.current.value, pass.current.value);
         if (!email) setEmptyEmail(true)
         if (!pass) setEmptyPass(true)
         if (!(email && pass)) {
@@ -58,11 +57,11 @@ const Page = () => {
         })
     }
 
-    useEffect(() => {
-        if (session) {
-            router.push('/');
-        }
-    }, [session, router]);
+    // useEffect(() => {
+    //     if (session) {
+    //         router.push('/');
+    //     }
+    // }, [session, router]);
 
     useEffect(() => {
         if (error) {

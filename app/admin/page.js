@@ -1,6 +1,7 @@
 'use client';
+import { Navbar, Sidebar } from '../components';
+import { useState, useEffect } from 'react';
 import React from 'react';
-import { Navbar, Sidebar } from '@/app/components';
 
 const Page = () => {
     return (
@@ -18,7 +19,7 @@ const Page = () => {
                         </svg>
                     </button>
                     <div>
-                        <p>Student</p>
+                        <p>Admin</p>
                     </div>
                 </div>
             </div>
