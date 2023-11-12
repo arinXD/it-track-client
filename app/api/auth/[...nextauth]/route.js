@@ -25,10 +25,14 @@ const handler = NextAuth({
                 if (res.ok && response) {
                     const userData = response.user
                     return {
-                        name: `${userData.fname} ${userData.lname}`,
+                        id: null,
+                        name: userData.name,
+                        stu_id: userData.stu_id,
                         email: userData.email,
                         image: userData.image,
                         role: userData.role,
+                        firstname: userData.fname,
+                        lastname: userData.lname,
                     }
                 }
                 return null
@@ -39,6 +43,7 @@ const handler = NextAuth({
                 // console.log(profile);
                 return {
                     id: profile.sub,
+                    stu_id: null,
                     email: profile.email,
                     name: profile.name,
                     firstname: profile.given_name,
@@ -55,12 +60,20 @@ const handler = NextAuth({
         signIn: "/auth/sign-in"
     },
     callbacks: {
-        jwt({ token, user }) {
-            if (user) token.role = user.role
+        async jwt({ token, user }) {
+            if (user) {
+                token.role = user.role
+                token.stu_id = user.stu_id
+                token.firstname = user.firstname
+                token.lastname = user.lastname
+            }
             return token
         },
-        session({ session, token }) {
+        async session({ session, token }) {
             session.user.role = token.role
+            session.user.stu_id = token.stu_id
+            session.user.firstname = token.firstname
+            session.user.lastname = token.lastname
             return session
         }
     },

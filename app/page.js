@@ -2,6 +2,7 @@ import { HomePage, Navbar, Sidebar } from '@/app/components'
 
 import React from 'react';
 import axios from 'axios';
+import { getServerSession } from 'next-auth';
 
 async function getData() {
     try {
@@ -17,8 +18,10 @@ async function getData() {
 }
 
 const Home = async () => {
+    const session = await getServerSession()
     const rootData = await getData()
     // console.log(rootData);
+    console.log(session);
     return (
         <>
             <header>

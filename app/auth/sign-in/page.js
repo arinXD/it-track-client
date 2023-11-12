@@ -44,7 +44,7 @@ const Page = () => {
             redirect: false,
             callbackUrl: "/",
         })
-        console.log(result);
+        // console.log(result);
         if (!result.ok) {
             setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง")
         }
@@ -57,11 +57,11 @@ const Page = () => {
         })
     }
 
-    // useEffect(() => {
-    //     if (session) {
-    //         router.push('/');
-    //     }
-    // }, [session, router]);
+    useEffect(() => {
+        if (session) {
+            router.push('/');
+        }
+    }, [session, router]);
 
     useEffect(() => {
         if (error) {
