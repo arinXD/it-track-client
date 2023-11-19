@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials";
+import axios from "axios";
 // import { GoogleProfile } from "next-auth/providers/google";
 
 const handler = NextAuth({
@@ -21,7 +22,6 @@ const handler = NextAuth({
                     headers: { "Content-Type": "application/json" }
                 })
                 const response = await res.json()
-                // console.log(response);
                 if (res.ok && response) {
                     const userData = response.user
                     return {
@@ -35,12 +35,23 @@ const handler = NextAuth({
                         lastname: userData.lname,
                     }
                 }
+                throw new Error("invalid crefentail")
                 return null
             }
         }),
         GoogleProvider({
-            profile(profile) {
-                // console.log(profile);
+            async profile(profile) {
+                const studentEmail = "kkumail.com"
+                const teacherEmail = "kku.ac.th"
+                let role
+                if (profile.email.includes(studentEmail)) {
+                    role = "student"
+                }
+                else if (profile.email.includes(teacherEmail)) {
+                    role = "teacher"
+                } else {
+                    role = "user"
+                }
                 return {
                     id: profile.sub,
                     stu_id: null,
@@ -49,7 +60,7 @@ const handler = NextAuth({
                     firstname: profile.given_name,
                     lastname: profile.family_name,
                     image: profile.picture,
-                    role: profile.role ?? "student",
+                    role: role,
                 }
             },
             clientId: process.env.GOOGLE_CLIENT_ID,
@@ -57,9 +68,31 @@ const handler = NextAuth({
         })
     ],
     pages: {
-        signIn: "/auth/sign-in"
+        signIn: "/auth/sign-in",
+        verifyRequest: '/auth/verify-request', // (used for check email message)
+        newUser: '/auth/new-user'
     },
     callbacks: {
+        async signIn({ user, account }) {
+
+            if (account.provider === "google") {
+                const options = {
+                    url: 'http://localhost:4000/api/auth/student/signin/google',
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8'
+                    },
+                    data: {
+                        email: user.email
+                    }
+                };
+
+                const result = await axios(options)
+                user.stu_id = result.data.data.stu_id
+            }
+            return user
+        },
         async jwt({ token, user }) {
             if (user) {
                 token.role = user.role

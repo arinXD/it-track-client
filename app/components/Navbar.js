@@ -7,6 +7,7 @@ import Link from 'next/link';
 
 const Navbar = () => {
     const { data: session } = useSession();
+    console.log(session?.user);
     const [profileToggle, setProfileToggle] = useState(false)
     const toggleProfile = () => {
         setTimeout(() => {

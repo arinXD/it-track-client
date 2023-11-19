@@ -1,7 +1,8 @@
 import React from 'react'
 import { Navbar } from '@/app/components'
 const PagePermission = async ({ params }) => {
-    const msg = params.msg
+    let msg = params.msg
+    msg = msg.split("%2B")
     return (
         <>
             <header>
@@ -19,7 +20,7 @@ const PagePermission = async ({ params }) => {
                         <p>
                             คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้
                         </p>
-                        <p>กรุณาเข้าสู่ระบบด้วย {msg}</p>
+                        <p>กรุณาเข้าสู่ระบบด้วย {msg.join(" ")}</p>
                     </div>
                 </div>
             </div>

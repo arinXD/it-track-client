@@ -1,18 +1,18 @@
 "use client";
-import React, { useRef } from 'react'
-import { useSession } from "next-auth/react"
+import React from 'react'
 import { AiOutlineCloseCircle, AiOutlineClose, AiFillQuestionCircle } from 'react-icons/ai';
 import { BsEyeFill, BsEyeSlashFill } from 'react-icons/bs';
 import { useEffect, useState } from 'react'
+import { signIn } from "next-auth/react"
 import Link from 'next/link';
 import { NextUIProvider } from "@nextui-org/react";
 import { Input, Card, CardBody } from "@nextui-org/react";
+import axios from 'axios';
 
 export default function SignUp(props) {
 
     let timeoutError;
     const eyeClass = 'w-5 h-5 text-gray-400 cursor-pointer'
-    const { data: session } = useSession();
     const [error, setError] = useState(false)
     const [displayPass, setDisplayPass] = useState(false)
     const [displayCon, setDisplayCon] = useState(false)
@@ -52,24 +52,55 @@ export default function SignUp(props) {
             && email
             && password
             && confirmPass)) {
-            setError("กรอกข้อมูลผู้ใช้ให้ครบ")
+            // setError("กรอกข้อมูลผู้ใช้ให้ครบ")
             return
         }
         if (password !== confirmPass) {
             setPasswordValid(true)
             setConfirmPassValid(true)
-            setError("รหัสผ่านไม่ตรงกัน")
+            // setError("รหัสผ่านไม่ตรงกัน")
             return
         }
         const data = {
+            stu_id: stuId,
             fname,
             lname,
             stuId,
             email,
             password,
         }
-        const result = await props.create(data)
-        console.log(result);
+        const options = {
+            url: 'http://localhost:4000/api/auth/student/signup',
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            data: data
+        };
+
+        axios(options)
+            .then(async (res) => {
+                if(res.status==201){
+                    await signIn("credentials", {
+                        email: email,
+                        password: password,
+                        redirect: true,
+                        callbackUrl: "/",
+                    })
+                }
+                return
+            }).catch(err => {
+                const msg = err.response.data.message
+                const field = err.response.data.errorField
+                if (field == "email") setemailValid(true)
+                if (field == "stu_id") setStuIdValid(true)
+                console.log();
+                console.log(err);
+                console.log(error);
+                setError(msg)
+                return
+            })
     }
 
     useEffect(() => {
@@ -85,14 +116,26 @@ export default function SignUp(props) {
             }
         };
     }, [error]);
+
+    async function clearError(params) {
+        setFnameValid(false)
+        setLnameValid(false)
+        setStuIdValid(false)
+        setemailValid(false)
+        setPasswordValid(false)
+        setConfirmPassValid(false)
+    }
     return (
         <NextUIProvider>
             <div className='sm:p-8 relative'>
                 <div className='rounded-full cursor-pointer absolute top-[4.5%] right-[4.5%] p-1 hover:bg-opacity-50 hover:bg-slate-100'>
-                    <AiOutlineClose className='w-6 h-6 text-blue-600 relative z-50' onClick={() => props.closeModal()} />
+                    <AiOutlineClose className='w-6 h-6 text-blue-600 relative z-50' onClick={() => {
+                        clearError()
+                        props.closeModal()
+                    }} />
                 </div>
                 <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                    ต้องการสร้างบัญชีผู้ใช้ ?
+                    สร้างบัญชีผู้ใช้
                 </h1>
                 <div className="mt-5 space-y-4 md:space-y-6">
                     <form className="space-y-3 md:space-y-4" onSubmit={onCreate}>
@@ -142,7 +185,7 @@ export default function SignUp(props) {
                                         <div className='absolute z-50'>
                                             <Card>
                                                 <CardBody>
-                                                    <p className='te text-default-foreground text-sm'>ตัวอย่าง 6430204230</p>
+                                                    <p className='te text-default-foreground text-sm'>ตัวอย่าง 643020423-0</p>
                                                 </CardBody>
                                             </Card>
                                         </div>
@@ -158,11 +201,11 @@ export default function SignUp(props) {
                                 value={stuId}
                                 onValueChange={setStuId}
                                 isInvalid={stuIdvalid}
-                                label="รหัสประจำตัวนักศึกษา (ไม่มีขีด)"
+                                label="รหัสประจำตัวนักศึกษา (มีขีด)"
                                 size="md"
                                 type="text"
                                 autoComplete="student id"
-                                pattern='^[0-9]{10}$' />
+                                pattern='^[0-9]{9}-[0-9]{1}$' />
                         </div>
                         <div>
                             <Input

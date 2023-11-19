@@ -1,16 +1,20 @@
 "use client"
 import React, { useRef } from 'react'
 import { useSession, signIn } from "next-auth/react"
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 import { BsEyeFill, BsEyeSlashFill } from 'react-icons/bs';
 import { useEffect, useState } from 'react'
 import Link from 'next/link';
-
 import { SignUp } from '@/app/components';
-
+import { Progress } from "@nextui-org/react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Page = () => {
+    const searchParams = useSearchParams()
+    const callbackUrl = searchParams.get('callbackUrl') ?? "/"
+
     const email = useRef(null)
     const pass = useRef(null)
 
@@ -28,14 +32,39 @@ const Page = () => {
     const [emptyPass, setEmptyPass] = useState(false)
     const [displayPass, setDisplayPass] = useState(false)
 
+
+    // progress
+    const [value, setValue] = React.useState(0);
+    let progressInterval
+
+    // toast
+    const notify = (params) => toast.error(params, {
+        position: toast.POSITION.TOP_CENTER,
+    });;
+
+    React.useEffect(() => {
+        setValue(0)
+        progressInterval = setInterval(() => {
+            setValue((v) => (v >= 100 ? 0 : v + 4.2));
+        }, 200);
+
+        return () => clearInterval(progressInterval);
+    }, [error]);
+
     const signInCredentials = async (event) => {
         setEmptyEmail(false)
         setEmptyPass(false)
         event.preventDefault()
-        if (!email) setEmptyEmail(true)
-        if (!pass) setEmptyPass(true)
-        if (!(email && pass)) {
+
+        if (!email.current.value) setEmptyEmail(true)
+        else setEmptyEmail(false)
+
+        if (!pass.current.value) setEmptyPass(true)
+        else setEmptyPass(false)
+
+        if (emptyEmail && emptyPass) {
             setError("กรุณากรอกข้อมูลผู้ใช้ให้ครบ")
+            notify("กรุณากรอกข้อมูลผู้ใช้ให้ครบ")
             return
         }
         const result = await signIn("credentials", {
@@ -44,22 +73,23 @@ const Page = () => {
             redirect: false,
             callbackUrl: "/",
         })
-        // console.log(result);
         if (!result.ok) {
             setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง")
+            notify("อีเมลหรือรหัสผ่านไม่ถูกต้อง")
         }
     }
 
     const signInGoogle = async () => {
         const result = await signIn("google", {
             redirect: true,
-            callbackUrl: "/",
+            callbackUrl: callbackUrl,
         })
     }
 
     useEffect(() => {
         if (session) {
-            router.push('/');
+            router.push(callbackUrl);
+            router.refresh()
         }
     }, [session, router]);
 
@@ -73,6 +103,9 @@ const Page = () => {
         return () => {
             if (timeoutError) {
                 clearTimeout(timeoutError);
+            }
+            if (progressInterval) {
+                clearInterval(progressInterval);
             }
         };
     }, [error]);
@@ -96,13 +129,24 @@ const Page = () => {
                 </div>
                 <div className="p-6 space-y-4 md:space-y-6 sm:p-8 w-[50%] h-[calc(100%)] max-h-full flex justify-start items-center">
                     <form className="h-[400px] w-full space-y-3 md:space-y-4" onSubmit={signInCredentials}>
+                        <ToastContainer />
                         {(error) ?
-                            <div className={'flex gap-3 items-center bg-red-500 text-gray-900 px-3 py-3'}>
-                                <AiOutlineCloseCircle onClick={() => {
-                                    setError(false)
-                                    clearTimeout(timeoutError)
-                                }} className='w-7 h-7 cursor-pointer' />
-                                {error}
+                            <div className='relative'>
+                                <div className={'flex gap-3 items-center bg-red-500 text-white px-3 py-3'}>
+                                    <AiOutlineCloseCircle onClick={() => {
+                                        setError(false)
+                                        clearTimeout(timeoutError)
+                                        clearInterval(progressInterval)
+                                    }} className='w-7 h-7 cursor-pointer' />
+                                    {error}
+                                </div>
+                                <Progress
+                                    size="md"
+                                    aria-label="Loading..."
+                                    value={value}
+                                    color="default"
+                                    className="bg-white w-full absolute bottom-0 h-[2px] rounded-none"
+                                />
                             </div>
                             :
                             null

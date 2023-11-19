@@ -1,11 +1,19 @@
 import { withAuth, NextRequestWithAuth } from "next-auth/middleware"
-import { NextResponse } from "next/server"
+import { NextResponse, NextRequest } from "next/server"
 
-export default withAuth(
-    middleware = (req) => {
+const auth = withAuth(
+    async function middleware(req) {
         const path = req.nextUrl.pathname
-        console.log(req.nextUrl.pathname);
-        console.log(req.nextauth.token);
+        console.log("Middleware token: ", req?.nextauth?.token);
+
+        // have no student id
+        // if (req.nextauth.token.stu_id == null
+        //     && req.nextauth.token.role == "student") {
+        //     const url = req.nextUrl.clone()
+        //     url.pathname = '/save/student/id'
+        //     return NextResponse.redirect(url)
+        // }
+
 
         if (path.startsWith("/student")
             && req.nextauth.token.role !== "student") {
@@ -16,30 +24,21 @@ export default withAuth(
         if (path.startsWith("/teacher")
             && req.nextauth.token.role !== "teacher") {
             return NextResponse.rewrite(
-                new URL("/permission/kku.ac.th", req.url)
+                new URL("/permission/Teacher+account", req.url)
             )
         }
         if (path.startsWith("/admin")
             && req.nextauth.token.role !== "admin") {
             return NextResponse.rewrite(
-                new URL("/permission/admin@email.com", req.url)
+                new URL("/permission/Admin+account", req.url)
             )
         }
-        // const regex = new RegExp("/auth/*")
-        // const url = req.nextUrl.clone()
-
-        // if (regex.test(req.nextUrl.pathname)) {
-        //     url.pathname = '/'
-        //     console.log("you are loging in");
-        //     return NextResponse.redirect(url)
-        // }
 
         return NextResponse.next()
     },
     {
         callbacks: {
             authorize: ({ token }) => {
-                console.log(token);
                 if (token) {
                     return true
                 }
@@ -49,36 +48,17 @@ export default withAuth(
     }
 )
 
+export default auth
+
 export const config = {
     matcher: [
-        // "/:path*",
+        "/",
         "/student/:path*",
         "/teacher/:path*",
         "/admin/:path*",
-        // "/auth/:path*",
     ]
 }
 
-
-// export default function middleware(request) {
-//     const regex = new RegExp("/auth/*")
-
-//     if(regex.test(request.url)){
-
-//     }
-
-//     console.log("-------Middleware---------");
-
-//     console.log(request.method);
-//     console.log(request.url);
-
-//     const origin = request.headers.get("origin")
-
-//     console.log(`origin: ${origin}`);
-
-//     return NextResponse.next()
-
-// }
 
 // if (req.nextauth.token) {
 //     const path = req.nextUrl.pathname
