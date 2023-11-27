@@ -2,13 +2,37 @@ import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
-// import { GoogleProfile } from "next-auth/providers/google";
+import { NextResponse } from 'next/server'
+
+const VerifiedEmailProvider = (options) => {
+    return {
+        id: 'verifiedEmail',
+        name: 'Verified Email',
+        type: 'credentials',
+        credentials: {
+            id: { label: "uid", type: "number" },
+            email: { label: 'Email', type: 'email' },
+            stu_id: { label: "Student Id", type: "text" },
+            role: { label: "Role", type: "text" },
+            image: { label: "Image", type: "text" },
+            fname: { label: "First Name", type: "text" },
+            lname: { label: "Last Name", type: "text" },
+            verification: { label: "Verification", type: "number" },
+        },
+        async authorize(credentials, req) {
+            console.log(credentials);
+            const { id, email, stu_id, role, image, fname, lname, verification } = credentials
+            return { id, email, stu_id, role, image, fname, lname, verification }
+        }
+    };
+};
 
 const handler = NextAuth({
     session: {
         strategy: "jwt",
     },
     providers: [
+        VerifiedEmailProvider(),
         CredentialsProvider({
             name: "Credentials",
             credentials: {
@@ -33,25 +57,16 @@ const handler = NextAuth({
                         role: userData.role,
                         firstname: userData.fname,
                         lastname: userData.lname,
+                        verification: userData.verification,
                     }
                 }
-                throw new Error("invalid crefentail")
-                return null
+                // console.log(response);
+                const { message } = response
+                throw new Error(message)
             }
         }),
         GoogleProvider({
             async profile(profile) {
-                const studentEmail = "kkumail.com"
-                const teacherEmail = "kku.ac.th"
-                let role
-                if (profile.email.includes(studentEmail)) {
-                    role = "student"
-                }
-                else if (profile.email.includes(teacherEmail)) {
-                    role = "teacher"
-                } else {
-                    role = "user"
-                }
                 return {
                     id: profile.sub,
                     stu_id: null,
@@ -60,18 +75,13 @@ const handler = NextAuth({
                     firstname: profile.given_name,
                     lastname: profile.family_name,
                     image: profile.picture,
-                    role: role,
+                    verification: 1,
                 }
             },
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         })
     ],
-    pages: {
-        signIn: "/auth/sign-in",
-        verifyRequest: '/auth/verify-request', // (used for check email message)
-        newUser: '/auth/new-user'
-    },
     callbacks: {
         async signIn({ user, account }) {
 
@@ -88,17 +98,40 @@ const handler = NextAuth({
                     }
                 };
 
-                const result = await axios(options)
-                user.stu_id = result.data.data.stu_id
+                try {
+                    const result = await axios(options)
+                    console.log(result.data);
+                    if (result.data.data) {
+                        user.stu_id = result.data.data.stu_id
+                        user.role = result.data.data.role
+                    }
+                } catch (error) {
+                    const message = error.response.data.message
+                    throw new Error(message)
+                    // console.log(message);
+                    // const homeUrl = new URL('/auth/sign-in', "http://localhost:3000/")
+                    // homeUrl.searchParams.set('error', message)
+                    // return NextResponse.redirect(homeUrl)
+                }
+
             }
             return user
         },
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
+            if (trigger === "update") {
+                if (session.action == "verify signin") {
+                    console.log("session in update trigger: ", session);
+                    token = session.user
+                }
+                token.test = session.user.test
+                return token
+            }
             if (user) {
                 token.role = user.role
                 token.stu_id = user.stu_id
                 token.firstname = user.firstname
                 token.lastname = user.lastname
+                token.verification = user.verification
             }
             return token
         },
@@ -107,10 +140,15 @@ const handler = NextAuth({
             session.user.stu_id = token.stu_id
             session.user.firstname = token.firstname
             session.user.lastname = token.lastname
+            session.user.verification = token.verification
+            session.user.test = token.test
             return session
         }
     },
-
+    pages: {
+        signIn: "/auth/sign-in",
+        error: '/auth/sign-in',
+    },
 })
 
 export { handler as GET, handler as POST }

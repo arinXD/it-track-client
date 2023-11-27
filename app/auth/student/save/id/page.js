@@ -1,7 +1,9 @@
 import React from 'react'
 const page = async () => {
   return (
-    <div>insert student id</div>
+    <div>
+      insert student id
+    </div>
   )
 }
 

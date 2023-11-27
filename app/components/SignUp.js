@@ -3,16 +3,18 @@ import React from 'react'
 import { AiOutlineCloseCircle, AiOutlineClose, AiFillQuestionCircle } from 'react-icons/ai';
 import { BsEyeFill, BsEyeSlashFill } from 'react-icons/bs';
 import { useEffect, useState } from 'react'
-import { signIn } from "next-auth/react"
+import { useRouter } from 'next/navigation'
 import Link from 'next/link';
 import { NextUIProvider } from "@nextui-org/react";
 import { Input, Card, CardBody } from "@nextui-org/react";
+import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 
 export default function SignUp(props) {
-
+    const router = useRouter()
     let timeoutError;
     const eyeClass = 'w-5 h-5 text-gray-400 cursor-pointer'
+    const [isSubmit, setIsSubmit] = useState(false)
     const [error, setError] = useState(false)
     const [displayPass, setDisplayPass] = useState(false)
     const [displayCon, setDisplayCon] = useState(false)
@@ -38,7 +40,11 @@ export default function SignUp(props) {
 
     async function onCreate(event) {
         event.preventDefault()
-
+        // // test
+        // router.push(`/email-verify/email/${email}`);
+        // router.refresh()
+        // return
+        setIsSubmit(true)
         checkEmpty(fname, setFnameValid)
         checkEmpty(lname, setLnameValid)
         checkEmpty(stuId, setStuIdValid)
@@ -52,13 +58,15 @@ export default function SignUp(props) {
             && email
             && password
             && confirmPass)) {
-            // setError("กรอกข้อมูลผู้ใช้ให้ครบ")
+            setError("กรอกข้อมูลผู้ใช้ให้ครบ")
+            setIsSubmit(false)
             return
         }
         if (password !== confirmPass) {
             setPasswordValid(true)
             setConfirmPassValid(true)
-            // setError("รหัสผ่านไม่ตรงกัน")
+            setError("รหัสผ่านไม่ตรงกัน")
+            setIsSubmit(false)
             return
         }
         const data = {
@@ -72,22 +80,20 @@ export default function SignUp(props) {
         const options = {
             url: 'http://localhost:4000/api/auth/student/signup',
             method: 'POST',
+            withCredentials: true,
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
-            data: data
+            data: data,
         };
 
         axios(options)
             .then(async (res) => {
-                if(res.status==201){
-                    await signIn("credentials", {
-                        email: email,
-                        password: password,
-                        redirect: true,
-                        callbackUrl: "/",
-                    })
+                if (res.status == 201) {
+                    // localStorage.setItem("email", email)
+                    router.push('/email-verify/email');
+                    router.refresh()
                 }
                 return
             }).catch(err => {
@@ -95,11 +101,14 @@ export default function SignUp(props) {
                 const field = err.response.data.errorField
                 if (field == "email") setemailValid(true)
                 if (field == "stu_id") setStuIdValid(true)
-                console.log();
-                console.log(err);
-                console.log(error);
+                // console.log();
+                // console.log(err);
+                // console.log(error);
                 setError(msg)
                 return
+            })
+            .finally(() => {
+                setIsSubmit(false)
             })
     }
 
@@ -279,7 +288,20 @@ export default function SignUp(props) {
                                 You may receive SMS notifications from us and can opt out at any time.</p>
                         </div>
                         <div>
-                            <button type="submit" className="w-full text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">สร้างบัญชีผู้ใช้</button>
+                            <button
+                                disabled={isSubmit}
+                                type="submit"
+                                className="w-full text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center flex items-center justify-center">
+                                {
+                                    isSubmit ?
+                                        <CircularProgress
+                                            color="inherit"
+                                            size={20}
+                                        />
+                                        :
+                                        "สร้างบัญชีผู้ใช้"
+                                }
+                            </button>
                         </div>
                     </form>
                 </div>

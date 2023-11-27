@@ -18,7 +18,7 @@ const Sidebar = () => {
         },
         {
             link: "/student/tracks/exam",
-            label: "หาความเหมาะสมในอาชีพ",
+            label: "หาแทรคที่เหมาะสม",
             icon:
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"></path>
@@ -54,20 +54,85 @@ const Sidebar = () => {
             <aside style={{ top: "65px" }} id="default-sidebar" className="border-r fixed top-16 left-0 z-10 w-72 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
                 <div className="h-full px-3 py-4 lg:px-5 overflow-y-auto bg-white">
                     <ul className="font-medium space-y-1">
-                        {links.map(link => (
+                        <li>
+                            <Link href={"/"}
+                                className={`${url == "/" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group duration-75`}
+                            >
+                                <BiHomeAlt2 className='w-6 h-6' />
+                                <span className="ml-3">หน้าหลัก</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href={"/student/tracks"}
+                                className={`${url == "/student/tracks" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group duration-75`}
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"></path>
+                                </svg>
+                                <span className="ml-3">คัดเลือกความเชี่ยวชาญ</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href={"/student/tracks/exam"}
+                                className={`${url == "/student/tracks/exam" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group duration-75`}
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"></path>
+                                </svg>
+                                <span className="ml-3">หาแทรคที่เหมาะสม</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href={"/student/verify"}
+                                className={`${url == "/student/verify" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group duration-75`}
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"></path>
+                                </svg>
+                                <span className="ml-3">ตรวจสอบสำเร็จการศึกษา</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href={"/pro"}
+                                className={`${url == "/pro" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group duration-75`}
+                            >
+                                <span className="ml-3">ทดสอบ API</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href={"/student"}
+                                className={`${url == "/student" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group duration-75`}
+                            >
+                                <span className="ml-3">นักศึกษา</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href={"/teacher"}
+                                className={`${url == "/teacher" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group duration-75`}
+                            >
+                                <span className="ml-3">อาจารย์</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href={"/admin"}
+                                className={`${url == "/admin" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group duration-75`}
+                            >
+                                <span className="ml-3">Admin</span>
+                            </Link>
+                        </li>
+                        {/* Loop but low perfomance */}
+                        {/* {links.map(link => (
                             <li key={link.link}>
                                 <Link href={link.link}
                                     className={url == link.link ? "bg-blue-500 font-bold text-white py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group" : "py-3 flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-500 hover:text-white group"}
                                 >
-                                    {/* <svg className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                                        <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-                                        <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
-                                    </svg> */}
                                     {link.icon}
                                     <span className="ml-3">{link.label}</span>
                                 </Link>
                             </li>
-                        ))}
+                        ))} */}
+
+                        {/* Default link */}
                         {/* <li>
                             <Link href="#" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-700 hover:text-white group">
                                 <svg className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
@@ -111,6 +176,7 @@ const Sidebar = () => {
                                 <span className="flex-1 ml-3 whitespace-nowrap">Products</span>
                             </Link>
                         </li> */}
+
                         {/* <li>
                             <Link href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                 <svg className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 16">

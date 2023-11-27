@@ -6,8 +6,8 @@ import { BiLogOut } from 'react-icons/bi';
 import Link from 'next/link';
 
 const Navbar = () => {
-    const { data: session } = useSession();
-    console.log(session?.user);
+    const { data: session, status } = useSession();
+    console.log("Nav session: ", session?.user);
     const [profileToggle, setProfileToggle] = useState(false)
     const toggleProfile = () => {
         setTimeout(() => {
@@ -18,13 +18,13 @@ const Navbar = () => {
             }
         }, 50)
     }
-    useEffect(() => {
-        window.onclick = () => {
-            if (profileToggle) {
-                setProfileToggle(false)
-            }
-        }
-    })
+    // useEffect(() => {
+    //     window.onclick = () => {
+    //         if (profileToggle) {
+    //             setProfileToggle(false)
+    //         }
+    //     }
+    // })
     return (
         <nav className="bg-white fixed top-0 left-0 z-40 w-full border-b">
             <div className="px-2 sm:px-6 lg:ps-5 lg:pe-8">
@@ -68,12 +68,13 @@ const Navbar = () => {
                     </div>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                         <div className="relative ml-3">
-                            {(session) ?
+                            {status == "authenticated" ?
                                 <div className='relative flex justify-center items-center gap-2'>
                                     <Image
                                         onClick={toggleProfile}
                                         className='rounded-full border-1 border-slate-300 active:scale-90 cursor-pointer'
                                         src={session?.user?.image}
+                                        // src={'/image/user.png'}
                                         width={40} height={40}
                                         alt="user image"
                                     />
@@ -100,11 +101,17 @@ const Navbar = () => {
                                     </div>
                                 </div>
                                 :
-                                <div>
-                                    <button onClick={() => signIn()} className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded active:scale-90'>
-                                        เข้าสู่ระบบ
-                                    </button>
-                                </div>
+                                null
+                            }
+                            {
+                                status == "unauthenticated" ?
+                                    <div>
+                                        <button onClick={() => signIn()} className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded active:scale-90'>
+                                            เข้าสู่ระบบ
+                                        </button>
+                                    </div>
+                                    :
+                                    null
                             }
                         </div>
                     </div>

@@ -1,15 +1,14 @@
 "use client"
-import React, { useRef } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { useSession, signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 import { BsEyeFill, BsEyeSlashFill } from 'react-icons/bs';
-import { useEffect, useState } from 'react'
 import Link from 'next/link';
 import { SignUp } from '@/app/components';
 import { Progress } from "@nextui-org/react";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// import { ToastContainer, toast } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 
 const Page = () => {
     const searchParams = useSearchParams()
@@ -17,30 +16,29 @@ const Page = () => {
 
     const email = useRef(null)
     const pass = useRef(null)
-
+    const [isProcress, setIsProcress] = useState(false)
     const [displaySignUp, setDisplaySignUp] = useState(false)
 
-    const closeModal = () => {
-        setDisplaySignUp(false);
-    }
-
     const router = useRouter()
-    let timeoutError;
+
     const { data: session } = useSession();
     const [error, setError] = useState(false)
     const [emptyEmail, setEmptyEmail] = useState(false)
     const [emptyPass, setEmptyPass] = useState(false)
     const [displayPass, setDisplayPass] = useState(false)
-
-
     // progress
     const [value, setValue] = React.useState(0);
+    let timeoutError;
     let progressInterval
 
     // toast
-    const notify = (params) => toast.error(params, {
-        position: toast.POSITION.TOP_CENTER,
-    });;
+    // const notify = (params) => toast.error(params, {
+    //     position: toast.POSITION.TOP_CENTER,
+    // });;
+
+    const closeModal = () => {
+        setDisplaySignUp(false);
+    }
 
     React.useEffect(() => {
         setValue(0)
@@ -52,39 +50,60 @@ const Page = () => {
     }, [error]);
 
     const signInCredentials = async (event) => {
+        setIsProcress(true)
         setEmptyEmail(false)
         setEmptyPass(false)
         event.preventDefault()
+        const eValue = email.current.value
+        const pValue = pass.current.value
 
-        if (!email.current.value) setEmptyEmail(true)
-        else setEmptyEmail(false)
+        setEmptyEmail(empty => {
+            if (eValue === "") {
+                return true;
+            } else {
+                return false;
+            }
+        });
 
-        if (!pass.current.value) setEmptyPass(true)
-        else setEmptyPass(false)
+        setEmptyPass(empty => {
+            if (pValue === "") {
+                return true;
+            } else {
+                return false;
+            }
+        });
 
-        if (emptyEmail && emptyPass) {
+        if (!eValue || !pValue) {
             setError("กรุณากรอกข้อมูลผู้ใช้ให้ครบ")
-            notify("กรุณากรอกข้อมูลผู้ใช้ให้ครบ")
+            setIsProcress(false)
             return
         }
         const result = await signIn("credentials", {
             email: email.current.value,
             password: pass.current.value,
             redirect: false,
-            callbackUrl: "/",
+            callbackUrl: callbackUrl,
         })
+        setIsProcress(false)
         if (!result.ok) {
-            setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง")
-            notify("อีเมลหรือรหัสผ่านไม่ถูกต้อง")
+            // console.log(result);
+            setError(result.error)
         }
     }
 
     const signInGoogle = async () => {
         const result = await signIn("google", {
-            redirect: true,
+            redirect: false,
             callbackUrl: callbackUrl,
         })
+        console.log(result);
     }
+
+    useEffect(() => {
+        if (searchParams.get('error')) {
+            setError(searchParams.get('error'))
+        }
+    }, [])
 
     useEffect(() => {
         if (session) {
@@ -129,7 +148,6 @@ const Page = () => {
                 </div>
                 <div className="p-6 space-y-4 md:space-y-6 sm:p-8 w-[50%] h-[calc(100%)] max-h-full flex justify-start items-center">
                     <form className="h-[400px] w-full space-y-3 md:space-y-4" onSubmit={signInCredentials}>
-                        <ToastContainer />
                         {(error) ?
                             <div className='relative'>
                                 <div className={'flex gap-3 items-center bg-red-500 text-white px-3 py-3'}>
@@ -188,7 +206,12 @@ const Page = () => {
                         <div className="flex items-center justify-end">
                             <Link href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">ลืมรหัสผ่าน?</Link>
                         </div>
-                        <button type="submit" className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">เข้าสู่ระบบ</button>
+                        <button
+                            disabled={isProcress}
+                            type="submit"
+                            className={`${isProcress ? "opacity-70" : null} bg-blue-600 hover:bg-blue-700 w-full text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center`}>
+                            เข้าสู่ระบบ
+                        </button>
 
                         <div className='mt-3 flex items-center gap-5'>
                             <hr className='border-slate-500 w-full' />
@@ -198,9 +221,9 @@ const Page = () => {
 
                         <div className="mt-3">
                             <div onClick={signInGoogle} className='border border-slate-500 rounded-lg flex flex-row gap-4 items-center justify-center py-3 w-full cursor-pointer text-gray-500 hover:text-blue-500 hover:border-blue-500'>
-                                <img className='w-5 h-5' src="/google.png" />
+                                <img className='w-5 h-auto' src="/LogoKKU.png" />
                                 <span className='text-sm'>
-                                    เข้าสู่ระบบด้วยบัญชี Google
+                                    เข้าสู่ระบบด้วยบัญชี KKU Mail
                                 </span>
                             </div>
                         </div>
