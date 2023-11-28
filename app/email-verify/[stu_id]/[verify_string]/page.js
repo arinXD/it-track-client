@@ -2,12 +2,13 @@
 import React from 'react'
 import axios from 'axios'
 import { VerifyLogin } from '@/app/components'
+import { hostname } from '@/app/api/hostname'
 
 const VerifyingPage = async ({ params }) => {
     const { stu_id, verify_string } = params
     const verifyingEmail = async ({ stu_id, verify_string }) => {
         const options = {
-            url: `http://localhost:4000/api/auth/student/verify/email/${stu_id}/${verify_string}`,
+            url: `${hostname}/api/auth/student/verify/email/${stu_id}/${verify_string}`,
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

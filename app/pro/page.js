@@ -1,9 +1,11 @@
 import { Navbar, Sidebar, TablePagination } from "../components";
 import axios from "axios";
+import { hostname } from '@/app/api/hostname'
+
 async function fetchData() {
     try {
         const result = await axios.get(
-            "http://localhost:4000/api/test"
+            `${hostname}/api/test`
         )
         const data = result.data.data
         return data

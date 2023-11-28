@@ -6,13 +6,13 @@ const auth = withAuth(
         const path = req.nextUrl.pathname
         console.log("Middleware token: ", req?.nextauth?.token);
 
-        // have no student id
-        if (req.nextauth.token.stu_id == null
-            && req.nextauth.token.role == "student") {
-            const url = req.nextUrl.clone()
-            url.pathname = '/auth/student/save/id'
-            return NextResponse.redirect(url)
-        }
+        // Dont have student id
+        // if (req.nextauth.token.stu_id == null
+        //     && req.nextauth.token.role == "student") {
+        //     const url = req.nextUrl.clone()
+        //     url.pathname = '/auth/student/save/id'
+        //     return NextResponse.redirect(url)
+        // }
 
         if (path.startsWith("/student")
             && req.nextauth.token.role !== "student") {

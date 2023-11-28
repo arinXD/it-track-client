@@ -1,7 +1,5 @@
-import Image from 'next/image'
 import './globals.css'
 import AuthProvider from './components/Authprovider'
-import { Navbar, Sidebar } from './components'
 export default function RootLayout({
     children
 }) {

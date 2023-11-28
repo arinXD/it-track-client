@@ -6,49 +6,6 @@ import { BiHomeAlt2 } from 'react-icons/bi';
 
 const Sidebar = () => {
     const url = usePathname();
-    const links = [
-        { link: "/", label: "หน้าหลัก", icon: <BiHomeAlt2 className='w-6 h-6' /> },
-        {
-            link: "/student/tracks",
-            label: "คัดเลือกความเชี่ยวชาญ",
-            icon:
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"></path>
-                </svg>
-        },
-        {
-            link: "/student/tracks/exam",
-            label: "หาแทรคที่เหมาะสม",
-            icon:
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"></path>
-                </svg>
-        },
-        {
-            link: "/student/verify",
-            label: "ตรวจสอบสำเร็จการศึกษา",
-            icon:
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"></path>
-                </svg>
-        },
-        {
-            link: "/pro",
-            label: "ทดสอบ API",
-        },
-        {
-            link: "/student",
-            label: "นักศึกษา",
-        },
-        {
-            link: "/teacher",
-            label: "อาจารย์",
-        },
-        {
-            link: "/admin",
-            label: "เจ้าหน้าที่",
-        },
-    ]
     return (
         <>
             <aside style={{ top: "65px" }} id="default-sidebar" className="border-r fixed top-16 left-0 z-10 w-72 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
@@ -58,7 +15,7 @@ const Sidebar = () => {
                             <Link href={"/"}
                                 className={`${url == "/" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group duration-75`}
                             >
-                                <BiHomeAlt2 className='w-6 h-6' />
+                                c:\Users\blade\AppData\Local\Temp\sdfcjkmolsdahbjnmdfvolasdfjkm\Home.svg
                                 <span className="ml-3">หน้าหลัก</span>
                             </Link>
                         </li>

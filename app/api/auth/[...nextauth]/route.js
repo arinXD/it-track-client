@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 import { NextResponse } from 'next/server'
+import { hostname } from '@/app/api/hostname'
 
 const VerifiedEmailProvider = (options) => {
     return {
@@ -40,7 +41,7 @@ const handler = NextAuth({
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials, req) {
-                const res = await fetch("http://localhost:4000/api/auth/student/signin", {
+                const res = await fetch(`${hostname}/api/auth/student/signin`, {
                     method: 'POST',
                     body: JSON.stringify(credentials),
                     headers: { "Content-Type": "application/json" }
@@ -87,7 +88,7 @@ const handler = NextAuth({
 
             if (account.provider === "google") {
                 const options = {
-                    url: 'http://localhost:4000/api/auth/student/signin/google',
+                    url: `${hostname}/api/auth/student/signin/google`,
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',

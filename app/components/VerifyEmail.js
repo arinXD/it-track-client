@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
+import { hostname } from '@/app/api/hostname'
+
 const VerifyEmail = ({ decoded }) => {
     const { email, uniqueString } = decoded
     const [isSending, setIsSending] = useState(false)
@@ -10,7 +12,7 @@ const VerifyEmail = ({ decoded }) => {
         setIsSending(true)
         // http://localhost:4000/api/auth/student/send-verification
         const axiosOption = {
-            url: 'http://localhost:4000/api/auth/student/send-verification',
+            url: `${hostname}/api/auth/student/send-verification`,
             method: 'POST',
             withCredentials: true,
             headers: {

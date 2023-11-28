@@ -68,7 +68,7 @@ const Navbar = () => {
                     </div>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                         <div className="relative ml-3">
-                            {status == "authenticated" ?
+                            {status == "authenticated" &&
                                 <div className='relative flex justify-center items-center gap-2'>
                                     <Image
                                         onClick={toggleProfile}
@@ -100,18 +100,14 @@ const Navbar = () => {
                                         </div>
                                     </div>
                                 </div>
-                                :
-                                null
                             }
                             {
-                                status == "unauthenticated" ?
-                                    <div>
-                                        <button onClick={() => signIn()} className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded active:scale-90'>
-                                            เข้าสู่ระบบ
-                                        </button>
-                                    </div>
-                                    :
-                                    null
+                                status == "unauthenticated" &&
+                                <div>
+                                    <button onClick={() => signIn()} className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded active:scale-90'>
+                                        เข้าสู่ระบบ
+                                    </button>
+                                </div>
                             }
                         </div>
                     </div>

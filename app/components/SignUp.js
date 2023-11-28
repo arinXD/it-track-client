@@ -9,6 +9,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import { Input, Card, CardBody } from "@nextui-org/react";
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
+import { hostname } from '@/app/api/hostname'
 
 export default function SignUp(props) {
     const router = useRouter()
@@ -78,7 +79,7 @@ export default function SignUp(props) {
             password,
         }
         const options = {
-            url: 'http://localhost:4000/api/auth/student/signup',
+            url: `${hostname}/api/auth/student/signup`,
             method: 'POST',
             withCredentials: true,
             headers: {
@@ -95,8 +96,8 @@ export default function SignUp(props) {
                     router.push('/email-verify/email');
                     router.refresh()
                 }
-                return
             }).catch(err => {
+                setIsSubmit(false)
                 const msg = err.response.data.message
                 const field = err.response.data.errorField
                 if (field == "email") setemailValid(true)
@@ -105,10 +106,6 @@ export default function SignUp(props) {
                 // console.log(err);
                 // console.log(error);
                 setError(msg)
-                return
-            })
-            .finally(() => {
-                setIsSubmit(false)
             })
     }
 
