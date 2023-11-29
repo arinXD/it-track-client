@@ -3,8 +3,10 @@ import React, { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname'
+import { useRouter } from 'next/navigation'
 
 const VerifyEmail = ({ decoded }) => {
+    const Router = useRouter()
     const { email, uniqueString } = decoded
     const [isSending, setIsSending] = useState(false)
     
@@ -26,9 +28,14 @@ const VerifyEmail = ({ decoded }) => {
         }
         axios(axiosOption)
             .then(async res => {
-                console.log(res.data);
+                // console.log(res.data);
             }).catch(err => {
-                console.log(err.response.data);
+                const data = err.response.data
+                console.log(data);
+                if(data.verified){
+                    Router.push("/")
+                    Router.refresh()
+                }
             }).finally(() => {
                 setIsSending(false)
             })

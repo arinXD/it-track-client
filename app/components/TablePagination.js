@@ -3,14 +3,12 @@ import { useState, useEffect } from "react";
 import React from 'react';
 import { BiSearch } from 'react-icons/bi'
 
-const TablePagination = (props) => {
+const TablePagination = ({ data }) => {
     const [searchQuery, setSearchQuery] = useState("");
-    const [data, setData] = useState(props.data);
-    const [filteredData, setFilteredData] = useState(props.data);
+    const [filteredData, setFilteredData] = useState(data);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-    const columns = Object.keys(props.data[0]);
-    // const columns = ['id', "email", 'name']
+    const columns = Object.keys(data[0]);
 
     function handleSearch(query) {
         setSearchQuery(query);

@@ -1,13 +1,14 @@
 'use client';
 import React, { useEffect, useState } from 'react'
-import { useSession, signIn, signOut } from "next-auth/react"
+import { signIn, signOut } from "next-auth/react"
 import Image from 'next/image'
 import { BiLogOut } from 'react-icons/bi';
 import Link from 'next/link';
+import { useSession } from "next-auth/react"
 
 const Navbar = () => {
     const { data: session, status } = useSession();
-    console.log("Nav session: ", session?.user);
+    // console.log("Nav session: ", session?.user);
     const [profileToggle, setProfileToggle] = useState(false)
     const toggleProfile = () => {
         setTimeout(() => {
@@ -68,7 +69,7 @@ const Navbar = () => {
                     </div>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                         <div className="relative ml-3">
-                            {status == "authenticated" &&
+                            {status == "authenticated" ? 
                                 <div className='relative flex justify-center items-center gap-2'>
                                     <Image
                                         onClick={toggleProfile}
@@ -100,6 +101,17 @@ const Navbar = () => {
                                         </div>
                                     </div>
                                 </div>
+                                :
+                                <div className='relative flex justify-center items-center gap-2'>
+                                    <Image
+                                        className='p-1 border-1 rounded-full'
+                                        // src={session?.user?.image}
+                                        src={'/image/user.png'}
+                                        width={40} height={40}
+                                        alt="user image"
+                                    />
+                                </div>
+
                             }
                             {
                                 status == "unauthenticated" &&

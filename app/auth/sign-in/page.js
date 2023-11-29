@@ -15,6 +15,13 @@ const Page = () => {
     const callbackUrl = searchParams.get('callbackUrl') ?? "/"
 
     const email = useRef(null)
+
+    useEffect(() => {
+        if (localStorage.getItem("email")) {
+            email.current.value = localStorage.getItem("email")
+        }
+    }, [])
+
     const pass = useRef(null)
     const [isProcress, setIsProcress] = useState(false)
     const [displaySignUp, setDisplaySignUp] = useState(false)
