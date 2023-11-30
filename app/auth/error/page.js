@@ -3,7 +3,7 @@ import React from 'react'
 import { useSearchParams } from 'next/navigation'
 import { SignInButton } from '@/app/components'
 
-const page = () => {
+const Page = () => {
     const searchParams = useSearchParams()
     const error = searchParams.get('error')
     return (
@@ -19,4 +19,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page
