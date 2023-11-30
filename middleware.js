@@ -14,24 +14,24 @@ const auth = withAuth(
         //     return NextResponse.redirect(url)
         // }
 
-        // if (path.startsWith("/student")
-        //     && req.nextauth.token.role !== "student") {
-        //     return NextResponse.rewrite(
-        //         new URL("/permission/kkumail.com", req.url)
-        //     )
-        // }
-        // if (path.startsWith("/teacher")
-        //     && req.nextauth.token.role !== "teacher") {
-        //     return NextResponse.rewrite(
-        //         new URL("/permission/Teacher+account", req.url)
-        //     )
-        // }
-        // if (path.startsWith("/admin")
-        //     && req.nextauth.token.role !== "admin") {
-        //     return NextResponse.rewrite(
-        //         new URL("/permission/Admin+account", req.url)
-        //     )
-        // }
+        if (path.startsWith("/student")
+            && req.nextauth.token.role !== "student") {
+            return NextResponse.rewrite(
+                new URL("/permission/kkumail.com", req.url)
+            )
+        }
+        if (path.startsWith("/teacher")
+            && req.nextauth.token.role !== "teacher") {
+            return NextResponse.rewrite(
+                new URL("/permission/Teacher+account", req.url)
+            )
+        }
+        if (path.startsWith("/admin")
+            && req.nextauth.token.role !== "admin") {
+            return NextResponse.rewrite(
+                new URL("/permission/Admin+account", req.url)
+            )
+        }
 
         return NextResponse.next()
     },
