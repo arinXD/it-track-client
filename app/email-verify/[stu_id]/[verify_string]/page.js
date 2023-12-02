@@ -8,7 +8,7 @@ const VerifyingPage = async ({ params }) => {
     const { stu_id, verify_string } = params
     const verifyingEmail = async ({ stu_id, verify_string }) => {
         const options = {
-            url: `${hostname}/api/auth/student/verify/email/${stu_id}/${verify_string}`,
+            url: `${hostname}/api/auth/verify/email/${stu_id}/${verify_string}`,
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

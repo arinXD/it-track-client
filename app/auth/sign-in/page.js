@@ -7,6 +7,7 @@ import { BsEyeFill, BsEyeSlashFill } from 'react-icons/bs';
 import Link from 'next/link';
 import { SignUp } from '@/app/components';
 import { Progress } from "@nextui-org/react";
+import { decodeToken } from '@/app/components/serverAction/TokenAction';
 // import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 
@@ -17,9 +18,15 @@ const Page = () => {
     const email = useRef(null)
 
     useEffect(() => {
-        if (localStorage.getItem("email")) {
-            email.current.value = localStorage.getItem("email")
-        }
+        const getToken = async () => {
+            if (localStorage.getItem("token")) {
+                const token = localStorage.getItem("token");
+                const value = await decodeToken(token);
+                email.current.value = value;
+            }
+        };
+
+        getToken();
     }, [])
 
     const pass = useRef(null)

@@ -11,19 +11,41 @@ const VerifiedEmailProvider = (options) => {
         name: 'Verified Email',
         type: 'credentials',
         credentials: {
-            id: { label: "uid", type: "number" },
             email: { label: 'Email', type: 'email' },
-            stu_id: { label: "Student Id", type: "text" },
-            role: { label: "Role", type: "text" },
-            image: { label: "Image", type: "text" },
-            fname: { label: "First Name", type: "text" },
-            lname: { label: "Last Name", type: "text" },
-            verification: { label: "Verification", type: "number" },
         },
         async authorize(credentials, req) {
-            console.log(credentials);
-            const { id, email, stu_id, role, image, fname, lname, verification } = credentials
-            return { id, email, stu_id, role, image, fname, lname, verification }
+            const options = {
+                url: `${hostname}/api/auth/signin/verified/email`,
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                data: {
+                    email: credentials.email
+                }
+            };
+
+            try {
+                const result = await axios(options)
+                if (result.data.userData) {
+                    const userData = result.data.userData
+                    return {
+                        id: null,
+                        name: userData.name,
+                        stu_id: userData.stu_id,
+                        email: userData.email,
+                        image: userData.image,
+                        role: userData.role,
+                        firstname: userData.fname,
+                        lastname: userData.lname,
+                        verification: userData.verification,
+                    }
+                }
+            } catch (error) {
+                const message = error.response.data.message
+                throw new Error(message)
+            }
         }
     };
 };
@@ -41,7 +63,7 @@ const handler = NextAuth({
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials, req) {
-                const res = await fetch(`${hostname}/api/auth/student/signin`, {
+                const res = await fetch(`${hostname}/api/auth/signin`, {
                     method: 'POST',
                     body: JSON.stringify(credentials),
                     headers: { "Content-Type": "application/json" }
@@ -88,7 +110,7 @@ const handler = NextAuth({
 
             if (account.provider === "google") {
                 const options = {
-                    url: `${hostname}/api/auth/student/signin/google`,
+                    url: `${hostname}/api/auth/signin/google`,
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -109,10 +131,6 @@ const handler = NextAuth({
                 } catch (error) {
                     const message = error.response.data.message
                     throw new Error(message)
-                    // console.log(message);
-                    // const homeUrl = new URL('/auth/sign-in', "http://localhost:3000/")
-                    // homeUrl.searchParams.set('error', message)
-                    // return NextResponse.redirect(homeUrl)
                 }
 
             }
