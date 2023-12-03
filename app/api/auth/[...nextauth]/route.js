@@ -33,7 +33,7 @@ const VerifiedEmailProvider = (options) => {
                     return {
                         id: null,
                         name: userData.name,
-                        stu_id: userData.stu_id,
+                        stu_id: userData.stu_id || null,
                         email: userData.email,
                         image: userData.image,
                         role: userData.role,
@@ -74,7 +74,7 @@ const handler = NextAuth({
                     return {
                         id: null,
                         name: userData.name,
-                        stu_id: userData.stu_id,
+                        stu_id: userData.stu_id || null,
                         email: userData.email,
                         image: userData.image,
                         role: userData.role,
@@ -125,7 +125,7 @@ const handler = NextAuth({
                     const result = await axios(options)
                     console.log(result.data);
                     if (result.data.data) {
-                        user.stu_id = result.data.data.stu_id
+                        user.stu_id = result.data.data.stu_id || null
                         user.role = result.data.data.role
                     }
                 } catch (error) {
