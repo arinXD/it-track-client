@@ -1,7 +1,7 @@
-'use client';
+
 // Subject.js
-import React, { useState, useEffect } from 'react';
-import { Navbar, Sidebar } from '@/app/components';
+// import React, { useState, useEffect } from 'react';
+import { Navbar, Sidebar,ExcelUpload } from '@/app/components';
 import { TablePagination } from "../components";
 import axios from "axios";
 import { hostname } from '@/app/api/hostname'
@@ -12,6 +12,7 @@ async function fetchData() {
             `${hostname}/api/subjects`
         )
         const data = result.data.data
+        if (data.length == 0) return [{ id: 1, "ข้อมูล": "ไม่มีข้อมูล" }]
         return data
     } catch (error) {
         console.log(error);
@@ -21,6 +22,7 @@ async function fetchData() {
 
 export default async function Subject() {
     const data = await fetchData()
+    console.log(data);
     return (
         <>
             <header>
@@ -32,6 +34,7 @@ export default async function Subject() {
                     <h2>Subjects:</h2>
                     <div>
                         <TablePagination data={data} />
+                        <ExcelUpload />
                     </div>
                 </div>
             </div>
