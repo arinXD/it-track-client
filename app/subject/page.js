@@ -35,7 +35,7 @@ export default async function Subject() {
                     <div>
                         <TablePagination data={data} />
                         <ExcelUpload />
-                        <p>test</p>
+                        <p>test 2</p>
                     </div>
                 </div>
             </div>
