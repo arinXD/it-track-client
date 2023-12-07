@@ -8,6 +8,7 @@ import SignInButton from "./SignInButton"
 import VerifyEmail from "./VerifyEmail"
 import VerifyLogin from "./VerifyLogin"
 import ContentWrap from "./ContentWrap"
+import ExcelUpload from "./ExcelUpload"
 
 export {
     ContentWrap,
@@ -20,4 +21,5 @@ export {
     TablePagination,
     SignUp,
     SignInButton,
+    ExcelUpload
 }
