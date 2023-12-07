@@ -15,13 +15,16 @@ const auth = withAuth(
         // }
 
         if (path.startsWith("/student")
-            && req.nextauth.token.role !== "student") {
+            && req.nextauth.token.role !== "student"
+            && req.nextauth.token.role !== "teacher"
+            && req.nextauth.token.role !== "admin") {
             return NextResponse.rewrite(
                 new URL("/permission/kkumail.com", req.url)
             )
         }
         if (path.startsWith("/teacher")
-            && req.nextauth.token.role !== "teacher") {
+            && req.nextauth.token.role !== "teacher"
+            && req.nextauth.token.role !== "admin") {
             return NextResponse.rewrite(
                 new URL("/permission/Teacher+account", req.url)
             )
@@ -51,7 +54,7 @@ export default auth
 
 export const config = {
     matcher: [
-        "/",
+        // "/",
         "/student/:path*",
         "/teacher/:path*",
         "/admin/:path*",

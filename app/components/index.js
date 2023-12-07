@@ -7,8 +7,10 @@ import HomePage from "./HomePage"
 import SignInButton from "./SignInButton"
 import VerifyEmail from "./VerifyEmail"
 import VerifyLogin from "./VerifyLogin"
+import ContentWrap from "./ContentWrap"
 
 export {
+    ContentWrap,
     VerifyLogin,
     VerifyEmail,
     AuthProvider,

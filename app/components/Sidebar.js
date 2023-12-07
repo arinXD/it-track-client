@@ -11,71 +11,71 @@ const Sidebar = () => {
     const url = usePathname();
     return (
         <>
-            <aside style={{ top: "65px" }} id="default-sidebar" className="border-r fixed top-16 left-0 z-10 w-72 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+            <aside style={{ top: "65px" }} id="default-sidebar" className="border-r fixed top-16 left-0 z-10 w-[240px] h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
                 <div className="h-full px-3 py-4 lg:px-5 overflow-y-auto bg-white">
                     <ul className="font-medium space-y-1">
                         <li className="">
                             <Link href={"/"}
-                                className={`${url == "/" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group`}
+                                className={`${url == "/" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
                                 <Home
-                                    className="w-5 h-5 group-hover:text-white duration-150 transition"
+                                    className="w-5 h-5"
                                     set="bulk" stroke="bold" />
-                                <span className="ml-[8px]">หน้าหลัก</span>
+                                <span className="ml-3 text-sm">หน้าหลัก</span>
                             </Link>
                         </li>
                         <li className="">
                             <Link href={"/student/tracks"}
-                                className={`${url == "/student/tracks" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group`}
+                                className={`${url == "/student/tracks" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
                                 <HiMiniUserGroup
-                                    className="w-5 h-5 group-hover:text-white duration-150 transition" />
-                                <span className="ml-3">คัดเลือกความเชี่ยวชาญ</span>
+                                    className="w-5 h-5" />
+                                <span className="ml-3 text-sm">คัดเลือกความเชี่ยวชาญ</span>
                             </Link>
                         </li>
                         <li className="">
                             <Link href={"/student/tracks/exam"}
-                                className={`${url == "/student/tracks/exam" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group`}
+                                className={`${url == "/student/tracks/exam" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
                                 <MdQuiz
-                                    className="w-5 h-5 group-hover:text-white duration-150 transition" />
-                                <span className="ml-3">หาแทรคที่เหมาะสม</span>
+                                    className="w-5 h-5" />
+                                <span className="ml-3 text-sm">หาแทรคที่เหมาะสม</span>
                             </Link>
                         </li>
                         <li className="">
                             <Link href={"/student/verify"}
-                                className={`${url == "/student/verify" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group`}
+                                className={`${url == "/student/verify" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
-                                <HiAcademicCap className="w-5 h-5 group-hover:text-white duration-150 transition" />
-                                <span className="ml-3">ตรวจสอบสำเร็จการศึกษา</span>
+                                <HiAcademicCap className="w-5 h-5" />
+                                <span className="ml-3 text-sm">ตรวจสอบสำเร็จการศึกษา</span>
                             </Link>
                         </li>
                         <li className="">
                             <Link href={"/pro"}
-                                className={`${url == "/pro" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group`}
+                                className={`${url == "/pro" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
-                                <span className="ml-3">ทดสอบ API</span>
+                                <span className="ml-3 text-sm">ทดสอบ API</span>
                             </Link>
                         </li>
                         <li className="">
                             <Link href={"/student"}
-                                className={`${url == "/student" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group`}
+                                className={`${url == "/student" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
-                                <span className="ml-3">นักศึกษา</span>
+                                <span className="ml-3 text-sm">นักศึกษา</span>
                             </Link>
                         </li>
                         <li className="">
                             <Link href={"/teacher"}
-                                className={`${url == "/teacher" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group`}
+                                className={`${url == "/teacher" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
-                                <span className="ml-3">อาจารย์</span>
+                                <span className="ml-3 text-sm">อาจารย์</span>
                             </Link>
                         </li>
                         <li className="">
                             <Link href={"/admin"}
-                                className={`${url == "/admin" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group`}
+                                className={`${url == "/admin" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
-                                <span className="ml-3">Admin</span>
+                                <span className="ml-3 text-sm">Admin</span>
                             </Link>
                         </li>
                         {/* Loop but low perfomance */}

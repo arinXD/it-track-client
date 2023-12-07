@@ -7,16 +7,34 @@ import { BsEyeFill, BsEyeSlashFill } from 'react-icons/bs';
 import Link from 'next/link';
 import { SignUp } from '@/app/components';
 import { Progress } from "@nextui-org/react";
-import { decodeToken } from '@/app/components/serverAction/TokenAction';
+import { signToken, decodeToken } from '@/app/components/serverAction/TokenAction';
 // import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 
 const Page = () => {
+    const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get('callbackUrl') ?? "/"
 
     const email = useRef(null)
+    const pass = useRef(null)
+    const [isProcress, setIsProcress] = useState(false)
+    const [displaySignUp, setDisplaySignUp] = useState(false)
+    const { data: session } = useSession();
+    const [error, setError] = useState(false)
+    const [emptyEmail, setEmptyEmail] = useState(false)
+    const [emptyPass, setEmptyPass] = useState(false)
+    const [displayPass, setDisplayPass] = useState(false)
+    /******************
+    * Progess state
+    ******************/
+    const [value, setValue] = useState(0);
+    let timeoutError;
+    let progressInterval
 
+    // =================
+    // Auto fill email
+    // =================
     useEffect(() => {
         const getToken = async () => {
             if (localStorage.getItem("token")) {
@@ -29,32 +47,25 @@ const Page = () => {
         getToken();
     }, [])
 
-    const pass = useRef(null)
-    const [isProcress, setIsProcress] = useState(false)
-    const [displaySignUp, setDisplaySignUp] = useState(false)
-
-    const router = useRouter()
-
-    const { data: session } = useSession();
-    const [error, setError] = useState(false)
-    const [emptyEmail, setEmptyEmail] = useState(false)
-    const [emptyPass, setEmptyPass] = useState(false)
-    const [displayPass, setDisplayPass] = useState(false)
-    // progress
-    const [value, setValue] = React.useState(0);
-    let timeoutError;
-    let progressInterval
-
+    // ===========================
+    // Toast notify
+    // ===========================
     // toast
     // const notify = (params) => toast.error(params, {
     //     position: toast.POSITION.TOP_CENTER,
     // });;
 
+    // ===========================
+    // Close modal sign up
+    // ===========================
     const closeModal = () => {
         setDisplaySignUp(false);
     }
 
-    React.useEffect(() => {
+    // ===========================
+    // Handler progress interval
+    // ===========================
+    useEffect(() => {
         setValue(0)
         progressInterval = setInterval(() => {
             setValue((v) => (v >= 100 ? 0 : v + 4.2));
@@ -63,6 +74,9 @@ const Page = () => {
         return () => clearInterval(progressInterval);
     }, [error]);
 
+    // ======================
+    // Credentails sign in
+    // ======================
     const signInCredentials = async (event) => {
         setIsProcress(true)
         setEmptyEmail(false)
@@ -93,8 +107,8 @@ const Page = () => {
             return
         }
         const result = await signIn("credentials", {
-            email: email.current.value,
-            password: pass.current.value,
+            email: eValue,
+            password: pValue,
             redirect: false,
             callbackUrl: callbackUrl,
         })
@@ -102,23 +116,33 @@ const Page = () => {
         if (!result.ok) {
             // console.log(result);
             setError(result.error)
+        } else {
+            localStorage.setItem("token", await signToken({ email: eValue }))
         }
     }
 
+    // ======================
+    // Google sign in
+    // ======================
     const signInGoogle = async () => {
-        const result = await signIn("google", {
+        await signIn("google", {
             redirect: false,
             callbackUrl: callbackUrl,
         })
-        console.log(result);
     }
 
+    // ======================
+    // If error then Got cha!!
+    // ======================
     useEffect(() => {
         if (searchParams.get('error')) {
             setError(searchParams.get('error'))
         }
     }, [])
 
+    // ======================
+    // Redirect if has session
+    // ======================
     useEffect(() => {
         if (session) {
             router.push(callbackUrl);
@@ -126,6 +150,9 @@ const Page = () => {
         }
     }, [session, router]);
 
+    // ======================
+    // Handler error timing
+    // ======================
     useEffect(() => {
         if (error) {
             timeoutError = setTimeout(() => {

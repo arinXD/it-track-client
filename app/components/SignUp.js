@@ -145,7 +145,7 @@ export default function SignUp(props) {
     // ======================
     // Cleat error
     // ======================
-    async function clearError(params) {
+    async function clearError() {
         setFnameValid(false)
         setLnameValid(false)
         setemailValid(false)

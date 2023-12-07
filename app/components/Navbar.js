@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react'
 import { signIn, signOut } from "next-auth/react"
 import Image from 'next/image'
-import { BiLogOut } from 'react-icons/bi';
 import Link from 'next/link';
 import { useSession } from "next-auth/react"
+import { RiSettings5Fill } from "react-icons/ri";
+import { MdOutlineLogout } from "react-icons/md";
 
 const Navbar = () => {
     const { data: session, status } = useSession();
@@ -44,7 +45,7 @@ const Navbar = () => {
                             </svg>
                         </button>
                     </div>
-                    <div className="flex flex-1 items-center justify-center sm:justify-start">
+                    <div className="flex flex-1 items-center justify-center sm:justify-start gap-4">
                         <div className="flex flex-shrink-0 items-center">
                             <Link href="/" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white group">
                                 <img className="h-8 w-auto" src="/logo.png" alt="it kku" />
@@ -52,14 +53,20 @@ const Navbar = () => {
                             </Link>
                         </div>
                         <div className="hidden sm:ml-6 sm:block">
-                            <div className="flex space-x-4">
-                                {/* {links.map(link => (
-                                    <Link key={link.link}
-                                        className={(url == link.link) ? "bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" : "text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"}
-                                        href={link.link}>
-                                        {link.label}
-                                    </Link>
-                                ))} */}
+                            <div className="">
+                                <form>
+                                    <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only">Search</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                            <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                            </svg>
+                                        </div>
+                                        <input type="search" id="default-search" className="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none" placeholder="Search somthing..." required />
+                                        {/* <button type="submit" className="text-white absolute end-1.5 bottom-1.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-1">Search</button> */}
+                                    </div>
+                                </form>
+
                                 {/* <a href="#" className="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Dashboard</a>
                                 <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Team</a>
                                 <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Projects</a>
@@ -67,10 +74,16 @@ const Navbar = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
                         <div className="relative ml-3">
-                            {status == "authenticated" ? 
-                                <div className='relative flex justify-center items-center gap-2'>
+                            {status == "authenticated" ?
+                                <div className='relative flex justify-center items-center gap-5'>
+                                    {
+                                        session?.user?.role === "admin" &&
+                                        <Link href="/admin" className="bg-amber-500 text-white rounded-md px-3 py-2 text-sm font-medium">
+                                            Admin panel
+                                        </Link>
+                                    }
                                     <Image
                                         onClick={toggleProfile}
                                         className='rounded-full border-1 border-slate-300 active:scale-90 cursor-pointer'
@@ -95,21 +108,33 @@ const Navbar = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className='flex gap-3 cursor-pointer' onClick={() => signOut()}>
-                                            <BiLogOut className='w-6 h-6' />
+                                        <div className='flex gap-3 cursor-pointer mb-1 rounded-md p-2 hover:bg-gray-200'>
+                                            <div className='p-[.3rem] bg-gray-800 text-white rounded-full'>
+                                                <RiSettings5Fill className='w-6 h-6' />
+                                            </div>
+                                            <button className=''>cPanel</button>
+                                        </div>
+                                        <div className='flex gap-3 cursor-pointer rounded-md p-2 hover:bg-gray-200' onClick={() => signOut()}>
+                                            <div className='p-[.3rem] bg-gray-800 text-white rounded-full'>
+                                                {/* <FontAwesomeIcon icon="fa-solid fa-right-from-bracket" /> */}
+                                                <MdOutlineLogout className='w-6 h-6' />
+                                            </div>
                                             <button className=''>Sign out</button>
                                         </div>
                                     </div>
                                 </div>
                                 :
                                 <div className='relative flex justify-center items-center gap-2'>
-                                    <Image
+                                    {/* <Image
                                         className='p-1 border-1 rounded-full'
                                         // src={session?.user?.image}
                                         src={'/image/user.png'}
                                         width={40} height={40}
                                         alt="user image"
-                                    />
+                                    /> */}
+                                    <div className='w-[40px] h-[40px] border-1 rounded-full bg-gray-200'>
+
+                                    </div>
                                 </div>
 
                             }
