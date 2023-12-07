@@ -14,7 +14,7 @@ const VerifyEmail = ({ decoded }) => {
         setIsSending(true)
         // http://localhost:4000/api/auth/student/send-verification
         const axiosOption = {
-            url: `${hostname}/api/auth/student/send-verification`,
+            url: `${hostname}/api/auth/send-verification`,
             method: 'POST',
             withCredentials: true,
             headers: {

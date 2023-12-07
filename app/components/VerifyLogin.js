@@ -39,10 +39,10 @@ const VerifyLogin = ({ verifyData }) => {
     useEffect(() => {
         const setVerifyData = async () => {
             if (verifyData.userData) {
-                const { id, stu_id, role, email, image, fname, lname, verification } = verifyData.userData
+                const { email } = verifyData.userData
                 console.log("verify child", verifyData.userData);
                 await signIn("verifiedEmail", {
-                    id, email, stu_id, role, image, fname, lname, verification,
+                    email,
                     redirect: true,
                     callbackUrl: "/",
                 })

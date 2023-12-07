@@ -6,7 +6,7 @@ export default function PageNotFound({ params }) {
     return (
         <>
             <section className="page_404" >
-                <div style={{ margin: '0 auto' }}>
+                <div className="mx-auto">
                     <div className="row">
                         <div className="col-sm-12 ">
                             <div className="col-sm-10 col-sm-offset-1 text-center">

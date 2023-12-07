@@ -6,30 +6,45 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link';
 import { NextUIProvider } from "@nextui-org/react";
-import { Input, Card, CardBody } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname'
+import { signToken } from './serverAction/TokenAction';
+import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import { styled } from '@mui/material/styles';
+
 
 export default function SignUp(props) {
+    const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+        height: 6,
+        borderRadius: 5,
+        [`&.${linearProgressClasses.colorPrimary}`]: {
+            backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
+        },
+        [`& .${linearProgressClasses.bar}`]: {
+            borderRadius: 5,
+            backgroundColor: strength.color,
+        },
+    }));
+
     const router = useRouter()
     let timeoutError;
     const eyeClass = 'w-5 h-5 text-gray-400 cursor-pointer'
     const [isSubmit, setIsSubmit] = useState(false)
+
     const [error, setError] = useState(false)
     const [displayPass, setDisplayPass] = useState(false)
     const [displayCon, setDisplayCon] = useState(false)
-    const [displayTips, setDisplayTips] = useState(false)
 
     const [fname, setFname] = useState("");
     const [lname, setLname] = useState("");
-    const [stuId, setStuId] = useState("");
     const [email, setemail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPass, setConfirmPass] = useState("");
+
     const [fValid, setFnameValid] = useState(null);
     const [lvalid, setLnameValid] = useState(null);
-    const [stuIdvalid, setStuIdValid] = useState(null);
     const [emailvalid, setemailValid] = useState(null);
     const [passwordvalid, setPasswordValid] = useState(null);
     const [confirmPassvalid, setConfirmPassValid] = useState(null);
@@ -39,6 +54,9 @@ export default function SignUp(props) {
         else setValue(false)
     }
 
+    // ======================
+    // Call sign up
+    // ======================
     async function onCreate(event) {
         event.preventDefault()
         // // test
@@ -48,14 +66,12 @@ export default function SignUp(props) {
         setIsSubmit(true)
         checkEmpty(fname, setFnameValid)
         checkEmpty(lname, setLnameValid)
-        checkEmpty(stuId, setStuIdValid)
         checkEmpty(email, setemailValid)
         checkEmpty(password, setPasswordValid)
         checkEmpty(confirmPass, setConfirmPassValid)
 
         if (!(fname
             && lname
-            && stuId
             && email
             && password
             && confirmPass)) {
@@ -71,15 +87,13 @@ export default function SignUp(props) {
             return
         }
         const data = {
-            stu_id: stuId,
             fname,
             lname,
-            stuId,
             email,
             password,
         }
         const options = {
-            url: `${hostname}/api/auth/student/signup`,
+            url: `${hostname}/api/auth/signup`,
             method: 'POST',
             withCredentials: true,
             headers: {
@@ -89,26 +103,31 @@ export default function SignUp(props) {
             data: data,
         };
 
+        // ======================
+        // Sign up api
+        // ======================
         axios(options)
             .then(async (res) => {
                 if (res.status == 201) {
-                    // localStorage.setItem("email", email)
+                    localStorage.setItem("token", await signToken(data))
                     router.push('/email-verify/email');
                     router.refresh()
                 }
             }).catch(err => {
+                // console.log();
+                // console.log(err);
+                // console.log(error);
                 setIsSubmit(false)
                 const msg = err.response.data.message
                 const field = err.response.data.errorField
                 if (field == "email") setemailValid(true)
-                if (field == "stu_id") setStuIdValid(true)
-                // console.log();
-                // console.log(err);
-                // console.log(error);
                 setError(msg)
             })
     }
 
+    // ======================
+    // Error timing
+    // ======================
     useEffect(() => {
         if (error) {
             timeoutError = setTimeout(() => {
@@ -123,14 +142,77 @@ export default function SignUp(props) {
         };
     }, [error]);
 
-    async function clearError(params) {
+    // ======================
+    // Cleat error
+    // ======================
+    async function clearError() {
         setFnameValid(false)
         setLnameValid(false)
-        setStuIdValid(false)
         setemailValid(false)
         setPasswordValid(false)
         setConfirmPassValid(false)
     }
+
+    // ======================
+    // Password strength
+    // ======================
+    const strengthColorList = {
+        red: "#ef4444",
+        yellow: "#facc15",
+        green: "#15803d",
+    }
+    const getPasswordStrength = (password) => {
+        let strength = 0;
+
+        if (password.length >= 8) {
+            strength++;
+        }
+        if (/[0-9]/.test(password)) {
+            strength++;
+        }
+        if (/[A-Z]/.test(password)) {
+            strength++;
+        }
+        if (/[a-zก-๛!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+            strength++;
+        }
+
+        return strength;
+    };
+    const [strength, setStrength] = useState({
+        text: 'Password strength',
+        color: "",
+        value: 0
+    });
+
+    useEffect(() => {
+        const strengthValue = getPasswordStrength(password);
+
+        let text, color;
+        if (strengthValue === 1) {
+            text = 'ง่าย';
+            color = strengthColorList.red;
+        } else if (strengthValue === 2) {
+            text = 'ปานกลาง';
+            color = strengthColorList.yellow;
+        } else if (strengthValue === 3) {
+            text = 'ยาก';
+            color = strengthColorList.green;
+        } else if (strengthValue >= 4) {
+            text = 'ยากมาก';
+            color = strengthColorList.green;
+        } else {
+            text = 'ความยากของรหัสผ่าน';
+            color = '';
+        }
+
+        setStrength({
+            text: text,
+            color,
+            value: (strengthValue / 4) * 100,
+        });
+        // console.log(strength);
+    }, [password])
     return (
         <NextUIProvider>
             <div className='sm:p-8 relative'>
@@ -179,40 +261,6 @@ export default function SignUp(props) {
                                     autoComplete="last name" />
                             </div>
                         </div>
-                        <div className='relative'>
-                            <div className='mb-1 flex items-center'>
-                                <label className='text-sm text-gray-600'>รหัสประจำตัวนักศึกษามหาวิทยาลัยขอนแก่น</label>
-                                <div className='inline-block ms-1'>
-                                    <AiFillQuestionCircle
-                                        onMouseOver={() => setDisplayTips(true)}
-                                        onMouseOut={() => setDisplayTips(false)}
-                                        className='cursor-pointer' />
-                                    {displayTips ?
-                                        <div className='absolute z-50'>
-                                            <Card>
-                                                <CardBody>
-                                                    <p className='te text-default-foreground text-sm'>ตัวอย่าง 643020423-0</p>
-                                                </CardBody>
-                                            </Card>
-                                        </div>
-                                        :
-                                        null
-                                    }
-                                    <div>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <Input
-                                value={stuId}
-                                onValueChange={setStuId}
-                                isInvalid={stuIdvalid}
-                                label="รหัสประจำตัวนักศึกษา (มีขีด)"
-                                size="md"
-                                type="text"
-                                autoComplete="student id"
-                                pattern='^[0-9]{9}-[0-9]{1}$' />
-                        </div>
                         <div>
                             <Input
                                 value={email}
@@ -251,6 +299,20 @@ export default function SignUp(props) {
                                     </div>
                                 } />
                         </div>
+                        {
+                            strength.value > 0 &&
+                            <div className='px-1'>
+                                <p className='mb-2 text-sm text-gray-600 text-end'>
+                                    ความยากของรหัสผ่านต้อง <strong>ปานกลาง</strong> ขึ้นไป
+                                </p>
+                                <BorderLinearProgress variant="determinate"
+                                    value={strength.value} />
+                                <p className="text-sm mt-1 text-gray-600 text-end">
+                                    ระดับ: <strong>{strength.text}</strong>
+                                </p>
+                            </div>
+                        }
+
                         <div className='relative select-none'>
                             <Input
                                 value={confirmPass}
