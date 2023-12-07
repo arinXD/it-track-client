@@ -78,6 +78,13 @@ const Sidebar = () => {
                                 <span className="ml-3 text-sm">Admin</span>
                             </Link>
                         </li>
+                        <li className="">
+                            <Link href={"/subject"}
+                                className={`${url == "/subject" ? "bg-blue-500 font-bold text-white" : "text-gray-900"} py-3 flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white group`}
+                            >
+                                <span className="ml-3">เพิ่มวิชา</span>
+                            </Link>
+                        </li>
                         {/* Loop but low perfomance */}
                         {/* {links.map(link => (
                             <li key={link.link}>
