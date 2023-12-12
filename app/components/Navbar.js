@@ -75,12 +75,12 @@ const Navbar = () => {
                         </div>
                     </div>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
-                        <div className="relative ml-3">
+                        <div className="relative ml-3 flex flex-row gap-3">
                             {status == "authenticated" ?
                                 <div className='relative flex justify-center items-center gap-5'>
                                     {
                                         session?.user?.role === "admin" &&
-                                        <Link href="/admin" className="bg-amber-500 text-white rounded-md px-3 py-2 text-sm font-medium">
+                                        <Link href="/admin" className="bg-amber-400 text-white rounded-md px-3 py-2 text-sm font-medium">
                                             Admin panel
                                         </Link>
                                     }

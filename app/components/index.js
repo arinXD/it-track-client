@@ -9,8 +9,9 @@ import VerifyEmail from "./VerifyEmail"
 import VerifyLogin from "./VerifyLogin"
 import ContentWrap from "./ContentWrap"
 import ExcelUpload from "./ExcelUpload"
-
+import BreadCrumb from "./BreadCrumb"
 export {
+    BreadCrumb,
     ContentWrap,
     VerifyLogin,
     VerifyEmail,

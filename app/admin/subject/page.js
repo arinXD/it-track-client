@@ -1,8 +1,7 @@
 
 // Subject.js
 // import React, { useState, useEffect } from 'react';
-import { Navbar, Sidebar,ExcelUpload } from '@/app/components';
-import { TablePagination } from "../components";
+import { Navbar, Sidebar,ExcelUpload, TablePagination } from '@/app/components';
 import axios from "axios";
 import { hostname } from '@/app/api/hostname'
 
@@ -22,7 +21,6 @@ async function fetchData() {
 
 export default async function Subject() {
     const data = await fetchData()
-    console.log(data);
     return (
         <>
             <header>

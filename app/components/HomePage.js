@@ -1,9 +1,8 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import TablePagination from './TablePagination';
+import { Navbar, Sidebar, ContentWrap, TablePagination } from '@/app/components'
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { Navbar, Sidebar, ContentWrap } from '@/app/components'
 
 const HomePage = ({ data }) => {
     useEffect(() => {
