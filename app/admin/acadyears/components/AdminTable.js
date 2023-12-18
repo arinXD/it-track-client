@@ -1,12 +1,13 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import React from 'react';
 import { BiSearch } from 'react-icons/bi';
-import { Button, Input } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import { PlusIcon, EditIcon, DeleteIcon } from "@/app/components/icons";
-import { destroyAcadYear } from './action';
-import { useRouter, usePathname } from 'next/navigation'
+import { destroyAcadYear, destroyMultipleAcadYear } from './action';
+import Swal from 'sweetalert2'
+import { HiOutlineDotsVertical } from "react-icons/hi";
 
 function checkCurrentYear(year) {
     const currentYear = new Date().getFullYear();
@@ -21,25 +22,103 @@ function checkCurrentYear(year) {
     }
 }
 
-
-export default function AdminTable({ data, pathname, onOpen }) {
-
-    async function handlerDestroy(id) {
-        const result = await destroyAcadYear(id)
-        if (result) {
-            console.log(result);
-            console.log(url);
-            router.push(url);
-        }
-    }
-    
-    const router = useRouter()
-    const url = usePathname();
+export default function AdminTable({
+    data,
+    onOpenCreate, showToastMessage,
+    onOpenUpdate, callUpdate,
+}) {
+    const [initData, setInitData] = useState({})
+    const [processStatus, setProcessStatus] = useState(false)
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState(data);
     const [currentPage, setCurrentPage] = useState(1);
+    const [checkedAll, setcheckedAll] = useState(false)
     const itemsPerPage = 10;
-    const columns = Object.keys(data[0]);
+    let columns
+    const modalRef = useRef()
+
+    if (data.length > 0) {
+        columns = Object.keys(data[0]);
+    } else {
+        columns = []
+    }
+
+    function clearInitData() {
+        setInitData((prevData) => {
+            const newData = { ...prevData };
+            Object.keys(newData).forEach((acadyear) => {
+                newData[acadyear] = false;
+            });
+            return newData;
+        });
+    }
+
+    useEffect(() => {
+        let initData = {}
+        data.map(e => {
+            initData[e.acadyear] = false
+        })
+        setFilteredData(data)
+        clearInitData()
+    }, [data])
+
+    useEffect(() => {
+        function checkIfClickedOutside(e) {
+            if (modalRef.current && !modalRef.current.contains(e.target)) {
+                clearInitData()
+            }
+        }
+        document.addEventListener("click", checkIfClickedOutside)
+        return () => {
+            document.removeEventListener("click", checkIfClickedOutside)
+        }
+    })
+
+    useEffect(() => {
+        const checkBoxs = document.querySelectorAll('.acadCheckbox')
+        let status
+        if (checkedAll) {
+            status = true
+        } else {
+            status = false
+        }
+        for (const checkBox of checkBoxs) {
+            checkBox.checked = status
+        }
+    }, [checkedAll])
+
+    async function handlerDestroy(id) {
+        setProcessStatus(prevStatus => ({ ...prevStatus, [id]: true }));
+        const result = await destroyAcadYear(id);
+        setProcessStatus(prevStatus => ({ ...prevStatus, [id]: false }));
+        return result
+    }
+    async function handlerMultipleDestroy() {
+        const form = document.forms["multipleDelete"]
+        const acadCheckbox = form.querySelectorAll(".acadCheckbox")
+        let formData = []
+        acadCheckbox.forEach(e => {
+            if (e.checked) {
+                formData.push(e.value);
+            }
+        });
+        if (!formData.length) return
+        Swal.fire({
+            // title: `ต้องการลบปีการศึกษา ${e["acadyear"]} หรือไม่ ?`,
+            text: `ต้องการลบปีการศึกษา ${formData.join(", ")} หรือไม่ ?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const { ok, message } = await destroyMultipleAcadYear(formData)
+                showToastMessage(ok, message)
+            }
+        });
+    }
 
     function handleSearch(query) {
         setSearchQuery(query);
@@ -56,6 +135,19 @@ export default function AdminTable({ data, pathname, onOpen }) {
             setFilteredData(data);
         }
     }
+
+    function handleIconClick(acadyear) {
+        if (initData[acadyear]) {
+            clearInitData()
+        } else {
+            clearInitData()
+            setInitData((prevData) => ({
+                ...prevData,
+                [acadyear]: !prevData[acadyear],
+            }));
+        }
+    };
+
 
     const totalItems = filteredData.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -81,81 +173,163 @@ export default function AdminTable({ data, pathname, onOpen }) {
                         onChange={(e) => handleSearch(e.target.value)}
                     />
                 </div>
-                <Button onPress={onOpen} color="primary" endContent={<PlusIcon />}>
+                <Button onPress={onOpenCreate} color="primary" startContent={<PlusIcon className={'w-6 h-6 text-white'} />}>
                     Add New
                 </Button>
+                <Button onClick={handlerMultipleDestroy} className="bg-red-400 text-white" startContent={<DeleteIcon className={'w-5 h-5 text-white'} />}>
+                    Delete select
+                </Button>
             </div>
-            <table className="overflow-hidden w-full text-sm text-left text-gray-500">
-                <thead className="text-xs bg-gray-50">
-                    <tr>
-                        <th key="no" className="px-6 py-3">
-                            No.
-                        </th>
-                        {columns.map((column, index) => (
-                            <th key={column} className="px-6 py-3">
-                                {column}
-                            </th>
-                        ))}
-                        <th key="action" className="px-6 py-3" colSpan={2}>
-                            Action
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {totalItems > 0 ? (
-                        currentData.map((e, i) => (
-                            <tr key={i} className="bg-white border-b">
-                                <td
-                                    key={`number-${i}`}
-                                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-                                >
-                                    {i + 1}
-                                </td>
-                                {columns.map((column, index) => (
-                                    <td
-                                        key={`${column}-${i}`}
-                                        className="text-gray-900 px-6 py-4"
-                                    >
-                                        {
-                                            // current year
-                                            column === "acadyear" ?
-                                                (<>{e[column]} {checkCurrentYear(e[column])}</>)
+            <form name="multipleDelete">
+                <table className="w-full overflow-y-auto text-sm text-left text-gray-500">
+                    {
+                        data.length > 0 ?
+                            (<>
+                                <thead className="text-xs bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3">
+                                            <input type="checkbox" onChange={() => setcheckedAll(!checkedAll)} />
+                                        </th>
+                                        <th key="no" className="px-6 py-3">
+                                            No.
+                                        </th>
+                                        {columns.map((column, index) => (
+                                            <th key={column} className="px-6 py-3">
+                                                {column}
+                                            </th>
+                                        ))}
+                                        <th key="action" className="px-6 py-3 text-center" colSpan={2}>
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {totalItems > 0 ? (
+                                        currentData.map((e, i) => (
+                                            <tr key={i} className="bg-white border-b">
+                                                <td className="px-6 py-4">
+                                                    <input
+                                                        className="acadCheckbox"
+                                                        type="checkbox"
+                                                        name="acadyears[]"
+                                                        value={e["acadyear"]} />
+                                                </td>
+                                                <td
+                                                    key={`number-${i}`}
+                                                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                                                >
+                                                    {i + 1}
+                                                </td>
+                                                {columns.map((column, index) => (
+                                                    <td
+                                                        key={`${column}-${i}`}
+                                                        className="text-gray-900 px-6 py-4"
+                                                    >
+                                                        {
+                                                            // current year
+                                                            column === "acadyear" ?
+                                                                (<>{e[column]} {checkCurrentYear(e[column])}</>)
+                                                                :
+                                                                (<>{e[column]}</>)
+                                                        }
+                                                    </td>
+                                                ))}
+                                                <td className="text-center" key={`action-${i}`}>
+                                                    <div className="relative flex items-center justify-center cursor-pointer">
+                                                        {/* <div className="p-1 bg-gray-700 text-white active:scale-90 border rounded-full">
+                                                    </div> */}
+                                                        <HiOutlineDotsVertical
+                                                            onClick={() => handleIconClick(e.acadyear)}
+                                                            className="w-6 h-6 active:scale-90" />
+                                                        {
+                                                            initData[e["acadyear"]] &&
+                                                            <div
+                                                                ref={modalRef}
+                                                                className={`absolute z-50 select-none 
+                                                            flex flex-col items-start justify-center 
+                                                            gap-1 p-2 top-5 border border-gray-200 bg-white
+                                                            rounded-md
+                                                            `}>
+                                                                <button
+                                                                    type="button"
+                                                                    className="w-full flex flex-row py-1 px-2 gap-2 justify-start items-center hover:border-s-2 hover:border-gray-600"
+                                                                    onClick={
+                                                                        async () => {
+                                                                            await callUpdate(e["acadyear"])
+                                                                            onOpenUpdate()
+                                                                        }
+                                                                    }
+                                                                >
+                                                                    <EditIcon className={"w-7 h-7"} />
+                                                                    <p className="w-full text-start">
+                                                                        Edit
+                                                                    </p>
+                                                                </button>
+                                                                <button type="button" className="w-full flex flex-row py-1 px-2 gap-2 justify-start items-center group hover:border-s-2 hover:border-red-400"
+                                                                    onClick={() => {
+                                                                        Swal.fire({
+                                                                            // title: `ต้องการลบปีการศึกษา ${e["acadyear"]} หรือไม่ ?`,
+                                                                            text: `ต้องการลบปีการศึกษา ${e["acadyear"]} หรือไม่ ?`,
+                                                                            icon: "warning",
+                                                                            showCancelButton: true,
+                                                                            confirmButtonColor: "#3085d6",
+                                                                            cancelButtonColor: "#d33",
+                                                                            confirmButtonText: "ตกลง",
+                                                                            cancelButtonText: "ยกเลิก"
+                                                                        }).then(async (result) => {
+                                                                            if (result.isConfirmed) {
+                                                                                const { ok, message } = await handlerDestroy(e["acadyear"])
+                                                                                showToastMessage(ok, message)
+                                                                            }
+                                                                        });
 
-                                                :
-                                                (<>{e[column]}</>)
-                                        }
-                                    </td>
-                                ))}
-                                <td key={`action-${i}`}>
-                                    <div className="flex flex-row items-center gap-3">
-                                        <Link href={`${pathname}/${e["acadyear"]}`}>
-                                            <Button className="bg-yellow-300" startContent={<EditIcon className="w-5 h-5" />}>
-                                                Edit
-                                            </Button>
-                                        </Link>
-
-                                        <Link href={"#"}>
-                                            <Button onClick={() => handlerDestroy(e["acadyear"])} className="bg-red-500 text-white" startContent={<DeleteIcon className="w-5 h-5" />}>
-                                                Delete
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr key="no-data" className="bg-white border-b">
-                            <td
-                                key="data-action"
-                                colSpan={columns.length}
-                                className="text-gray-900 px-6 py-4 text-center"
-                            >
-                                No data available
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                                                                    }}
+                                                                    disabled={processStatus[e["acadyear"]]}
+                                                                >
+                                                                    <DeleteIcon className="w-7 h-7 text-red-400 group-hover:text-whites" />
+                                                                    <p className="w-full text-red-400 text-start group-hover:text-whites">
+                                                                        {processStatus[e["acadyear"]] ? "Deleting..." : "Delete"}
+                                                                    </p>
+                                                                </button>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr key="no-data" className="bg-white border-b">
+                                            <td
+                                                key="data-action"
+                                                colSpan={columns.length + 2}
+                                                className="text-gray-900 px-6 py-4 text-center"
+                                            >
+                                                No data available
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </>)
+                            :
+                            (<>
+                                <thead className="text-xs bg-gray-50">
+                                    <tr>
+                                        <th key="no" className="px-6 py-3 text-center">
+                                            acadyears
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="bg-white border-b">
+                                        <td className="text-gray-900 px-6 py-4 text-center">
+                                            ไม่มีข้อมูลปีการศึกษา
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </>)
+                    }
+                </table>
+            </form>
             <div className="flex items-center justify-between border-t">
                 <div className="flex flex-1 justify-between sm:hidden">
                     <button
@@ -266,6 +440,6 @@ export default function AdminTable({ data, pathname, onOpen }) {
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };

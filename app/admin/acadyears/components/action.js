@@ -1,12 +1,11 @@
 "use server"
 import axios from "axios"
 import { hostname } from "@/app/api/hostname"
-import { getServerSession } from 'next-auth';
-import { signToken } from '@/app/components/serverAction/TokenAction'
+import { getToken } from '@/app/components/serverAction/TokenAction'
+import { revalidatePath } from "next/cache"
 
-export async function createAcadYear(prevState, formData) {
-    const session = await getServerSession()
-    const token = await signToken({ email: session.user.email })
+export async function createAcadYear(formData) {
+    const token = await getToken()
     const acadyear = formData.get("acadyear")
     try {
         const options = {
@@ -22,24 +21,73 @@ export async function createAcadYear(prevState, formData) {
             }
         };
         const result = await axios(options)
-        console.log(result);
-        return { message: "done" }
+        revalidatePath("/admin/acadyears");
+        return result.data;
+
     } catch (error) {
         const message = error.response.data.message
-        return { message: message }
+        return {
+            ok: false,
+            message: message
+        }
     }
 }
-
+export async function updateAcadYear(formData) {
+    const token = await getToken()
+    const oldAcadyear = formData.get("oldAcadyear")
+    const acadyear = formData.get("newAcadyear")
+    try {
+        const options = {
+            url: `${hostname}/api/acadyear/${oldAcadyear}`,
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                "authorization": `${token}`,
+            },
+            data: {
+                acadyear
+            }
+        };
+        const result = await axios(options)
+        revalidatePath("/admin/acadyears");
+        return result.data
+    } catch (err) {
+        return { data: null }
+    }
+}
 export async function destroyAcadYear(id) {
-    const session = await getServerSession()
-    const token = await signToken({ email: session.user.email })
+    const token = await getToken()
     try {
         const result = await axios.delete(`${hostname}/api/acadyear/${id}`, {
             headers: {
                 "authorization": `${token}`,
             },
         });
-        return { data: result.data.data }
+        revalidatePath("/admin/acadyears");
+        return result.data
+    } catch (err) {
+        return { data: null }
+    }
+}
+export async function destroyMultipleAcadYear(formData) {
+    const token = await getToken()
+    try {
+        const options = {
+            url: `${hostname}/api/acadyear`,
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                "authorization": `${token}`,
+            },
+            data: {
+                acadyears: formData
+            }
+        };
+        const result = await axios(options)
+        revalidatePath("/admin/acadyears");
+        return result.data
     } catch (err) {
         return { data: null }
     }

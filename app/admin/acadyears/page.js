@@ -3,25 +3,28 @@ import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import axios from 'axios'
 import { hostname } from '@/app/api/hostname'
 import { getServerSession } from 'next-auth';
-import { signToken } from '@/app/components/serverAction/TokenAction'
+import { getToken } from '@/app/components/serverAction/TokenAction'
 import AcadYears from "./components/AcadYears"
 
 const fetchData = async (email) => {
-    const noData = [{ id: 1, data: "no data" }]
+    "use server"
     try {
-        const token = await signToken({ email })
-        console.log("admin token:", token);
-        const res = await axios.get(`${hostname}/api/acadyear`, {
+        const token = await getToken()
+        // console.log("admin token:", token);
+        const res = await fetch(`${hostname}/api/acadyear`, {
+            method: 'GET',
             headers: {
-                "authorization": `${token}`,
-            }
+                'Content-Type': 'application/json',
+                'authorization': `${token}`,
+            },
         })
-        let data = res.data.data
-        data = data.length ? data : noData
-        return data
+        const responseData = await res.json();
+        let data = responseData.data;
+        data = data.length ? data : [];
+        return data;
     } catch (error) {
         console.error(error);
-        return noData
+        return []
     }
 }
 const page = async () => {
@@ -36,7 +39,7 @@ const page = async () => {
             <ContentWrap>
                 <BreadCrumb />
                 <AcadYears data={data}>
-                    
+
                 </AcadYears>
             </ContentWrap>
         </>
