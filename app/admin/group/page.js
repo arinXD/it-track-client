@@ -1,8 +1,7 @@
 
 // group.js
 // import React, { useState, useEffect } from 'react';
-import { Navbar, Sidebar } from '@/app/components';
-import { TablePagination } from "@/app/components/TablePagination";
+import { Navbar, Sidebar, TablePagination } from '@/app/components';
 import axios from "axios";
 import { hostname } from '@/app/api/hostname'
 
@@ -34,9 +33,6 @@ export default function Group() {
                     <div>
                         <div>
                             <TablePagination data={data} />
-                            {/* {data.map((e, index) =>(
-                                <li key={index} >{e.id}</li>
-                            ))} */}
                         </div>
                     </div>
                 </div>
