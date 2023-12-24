@@ -8,7 +8,6 @@ const Page = () => {
     const [userData, setUserData] = useState({})
     const [enrollments, setEnrollment] = useState([])
     const { data: session } = useSession();
-    console.log(session);
     if (!session?.user?.stu_id) {
         return (
             <>

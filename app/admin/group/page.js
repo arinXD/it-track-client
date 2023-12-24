@@ -1,4 +1,3 @@
-
 // group.js
 // import React, { useState, useEffect } from 'react';
 import { Navbar, Sidebar, TablePagination } from '@/app/components';
@@ -10,16 +9,17 @@ async function fetchData() {
         const result = await axios.get(
             `${hostname}/api/groups`
         )
-        const data = result.data.data
+        let data = result.data.data
+        data = data.length > 0 ? data : [{ "ข้อมูล": "ไม่มี" }]
         return data
     } catch (error) {
-        console.log(error);
+        console.log(error.response.data.message);
         return [{ "ข้อมูล": "ไม่มี" }]
     }
 }
 
-export default function Group() {
-    const data =  fetchData()
+export default async function Group() {
+    const data = await fetchData()
     console.log(data)
     return (
         <>
