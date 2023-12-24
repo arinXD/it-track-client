@@ -114,6 +114,11 @@ export default function AdminTable({
             cancelButtonText: "ยกเลิก"
         }).then(async (result) => {
             if (result.isConfirmed) {
+                document.querySelector("#checkAllBtn").checked = false
+                setcheckedAll(false)
+                acadCheckbox.forEach(e => {
+                    e.checked = false
+                });
                 const { ok, message } = await destroyMultipleAcadYear(formData)
                 showToastMessage(ok, message)
             }
@@ -188,7 +193,7 @@ export default function AdminTable({
                                 <thead className="text-xs bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3">
-                                            <input type="checkbox" onChange={() => setcheckedAll(!checkedAll)} />
+                                            <input type="checkbox" id="checkAllBtn" onChange={() => setcheckedAll(!checkedAll)} />
                                         </th>
                                         <th key="no" className="px-6 py-3">
                                             No.

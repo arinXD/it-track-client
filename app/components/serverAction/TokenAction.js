@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 
 export const decodeToken = async (data) => {
     const decode = jwtDecode(data)
-    const result = decode.email
+    const result = decode.data.email
     return result
 }
 

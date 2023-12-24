@@ -79,6 +79,12 @@ export default function SignUp(props) {
             setIsSubmit(false)
             return
         }
+        // console.log(strength);
+        if(strength.value<50){
+            setError("ความยากของรหัสผ่านต้อง ปานกลาง ขึ้นไป")
+            setIsSubmit(false)
+            return
+        }
         if (password !== confirmPass) {
             setPasswordValid(true)
             setConfirmPassValid(true)
@@ -109,7 +115,7 @@ export default function SignUp(props) {
         axios(options)
             .then(async (res) => {
                 if (res.status == 201) {
-                    localStorage.setItem("token", await signToken(data))
+                    localStorage.setItem("token", await signToken({email:data.email}))
                     router.push('/email-verify/email');
                     router.refresh()
                 }

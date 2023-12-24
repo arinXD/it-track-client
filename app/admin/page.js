@@ -29,7 +29,7 @@ const Page = () => {
                 <h1 className='text-xl font-bold my-3'>Admin Panel</h1>
                 <div className='flex flex-col space-y-6 mt-6'>
                     <div>
-                        <h2>ทั่วไป</h2>
+                        <h2 className=''>ทั่วไป</h2>
                         <ul className='grid grid-cols-4 gap-2 mt-2'>
                             {acadLinks.map((e, index) => (
                                 <li key={index} className='border border-gray-300 rounded-md'>

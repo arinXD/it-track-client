@@ -4,7 +4,7 @@ import { NextResponse, NextRequest } from "next/server"
 const auth = withAuth(
     async function middleware(req) {
         const path = req.nextUrl.pathname
-        // console.log("Middleware token: ", req?.nextauth?.token);
+        console.log("Middleware token: ", req?.nextauth?.token);
 
         if (path === "/" && req.nextauth.token.role === "admin") {
             const url = req.nextUrl.clone()
