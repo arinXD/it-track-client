@@ -2,7 +2,7 @@
 // group.js
 // import React, { useState, useEffect } from 'react';
 import { Navbar, Sidebar } from '@/app/components';
-import { TablePagination } from "../../components/TablePagination";
+import { TablePagination } from "@/app/components/TablePagination";
 import axios from "axios";
 import { hostname } from '@/app/api/hostname'
 
