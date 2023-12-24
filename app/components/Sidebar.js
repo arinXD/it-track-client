@@ -73,7 +73,7 @@ const Sidebar = () => {
                         </li>
                         <li className="">
                             <Link href={"/admin"}
-                                className={`${url == "/admin" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                className={`${url.includes("/admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
                                 <span className="ml-3 text-sm">Admin</span>
                             </Link>

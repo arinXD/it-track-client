@@ -22,7 +22,10 @@ const Page = async () => {
     const session = await getServerSession()
     const rootData = await getData()
     // console.log(rootData);
-    console.log("Home page session: ", session);
+    // console.log("Home page session: ", session);
+    // name: 'Arinchawut Kanlayanam',
+    // email: 'arinchawut.k@kkumail.com',
+    // image: 'image.com'
     return (
         <>
             <HomePage data={rootData} />

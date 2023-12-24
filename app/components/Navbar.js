@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useSession } from "next-auth/react"
 import { RiSettings5Fill } from "react-icons/ri";
 import { MdOutlineLogout } from "react-icons/md";
+import { Button } from "@nextui-org/react";
 
 const Navbar = () => {
     const { data: session, status } = useSession();
@@ -80,8 +81,10 @@ const Navbar = () => {
                                 <div className='relative flex justify-center items-center gap-5'>
                                     {
                                         session?.user?.role === "admin" &&
-                                        <Link href="/admin" className="bg-amber-400 text-white rounded-md px-3 py-2 text-sm font-medium">
-                                            Admin panel
+                                        <Link href="/admin">
+                                            <Button className='bg-amber-400 text-white font-medium text-sm'>
+                                                Admin panel
+                                            </Button>
                                         </Link>
                                     }
                                     <Image

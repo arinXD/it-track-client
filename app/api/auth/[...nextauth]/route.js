@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 import { hostname } from '@/app/api/hostname'
+import { signToken } from "@/app/components/serverAction/TokenAction";
 
 const VerifiedEmailProvider = (options) => {
     return {
@@ -108,15 +109,16 @@ const handler = NextAuth({
         async signIn({ user, account }) {
 
             if (account.provider === "google") {
+                const token = await signToken({ email: user.email })
                 const options = {
                     url: `${hostname}/api/auth/signin/google`,
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json;charset=UTF-8'
+                        'Content-Type': 'application/json;charset=UTF-8',
                     },
                     data: {
-                        email: user.email
+                        email: token
                     }
                 };
 
