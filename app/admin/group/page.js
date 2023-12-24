@@ -10,11 +10,11 @@ async function fetchData() {
             `${hostname}/api/groups`
         )
         let data = result.data.data
-        data = data.length > 0 ? data : [{ "ข้อมูล": "ไม่มี" }]
+        data = data.length > 0 ? data : [{ id: 1, "ข้อมูล": "ไม่มี" }]
         return data
     } catch (error) {
         console.log(error.response.data.message);
-        return [{ "ข้อมูล": "ไม่มี" }]
+        return [{ id: 1, "ข้อมูล": "ไม่มี" }]
     }
 }
 
