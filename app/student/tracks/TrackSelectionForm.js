@@ -122,6 +122,14 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 confirmButtonColor: "#3085d6",
                 confirmButtonText: "ตกลง"
             })
+        } else {
+            Swal.fire({
+                title: "Warning!",
+                text: `${result}`,
+                icon: "warning",
+                confirmButtonColor: "#3085d6",
+                confirmButtonText: "ตกลง"
+            })
         }
     }
     useEffect(() => {
