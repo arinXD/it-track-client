@@ -17,7 +17,7 @@ const Page = () => {
                 <Sidebar />
                 <ContentWrap>
                     <div>
-                        Sign in as kkumail.
+                        ไม่สามารถเข้าถึงข้อมูลของคุณได้ กรุณาติดต่อ ittrack@gmail.com
                     </div>
                 </ContentWrap>
             </>

@@ -29,7 +29,7 @@ const StudentEnrollment = ({ setUserData, setEnrollment }) => {
         fetchEnrollment()
     }, [session])
     return (
-        <div></div>
+        <></>
     )
 }
 

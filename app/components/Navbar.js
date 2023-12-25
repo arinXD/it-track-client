@@ -7,11 +7,17 @@ import { useSession } from "next-auth/react"
 import { RiSettings5Fill } from "react-icons/ri";
 import { MdOutlineLogout } from "react-icons/md";
 import { Button } from "@nextui-org/react";
+import { usePathname } from 'next/navigation';
+import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
+import { GoHome, GoHomeFill } from "react-icons/go";
+import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
 
 const Navbar = () => {
     const { data: session, status } = useSession();
-    // console.log("Nav session: ", session?.user);
+    const [openToggle, setOpenToggle] = useState(false)
     const [profileToggle, setProfileToggle] = useState(false)
+    const url = usePathname();
+
     const toggleProfile = () => {
         setTimeout(() => {
             if (profileToggle) {
@@ -33,7 +39,10 @@ const Navbar = () => {
             <div className="px-2 sm:px-6 lg:ps-5 lg:pe-8">
                 <div className="relative flex h-16 items-center justify-between">
                     <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                        <button type="button" className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <button
+                            onClick={() => setOpenToggle(!openToggle)}
+                            type="button"
+                            className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
                             <span className="absolute -inset-0.5"></span>
                             <span className="sr-only">Open main menu</span>
 
@@ -153,32 +162,62 @@ const Navbar = () => {
                     </div>
                 </div>
             </div>
-            <div className="sm:hidden" id="mobile-menu">
-                <div className="space-y-1 px-2 pb-3 pt-2">
-
-                    <a href="#" className="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium" aria-current="page">Dashboard</a>
-                    <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Team</a>
-                    <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Projects</a>
-                    <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Calendar</a>
+            {openToggle &&
+                <div className="sm:hidden" id="mobile-menu">
+                    <div className="space-y-1 px-2 pb-3 pt-2">
+                        <Link href={"/"}
+                            className={`${url == "/" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                        >
+                            {url == "/" ?
+                                <GoHomeFill
+                                    className="w-5 h-5"
+                                    set="bulk" stroke="bold" />
+                                :
+                                <GoHome
+                                    className="w-5 h-5"
+                                    set="bulk" stroke="bold" />
+                            }
+                            <span className="ml-3 text-sm">หน้าหลัก</span>
+                        </Link>
+                        <Link href={"/student/tracks"}
+                            className={`${url == "/student/tracks" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                        >
+                            {url == "/student/tracks" ?
+                                <HiUserGroup
+                                    className="w-5 h-5" />
+                                :
+                                <HiOutlineUserGroup
+                                    className="w-5 h-5" />
+                            }
+                            <span className="ml-3 text-sm">คัดเลือกความเชี่ยวชาญ</span>
+                        </Link>
+                        <Link href={"/student/tracks/exam"}
+                            className={`${url == "/student/tracks/exam" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                        >
+                            {url == "/student/tracks/exam" ?
+                                <MdQuiz
+                                    className="w-5 h-5" />
+                                :
+                                <MdOutlineQuiz
+                                    className="w-5 h-5" />
+                            }
+                            <span className="ml-3 text-sm">หาแทรคที่เหมาะสม</span>
+                        </Link>
+                        <Link href={"/student/verify"}
+                            className={`${url == "/student/verify" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                        >
+                            {url == "/student/verify" ?
+                                <HiAcademicCap className="w-5 h-5" />
+                                :
+                                <HiOutlineAcademicCap className="w-5 h-5" />
+                            }
+                            <span className="ml-3 text-sm">ตรวจสอบสำเร็จการศึกษา</span>
+                        </Link>
+                    </div>
                 </div>
-            </div>
+            }
         </nav>
     )
 }
 
 export default Navbar
-{/* <!-- Sign up modal -->
-<div id="default-modal" aria-hidden="true"
-    onClick={closeOnOverlayClick}
-    className={`${(displaySignIn) ? "fixed" : "hidden"} z-10 bg-gray-800 bg-opacity-50 top-0 left-0 right-0 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%)] max-h-full`}>
-    <div
-        id='wrap'
-        style={{ transform: 'translate(-50%, -50%)' }}
-        className="z-20 top-[50%] left-[50%] absolute w-full max-w-lg max-h-full bg-gray-800 border-gray-700 rounded-lg">
-        <!-- Modal content -->
-        <div className="relative z-30 rounded-lg shadow">
-            <!-- Modal body -->
-            <SignIn closeModal={closeModal} />
-        </div>
-    </div>
-</div> */}

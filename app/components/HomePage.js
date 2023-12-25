@@ -26,7 +26,7 @@ const HomePage = ({ data }) => {
             <Sidebar />
             <ContentWrap>
                 <div>
-                    <div data-aos="fade-up" className='mt-3'>
+                    <div data-aos="fade-up" className=''>
                         <TablePagination data={data} />
                     </div>
                 </div>
