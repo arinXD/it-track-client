@@ -175,20 +175,20 @@ const Page = () => {
         <section className="absolute w-full p-5 max-h-full max-w-full h-[calc(100%)]">
             <div
                 style={{ transform: 'translate(-50%, -50%)' }}
-                className='absolute w-full max-h-full max-w-7xl h-[calc(100%)] top-[50%] left-[50%] flex flex-row items-center gap-8 px-10'>
-                <div className='w-[50%] h-[calc(100%)] max-h-full flex flex-col items-center justify-center p-8'>
-                    <div className='w-fit h-[400px]'>
-                        <h1 className="mb-1 font-bold text-5xl leading-tight tracking-tight text-blue-500">
+                className='absolute w-full max-h-full max-w-7xl h-[calc(100%)] top-[50%] left-[50%] flex flex-col items-center gap-5 p-4'>
+                <div className='pt-8 pb-3 w-full max-h-full flex flex-col items-center justify-center'>
+                    <div className='w-fit'>
+                        <h1 className="font-bold text-4xl sm:text-5xl leading-tight tracking-tight text-blue-500">
                             IT Tracks
                         </h1>
-                        <h2 className=''>
+                        <h2 className='mt-2'>
                             Welcome to IT Track by IT64
                         </h2>
 
                     </div>
                 </div>
-                <div className="p-6 space-y-4 md:space-y-6 sm:p-8 w-[50%] h-[calc(100%)] max-h-full flex justify-start items-center">
-                    <form className="h-[400px] w-full space-y-3 md:space-y-4" onSubmit={signInCredentials}>
+                <div className="max-h-full w-full sm:w-1/2 px-10 flex justify-start items-center">
+                    <form className="w-full space-y-4" onSubmit={signInCredentials}>
                         {(error) ?
                             <div className='relative'>
                                 <div className={'flex gap-3 items-center bg-red-500 text-white px-3 py-3'}>
@@ -283,7 +283,7 @@ const Page = () => {
                 <div
                     id='wrap'
                     style={{ transform: 'translate(-50%, -50%)' }}
-                    className="z-20 top-[50%] left-[50%] absolute w-full max-w-lg  bg-white border-white rounded-lg">
+                    className="z-20 top-[50%] left-[50%] absolute w-full max-w-lg bg-white border-white rounded-lg">
                     {/* <!-- Modal content --> */}
                     <div className="relative z-30 rounded-lg shadow">
                         {/* <!-- Modal body --> */}

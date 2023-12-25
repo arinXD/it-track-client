@@ -221,7 +221,7 @@ export default function SignUp(props) {
     }, [password])
     return (
         <NextUIProvider>
-            <div className='sm:p-8 relative'>
+            <div className='p-4 sm:p-8 relative'>
                 <div className='rounded-full cursor-pointer absolute top-[4.5%] right-[4.5%] p-1 hover:bg-opacity-50 hover:bg-slate-100'>
                     <AiOutlineClose className='w-6 h-6 text-blue-600 relative z-50' onClick={() => {
                         clearError()
@@ -244,14 +244,14 @@ export default function SignUp(props) {
                             :
                             null
                         }
-                        <div className='flex flex-row gap-4'>
+                        <div className='flex flex-col sm:flex-row gap-4'>
                             <div className='w-full'>
                                 <Input
                                     value={fname}
                                     onValueChange={setFname}
                                     isInvalid={fValid}
                                     label="ชื่อจริง"
-                                    size="md"
+                                    size="sm"
                                     type="text"
                                     autoComplete="first name"
                                 />
@@ -262,7 +262,7 @@ export default function SignUp(props) {
                                     onValueChange={setLname}
                                     isInvalid={lvalid}
                                     label="นามสกุล"
-                                    size="md"
+                                    size="sm"
                                     type="text"
                                     autoComplete="last name" />
                             </div>
@@ -273,7 +273,7 @@ export default function SignUp(props) {
                                 onValueChange={setemail}
                                 isInvalid={emailvalid}
                                 label="อีเมล"
-                                size="md"
+                                size="sm"
                                 type="email"
                                 autoComplete="username"
                             // placeholder="you@example.com"
@@ -285,7 +285,7 @@ export default function SignUp(props) {
                                 onValueChange={setPassword}
                                 isInvalid={passwordvalid}
                                 label="รหัสผ่าน"
-                                size="md"
+                                size="sm"
                                 type={(displayPass) ? "text" : "password"}
                                 autoComplete="current-password"
                                 endContent={
@@ -325,7 +325,7 @@ export default function SignUp(props) {
                                 onValueChange={setConfirmPass}
                                 isInvalid={confirmPassvalid}
                                 label="ยืนยันรหัสผ่าน"
-                                size="md"
+                                size="sm"
                                 type={(displayCon) ? "text" : "password"}
                                 autoComplete="current-password"
                                 endContent={
