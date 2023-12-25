@@ -168,7 +168,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         }
         fetchData()
     }, [userData])
-    if (userData?.track !== null) {
+    if (userData?.track != null) {
+        console.log(userData);
         return (
             <div className='text-center'>
                 <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
@@ -180,6 +181,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         )
     } else if ((userData?.acadyear !== trackSelect?.acadyear)
         && (userData?.track === null)) {
+        console.log(userData);
         return (
             <div className='text-center'>
                 <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
