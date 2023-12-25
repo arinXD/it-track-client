@@ -14,11 +14,15 @@ const StudentEnrollment = ({ setUserData, setEnrollment }) => {
                     const response = await axios.get(`${hostname}/api/students/enrollments/${stu_id}`)
                     const data = response.data.data
                     setUserData(data)
-                    setEnrollment(data.Enrollments)
+                    if (data.Enrollments.length > 0) {
+                        setEnrollment(data.Enrollments)
+                    } else {
+                        setEnrollment([])
+                    }
                 } catch (error) {
                     console.log("Cant fetch enrollment.");
                     setUserData({})
-                    setEnrollment({})
+                    setEnrollment([])
                 }
             }
         }

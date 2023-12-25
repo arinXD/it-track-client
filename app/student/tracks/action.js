@@ -31,11 +31,8 @@ export async function createTrackSelection(formData) {
             subjectData["grade"] = grade
             subjectsData.push(subjectData)
         });
-        // console.log(formData)
-        // console.log(subjects)
-        // console.log(subjectsData)
         const options = {
-            url: `${hostname}/api/student/track/select`,
+            url: `${hostname}/api/students/track/select`,
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -51,11 +48,9 @@ export async function createTrackSelection(formData) {
             }
         };
         const result = await axios(options)
-        console.log(result.data);
         revalidatePath("/student/tracks");
         return (result.data);
     } catch (error) {
-        // console.error(error);
         return ({
             ok: false,
             message: "create track selection error."

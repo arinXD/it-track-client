@@ -4,6 +4,7 @@ import { hostname } from '@/app/api/hostname'
 import axios from 'axios'
 import { useState, useEffect, useReducer } from 'react'
 import { createTrackSelection } from './action'
+import Swal from 'sweetalert2'
 import { Button } from "@nextui-org/react";
 import { DeleteIcon } from '@/app/components/icons'
 
@@ -43,7 +44,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
     const [trackSelect, setTrackSelect] = useState({})
     const [trackSubjects, setTrackSubjects] = useState([])
     const [tracks, setTracks] = useState([])
-    const [{ order1, order2, order3, }, dispatch] = useReducer(OrderReducer, initOrder);
+    const [orders, dispatch] = useReducer(OrderReducer, initOrder);
+    const [processing, isProcessing] = useState(false)
 
     const getEnrollmentGrade = (subjectCode) => {
         // ต้องการหา subjectCode ใน enrollments
@@ -64,9 +66,29 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         });
     }
     const handleSubmit = async (event) => {
+        const convertTime = (timestamp) => {
+            const timestampDate = new Date(timestamp);
+            const thailandOffset = 7;
+            timestampDate.setHours(timestampDate.getHours() + thailandOffset);
+            const formattedTimestamp = timestampDate.toISOString().replace('T', ' ').slice(0, -8);
+            return (formattedTimestamp);
+        };
+        isProcessing(true)
         event.preventDefault();
         const formData = new FormData(event.target)
-        await createTrackSelection(formData)
+        const result = await createTrackSelection(formData)
+        const data = result.data
+        isProcessing(false)
+        console.log(data);
+        if (result.ok) {
+            Swal.fire({
+                title: "บันทึกข้อมูลการคัดเลือก",
+                text: `บันทึกข้อมูลการคัดเลือกของคุณ ณ วันที่ ${convertTime(data.updatedAt)}`,
+                icon: "success",
+                confirmButtonColor: "#3085d6",
+                confirmButtonText: "ตกลง"
+            })
+        }
     }
 
     useEffect(() => {
@@ -74,12 +96,32 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             try {
                 const response = await axios.get(`${hostname}/api/tracks/selects/get/last`);
                 const trackResponse = await axios.get(`${hostname}/api/tracks`)
+                const selectDataResponse = await axios.get(`${hostname}/api/students/${userData.stu_id}/track/select`)
+
+                const selectedData = selectDataResponse.data.data
                 const data = response.data.data;
                 const trackData = trackResponse.data.data
+                if (selectedData) {
+                    for (let index = 1; index < 4; index++) {
+                        const type = `SET_ORDER_${index}`
+                        dispatch({
+                            type,
+                            payload: selectedData[`track_order_${index}`]
+                        });
+                    }
+                } else {
+                    dispatch({
+                        type: "CLEAR_ORDER",
+                    });
+                }
+
                 setTrackSelect(data);
-                setTrackSubjects(data.Subjects)
+                if (data.Subjects) {
+                    setTrackSubjects(data.Subjects)
+                } else {
+                    setTrackSubjects([])
+                }
                 setTracks(trackData)
-                // console.log(data);
             } catch (error) {
                 console.error(error);
                 setTrackSelect({});
@@ -88,7 +130,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             }
         }
         fetchData()
-    }, [])
+    }, [userData])
 
     return (
         <div className="relative flex flex-col rounded-xl bg-transparent bg-clip-border text-gray-700 shadow-none">
@@ -172,12 +214,14 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                         }}
                                                         required={true}
                                                         name={`track_order_${index + 1}`}
-                                                        defaultValue=""
+                                                        value={
+                                                            (orders[`order${index + 1}`]) ? orders[`order${index + 1}`] : ""
+                                                        }
                                                         className="select-order bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-white dark:placeholder-black-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:border-blue-500 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50">
                                                         <option value="" disabled hidden>เลือกแทรค</option>
                                                         {tracks.map((track, index) => (
                                                             <option
-                                                                hidden={[order1, order2, order3].includes(track.track)}
+                                                                hidden={[orders.order1, orders.order2, orders.order3].includes(track.track)}
                                                                 key={index}
                                                                 value={track.track}
                                                             >
@@ -244,9 +288,10 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                     className="mt-4 block w-full select-none rounded-lg bg-blue-500 py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                                     type="submit"
                                     data-ripple-light="true"
-                                    disabled={!isConfirm}
+                                    disabled={!isConfirm && !processing}
                                 >
-                                    ตกลง
+                                    {!processing ? "ตกลง" : "บันทึกข้อมูล..."}
+
                                 </button>
 
                             </form>

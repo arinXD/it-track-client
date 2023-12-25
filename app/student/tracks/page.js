@@ -23,9 +23,6 @@ const Page = () => {
             </>
         )
     }
-    // if (!(Object.keys(userData).length === 0)) {
-    //     console.log(enrollments);
-    // }
     return (
         <>
             <header>
