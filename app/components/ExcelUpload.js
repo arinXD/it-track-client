@@ -1,51 +1,16 @@
 "use client"
 
-// // ExcelUpload.js
-// import React, { useCallback } from 'react';
-// import { useDropzone } from 'react-dropzone';
-// import axios from 'axios';
-
-// const ExcelUpload = ({ onUpload }) => {
-//     const onDrop = useCallback(
-//         async (acceptedFiles) => {
-//             const file = acceptedFiles[0];
-//             const formData = new FormData();
-//             formData.append('file', file);
-
-//             try {
-//                 const response = await axios.post('http://localhost:4000/api/subjects', formData, {
-//                     headers: {
-//                         'Content-Type': 'multipart/form-data',
-//                     },
-//                 });
-//                 onUpload(response.data);
-//             } catch (error) {
-//                 console.error('Error uploading file:', error);
-//             }
-//         },
-//         [onUpload]
-//     );
-
-//     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel' });
-
-//     return (
-//         <div>
-//             <div {...getRootProps()} className={`dropzone ${isDragActive ? 'active' : ''}`}>
-//                 <input {...getInputProps()} />
-//                 <p>Drag 'n' drop an Excel file here, or click to select one</p>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default ExcelUpload;
-
+// ExcelUpload.js
 import { useState } from "react";
 import * as XLSX from "xlsx";
+import axios from 'axios';
+import { hostname } from '@/app/api/hostname';
 
-function ExcelUpload() {
-
+function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
   const [data, setData] = useState([]);
+  const [editingCell, setEditingCell] = useState(null);
+  const [displayHeaders, setDisplayHeaders] = useState([]);
+  const [originalHeaders, setOriginalHeaders] = useState([]);
 
   const handleFileUpload = (e) => {
     const reader = new FileReader();
@@ -57,41 +22,125 @@ function ExcelUpload() {
       const sheet = workbook.Sheets[sheetName];
       const parsedData = XLSX.utils.sheet_to_json(sheet);
       setData(parsedData);
+
+      // Set initial headers based on the first row
+      const initialHeaders = Object.keys(parsedData[0]);
+      setDisplayHeaders([...initialHeaders]);
+      setOriginalHeaders([...initialHeaders]);
     };
-  }
+  };
+
+  const handleInsertSubject = async () => {
+    try {
+
+      const formattedData = data.map(row => {
+        const formattedRow = {};
+        displayHeaders.forEach((header, index) => {
+          formattedRow[header] = row[originalHeaders[index]];
+        });
+        return formattedRow;
+      });
+
+      const result = await axios.post(`${hostname}/api/subjects/insertSubjectsFromExcel`, formattedData);
+      console.log('Inserted subjects:', result.data.data);
+
+      onDataInsertXlsx();
+    } catch (error) {
+      console.error('Error inserting subjects:', error);
+      // Handle error if needed
+    }
+  };
+
+  const handleClearFile = () => {
+    setData([]);
+    setEditingCell(null);
+    setDisplayHeaders([]);
+    setOriginalHeaders([]);
+    document.getElementById("fileInput").value = null;
+  };
+
+  const handleDoubleClick = (rowIndex, columnIndex) => {
+    setEditingCell({ rowIndex, columnIndex });
+  };
+
+  const handleCellBlur = () => {
+    setEditingCell(null);
+  };
+
+  const handleCellChange = (e, rowIndex, columnIndex) => {
+    if (editingCell && editingCell.columnIndex !== undefined) {
+      const newHeaders = [...displayHeaders];
+      newHeaders[editingCell.columnIndex] = e.target.value;
+      setDisplayHeaders(newHeaders);
+    }
+  };
+
 
   return (
     <div className="App">
-
-      <input 
-        type="file" 
-        accept=".xlsx, .xls" 
-        onChange={handleFileUpload} 
+      <input
+        id="fileInput"
+        type="file"
+        accept=".xlsx, .xls"
+        onChange={handleFileUpload}
       />
 
       {data.length > 0 && (
-        <table className="table">
-          <thead>
-            <tr>
-              {Object.keys(data[0]).map((key) => (
-                <th key={key}>{key}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, index) => (
-              <tr key={index}>
-                {Object.values(row).map((value, index) => (
-                  <td key={index}>{value}</td>
+        <>
+          <table className="table">
+            <thead>
+              <tr>
+                {displayHeaders.map((header, index) => (
+                  <th key={index} onDoubleClick={() => handleDoubleClick(null, index)}>
+                    {editingCell && editingCell.columnIndex === index ? (
+                      <input
+                        value={header}
+                        onChange={(e) => handleCellChange(e, null, index)}
+                        onBlur={handleCellBlur}
+                        autoFocus
+                      />
+                    ) : (
+                      header
+                    )}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {originalHeaders.map((originalHeader, columnIndex) => (
+                    <td
+                      key={columnIndex}
+                      onDoubleClick={() => handleDoubleClick(rowIndex, columnIndex)}
+                    >
+                      {editingCell &&
+                        editingCell.rowIndex === rowIndex &&
+                        editingCell.columnIndex === columnIndex ? (
+                        <input
+                          value={row[originalHeader]}
+                          onChange={(e) =>
+                            handleCellChange(e, rowIndex, columnIndex)
+                          }
+                          onBlur={handleCellBlur}
+                          autoFocus
+                        />
+                      ) : (
+                        row[originalHeader]
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button onClick={handleInsertSubject}>Add to Database</button>
+          <button onClick={handleClearFile}>Clear File</button>
+        </>
       )}
 
       <br /><br />
-      ... webstylepress ...
+      {/* ... additional UI or components ... */}
     </div>
   );
 }
