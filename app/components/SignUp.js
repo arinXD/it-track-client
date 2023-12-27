@@ -13,7 +13,7 @@ import { hostname } from '@/app/api/hostname'
 import { signToken } from './serverAction/TokenAction';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { styled } from '@mui/material/styles';
-
+import { createUser } from './serverAction/signUpAction';
 
 export default function SignUp(props) {
     const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -80,7 +80,7 @@ export default function SignUp(props) {
             return
         }
         // console.log(strength);
-        if(strength.value<50){
+        if (strength.value < 50) {
             setError("ความยากของรหัสผ่านต้อง ปานกลาง ขึ้นไป")
             setIsSubmit(false)
             return
@@ -98,37 +98,17 @@ export default function SignUp(props) {
             email,
             password,
         }
-        const options = {
-            url: `${hostname}/api/auth/signup`,
-            method: 'POST',
-            withCredentials: true,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            data: data,
-        };
+        const result = await createUser(data);
+        if (result.ok) {
+            localStorage.setItem("token", await signToken({ email: data.email }))
+            router.push('/email-verify/email');
+            router.refresh()
+        } else {
+            setIsSubmit(false)
+            if (result.field == "email") setemailValid(true)
+            setError(result.message)
+        }
 
-        // ======================
-        // Sign up api
-        // ======================
-        axios(options)
-            .then(async (res) => {
-                if (res.status == 201) {
-                    localStorage.setItem("token", await signToken({email:data.email}))
-                    router.push('/email-verify/email');
-                    router.refresh()
-                }
-            }).catch(err => {
-                // console.log();
-                // console.log(err);
-                // console.log(error);
-                setIsSubmit(false)
-                const msg = err.response.data.message
-                const field = err.response.data.errorField
-                if (field == "email") setemailValid(true)
-                setError(msg)
-            })
     }
 
     // ======================
