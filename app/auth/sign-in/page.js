@@ -112,9 +112,8 @@ const Page = () => {
             redirect: false,
             callbackUrl: callbackUrl,
         })
-        setIsProcress(false)
         if (!result.ok) {
-            // console.log(result);
+            setIsProcress(false)
             setError(result.error)
         } else {
             localStorage.setItem("token", await signToken({ email: eValue }))
