@@ -27,7 +27,8 @@ export async function createUser(data) {
             value: token,
             httpOnly: true,
             maxAge: 21600000,
-            secure: true
+            secure: true,
+            sameSite: "lax",
         })
         return { ok: true }
     } catch (error) {
