@@ -26,7 +26,8 @@ export async function createUser(data) {
             name: 'token',
             value: token,
             httpOnly: true,
-            maxAge: 21600000
+            maxAge: 21600000,
+            secure: true
         })
         return { ok: true }
     } catch (error) {
