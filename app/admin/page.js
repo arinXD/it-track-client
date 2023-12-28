@@ -1,28 +1,55 @@
 'use client';
-import { Navbar, Sidebar } from '../components';
+import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '../components';
 import { useState, useEffect } from 'react';
 import React from 'react';
+import Link from 'next/link';
 
 const Page = () => {
+    const acadLinks = [
+        { href: "/admin/acadyears", lable: "ปีการศึกษา" },
+        { href: "/admin/program", lable: "หลักสูตร" },
+        { href: "/admin/category", lable: "หมวดหมู่วิชา" },
+        { href: "/admin/group", lable: "กลุ่มวิชา" },
+        { href: "/admin/subgroup", lable: "กลุ่มย่อยวิชา" },
+        { href: "/admin/subject", lable: "วิชา" },
+    ]
+    const tracks = [
+        { href: "/admin/track", lable: "ข้อมูลแทรค" },
+        { href: "/admin/track/selection", lable: "คัดเลือกแทรค" },
+        { href: "/admin/track/student", lable: "รายชื่อนักศึกษาภายในแทรค" },
+    ]
     return (
         <>
             <header>
                 <Navbar />
             </header>
             <Sidebar />
-            <div className='mt-16'> {/* เว้น nav */}
-                <div className='p-8 sm:ml-72'> {/* เว้น side bar */}
-                    <button data-drawer-target="default-sidebar" data-drawer-toggle="default-sidebar" aria-controls="default-sidebar" type="button" className="inline-flex items-center p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
-                        <span className="sr-only">Open sidebar</span>
-                        <svg className="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path clipRule="evenodd" fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
-                        </svg>
-                    </button>
+            <ContentWrap>
+                <BreadCrumb />
+                <h1 className='text-xl font-bold my-3'>Admin Panel</h1>
+                <div className='flex flex-col space-y-6 mt-6'>
                     <div>
-                        <p>Admin</p>
+                        <h2 className=''>ทั่วไป</h2>
+                        <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-2'>
+                            {acadLinks.map((e, index) => (
+                                <li key={index} className='border border-gray-300 rounded-md overflow-hidden'>
+                                    <Link className='block w-full px-3 py-2' href={e.href}>{e.lable}</Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div>
+                        <h2>แทรค</h2>
+                        <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-2'>
+                            {tracks.map((e, index) => (
+                                <li key={index} className='border border-gray-300 rounded-md overflow-hidden'>
+                                    <Link className='block w-full px-3 py-2' href={e.href}>{e.lable}</Link>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
-            </div>
+            </ContentWrap>
         </>
     )
 }

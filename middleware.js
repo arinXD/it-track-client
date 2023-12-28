@@ -6,14 +6,11 @@ const auth = withAuth(
         const path = req.nextUrl.pathname
         console.log("Middleware token: ", req?.nextauth?.token);
 
-        // Dont have student id
-        // if (req.nextauth.token.stu_id == null
-        //     && req.nextauth.token.role == "student") {
-        //     const url = req.nextUrl.clone()
-        //     url.pathname = '/auth/student/save/id'
-        //     return NextResponse.redirect(url)
-        // }
-
+        if (path === "/" && req.nextauth.token.role === "admin") {
+            const url = req.nextUrl.clone()
+            url.pathname = '/admin'
+            return NextResponse.redirect(url)
+        }
         if (path.startsWith("/student")
             && req.nextauth.token.role !== "student"
             && req.nextauth.token.role !== "teacher"
@@ -26,13 +23,13 @@ const auth = withAuth(
             && req.nextauth.token.role !== "teacher"
             && req.nextauth.token.role !== "admin") {
             return NextResponse.rewrite(
-                new URL("/permission/Teacher+account", req.url)
+                new URL("/permission/Teacher-account", req.url)
             )
         }
         if (path.startsWith("/admin")
             && req.nextauth.token.role !== "admin") {
             return NextResponse.rewrite(
-                new URL("/permission/Admin+account", req.url)
+                new URL("/permission/Admin-account", req.url)
             )
         }
 
@@ -54,7 +51,7 @@ export default auth
 
 export const config = {
     matcher: [
-        // "/",
+        "/",
         "/student/:path*",
         "/teacher/:path*",
         "/admin/:path*",

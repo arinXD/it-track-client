@@ -1,11 +1,19 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import TablePagination from './TablePagination';
+import { Navbar, Sidebar, ContentWrap, TablePagination } from '@/app/components'
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { Navbar, Sidebar, ContentWrap } from '@/app/components'
+// import { signToken } from './serverAction/TokenAction';
 
 const HomePage = ({ data }) => {
+    // async function callToken() {
+    //     const token = await signToken({ email: "rakuzanoat@gmail.com" })
+    //     return token
+    // }
+    // const [token, setToken] = useState("")
+    // useEffect(() => {
+    //     setToken(callToken())
+    // }, [])
     useEffect(() => {
         AOS.init();
     }, []);
@@ -18,7 +26,7 @@ const HomePage = ({ data }) => {
             <Sidebar />
             <ContentWrap>
                 <div>
-                    <div data-aos="fade-up" className='mt-3'>
+                    <div data-aos="fade-up" className=''>
                         <TablePagination data={data} />
                     </div>
                 </div>

@@ -6,11 +6,44 @@ import Link from 'next/link';
 import { useSession } from "next-auth/react"
 import { RiSettings5Fill } from "react-icons/ri";
 import { MdOutlineLogout } from "react-icons/md";
+import { Button } from "@nextui-org/react";
+import { usePathname } from 'next/navigation';
+import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
+import { GoHome, GoHomeFill } from "react-icons/go";
+import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
 
 const Navbar = () => {
+    const links = [
+        {
+            href: "/",
+            activeIcon: <GoHomeFill className="w-5 h-5" />,
+            icon: <GoHome className="w-5 h-5" />,
+            label: "หน้าหลัก"
+        },
+        {
+            href: "/student/tracks",
+            activeIcon: <HiUserGroup className="w-5 h-5" />,
+            icon: <HiOutlineUserGroup className="w-5 h-5" />,
+            label: "คัดเลือกความเชี่ยวชาญ"
+        },
+        {
+            href: "/student/tracks/exam",
+            activeIcon: <MdQuiz className="w-5 h-5" />,
+            icon: <MdOutlineQuiz className="w-5 h-5" />,
+            label: "หาแทรคที่เหมาะสม"
+        },
+        {
+            href: "/student/verify",
+            activeIcon: <HiAcademicCap className="w-5 h-5" />,
+            icon: <HiOutlineAcademicCap className="w-5 h-5" />,
+            label: "ตรวจสอบสำเร็จการศึกษา"
+        },
+    ]
     const { data: session, status } = useSession();
-    // console.log("Nav session: ", session?.user);
+    const [openToggle, setOpenToggle] = useState(false)
     const [profileToggle, setProfileToggle] = useState(false)
+    const url = usePathname();
+
     const toggleProfile = () => {
         setTimeout(() => {
             if (profileToggle) {
@@ -32,7 +65,10 @@ const Navbar = () => {
             <div className="px-2 sm:px-6 lg:ps-5 lg:pe-8">
                 <div className="relative flex h-16 items-center justify-between">
                     <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                        <button type="button" className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <button
+                            onClick={() => setOpenToggle(!openToggle)}
+                            type="button"
+                            className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
                             <span className="absolute -inset-0.5"></span>
                             <span className="sr-only">Open main menu</span>
 
@@ -75,13 +111,15 @@ const Navbar = () => {
                         </div>
                     </div>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
-                        <div className="relative ml-3">
+                        <div className="relative ml-3 flex flex-row gap-3">
                             {status == "authenticated" ?
-                                <div className='relative flex justify-center items-center gap-5'>
+                                <div className='relative hidden sm:flex justify-center items-center gap-5'>
                                     {
                                         session?.user?.role === "admin" &&
-                                        <Link href="/admin" className="bg-amber-500 text-white rounded-md px-3 py-2 text-sm font-medium">
-                                            Admin panel
+                                        <Link href="/admin">
+                                            <Button className='bg-amber-400 text-white font-medium text-sm'>
+                                                Admin panel
+                                            </Button>
                                         </Link>
                                     }
                                     <Image
@@ -124,14 +162,7 @@ const Navbar = () => {
                                     </div>
                                 </div>
                                 :
-                                <div className='relative flex justify-center items-center gap-2'>
-                                    {/* <Image
-                                        className='p-1 border-1 rounded-full'
-                                        // src={session?.user?.image}
-                                        src={'/image/user.png'}
-                                        width={40} height={40}
-                                        alt="user image"
-                                    /> */}
+                                <div className='relative hidden sm:flex justify-center items-center gap-2'>
                                     <div className='w-[40px] h-[40px] border-1 rounded-full bg-gray-200'>
 
                                     </div>
@@ -150,32 +181,73 @@ const Navbar = () => {
                     </div>
                 </div>
             </div>
-            <div className="sm:hidden" id="mobile-menu">
-                <div className="space-y-1 px-2 pb-3 pt-2">
-
-                    <a href="#" className="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium" aria-current="page">Dashboard</a>
-                    <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Team</a>
-                    <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Projects</a>
-                    <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Calendar</a>
+            {openToggle &&
+                <div className="sm:hidden" id="mobile-menu">
+                    <div className="space-y-1 p-2 border-t-1 border-t-gray-200">
+                        {session &&
+                            <div className="flex gap-4 items-start mb-1 border-b-1 border-b-gray-200 py-3 p-2">
+                                <Image
+                                    className='rounded-full border-1 border-slate-300'
+                                    src={session?.user?.image}
+                                    width={45} height={45}
+                                    alt="user image"
+                                />
+                                <div className='w-full'>
+                                    <div>
+                                        <div>{session?.user?.name}</div>
+                                        <div className='text-sm text-gray-500'>{session?.user?.email}</div>
+                                    </div>
+                                    <div className='mt-2 flex flex-row gap-4 justify-start items-center'>
+                                        <Link href={"/"} className='text-sm text-blue-500 border-1 border-blue-500 p-1 px-2 rounded-md'>ดูโปรไฟล์</Link>
+                                        {session?.user?.role == "admin" &&
+                                            <Link onClick={() => setOpenToggle(false)} href={"/admin"} className='text-sm text-amber-400 rounded-md p-1 px-2 border-1 border-amber-400'>Admin Panel</Link>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        {links.map((link, index) => (
+                            index == 0 && session?.user?.role == "admin" ?
+                                <Link href={"/admin"}
+                                    className={`${url.includes("admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                    onClick={() => setOpenToggle(false)}
+                                    key={index}
+                                >
+                                    {url.includes("admin") ?
+                                        <>{link.activeIcon}</>
+                                        :
+                                        <>{link.icon}</>
+                                    }
+                                    <span className="ml-3 text-sm">Admin Panel</span>
+                                </Link>
+                                :
+                                <Link href={link.href}
+                                    className={`${url == link.href ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                    onClick={() => setOpenToggle(false)}
+                                    key={index}
+                                >
+                                    {url == link.href ?
+                                        <>{link.activeIcon}</>
+                                        :
+                                        <>{link.icon}</>
+                                    }
+                                    <span className="ml-3 text-sm">{link.label}</span>
+                                </Link>
+                        ))}
+                        <div className='border-t-1 border-t-gray-200 cursor-pointer'
+                            onClick={() => signOut()}>
+                            <div className='flex rounded-md p-2 py-3 hover:bg-gray-200 mt-1'>
+                                <div className='text-gray-900'>
+                                    <MdOutlineLogout className='w-5 h-5' />
+                                </div>
+                                <button className='ml-3 text-sm'>Sign out</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </nav>
+            }
+        </nav >
     )
 }
 
 export default Navbar
-{/* <!-- Sign up modal -->
-<div id="default-modal" aria-hidden="true"
-    onClick={closeOnOverlayClick}
-    className={`${(displaySignIn) ? "fixed" : "hidden"} z-10 bg-gray-800 bg-opacity-50 top-0 left-0 right-0 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%)] max-h-full`}>
-    <div
-        id='wrap'
-        style={{ transform: 'translate(-50%, -50%)' }}
-        className="z-20 top-[50%] left-[50%] absolute w-full max-w-lg max-h-full bg-gray-800 border-gray-700 rounded-lg">
-        <!-- Modal content -->
-        <div className="relative z-30 rounded-lg shadow">
-            <!-- Modal body -->
-            <SignIn closeModal={closeModal} />
-        </div>
-    </div>
-</div> */}

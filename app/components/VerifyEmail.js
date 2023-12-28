@@ -9,7 +9,7 @@ const VerifyEmail = ({ decoded }) => {
     const Router = useRouter()
     const { email, uniqueString } = decoded
     const [isSending, setIsSending] = useState(false)
-    
+
     const sendVerification = async () => {
         setIsSending(true)
         // http://localhost:4000/api/auth/student/send-verification
@@ -32,7 +32,7 @@ const VerifyEmail = ({ decoded }) => {
             }).catch(err => {
                 const data = err.response.data
                 console.log(data);
-                if(data.verified){
+                if (data.verified) {
                     Router.push("/")
                     Router.refresh()
                 }
@@ -53,15 +53,12 @@ const VerifyEmail = ({ decoded }) => {
                                 onClick={() => sendVerification()}
                                 className='btn btn-secondary'>
                                 {
-                                    isSending ?
-                                        <>
+                                    <>
+                                        {isSending ?
                                             <span className="loading loading-spinner"></span>
-                                            send verification again.
-                                        </>
-                                        :
-                                        <>
-                                            send verification again.
-                                        </>
+                                            : null}
+                                        send verification again.
+                                    </>
                                 }
                             </button>
                         </p>

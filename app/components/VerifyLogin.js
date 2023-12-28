@@ -2,37 +2,51 @@
 import { useSession, signIn } from "next-auth/react"
 import SignInButton from "./SignInButton"
 import React, { useEffect, useState } from 'react'
-
+import Swal from 'sweetalert2'
 
 const VerifyLogin = ({ verifyData }) => {
 
-    const { data: session, update } = useSession();
-    const [localEmail, setLocalEmail] = useState()
+    // const { data: session, update } = useSession();
+    // const [localEmail, setLocalEmail] = useState()
 
-    const testLog = () => {
-        console.log(session);
-    }
-    const updateSession = async () => {
-        await update({
-            ...session,
-            user: {
-                ...session?.user,
-                test: "test session"
-            }
-        })
-            .then(result => {
-                console.log("result in update: ", result);
-            }).catch(err => {
-                console.log("error on update: ", err);
-            })
-    }
-    const getLocalStorage = async () => {
-        console.log(localEmail);
-    }
+    // const testLog = () => {
+    //     console.log(session);
+    // }
+    // const updateSession = async () => {
+    //     await update({
+    //         ...session,
+    //         user: {
+    //             ...session?.user,
+    //             test: "test session"
+    //         }
+    //     })
+    //         .then(result => {
+    //             console.log("result in update: ", result);
+    //         }).catch(err => {
+    //             console.log("error on update: ", err);
+    //         })
+    // }
+    // const getLocalStorage = async () => {
+    //     console.log(localEmail);
+    // }
+
+    // useEffect(() => {
+    //     if (localStorage.getItem("email")) {
+    //         setLocalEmail(localStorage.getItem("email"))
+    //     }
+    // }, [])
+    // useEffect(() => {
+    //     console.log(session);
+    // }, [session])
 
     useEffect(() => {
-        if (localStorage.getItem("email")) {
-            setLocalEmail(localStorage.getItem("email"))
+        if (verifyData.ok) {
+            Swal.fire({
+                title: "Verifired Email",
+                text: "Your emali has verify.",
+                icon: "success",
+                showConfirmButton: false,
+            });
         }
     }, [])
 
@@ -41,11 +55,13 @@ const VerifyLogin = ({ verifyData }) => {
             if (verifyData.userData) {
                 const { email } = verifyData.userData
                 console.log("verify child", verifyData.userData);
-                await signIn("verifiedEmail", {
-                    email,
-                    redirect: true,
-                    callbackUrl: "/",
-                })
+                setTimeout(async () => {
+                    await signIn("verifiedEmail", {
+                        email,
+                        redirect: true,
+                        callbackUrl: "/",
+                    })
+                }, 3000)
             }
             else {
                 console.log("error in verify email");
@@ -54,10 +70,6 @@ const VerifyLogin = ({ verifyData }) => {
         }
         setVerifyData()
     }, [])
-
-    useEffect(() => {
-        console.log(session);
-    }, [session])
 
     return (
         <div>

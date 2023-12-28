@@ -13,7 +13,7 @@ import { hostname } from '@/app/api/hostname'
 import { signToken } from './serverAction/TokenAction';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { styled } from '@mui/material/styles';
-
+import { createUser } from './serverAction/signUpAction';
 
 export default function SignUp(props) {
     const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -79,6 +79,12 @@ export default function SignUp(props) {
             setIsSubmit(false)
             return
         }
+        // console.log(strength);
+        if (strength.value < 50) {
+            setError("ความยากของรหัสผ่านต้อง ปานกลาง ขึ้นไป")
+            setIsSubmit(false)
+            return
+        }
         if (password !== confirmPass) {
             setPasswordValid(true)
             setConfirmPassValid(true)
@@ -92,37 +98,16 @@ export default function SignUp(props) {
             email,
             password,
         }
-        const options = {
-            url: `${hostname}/api/auth/signup`,
-            method: 'POST',
-            withCredentials: true,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            data: data,
-        };
+        const result = await createUser(data);
+        if (result.ok) {
+            localStorage.setItem("token", await signToken({ email: data.email }))
+            router.push('/email-verify/email');
+        } else {
+            setIsSubmit(false)
+            if (result.field == "email") setemailValid(true)
+            setError(result.message)
+        }
 
-        // ======================
-        // Sign up api
-        // ======================
-        axios(options)
-            .then(async (res) => {
-                if (res.status == 201) {
-                    localStorage.setItem("token", await signToken(data))
-                    router.push('/email-verify/email');
-                    router.refresh()
-                }
-            }).catch(err => {
-                // console.log();
-                // console.log(err);
-                // console.log(error);
-                setIsSubmit(false)
-                const msg = err.response.data.message
-                const field = err.response.data.errorField
-                if (field == "email") setemailValid(true)
-                setError(msg)
-            })
     }
 
     // ======================
@@ -215,7 +200,7 @@ export default function SignUp(props) {
     }, [password])
     return (
         <NextUIProvider>
-            <div className='sm:p-8 relative'>
+            <div className='p-4 sm:p-8 relative'>
                 <div className='rounded-full cursor-pointer absolute top-[4.5%] right-[4.5%] p-1 hover:bg-opacity-50 hover:bg-slate-100'>
                     <AiOutlineClose className='w-6 h-6 text-blue-600 relative z-50' onClick={() => {
                         clearError()
@@ -238,14 +223,14 @@ export default function SignUp(props) {
                             :
                             null
                         }
-                        <div className='flex flex-row gap-4'>
+                        <div className='flex flex-col sm:flex-row gap-4'>
                             <div className='w-full'>
                                 <Input
                                     value={fname}
                                     onValueChange={setFname}
                                     isInvalid={fValid}
                                     label="ชื่อจริง"
-                                    size="md"
+                                    size="sm"
                                     type="text"
                                     autoComplete="first name"
                                 />
@@ -256,7 +241,7 @@ export default function SignUp(props) {
                                     onValueChange={setLname}
                                     isInvalid={lvalid}
                                     label="นามสกุล"
-                                    size="md"
+                                    size="sm"
                                     type="text"
                                     autoComplete="last name" />
                             </div>
@@ -267,7 +252,7 @@ export default function SignUp(props) {
                                 onValueChange={setemail}
                                 isInvalid={emailvalid}
                                 label="อีเมล"
-                                size="md"
+                                size="sm"
                                 type="email"
                                 autoComplete="username"
                             // placeholder="you@example.com"
@@ -279,7 +264,7 @@ export default function SignUp(props) {
                                 onValueChange={setPassword}
                                 isInvalid={passwordvalid}
                                 label="รหัสผ่าน"
-                                size="md"
+                                size="sm"
                                 type={(displayPass) ? "text" : "password"}
                                 autoComplete="current-password"
                                 endContent={
@@ -319,7 +304,7 @@ export default function SignUp(props) {
                                 onValueChange={setConfirmPass}
                                 isInvalid={confirmPassvalid}
                                 label="ยืนยันรหัสผ่าน"
-                                size="md"
+                                size="sm"
                                 type={(displayCon) ? "text" : "password"}
                                 autoComplete="current-password"
                                 endContent={

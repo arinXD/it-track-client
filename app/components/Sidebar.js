@@ -2,10 +2,9 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
-import { HiMiniUserGroup } from "react-icons/hi2";
-import { Home } from 'react-iconly';
-import { HiAcademicCap } from "react-icons/hi";
-import { MdQuiz } from "react-icons/md";
+import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
+import { GoHome, GoHomeFill } from "react-icons/go";
+import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
 
 const Sidebar = () => {
     const url = usePathname();
@@ -18,9 +17,15 @@ const Sidebar = () => {
                             <Link href={"/"}
                                 className={`${url == "/" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
-                                <Home
-                                    className="w-5 h-5"
-                                    set="bulk" stroke="bold" />
+                                {url == "/" ?
+                                    <GoHomeFill
+                                        className="w-5 h-5"
+                                        set="bulk" stroke="bold" />
+                                    :
+                                    <GoHome
+                                        className="w-5 h-5"
+                                        set="bulk" stroke="bold" />
+                                }
                                 <span className="ml-3 text-sm">หน้าหลัก</span>
                             </Link>
                         </li>
@@ -28,8 +33,13 @@ const Sidebar = () => {
                             <Link href={"/student/tracks"}
                                 className={`${url == "/student/tracks" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
-                                <HiMiniUserGroup
-                                    className="w-5 h-5" />
+                                {url == "/student/tracks" ?
+                                    <HiUserGroup
+                                        className="w-5 h-5" />
+                                    :
+                                    <HiOutlineUserGroup
+                                        className="w-5 h-5" />
+                                }
                                 <span className="ml-3 text-sm">คัดเลือกความเชี่ยวชาญ</span>
                             </Link>
                         </li>
@@ -37,8 +47,13 @@ const Sidebar = () => {
                             <Link href={"/student/tracks/exam"}
                                 className={`${url == "/student/tracks/exam" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
-                                <MdQuiz
-                                    className="w-5 h-5" />
+                                {url == "/student/tracks/exam" ?
+                                    <MdQuiz
+                                        className="w-5 h-5" />
+                                    :
+                                    <MdOutlineQuiz
+                                        className="w-5 h-5" />
+                                }
                                 <span className="ml-3 text-sm">หาแทรคที่เหมาะสม</span>
                             </Link>
                         </li>
@@ -46,11 +61,15 @@ const Sidebar = () => {
                             <Link href={"/student/verify"}
                                 className={`${url == "/student/verify" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
-                                <HiAcademicCap className="w-5 h-5" />
+                                {url == "/student/verify" ?
+                                    <HiAcademicCap className="w-5 h-5" />
+                                    :
+                                    <HiOutlineAcademicCap className="w-5 h-5" />
+                                }
                                 <span className="ml-3 text-sm">ตรวจสอบสำเร็จการศึกษา</span>
                             </Link>
                         </li>
-                        <li className="">
+                        {/* <li className="">
                             <Link href={"/pro"}
                                 className={`${url == "/pro" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
@@ -73,7 +92,7 @@ const Sidebar = () => {
                         </li>
                         <li className="">
                             <Link href={"/admin"}
-                                className={`${url == "/admin" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                className={`${url.includes("/admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
                                 <span className="ml-3 text-sm">Admin</span>
                             </Link>
@@ -92,6 +111,8 @@ const Sidebar = () => {
                                 <span className="ml-3">โปรแกรม</span>
                             </Link>
                         </li>
+                        </li> */}
+
                         {/* Loop but low perfomance */}
                         {/* {links.map(link => (
                             <li key={link.link}>
