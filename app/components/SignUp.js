@@ -102,7 +102,6 @@ export default function SignUp(props) {
         if (result.ok) {
             localStorage.setItem("token", await signToken({ email: data.email }))
             router.push('/email-verify/email');
-            router.refresh()
         } else {
             setIsSubmit(false)
             if (result.field == "email") setemailValid(true)

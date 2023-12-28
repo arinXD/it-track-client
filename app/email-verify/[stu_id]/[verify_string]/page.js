@@ -24,7 +24,6 @@ const VerifyingPage = async ({ params }) => {
         }
     }
     const verifyData = await verifyingEmail({ stu_id, verify_string })
-    
     return (
         <>
             <div className='container mx-auto my-24 text-center'>
