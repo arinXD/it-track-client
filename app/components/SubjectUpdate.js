@@ -27,6 +27,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 // Fetch the subject details
                 const subjectResult = await axios.get(`${hostname}/api/subjects/${subjectId}`);
                 const subjectData = subjectResult.data.data;
+                console.log(subjectData);
 
                 setSemester(subjectData.semester);
                 setSubjectCode(subjectData.subject_code);
@@ -41,7 +42,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
 
                 const subgroupResult = await axios.get(`${hostname}/api/subgroups`);
                 const subgroups = subgroupResult.data.data;
-                
+
                 const programcodeResult = await axios.get(`${hostname}/api/programcodes`);
                 const programcodes = programcodeResult.data.data;
                 // Map groups for react-select
@@ -53,7 +54,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 const selectedGroup = optionsGroups.find(option => option.value === subjectData.group_id);
                 setSelectedGroup(selectedGroup);
 
-                
+
                 const optionsSubGroups = subgroups.map((subgroup) => ({
                     value: subgroup.id,
                     label: subgroup.sub_group_title
@@ -61,14 +62,14 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 setSupGroups(optionsSubGroups);
                 const selectedSupGroup = optionsSubGroups.find(option => option.value === subjectData.sub_group_id);
                 setSelectedSubGroup(selectedSupGroup);
-                
+
                 // Corrected variable names
                 const optionsProgramCodes = programcodes.map((programcode) => ({
                     value: programcode.id,
                     label: programcode.program_title
                 }));
                 setProgramCode(optionsProgramCodes);
-                const selectedProgramCode = optionsProgramCodes.find(option => option.value === subjectData.program_code_id );
+                const selectedProgramCode = optionsProgramCodes.find(option => option.value === subjectData.program_code_id);
                 setSelectedProgramCode(selectedProgramCode);
 
             } catch (error) {
@@ -83,7 +84,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
         try {
             await axios.post(`${hostname}/api/subjects/updateSubject/${subjectId}`, {
                 semester: semester ? semester : null,
-                subject_code: subject_code ?subject_code  : null,
+                subject_code: subject_code ? subject_code : null,
                 title_th: title_th ? title_th : null,
                 title_en: title_en ? title_en : null,
                 information: information ? information : null,

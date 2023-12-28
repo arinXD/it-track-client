@@ -8,7 +8,6 @@ import Swal from 'sweetalert2';
 import { CSVLink } from 'react-csv';
 import * as XLSX from "xlsx";
 
-
 async function fetchData() {
     try {
         const groupResult = await axios.get(`${hostname}/api/groups`);
@@ -28,7 +27,7 @@ async function fetchData() {
 
         return { subjects, groups, programcodes, subgroups, programs }
     } catch (error) {
-        console.log(error);
+        console.log("fetch errpr:", error);
     }
 }
 
@@ -45,12 +44,14 @@ export default function Subject() {
 
     useEffect(() => {
         fetchData().then(data => {
+            console.log(data);
             setSubjects(data.subjects)
             setGroups(data.groups)
             setProgramcodes(data.programcodes)
             setSubgroups(data.subgroups)
             setPrograms(data.programs)
-            console.log(data);
+        }).catch(err => {
+            console.log("error on useeffect:", err);
         });
     }, []);
 
@@ -222,10 +223,11 @@ export default function Subject() {
                     <button onClick={handleExportExcel}>Export to Excel</button>
                     <div>
                         {/* Render your subject data here */}
-                        {subjects.map(subject => (
-                            <div key={subject.id}>
+                        {subjects.map((subject, index) => (
+                            <div key={index}>
                                 {/* Display subject information */}
                                 <p>
+                                    id: {subject.subject_id} <br />
                                     Program: {subject.program_code_id ?
                                         <>
                                             {programcodes.map(programcode => (
@@ -277,7 +279,7 @@ export default function Subject() {
                                 <p>Information: {subject.information || "ไม่มีข้อมูล"}</p>
                                 <p>Cradit: {subject.cradit || "ไม่มีข้อมูล"}</p>
                                 <button onClick={() => handleUpdateModalOpen(subject)}>Update</button>
-                                <button onClick={() => handleDeleteSubject(subject.id)}>Delete</button>
+                                <button onClick={() => handleDeleteSubject(subject.subject_id)}>Delete</button>
                                 <p>______________________________________________________________________</p>
                             </div>
                         ))}
@@ -289,13 +291,14 @@ export default function Subject() {
 
             {/* Render the SubjectInsert modal */}
             <SubjectInsert isOpen={isInsertModalOpen} onClose={handleInsertModalClose} onDataInserted={handleDataInserted} />
-
-            <SubjectUpdate
-                isOpen={isUpdateModalOpen}
-                onClose={handleUpdateModalClose}
-                onUpdate={handleDataUpdated}
-                subjectId={selectedSubjectForUpdate ? selectedSubjectForUpdate.id : null}
-            />
+            {selectedSubjectForUpdate?.subject_id &&
+                <SubjectUpdate
+                    isOpen={isUpdateModalOpen}
+                    onClose={handleUpdateModalClose}
+                    onUpdate={handleDataUpdated}
+                    subjectId={selectedSubjectForUpdate.subject_id}
+                />
+            }
         </>
     );
 }
