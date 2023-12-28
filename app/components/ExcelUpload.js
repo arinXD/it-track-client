@@ -9,6 +9,7 @@ import { hostname } from '@/app/api/hostname';
 function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
   const [data, setData] = useState([]);
   const [editingCell, setEditingCell] = useState(null);
+  const [editingTbody, setEditingTbody] = useState(null);
   const [displayHeaders, setDisplayHeaders] = useState([]);
   const [originalHeaders, setOriginalHeaders] = useState([]);
 
@@ -45,6 +46,7 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
       console.log('Inserted subjects:', result.data.data);
 
       onDataInsertXlsx();
+      handleClearFile();
     } catch (error) {
       console.error('Error inserting subjects:', error);
       // Handle error if needed
@@ -66,12 +68,26 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
   const handleCellBlur = () => {
     setEditingCell(null);
   };
+  const handleCellBlurTbody = () => {
+    setEditingTbody(null);
+  };
 
   const handleCellChange = (e, rowIndex, columnIndex) => {
     if (editingCell && editingCell.columnIndex !== undefined) {
       const newHeaders = [...displayHeaders];
       newHeaders[editingCell.columnIndex] = e.target.value;
       setDisplayHeaders(newHeaders);
+    }
+  };
+  const handleCellDoubleClick = (rowIndex, columnIndex) => {
+    setEditingTbody({ rowIndex, columnIndex });
+  };
+
+  const handleCellInputChange = (e, rowIndex, columnIndex) => {
+    if (editingTbody && editingTbody.columnIndex !== undefined) {
+      const newData = [...data];
+      newData[rowIndex][originalHeaders[columnIndex]] = e.target.value;
+      setData(newData);
     }
   };
 
@@ -112,17 +128,17 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
                   {originalHeaders.map((originalHeader, columnIndex) => (
                     <td
                       key={columnIndex}
-                      onDoubleClick={() => handleDoubleClick(rowIndex, columnIndex)}
+                      onDoubleClick={() => handleCellDoubleClick(rowIndex, columnIndex)}
                     >
-                      {editingCell &&
-                        editingCell.rowIndex === rowIndex &&
-                        editingCell.columnIndex === columnIndex ? (
+                      {editingTbody &&
+                        editingTbody.rowIndex === rowIndex &&
+                        editingTbody.columnIndex === columnIndex ? (
                         <input
                           value={row[originalHeader]}
                           onChange={(e) =>
-                            handleCellChange(e, rowIndex, columnIndex)
+                            handleCellInputChange(e, rowIndex, columnIndex)
                           }
-                          onBlur={handleCellBlur}
+                          onBlur={handleCellBlurTbody}
                           autoFocus
                         />
                       ) : (
