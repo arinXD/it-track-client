@@ -13,6 +13,32 @@ import { GoHome, GoHomeFill } from "react-icons/go";
 import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
 
 const Navbar = () => {
+    const links = [
+        {
+            href: "/",
+            activeIcon: <GoHomeFill className="w-5 h-5" />,
+            icon: <GoHome className="w-5 h-5" />,
+            label: "หน้าหลัก"
+        },
+        {
+            href: "/student/tracks",
+            activeIcon: <HiUserGroup className="w-5 h-5" />,
+            icon: <HiOutlineUserGroup className="w-5 h-5" />,
+            label: "คัดเลือกความเชี่ยวชาญ"
+        },
+        {
+            href: "/student/tracks/exam",
+            activeIcon: <MdQuiz className="w-5 h-5" />,
+            icon: <MdOutlineQuiz className="w-5 h-5" />,
+            label: "หาแทรคที่เหมาะสม"
+        },
+        {
+            href: "/student/verify",
+            activeIcon: <HiAcademicCap className="w-5 h-5" />,
+            icon: <HiOutlineAcademicCap className="w-5 h-5" />,
+            label: "ตรวจสอบสำเร็จการศึกษา"
+        },
+    ]
     const { data: session, status } = useSession();
     const [openToggle, setOpenToggle] = useState(false)
     const [profileToggle, setProfileToggle] = useState(false)
@@ -87,7 +113,7 @@ const Navbar = () => {
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
                         <div className="relative ml-3 flex flex-row gap-3">
                             {status == "authenticated" ?
-                                <div className='relative flex justify-center items-center gap-5'>
+                                <div className='relative hidden sm:flex justify-center items-center gap-5'>
                                     {
                                         session?.user?.role === "admin" &&
                                         <Link href="/admin">
@@ -136,14 +162,7 @@ const Navbar = () => {
                                     </div>
                                 </div>
                                 :
-                                <div className='relative flex justify-center items-center gap-2'>
-                                    {/* <Image
-                                        className='p-1 border-1 rounded-full'
-                                        // src={session?.user?.image}
-                                        src={'/image/user.png'}
-                                        width={40} height={40}
-                                        alt="user image"
-                                    /> */}
+                                <div className='relative hidden sm:flex justify-center items-center gap-2'>
                                     <div className='w-[40px] h-[40px] border-1 rounded-full bg-gray-200'>
 
                                     </div>
@@ -164,59 +183,70 @@ const Navbar = () => {
             </div>
             {openToggle &&
                 <div className="sm:hidden" id="mobile-menu">
-                    <div className="space-y-1 px-2 pb-3 pt-2">
-                        <Link href={"/"}
-                            className={`${url == "/" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                        >
-                            {url == "/" ?
-                                <GoHomeFill
-                                    className="w-5 h-5"
-                                    set="bulk" stroke="bold" />
+                    <div className="space-y-1 p-2 border-t-1 border-t-gray-200">
+                        {session &&
+                            <div className="flex gap-4 items-start mb-1 border-b-1 border-b-gray-200 py-3 p-2">
+                                <Image
+                                    className='rounded-full border-1 border-slate-300'
+                                    src={session?.user?.image}
+                                    width={45} height={45}
+                                    alt="user image"
+                                />
+                                <div className='w-full'>
+                                    <div>
+                                        <div>{session?.user?.name}</div>
+                                        <div className='text-sm text-gray-500'>{session?.user?.email}</div>
+                                    </div>
+                                    <div className='mt-2 flex flex-row gap-4 justify-start items-center'>
+                                        <Link href={"/"} className='text-sm text-blue-500 border-1 border-blue-500 p-1 px-2 rounded-md'>ดูโปรไฟล์</Link>
+                                        {session?.user?.role == "admin" &&
+                                            <Link onClick={() => setOpenToggle(false)} href={"/admin"} className='text-sm text-amber-400 rounded-md p-1 px-2 border-1 border-amber-400'>Admin Panel</Link>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        {links.map((link, index) => (
+                            index == 0 && session?.user?.role == "admin" ?
+                                <Link href={"/admin"}
+                                    className={`${url.includes("admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                    onClick={() => setOpenToggle(false)}
+                                    key={index}
+                                >
+                                    {url.includes("admin") ?
+                                        <>{link.activeIcon}</>
+                                        :
+                                        <>{link.icon}</>
+                                    }
+                                    <span className="ml-3 text-sm">Admin Panel</span>
+                                </Link>
                                 :
-                                <GoHome
-                                    className="w-5 h-5"
-                                    set="bulk" stroke="bold" />
-                            }
-                            <span className="ml-3 text-sm">หน้าหลัก</span>
-                        </Link>
-                        <Link href={"/student/tracks"}
-                            className={`${url == "/student/tracks" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                        >
-                            {url == "/student/tracks" ?
-                                <HiUserGroup
-                                    className="w-5 h-5" />
-                                :
-                                <HiOutlineUserGroup
-                                    className="w-5 h-5" />
-                            }
-                            <span className="ml-3 text-sm">คัดเลือกความเชี่ยวชาญ</span>
-                        </Link>
-                        <Link href={"/student/tracks/exam"}
-                            className={`${url == "/student/tracks/exam" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                        >
-                            {url == "/student/tracks/exam" ?
-                                <MdQuiz
-                                    className="w-5 h-5" />
-                                :
-                                <MdOutlineQuiz
-                                    className="w-5 h-5" />
-                            }
-                            <span className="ml-3 text-sm">หาแทรคที่เหมาะสม</span>
-                        </Link>
-                        <Link href={"/student/verify"}
-                            className={`${url == "/student/verify" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                        >
-                            {url == "/student/verify" ?
-                                <HiAcademicCap className="w-5 h-5" />
-                                :
-                                <HiOutlineAcademicCap className="w-5 h-5" />
-                            }
-                            <span className="ml-3 text-sm">ตรวจสอบสำเร็จการศึกษา</span>
-                        </Link>
+                                <Link href={link.href}
+                                    className={`${url == link.href ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                    onClick={() => setOpenToggle(false)}
+                                    key={index}
+                                >
+                                    {url == link.href ?
+                                        <>{link.activeIcon}</>
+                                        :
+                                        <>{link.icon}</>
+                                    }
+                                    <span className="ml-3 text-sm">{link.label}</span>
+                                </Link>
+                        ))}
+                        <div className='border-t-1 border-t-gray-200 cursor-pointer'
+                            onClick={() => signOut()}>
+                            <div className='flex rounded-md p-2 py-3 hover:bg-gray-200 mt-1'>
+                                <div className='text-gray-900'>
+                                    <MdOutlineLogout className='w-5 h-5' />
+                                </div>
+                                <button className='ml-3 text-sm'>Sign out</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             }
-        </nav>
+        </nav >
     )
 }
 

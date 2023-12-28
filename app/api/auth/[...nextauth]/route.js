@@ -32,14 +32,7 @@ const VerifiedEmailProvider = (options) => {
                     const userData = result.data.userData
                     return {
                         id: null,
-                        name: userData.name,
-                        stu_id: userData.stu_id || null,
-                        email: userData.email,
-                        image: userData.image,
-                        role: userData.role,
-                        firstname: userData.fname,
-                        lastname: userData.lname,
-                        verification: userData.verification,
+                        ...userData
                     }
                 }
             } catch (error) {
@@ -70,17 +63,10 @@ const handler = NextAuth({
                 })
                 const response = await res.json()
                 if (res.ok && response) {
-                    const userData = response.user
+                    let userData = response.user
                     return {
                         id: null,
-                        name: userData.name,
-                        stu_id: userData.stu_id || null,
-                        email: userData.email,
-                        image: userData.image,
-                        role: userData.role,
-                        firstname: userData.fname,
-                        lastname: userData.lname,
-                        verification: userData.verification,
+                        ...userData
                     }
                 }
                 // console.log(response);
@@ -92,7 +78,6 @@ const handler = NextAuth({
             async profile(profile) {
                 return {
                     id: profile.sub,
-                    stu_id: null,
                     email: profile.email,
                     name: profile.name,
                     firstname: profile.given_name,
@@ -107,7 +92,6 @@ const handler = NextAuth({
     ],
     callbacks: {
         async signIn({ user, account }) {
-
             if (account.provider === "google") {
                 const token = await signToken({ email: user.email })
                 const options = {
@@ -124,10 +108,13 @@ const handler = NextAuth({
 
                 try {
                     const result = await axios(options)
-                    console.log(result.data);
-                    if (result.data.data) {
-                        user.stu_id = result.data.data.stu_id || null
-                        user.role = result.data.data.role
+                    let userData = result.data.data
+                    if (userData) {
+                        for (let key in userData) {
+                            if (!(user.hasOwnProperty(key))) {
+                                user[key] = userData[key];
+                            }
+                        }
                     }
                 } catch (error) {
                     const message = error.response.data.message
@@ -147,21 +134,13 @@ const handler = NextAuth({
                 return token
             }
             if (user) {
-                token.role = user.role
-                token.stu_id = user.stu_id
-                token.firstname = user.firstname
-                token.lastname = user.lastname
-                token.verification = user.verification
+                user.picture = token.picture
+                token = user
             }
             return token
         },
         async session({ session, token }) {
-            session.user.role = token.role
-            session.user.stu_id = token.stu_id
-            session.user.firstname = token.firstname
-            session.user.lastname = token.lastname
-            session.user.verification = token.verification
-            session.user.test = token.test
+            session.user = token
             return session
         }
     },

@@ -23,13 +23,13 @@ const auth = withAuth(
             && req.nextauth.token.role !== "teacher"
             && req.nextauth.token.role !== "admin") {
             return NextResponse.rewrite(
-                new URL("/permission/Teacher+account", req.url)
+                new URL("/permission/Teacher-account", req.url)
             )
         }
         if (path.startsWith("/admin")
             && req.nextauth.token.role !== "admin") {
             return NextResponse.rewrite(
-                new URL("/permission/Admin+account", req.url)
+                new URL("/permission/Admin-account", req.url)
             )
         }
 

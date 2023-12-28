@@ -53,7 +53,8 @@ export async function updateAcadYear(formData) {
         revalidatePath("/admin/acadyears");
         return result.data
     } catch (err) {
-        return { data: null }
+        const data = err.response.data
+        return data
     }
 }
 export async function destroyAcadYear(id) {

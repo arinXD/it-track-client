@@ -12,13 +12,9 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 function checkCurrentYear(year) {
     const currentYear = new Date().getFullYear();
     if (year == currentYear + 543) {
-        return (
-            <span className="inline-block ms-4 text-sm text-gray-400 py-[.15em] px-[.7em] border border-gray-200 rounded-full">
-                current year
-            </span>
-        )
+        return true
     } else {
-        return null
+        return false
     }
 }
 
@@ -163,43 +159,54 @@ export default function AdminTable({
 
     return (
         <div className="max-w-screen-xl mx-auto">
-            <div className="flex justify-end gap-4">
+            <div className="flex flex-col md:flex-row justify-end gap-3 mb-3">
                 <div className="flex justify-end">
-                    <div className="rounded-e-none py-2 px-3 text-sm mb-3 text-gray-900 rounded-lg bg-gray-100">
+                    <div className="rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
                         <BiSearch className="w-5 h-5 text-gray-900" />
                     </div>
                     <input
                         type="search"
                         id="search"
-                        className="rounded-s-none pl-0 py-2 px-4 text-sm mb-3 text-gray-900 rounded-lg bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="rounded-s-none pl-0 py-2 px-4 text-sm text-gray-900 rounded-lg bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Search..."
                         value={searchQuery}
                         style={{ width: '100%' }}
                         onChange={(e) => handleSearch(e.target.value)}
                     />
                 </div>
-                <Button onPress={onOpenCreate} color="primary" startContent={<PlusIcon className={'w-6 h-6 text-white'} />}>
-                    Add New
-                </Button>
-                <Button onClick={handlerMultipleDestroy} className="bg-red-400 text-white" startContent={<DeleteIcon className={'w-5 h-5 text-white'} />}>
-                    Delete select
-                </Button>
+                <div className="flex md:flex-row gap-3">
+                    <Button
+                        className="w-1/2"
+                        onPress={onOpenCreate}
+                        color="primary"
+                    >
+                        <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
+                        Add New
+                    </Button>
+                    <Button
+                        className="bg-red-400 text-white w-1/2"
+                        onClick={handlerMultipleDestroy}
+                    >
+                        <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
+                        Delete select
+                    </Button>
+                </div>
             </div>
             <form name="multipleDelete">
-                <table className="w-full overflow-y-auto text-sm text-left text-gray-500">
+                <table className="w-full block md:table overflow-x-auto text-sm text-left text-gray-500">
                     {
                         data.length > 0 ?
                             (<>
                                 <thead className="text-xs bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3">
+                                        <th className="px-6 py-3 text-center">
                                             <input type="checkbox" id="checkAllBtn" onChange={() => setcheckedAll(!checkedAll)} />
                                         </th>
-                                        <th key="no" className="px-6 py-3">
+                                        <th key="no" className="px-6 py-3 text-center">
                                             No.
                                         </th>
                                         {columns.map((column, index) => (
-                                            <th key={column} className="px-6 py-3">
+                                            <th key={column} className="px-6 py-3 text-center">
                                                 {column}
                                             </th>
                                         ))}
@@ -212,7 +219,7 @@ export default function AdminTable({
                                     {totalItems > 0 ? (
                                         currentData.map((e, i) => (
                                             <tr key={i} className="bg-white border-b">
-                                                <td className="px-6 py-4">
+                                                <td className="px-6 py-4 text-center">
                                                     <input
                                                         className="acadCheckbox"
                                                         type="checkbox"
@@ -221,21 +228,30 @@ export default function AdminTable({
                                                 </td>
                                                 <td
                                                     key={`number-${i}`}
-                                                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                                                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-center"
                                                 >
                                                     {i + 1}
                                                 </td>
                                                 {columns.map((column, index) => (
                                                     <td
                                                         key={`${column}-${i}`}
-                                                        className="text-gray-900 px-6 py-4"
+                                                        className="text-gray-900 px-6 py-4 text-center"
                                                     >
                                                         {
                                                             // current year
                                                             column === "acadyear" ?
-                                                                (<>{e[column]} {checkCurrentYear(e[column])}</>)
+                                                                (
+                                                                    <div className="flex flex-col md:flex-row justify-center items-center gap-1 md:gap-3">
+                                                                        {checkCurrentYear(e[column]) &&
+                                                                            <span className="block text-sm text-gray-400 py-[.05em] px-[.4em] border border-gray-200 rounded-full">
+                                                                                current
+                                                                            </span>
+                                                                        }
+                                                                        <span className="block">{e[column]}</span>
+                                                                    </div>
+                                                                )
                                                                 :
-                                                                (<>{e[column]}</>)
+                                                                (<span>{e[column]}</span>)
                                                         }
                                                     </td>
                                                 ))}
@@ -335,7 +351,7 @@ export default function AdminTable({
                     }
                 </table>
             </form>
-            <div className="flex items-center justify-between border-t">
+            <div className="flex items-center justify-between mt-3">
                 <div className="flex flex-1 justify-between sm:hidden">
                     <button
                         onClick={() => setCurrentPage(currentPage - 1)}
