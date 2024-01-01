@@ -59,7 +59,6 @@ const AcadYears = ({ data }) => {
                     onOpenUpdate={onOpenUpdate}
                     callUpdate={callUpdate}
                     data={data}
-                    showToastMessage={showToastMessage}
                 />
             </div>
             <>
@@ -121,8 +120,10 @@ const AcadYears = ({ data }) => {
                                     //  action={createAcadYear}
                                     onSubmit={async (e) => {
                                         e.preventDefault();
-                                        const { ok, message } = await createAcadYear(new FormData(e.target));
-                                        showToastMessage(ok, message)
+                                        const { data } = await createAcadYear(new FormData(e.target));
+                                        for(let element of data){
+                                            showToastMessage(element.ok, element.message)
+                                        };
                                         onClose();
                                     }}
                                 >
@@ -131,10 +132,10 @@ const AcadYears = ({ data }) => {
                                             name="acadyear"
                                             defaultValue={currentYear}
                                             label="ปีการศึกษา"
-                                            type="number"
+                                            type="text"
                                             variant="outlined"
                                             inputProps={{
-                                                min: 1,
+                                                min: 1000,
                                                 max: 9999,
                                             }}
                                         />

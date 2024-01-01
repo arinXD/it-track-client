@@ -4,7 +4,8 @@ export default function RootLayout({
     children
 }) {
     return (
-        <html data-theme="winter">
+        // <html data-theme="winter">
+        <html>
             <body suppressHydrationWarning={true}>
                 <main>
                     <AuthProvider>

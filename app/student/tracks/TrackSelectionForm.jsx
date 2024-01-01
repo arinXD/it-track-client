@@ -7,53 +7,41 @@ import { createTrackSelection } from './action'
 import Swal from 'sweetalert2'
 import { Button } from "@nextui-org/react";
 import { DeleteIcon } from '@/app/components/icons'
+import { dmy, dmyt } from '@/src/util/dateFormater'
 
-const initOrder = {
-    order1: "", order2: "", order3: "",
-}
-const OrderReducer = (state, { type, payload }) => {
-    switch (type) {
-        case 'SET_ORDER_1':
-            return {
-                ...state,
-                order1: payload
-            };
-        case 'SET_ORDER_2':
-            return {
-                ...state,
-                order2: payload
-            };
-        case 'SET_ORDER_3':
-            return {
-                ...state,
-                order3: payload
-            };
-        case "CLEAR_ORDER":
-            return {
-                order1: "",
-                order2: "",
-                order3: "",
-            };
-        default:
-            return state;
-    }
-};
 
 const TrackSelectionForm = ({ enrollments, userData }) => {
-    const months = {
-        1: 'มกราคม',
-        2: 'กุมภาพันธ์',
-        3: 'มีนาคม',
-        4: 'เมษายน',
-        5: 'พฤษภาคม',
-        6: 'มิถุนายน',
-        7: 'กรกฎาคม',
-        8: 'สิงหาคม',
-        9: 'กันยายน',
-        10: 'ตุลาคม',
-        11: 'พฤศจิกายน',
-        12: 'ธันวาคม',
+    const initOrder = {
+        order1: "", order2: "", order3: "",
     }
+    const OrderReducer = (state, { type, payload }) => {
+        switch (type) {
+            case 'SET_ORDER_1':
+                return {
+                    ...state,
+                    order1: payload
+                };
+            case 'SET_ORDER_2':
+
+                return {
+                    ...state,
+                    order2: payload
+                };
+            case 'SET_ORDER_3':
+                return {
+                    ...state,
+                    order3: payload
+                };
+            case "CLEAR_ORDER":
+                return {
+                    order1: "",
+                    order2: "",
+                    order3: "",
+                };
+            default:
+                return state;
+        }
+    };
     const [isConfirm, setIsConfirm] = useState(false)
     const [trackSelect, setTrackSelect] = useState({})
     const [trackSubjects, setTrackSubjects] = useState([])
@@ -79,33 +67,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             select.value = '';
         });
     }
-    const convertTime = (timestamp) => {
-        const timestampDate = new Date(timestamp);
-        const thailandOffset = 7;
-        timestampDate.setHours(timestampDate.getHours() + thailandOffset);
-        const formattedTimestamp = timestampDate.toISOString().replace('T', ' ').slice(0, -8);
-        return (formattedTimestamp);
-    };
-    const dmy = (dateString) => {
-        const dateObject = new Date(dateString);
-        const day = dateObject.getDate();
-        let month = dateObject.getMonth() + 1; // zero-based
-        month = months[month]
-        const year = dateObject.getFullYear() + 543;
-        const formattedDate = `${day} ${month} ${year}`;
-        return formattedDate
-    }
-    const dmyt = (dateString) => {
-        const dateObject = new Date(dateString);
-        const day = dateObject.getDate();
-        let month = dateObject.getMonth() + 1; // zero-based
-        month = months[month]
-        const year = dateObject.getFullYear() + 543;
-        const hours = dateObject.getHours();
-        const minutes = dateObject.getMinutes();
-        const formattedDate = `${day} ${month} ${year} เวลา ${hours}:${minutes} น.`;
-        return formattedDate
-    }
     const handleSubmit = async (event) => {
         isProcessing(true)
         event.preventDefault();
@@ -113,7 +74,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         const result = await createTrackSelection(formData)
         const data = result.data
         isProcessing(false)
-        // console.log(data);
         if (result.ok) {
             Swal.fire({
                 title: "บันทึกข้อมูลการคัดเลือก",
@@ -125,7 +85,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         } else {
             Swal.fire({
                 title: "Warning!",
-                text: `${result}`,
+                text: `มีบางอย่างผิดพลาด ${result.message}`,
                 icon: "warning",
                 confirmButtonColor: "#3085d6",
                 confirmButtonText: "ตกลง"
@@ -176,6 +136,32 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         }
         fetchData()
     }, [userData])
+
+    const handleChange = async (value, index) => {
+        const type = `SET_ORDER_${index + 1}`;
+        dispatch({
+            type,
+            payload: value,
+        });
+    };
+    useEffect(() => {
+        if ([orders.order1, orders.order2, orders.order3].filter(e => e).length === 2) {
+            const trackArr = [orders.order1, orders.order2, orders.order3]
+            let c = trackArr.findIndex((track) => track == "")
+            const result = tracks.filter(
+                t => {
+                    return !(trackArr.includes(t.track))
+                }
+            );
+            const type = `SET_ORDER_${c + 1}`
+            const payload = result[0].track
+            dispatch({
+                type,
+                payload
+            });
+        }
+    }, [orders]);
+
     if (userData?.track != null) {
         console.log(userData);
         return (
@@ -206,7 +192,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                     :
                     <>
 
-                        {(trackSelect.has_finished || new Date(trackSelect.expiredAt) < new Date()) ?
+                        {(trackSelect.has_finished || (new Date(trackSelect.expiredAt) < new Date())) ?
                             <p>
                                 การคัดเลือกความเชี่ยวชาญ หลักสูตรเทคโนโลยีสารสนเทศ
                                 <strong> จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
@@ -273,22 +259,18 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             <label className="block font-bold text-black text-base">เลือกอันดับความเชี่ยวชาญ (แทรค) ที่ต้องการ</label>
                                             <label className="block text-sm font-medium text-black mb-5 mt-2">* อันดับแรกคืออันดับที่ต้องการมากที่สุด จากนั้นเลือกอันดับที่ต้องการรองจากอับดับแรก ในกรณีที่อับดับแรกเต็ม</label>
                                         </div>
-                                        {/* <div>
-                                            {order1} {order2} {order3}
-                                        </div> */}
+                                        <div>
+                                            {/* {JSON.stringify([orders.order1, orders.order2, orders.order3].filter(e => e))} <br /> */}
+                                            {/* {[orders.order1, orders.order2, orders.order3].filter(e => e).length} <br /> */}
+                                            {/* {JSON.stringify(tracks.filter((t) => ![orders.order1, orders.order2, orders.order3].includes(t.track)))} */}
+                                        </div>
                                         <div>
                                             {tracks.map((e, index) => (
                                                 <div key={index}>
                                                     <label className="block text-sm font-medium text-black mb-2">อันดับที่ {index + 1}</label>
                                                     <div className="relative h-11 w-full mb-4">
                                                         <select
-                                                            onChange={(event) => {
-                                                                const type = `SET_ORDER_${index + 1}`
-                                                                dispatch({
-                                                                    type,
-                                                                    payload: event.target.value
-                                                                });
-                                                            }}
+                                                            onChange={() => handleChange(event.target.value, index)}
                                                             required={true}
                                                             name={`track_order_${index + 1}`}
                                                             value={

@@ -5,4 +5,10 @@ export async function isEmptyObj(obj) {
         return false
     }
 }
-
+export async function getObjKey(obj) {
+    if (!(Object.keys(obj).length === 0)) {
+        return Object.keys(obj)
+    } else {
+        return []
+    }
+}

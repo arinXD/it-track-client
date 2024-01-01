@@ -1,6 +1,5 @@
-'use client';
+"use client"
 import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '../components';
-import { useState, useEffect } from 'react';
 import React from 'react';
 import Link from 'next/link';
 
@@ -15,8 +14,8 @@ const Page = () => {
     ]
     const tracks = [
         { href: "/admin/track", lable: "ข้อมูลแทรค" },
-        { href: "/admin/track/selection", lable: "คัดเลือกแทรค" },
-        { href: "/admin/track/student", lable: "รายชื่อนักศึกษาภายในแทรค" },
+        { href: "/admin/track-selection", lable: "คัดเลือกแทรค" },
+        { href: "/admin/track-student", lable: "รายชื่อนักศึกษาภายในแทรค" },
     ]
     return (
         <>

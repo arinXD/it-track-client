@@ -1,7 +1,19 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
+const links = {
+    "/": "หน้าหลัก",
+    "admin": "หน้าหลัก",
+    "acadyears": "ปีการศึกษา",
+    "program": "หลักสูตร",
+    "category": "หมวดหมู่วิชา",
+    "group": "กลุ่มวิชา",
+    "subgroup": "กลุ่มย่อยวิชา",
+    "subject": "วิชา",
+    "track": "ข้อมูลแทรค",
+    "track-selection": "คัดเลือกแทรค",
+    "track-student": "รายชื่อนักศึกษาภายในแทรค",
+}
 const BreadCrumb = () => {
     const url = usePathname();
     const urls = url.split("/").filter(e => e)
@@ -20,10 +32,10 @@ const BreadCrumb = () => {
                                             </svg>
                                             {
                                                 index + 1 === urls.length ?
-                                                    <span className="text-sm font-medium text-gray-500">{url}</span>
+                                                    <span className="text-sm font-medium text-gray-500">{links[url]}</span>
                                                     :
                                                     <Link href={`/${url}`} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-                                                        {url}
+                                                        {links[url]}
                                                     </Link>
 
                                             }
@@ -35,10 +47,10 @@ const BreadCrumb = () => {
                                             </svg>
                                             {
                                                 index + 1 === urls.length ?
-                                                    <span className="ms-1 text-sm font-medium text-gray-500 md:ms-2">{url}</span>
+                                                    <span className="ms-1 text-sm font-medium text-gray-500 md:ms-2">{links[url]}</span>
                                                     :
                                                     <Link href={`/${url}`} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-                                                        {url}
+                                                        {links[url]}
                                                     </Link>
                                             }
                                         </>

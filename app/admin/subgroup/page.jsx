@@ -2,7 +2,7 @@
 
 // subgroup.js
 import React, { useState, useEffect } from 'react';
-import { Navbar, Sidebar, SubGroupInsert, SubGroupUpdate } from '@/app/components';
+import { Navbar, Sidebar, SubGroupInsert, SubGroupUpdate, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import Swal from 'sweetalert2';
@@ -110,35 +110,34 @@ export default function SubGroup() {
                 <Navbar />
             </header>
             <Sidebar />
-            <div className='mt-16'>
-                <div className='p-8 sm:ml-72'>
-                    <h1>SubGroup:</h1>
-                    <div>
-                        {subGroups.map(subgroup => (
-                            <div key={subgroup.id}>
-                                <p>{subgroup.category ? subgroup.category.category_title : 'No Category'}</p>
-                                <p>{subgroup.group ? subgroup.group.group_title : 'No SubGroup'}</p>
-                                <h1 className='font-bold'>{subgroup.sub_group_title}</h1>
-                                <button onClick={() => handleUpdateModalOpen(subgroup)}>Update</button>
-                                <button onClick={() => handleDeleteSubGroup(subgroup.id)}>Delete</button>
-                                {/* Add other subgroup properties as needed */}
-                            </div>
-                        ))}
-                    </div>
-                    <button onClick={handleInsertModalOpen}>Add SubGroup</button>
+            <ContentWrap>
+                <BreadCrumb />
+                <h1>SubGroup:</h1>
+                <div>
+                    {subGroups.map(subgroup => (
+                        <div key={subgroup.id}>
+                            <p>{subgroup.category ? subgroup.category.category_title : 'No Category'}</p>
+                            <p>{subgroup.group ? subgroup.group.group_title : 'No SubGroup'}</p>
+                            <h1 className='font-bold'>{subgroup.sub_group_title}</h1>
+                            <button onClick={() => handleUpdateModalOpen(subgroup)}>Update</button>
+                            <button onClick={() => handleDeleteSubGroup(subgroup.id)}>Delete</button>
+                            {/* Add other subgroup properties as needed */}
+                        </div>
+                    ))}
                 </div>
-            </div>
+                <button onClick={handleInsertModalOpen}>Add SubGroup</button>
 
-            {/* Render the SubGroupInsert modal */}
-            <SubGroupInsert isOpen={isInsertModalOpen} onClose={handleInsertModalClose} onDataInserted={handleDataInserted} />
+                {/* Render the SubGroupInsert modal */}
+                <SubGroupInsert isOpen={isInsertModalOpen} onClose={handleInsertModalClose} onDataInserted={handleDataInserted} />
 
-            {/* Render the SubGroupUpdate modal */}
-            <SubGroupUpdate
-                isOpen={isUpdateModalOpen}
-                onClose={handleUpdateModalClose}
-                onUpdate={handleDataUpdated}
-                subGroupId={selectedSubGroupForUpdate ? selectedSubGroupForUpdate.id : null}
-            />
+                {/* Render the SubGroupUpdate modal */}
+                <SubGroupUpdate
+                    isOpen={isUpdateModalOpen}
+                    onClose={handleUpdateModalClose}
+                    onUpdate={handleDataUpdated}
+                    subGroupId={selectedSubGroupForUpdate ? selectedSubGroupForUpdate.id : null}
+                />
+            </ContentWrap>
         </>
     );
 }

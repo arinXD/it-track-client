@@ -5,8 +5,10 @@ import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoHome, GoHomeFill } from "react-icons/go";
 import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
+import { useSession } from "next-auth/react"
 
 const Sidebar = () => {
+    const { data: session } = useSession();
     const url = usePathname();
     return (
         <>
@@ -14,20 +16,37 @@ const Sidebar = () => {
                 <div className="h-full px-3 py-4 lg:px-5 overflow-y-auto bg-white">
                     <ul className="font-medium space-y-1">
                         <li className="">
-                            <Link href={"/"}
-                                className={`${url == "/" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                            >
-                                {url == "/" ?
-                                    <GoHomeFill
-                                        className="w-5 h-5"
-                                        set="bulk" stroke="bold" />
-                                    :
-                                    <GoHome
-                                        className="w-5 h-5"
-                                        set="bulk" stroke="bold" />
-                                }
-                                <span className="ml-3 text-sm">หน้าหลัก</span>
-                            </Link>
+                            {session?.user?.role == "admin" ?
+                                <Link href={"/admin"}
+                                    className={`${url.includes("admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                >
+                                    {url.includes("admin") ?
+                                        <GoHomeFill
+                                            className="w-5 h-5"
+                                            set="bulk" stroke="bold" />
+                                        :
+                                        <GoHome
+                                            className="w-5 h-5"
+                                            set="bulk" stroke="bold" />
+                                    }
+                                    <span className="ml-3 text-sm">Admin Panel</span>
+                                </Link>
+                                :
+                                <Link href={"/"}
+                                    className={`${url == "/" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                >
+                                    {url == "/" ?
+                                        <GoHomeFill
+                                            className="w-5 h-5"
+                                            set="bulk" stroke="bold" />
+                                        :
+                                        <GoHome
+                                            className="w-5 h-5"
+                                            set="bulk" stroke="bold" />
+                                    }
+                                    <span className="ml-3 text-sm">หน้าหลัก</span>
+                                </Link>
+                            }
                         </li>
                         <li className="">
                             <Link href={"/student/tracks"}

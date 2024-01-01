@@ -37,11 +37,11 @@ module.exports = {
             // => @media (min-width: 1536px) { ... }
         },
     },
-    daisyui: {
-        themes: ["winter"],
-    },
+    // daisyui: {
+    //     themes: ["winter"],
+    // },
     plugins: [
-        require("daisyui"),
+        // require("daisyui"),
         nextui(),
         require('tailwindcss-animated'),
     ],

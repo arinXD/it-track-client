@@ -2,12 +2,12 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import React from 'react';
-import { BiSearch } from 'react-icons/bi';
-import { Button } from "@nextui-org/react";
-import { PlusIcon, EditIcon, DeleteIcon } from "@/app/components/icons";
+import { Button, Input } from "@nextui-org/react";
+import { PlusIcon, EditIcon, DeleteIcon, SearchIcon } from "@/app/components/icons";
 import { destroyAcadYear, destroyMultipleAcadYear } from './action';
 import Swal from 'sweetalert2'
 import { HiOutlineDotsVertical } from "react-icons/hi";
+import { dmy } from "@/src/util/dateFormater";
 
 function checkCurrentYear(year) {
     const currentYear = new Date().getFullYear();
@@ -19,9 +19,7 @@ function checkCurrentYear(year) {
 }
 
 export default function AdminTable({
-    data,
-    onOpenCreate, showToastMessage,
-    onOpenUpdate, callUpdate,
+    data, onOpenCreate, onOpenUpdate, callUpdate,
 }) {
     const [initData, setInitData] = useState({})
     const [processStatus, setProcessStatus] = useState(false)
@@ -29,7 +27,7 @@ export default function AdminTable({
     const [filteredData, setFilteredData] = useState(data);
     const [currentPage, setCurrentPage] = useState(1);
     const [checkedAll, setcheckedAll] = useState(false)
-    const itemsPerPage = 10;
+    const [itemsPerPage, setItemPerPage] = useState(10);
     let columns
     const modalRef = useRef()
 
@@ -50,10 +48,6 @@ export default function AdminTable({
     }
 
     useEffect(() => {
-        let initData = {}
-        data.map(e => {
-            initData[e.acadyear] = false
-        })
         setFilteredData(data)
         clearInitData()
     }, [data])
@@ -149,20 +143,28 @@ export default function AdminTable({
         }
     };
 
+    useEffect(() => {
+        totalItems = filteredData.length;
+        totalPages = Math.ceil(totalItems / itemsPerPage);
 
-    const totalItems = filteredData.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+        startIndex = (currentPage - 1) * itemsPerPage;
+        endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+        currentData = filteredData.slice(startIndex, endIndex);
+    }, [itemsPerPage])
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-    const currentData = filteredData.slice(startIndex, endIndex);
+    let totalItems = filteredData.length;
+    let totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    let startIndex = (currentPage - 1) * itemsPerPage;
+    let endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+    let currentData = filteredData.slice(startIndex, endIndex);
 
     return (
         <div className="max-w-screen-xl mx-auto">
             <div className="flex flex-col md:flex-row justify-end gap-3 mb-3">
                 <div className="flex justify-end">
-                    <div className="rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
-                        <BiSearch className="w-5 h-5 text-gray-900" />
+                    <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
+                        <SearchIcon width={16} height={16} />
                     </div>
                     <input
                         type="search"
@@ -180,15 +182,15 @@ export default function AdminTable({
                         onPress={onOpenCreate}
                         color="primary"
                     >
-                        <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
                         Add New
+                        <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
                     </Button>
                     <Button
                         className="bg-red-400 text-white w-1/2"
                         onClick={handlerMultipleDestroy}
                     >
+                        Delete Select
                         <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
-                        Delete select
                     </Button>
                 </div>
             </div>
@@ -201,9 +203,6 @@ export default function AdminTable({
                                     <tr>
                                         <th className="px-6 py-3 text-center">
                                             <input type="checkbox" id="checkAllBtn" onChange={() => setcheckedAll(!checkedAll)} />
-                                        </th>
-                                        <th key="no" className="px-6 py-3 text-center">
-                                            No.
                                         </th>
                                         {columns.map((column, index) => (
                                             <th key={column} className="px-6 py-3 text-center">
@@ -226,12 +225,6 @@ export default function AdminTable({
                                                         name="acadyears[]"
                                                         value={e["acadyear"]} />
                                                 </td>
-                                                <td
-                                                    key={`number-${i}`}
-                                                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-center"
-                                                >
-                                                    {i + 1}
-                                                </td>
                                                 {columns.map((column, index) => (
                                                     <td
                                                         key={`${column}-${i}`}
@@ -251,7 +244,10 @@ export default function AdminTable({
                                                                     </div>
                                                                 )
                                                                 :
-                                                                (<span>{e[column]}</span>)
+                                                                ["createdAt", "updatedAt"].includes(column) ?
+                                                                    (<span>{dmy(e[column])}</span>)
+                                                                    :
+                                                                    (<span>{e[column]}</span>)
                                                         }
                                                     </td>
                                                 ))}

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { Navbar, Sidebar, GroupInsert, GroupUpdate } from '@/app/components';
+import { Navbar, Sidebar, GroupInsert, GroupUpdate, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import Swal from 'sweetalert2';
@@ -53,7 +53,7 @@ export default function Group() {
         // Close the modal after inserting
         handleInsertModalClose();
     };
-    
+
 
     const handleUpdateModalOpen = (group) => {
         setSelectedGroupForUpdate(group);
@@ -83,7 +83,7 @@ export default function Group() {
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
         });
-    
+
         if (value) {
             try {
                 await axios.delete(`${hostname}/api/groups/deleteGroup/${groupId}`);
@@ -108,34 +108,32 @@ export default function Group() {
                 <Navbar />
             </header>
             <Sidebar />
-            <div className='mt-16'>
-                <div className='p-8 sm:ml-72'>
-                    <h1>Group:</h1>
-                    <div>
-                        {/* Render your group data here */}
-                        {groups.map(group => (
-                            <div key={group.id}>
-                                <p>{group.category ? group.category.category_title : 'No Group'}</p>
-                                <h1 className='font-bold'>{group.group_title}</h1>
-                                {/* Add other group properties as needed */}
-                                <button onClick={() => handleUpdateModalOpen(group)}>Update</button>
-                                <button onClick={() => handleDeleteGroup(group.id)}>Delete</button>
-                            </div>
-                        ))}
-                    </div>
-                    <button onClick={handleInsertModalOpen}>Add Group</button>
+            <ContentWrap>
+                <BreadCrumb />
+                <h1>Group:</h1>
+                <div>
+                    {/* Render your group data here */}
+                    {groups.map(group => (
+                        <div key={group.id}>
+                            <p>{group.category ? group.category.category_title : 'No Group'}</p>
+                            <h1 className='font-bold'>{group.group_title}</h1>
+                            {/* Add other group properties as needed */}
+                            <button onClick={() => handleUpdateModalOpen(group)}>Update</button>
+                            <button onClick={() => handleDeleteGroup(group.id)}>Delete</button>
+                        </div>
+                    ))}
                 </div>
-            </div>
+                <button onClick={handleInsertModalOpen}>Add Group</button>
+                {/* Render the GroupInsert modal */}
+                <GroupInsert isOpen={isInsertModalOpen} onClose={handleInsertModalClose} onDataInserted={handleDataInserted} />
 
-            {/* Render the GroupInsert modal */}
-            <GroupInsert isOpen={isInsertModalOpen} onClose={handleInsertModalClose} onDataInserted={handleDataInserted} />
-
-            <GroupUpdate
-                isOpen={isUpdateModalOpen}
-                onClose={handleUpdateModalClose}
-                onUpdate={handleDataUpdated}
-                groupId={selectedGroupForUpdate ? selectedGroupForUpdate.id : null}
-            />
+                <GroupUpdate
+                    isOpen={isUpdateModalOpen}
+                    onClose={handleUpdateModalClose}
+                    onUpdate={handleDataUpdated}
+                    groupId={selectedGroupForUpdate ? selectedGroupForUpdate.id : null}
+                />
+            </ContentWrap>
         </>
     );
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { Navbar, Sidebar, CategoryInsert, CategoryUpdate } from '@/app/components';
+import { Navbar, Sidebar, CategoryInsert, CategoryUpdate, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import Swal from 'sweetalert2';
@@ -111,33 +111,33 @@ export default function Category() {
                 <Navbar />
             </header>
             <Sidebar />
-            <div className='mt-16'>
-                <div className='p-8 sm:ml-72'>
-                    <h1>Category:</h1>
-                    <div>
-                        {/* Render your category data here */}
-                        {categories.map(category => (
-                            <div key={category.id}>
-                                <p>{category.category_title}</p>
-                                {/* Add other category properties as needed */}
+            <ContentWrap>
+                <BreadCrumb/>
+                <h1>Category:</h1>
+                <div>
+                    {/* Render your category data here */}
+                    {categories.map(category => (
+                        <div key={category.id}>
+                            <p>{category.category_title}</p>
+                            {/* Add other category properties as needed */}
 
-                                <button onClick={() => handleUpdateModalOpen(category.id, category.category_title)}>Update</button>
-                                <button onClick={() => handleDeleteCategory(category.id)}>Delete</button>
-                            </div>
-                        ))}
-                    </div>
-                    <button onClick={handleModalOpen}>Add Category</button>
+                            <button onClick={() => handleUpdateModalOpen(category.id, category.category_title)}>Update</button>
+                            <button onClick={() => handleDeleteCategory(category.id)}>Delete</button>
+                        </div>
+                    ))}
                 </div>
-            </div>
-            <CategoryInsert isOpen={isModalOpen} onClose={handleModalClose} onDataInserted={handleDataInserted} />
+                <button onClick={handleModalOpen}>Add Category</button>
+                <CategoryInsert isOpen={isModalOpen} onClose={handleModalClose} onDataInserted={handleDataInserted} />
 
-            <CategoryUpdate
-                isOpen={isUpdateModalOpen}
-                onClose={handleUpdateModalClose}
-                onUpdate={handleDataUpdated}
-                categoryId={selectedCategoryId}
-                currentTitle={selectedCategoryTitle}
-            />
+                <CategoryUpdate
+                    isOpen={isUpdateModalOpen}
+                    onClose={handleUpdateModalClose}
+                    onUpdate={handleDataUpdated}
+                    categoryId={selectedCategoryId}
+                    currentTitle={selectedCategoryTitle}
+                />
+            </ContentWrap>
+
         </>
     );
 }

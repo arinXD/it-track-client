@@ -1,12 +1,19 @@
 "use server"
 import axios from "axios"
-import { hostname } from "@/app/api/hostname"
-import { getToken } from '@/app/components/serverAction/TokenAction'
-import { revalidatePath } from "next/cache"
+import {
+    hostname
+} from "@/app/api/hostname"
+import {
+    getToken
+} from '@/app/components/serverAction/TokenAction'
+import {
+    revalidatePath
+} from "next/cache"
 
 export async function createAcadYear(formData) {
     const token = await getToken()
     const acadyear = formData.get("acadyear")
+    const acadyearArr = acadyear.split(" ").filter(e => e)
     try {
         const options = {
             url: `${hostname}/api/acadyear/`,
@@ -17,7 +24,7 @@ export async function createAcadYear(formData) {
                 "authorization": `${token}`,
             },
             data: {
-                acadyear
+                acadyear: acadyearArr
             }
         };
         const result = await axios(options)
@@ -68,7 +75,9 @@ export async function destroyAcadYear(id) {
         revalidatePath("/admin/acadyears");
         return result.data
     } catch (err) {
-        return { data: null }
+        return {
+            data: null
+        }
     }
 }
 export async function destroyMultipleAcadYear(formData) {
@@ -90,6 +99,8 @@ export async function destroyMultipleAcadYear(formData) {
         revalidatePath("/admin/acadyears");
         return result.data
     } catch (err) {
-        return { data: null }
+        return {
+            data: null
+        }
     }
 }
