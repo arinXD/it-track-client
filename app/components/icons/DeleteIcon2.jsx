@@ -1,6 +1,6 @@
 import React from "react";
-export default ({ size = 24, width, height, ...props }) => (
-    <svg
+export default function DeleteIcon2({ size = 24, width, height, ...props }) {
+    return (<svg
         aria-hidden="true"
         fill="none"
         focusable="false"
@@ -45,5 +45,5 @@ export default ({ size = 24, width, height, ...props }) => (
             strokeLinejoin="round"
             strokeWidth={1.5}
         />
-    </svg>
-);
+    </svg>)
+}
