@@ -73,7 +73,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         const formData = new FormData(event.target)
         const result = await createTrackSelection(formData)
         const data = result.data
-        isProcessing(false)
         if (result.ok) {
             Swal.fire({
                 title: "บันทึกข้อมูลการคัดเลือก",
@@ -83,7 +82,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 confirmButtonText: "ตกลง"
             })
         } else {
-            console.log(err);
             Swal.fire({
                 title: "Warning!",
                 text: `มีบางอย่างผิดพลาด ${result.message}`,
@@ -92,6 +90,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 confirmButtonText: "ตกลง"
             })
         }
+        isProcessing(false)
     }
     useEffect(() => {
 
@@ -289,7 +288,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                             {tracks.map((track, index) => (
                                                                 <option
                                                                     hidden={[orders.order1, orders.order2, orders.order3].includes(track.track)}
-                                                                    disabled={[orders.order1, orders.order2, orders.order3].includes(track.track)}
+                                                                    readOnly={[orders.order1, orders.order2, orders.order3].includes(track.track)}
                                                                     key={index}
                                                                     value={track.track}
                                                                 >
