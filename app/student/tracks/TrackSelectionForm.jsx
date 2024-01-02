@@ -287,8 +287,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                             <option value="" disabled hidden>เลือกแทรค</option>
                                                             {tracks.map((track, index) => (
                                                                 <option
+                                                                    className={`${[orders.order1, orders.order2, orders.order3].includes(track.track) && "hidden"}`}
                                                                     hidden={[orders.order1, orders.order2, orders.order3].includes(track.track)}
-                                                                    readOnly={[orders.order1, orders.order2, orders.order3].includes(track.track)}
                                                                     key={index}
                                                                     value={track.track}
                                                                 >
