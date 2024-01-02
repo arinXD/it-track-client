@@ -286,13 +286,11 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                             className="select-order bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-white dark:placeholder-black-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:border-blue-500 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50">
                                                             <option value="" disabled hidden>เลือกแทรค</option>
                                                             {tracks.map((track, index) => (
-                                                                <option
-                                                                    hidden={[orders.order1, orders.order2, orders.order3].includes(track.track)}
-                                                                    key={index}
-                                                                    value={track.track}
-                                                                >
-                                                                    {track.track}
-                                                                </option>
+                                                                ![orders.order1, orders.order2, orders.order3].includes(track.track) && (
+                                                                    <option key={index} value={track.track}>
+                                                                        {track.track}
+                                                                    </option>
+                                                                )
                                                             ))}
                                                         </select>
                                                     </div>
