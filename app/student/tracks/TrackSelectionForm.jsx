@@ -83,6 +83,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 confirmButtonText: "ตกลง"
             })
         } else {
+            console.log(err);
             Swal.fire({
                 title: "Warning!",
                 text: `มีบางอย่างผิดพลาด ${result.message}`,

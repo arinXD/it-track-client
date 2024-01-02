@@ -51,9 +51,11 @@ export async function createTrackSelection(formData) {
         revalidatePath("/student/tracks");
         return (result.data);
     } catch (error) {
+        const err = err.response.data
         return ({
             ok: false,
-            message: "create track selection error."
+            message: "create track selection error.",
+            err
         })
     }
     // const acadyear = formData.get("acadyear")
