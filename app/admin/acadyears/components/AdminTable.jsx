@@ -8,6 +8,8 @@ import { destroyAcadYear, destroyMultipleAcadYear } from './action';
 import Swal from 'sweetalert2'
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { dmy } from "@/src/util/dateFormater";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function checkCurrentYear(year) {
     const currentYear = new Date().getFullYear();
@@ -17,6 +19,31 @@ function checkCurrentYear(year) {
         return false
     }
 }
+const showToastMessage = (ok, message) => {
+    if (ok) {
+        toast.success(message, {
+            position: toast.POSITION.TOP_RIGHT,
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    } else {
+        toast.warning(message, {
+            position: toast.POSITION.TOP_RIGHT,
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    }
+};
 
 export default function AdminTable({
     data, onOpenCreate, onOpenUpdate, callUpdate,
@@ -194,6 +221,7 @@ export default function AdminTable({
                     </Button>
                 </div>
             </div>
+            <ToastContainer />
             <form name="multipleDelete">
                 <table className="w-full block md:table overflow-x-auto text-sm text-left text-gray-500">
                     {
