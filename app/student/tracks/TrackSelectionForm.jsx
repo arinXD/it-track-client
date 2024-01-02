@@ -268,7 +268,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         </div>
                                         <div>
                                             {/* {JSON.stringify([orders.order1, orders.order2, orders.order3].filter(e => e))} <br /> */}
-                                            {/* {[orders.order1, orders.order2, orders.order3].filter(e => e).length} <br /> */}
+                                            {JSON.stringify([orders.order1, orders.order2, orders.order3])}
                                             {/* {JSON.stringify(tracks.filter((t) => ![orders.order1, orders.order2, orders.order3].includes(t.track)))} */}
                                         </div>
                                         <div>
