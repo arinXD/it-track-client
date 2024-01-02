@@ -29,7 +29,7 @@ const statusColorMap = {
 };
 const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions"];
 
-const page = () => {
+const Page = () => {
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
@@ -331,4 +331,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page

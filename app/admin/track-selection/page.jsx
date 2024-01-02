@@ -16,7 +16,7 @@ import Swal from 'sweetalert2';
 
 const defaultSubj = ["SC361002", "SC361003", "SC361004", "SC361005"]
 
-const page = () => {
+const Page = () => {
     const showToastMessage = (ok, message) => {
         if (ok) {
             toast.success(message, {
@@ -380,4 +380,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page
