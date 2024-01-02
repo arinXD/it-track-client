@@ -1,16 +1,31 @@
 const months = {
-    1: 'มกราคม',
-    2: 'กุมภาพันธ์',
-    3: 'มีนาคม',
-    4: 'เมษายน',
-    5: 'พฤษภาคม',
-    6: 'มิถุนายน',
-    7: 'กรกฎาคม',
-    8: 'สิงหาคม',
-    9: 'กันยายน',
+    "01": 'มกราคม',
+    "02": 'กุมภาพันธ์',
+    '03': 'มีนาคม',
+    "04": 'เมษายน',
+    "05": 'พฤษภาคม',
+    "06": 'มิถุนายน',
+    "07": 'กรกฎาคม',
+    '08': 'สิงหาคม',
+    "09": 'กันยายน',
     10: 'ตุลาคม',
     11: 'พฤศจิกายน',
     12: 'ธันวาคม',
+}
+
+const shortMonths = {
+    "01": 'ม.ค.',
+    "02": 'ก.พ.',
+    '03': 'ม.ค.',
+    "04": 'เม.ย.',
+    "05": 'พ.ค.',
+    "06": 'มิ.ย.',
+    "07": 'ก.ค.',
+    '08': 'ส.ค.',
+    "09": 'ก.ย.',
+    10: 'ต.ค.',
+    11: 'พ.ย.',
+    12: 'ธ.ค.',
 }
 
 function dmy(dateString) {
@@ -29,7 +44,25 @@ function dmyt(dateString) {
     return result
 }
 
+function dMy(dateString) {
+    let [date, time] = dateString.split("T")
+    let [y, m, d] = date.split("-")
+    let [h, min, s] = time.split(".")[0].split(":")
+    const result = `${d} ${shortMonths[m]} ${y}`
+    return result
+}
+
+function dMyt(dateString) {
+    let [date, time] = dateString.split("T")
+    let [y, m, d] = date.split("-")
+    let [h, min, s] = time.split(".")[0].split(":")
+    const result = `${d} ${shortMonths[m]} ${y} ${h}:${min} น.`
+    return result
+}
+
 module.exports = {
     dmy,
     dmyt,
+    dMy,
+    dMyt,
 }

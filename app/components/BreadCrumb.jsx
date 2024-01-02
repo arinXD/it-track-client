@@ -1,6 +1,8 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { HomeIcon, RightArrow } from './icons';
+
 const links = {
     "/": "หน้าหลัก",
     "admin": "หน้าหลัก",
@@ -13,53 +15,61 @@ const links = {
     "track": "ข้อมูลแทรค",
     "track-selection": "คัดเลือกแทรค",
     "track-student": "รายชื่อนักศึกษาภายในแทรค",
-}
+};
+
 const BreadCrumb = () => {
     const url = usePathname();
-    const urls = url.split("/").filter(e => e)
+    const urls = url.split("/").filter(e => e);
+
+    const elements = [];
+    for (const [index, currentUrl] of urls.entries()) {
+        const isLastIndex = index + 1 === urls.length;
+        let nextIndex = []
+        for (let j = 0; j <= index; j++) {
+            nextIndex.push(urls[j])
+        }
+        nextIndex = `/${nextIndex.join("/")}`
+        elements.push(
+            <li key={currentUrl} className="inline-flex items-center">
+                <div className="flex items-center">
+                    {index === 0 ?
+                        // index แรก
+                        <>
+                            <HomeIcon />
+                            {
+                                isLastIndex ?
+                                    <span className="text-sm font-medium text-gray-500">{links[currentUrl] || String(currentUrl)}</span>
+                                    :
+                                    <Link href={`/${currentUrl}`} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                                        {links[currentUrl] || String(currentUrl)}
+                                    </Link>
+                            }
+                        </>
+                        :
+                        // index ต่อไป
+                        <>
+                            <RightArrow />
+                            {
+                                isLastIndex ?
+                                    <span className="ms-1 text-sm font-medium text-gray-500 md:ms-2">{links[currentUrl] || String(currentUrl)}</span>
+                                    :
+                                    // ต่อ link 
+                                    <Link href={nextIndex} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                                        {links[currentUrl] || String(currentUrl)}
+                                    </Link>
+                            }
+                        </>
+                    }
+                </div>
+            </li>
+        );
+    }
+
     return (
         <>
             <nav className="flex mb-3" aria-label="Breadcrumb">
                 <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
-                    {
-                        urls.map((url, index) => (
-                            <li key={index} className="inline-flex items-center">
-                                <div className="flex items-center">
-                                    {!index ?
-                                        <>
-                                            <svg className="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
-                                            </svg>
-                                            {
-                                                index + 1 === urls.length ?
-                                                    <span className="text-sm font-medium text-gray-500">{links[url]}</span>
-                                                    :
-                                                    <Link href={`/${url}`} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-                                                        {links[url]}
-                                                    </Link>
-
-                                            }
-                                        </>
-                                        :
-                                        <>
-                                            <svg className="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4" />
-                                            </svg>
-                                            {
-                                                index + 1 === urls.length ?
-                                                    <span className="ms-1 text-sm font-medium text-gray-500 md:ms-2">{links[url]}</span>
-                                                    :
-                                                    <Link href={`/${url}`} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-                                                        {links[url]}
-                                                    </Link>
-                                            }
-                                        </>
-                                    }
-                                </div>
-                            </li>
-
-                        ))
-                    }
+                    {elements}
                 </ol>
             </nav>
         </>

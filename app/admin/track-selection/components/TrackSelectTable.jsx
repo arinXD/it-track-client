@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { dmyt } from '@/src/util/dateFormater'
-import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
-import { PlusIcon, EditIcon, DeleteIcon, SearchIcon } from "@/app/components/icons";
+import { dMyt } from '@/src/util/dateFormater'
+import { Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
+import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 
-const TrackSelectTable = ({ trackSelection, setSelectedKey, handleOpen }) => {
+const TrackSelectTable = ({ trackSelection, setSelectedKey, handleOpen, handleDelete }) => {
     const [selectedKeys, setSelectedKeys] = useState(false)
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState(trackSelection);
@@ -98,9 +98,29 @@ const TrackSelectTable = ({ trackSelection, setSelectedKey, handleOpen }) => {
                                         </Link>
                                     </TableCell>
                                     <TableCell>{e.has_finished}</TableCell>
-                                    <TableCell>{dmyt(e.startAt)}</TableCell>
-                                    <TableCell>{dmyt(e.expiredAt)}</TableCell>
-                                    <TableCell>ลบ แก้ไข</TableCell>
+                                    <TableCell>{dMyt(e.startAt)}</TableCell>
+                                    <TableCell>{dMyt(e.expiredAt)}</TableCell>
+                                    <TableCell>
+                                        <div className="relative flex items-center gap-2">
+                                            <Tooltip content="รายละเอียด">
+                                                <Link href={`/admin/track-selection/${e.id}`} className='focus:outline-none'>
+                                                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                                        <EyeIcon />
+                                                    </span>
+                                                </Link>
+                                            </Tooltip>
+                                            <Tooltip content="แก้ไข">
+                                                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                                    <EditIcon2 />
+                                                </span>
+                                            </Tooltip>
+                                            <Tooltip color="danger" content="ลบ">
+                                                <span onClick={() => handleDelete(e.acadyear)} className="text-lg text-danger cursor-pointer active:opacity-50">
+                                                    <DeleteIcon2 />
+                                                </span>
+                                            </Tooltip>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody> :

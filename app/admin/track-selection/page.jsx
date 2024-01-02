@@ -12,6 +12,7 @@ import { hostname } from '@/app/api/hostname';
 import { getToken } from '@/app/components/serverAction/TokenAction'
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Swal from 'sweetalert2';
 
 const defaultSubj = ["SC361002", "SC361003", "SC361004", "SC361005"]
 
@@ -57,6 +58,21 @@ const page = () => {
     const [searchSubj, setSearchSubj] = useState("")
     const [filterSubj, setFilterSubj] = useState([])
 
+    async function callData() {
+        let data = await fetchData("/api/tracks/selects")
+        const acadData = await fetchData("/api/acadyear")
+        let subjData = await fetchData("/api/subjects")
+        subjData = subjData.filter(element => element.subject_code.includes('SC') || element.subject_code.includes('CP'))
+        data = data.map(e => {
+            let status = !e.has_finished ? "กำลังดำเนินการ" : "สิ้นสุด";
+            return { ...e, has_finished: status };
+        })
+        setTrackSelection(data)
+        setAcadyear(acadData)
+        setSubjects(subjData)
+        setFilterSubj(subjData)
+    }
+
     useEffect(() => {
         const currentDateTime = new Date();
         const formattedDateTime = format(currentDateTime, 'yyyy-MM-dd HH:mm');
@@ -71,20 +87,6 @@ const page = () => {
     }, [acadyear])
 
     useEffect(() => {
-        async function callData() {
-            let data = await fetchData("/api/tracks/selects")
-            const acadData = await fetchData("/api/acadyear")
-            let subjData = await fetchData("/api/subjects")
-            subjData = subjData.filter(element => element.subject_code.includes('SC') || element.subject_code.includes('CP'))
-            data = data.map(e => {
-                let status = !e.has_finished ? "กำลังดำเนินการ" : "สิ้นสุด";
-                return { ...e, has_finished: status };
-            })
-            setTrackSelection(data)
-            setAcadyear(acadData)
-            setSubjects(subjData)
-            setFilterSubj(subjData)
-        }
         callData()
     }, [])
 
@@ -178,16 +180,50 @@ const page = () => {
             };
             const result = await axios(options)
             const { ok, message } = result.data
-            console.log(result.data);
+            await callData()
             showToastMessage(ok, message)
             return
-
         } catch (error) {
             const message = error?.response?.data?.message
-            console.log(message);
             showToastMessage(false, message)
             return
         }
+    }
+
+    async function handleDelete(acadyear) {
+        Swal.fire({
+            // title: `ต้องการลบปีการศึกษา ${e["acadyear"]} หรือไม่ ?`,
+            text: `ต้องการลบการคัดแทรคปีการศึกษา ${acadyear} หรือไม่ ?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const token = await getToken()
+                const options = {
+                    url: `${hostname}/api/tracks/selects/${acadyear}`,
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        "authorization": `${token}`,
+                    },
+                };
+                axios(options)
+                    .then(async result => {
+                        const { ok, message } = result.data
+                        showToastMessage(ok, message)
+                        await callData()
+                    })
+                    .catch(error => {
+                        const message = error.response.data.message
+                        showToastMessage(false, message)
+                    })
+            }
+        });
     }
 
     return (
@@ -334,6 +370,7 @@ const page = () => {
                     </ModalContent>
                 </Modal>
                 <TrackSelectTable
+                    handleDelete={handleDelete}
                     handleOpen={handleOpen}
                     trackSelection={trackSelection}
                     setSelectedKey={setSelectedKey}

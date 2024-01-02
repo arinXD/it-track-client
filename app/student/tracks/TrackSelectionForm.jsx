@@ -167,24 +167,31 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         return (
             <div className='text-center'>
                 <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
-                    {/* การคัดเลือกความเชี่ยวชาญ วิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ */}
                     {trackSelect.title}
                 </h4>
                 <p>แทรคของคุณคือ {userData?.track}</p>
             </div>
         )
     } else if ((userData?.acadyear !== trackSelect?.acadyear)
-        && (userData?.track === null)) {
+        && (userData?.track === null)
+        && (userData?.program === "IT")) {
         return (
             <div className='text-center'>
                 <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
-                    {/* การคัดเลือกความเชี่ยวชาญ วิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ */}
                     {trackSelect.title}
                 </h4>
                 <p>คุณไม่มีสิทธิ์เข้ารับการคัดเลือกในปีนี้ ติดต่อเพิ่มเติมที่อีเมล ittrack@gmail.com </p>
             </div>
         )
-    } else {
+    } else if (userData?.program !== "IT") {
+        <div className='text-center'>
+            <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
+                {trackSelect.title}
+            </h4>
+            <p>คุณไม่มีสิทธิ์เข้ารับการคัดเลือกแทรคในหลักสูตรเทคโนโลยีสารสนเทศ ติดต่อเพิ่มเติมที่อีเมล ittrack@gmail.com </p>
+        </div>
+    }
+    else {
         return (
             <div className="relative flex flex-col rounded-xl bg-transparent bg-clip-border text-gray-700 shadow-none">
                 {!trackSelect.id ?
