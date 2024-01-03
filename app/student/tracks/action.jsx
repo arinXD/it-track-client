@@ -3,17 +3,6 @@ import axios from "axios"
 import { hostname } from "@/app/api/hostname"
 import { revalidatePath } from "next/cache"
 
-async function getSubjectsForTrackSelect(id) {
-    try {
-        const res = await axios.get(`${hostname}/api/tracks/selects/${id}/subjects`)
-        const subjects = res.data.data
-        return subjects
-    } catch (error) {
-        console.error(error)
-        return ([])
-    }
-}
-
 export async function createTrackSelection(formData) {
     try {
         const track_selection_id = formData.get("track_selection_id")
@@ -21,13 +10,20 @@ export async function createTrackSelection(formData) {
         const track_order_1 = formData.get("track_order_1")
         const track_order_2 = formData.get("track_order_2")
         const track_order_3 = formData.get("track_order_3")
-        const subjects = await getSubjectsForTrackSelect(track_selection_id)
+        const unique = new Set([track_order_1, track_order_2, track_order_3]).size === 3
+        if (!unique) {
+            return ({
+                ok: false,
+                message: "แทรคต้องไม่ซ้ำกัน",
+            })
+        }
+
         const subjectsData = []
-        subjects.forEach(subject => {
+        const subjKey = Array.from(formData.keys()).filter(e => e.includes('subject_')).map(f => f.split("_")[1])
+        subjKey.forEach(subject => {
             let subjectData = {}
-            const subject_code = subject.subject_code
-            const grade = formData.get(`subject_${subject_code}`)
-            subjectData["subject_code"] = subject_code
+            const grade = formData.get(`subject_${subject}`)
+            subjectData["subject_code"] = subject
             subjectData["grade"] = grade
             subjectsData.push(subjectData)
         });

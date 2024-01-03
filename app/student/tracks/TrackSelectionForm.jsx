@@ -62,10 +62,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             type: "CLEAR_ORDER",
 
         });
-        const selects = document.querySelectorAll("select.select-order")
-        selects.forEach(select => {
-            select.value = '';
-        });
     }
     const handleSubmit = async (event) => {
         isProcessing(true)
@@ -145,15 +141,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         });
     };
     useEffect(() => {
-        Object.keys(orders).map((key, index) => {
-            const select = document.querySelector(`#track_order_${index + 1}`)
-            const options = select.querySelectorAll("option")
-            options.forEach((option) => {
-                if (option.value === orders[key]) {
-                    option.remove();
-                }
-            });
-        })
         if ([orders.order1, orders.order2, orders.order3].filter(e => e).length === 2) {
             const trackArr = [orders.order1, orders.order2, orders.order3]
             let c = trackArr.findIndex((track) => track == "")
@@ -297,7 +284,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                             <option value="" disabled hidden>เลือกแทรค</option>
                                                             {tracks.map((track, index) => (
                                                                 <option
-                                                                    hidden={[orders.order1, orders.order2, orders.order3].includes(track.track)}
+                                                                    // hidden={[orders.order1, orders.order2, orders.order3].includes(track.track)}
                                                                     key={index}
                                                                     value={track.track}
                                                                 >
