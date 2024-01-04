@@ -4,16 +4,35 @@ import { dMyt } from '@/src/util/dateFormater'
 import { Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 
-const TrackSelectTable = ({ trackSelection, setSelectedKey, handleOpen, handleDelete }) => {
-    const [selectedKeys, setSelectedKeys] = useState(false)
+const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSelectedDel }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState(trackSelection);
     const [itemsPerPage, setItemPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedKey, setSelectedKey] = useState([])
 
     useEffect(() => {
         setFilteredData(trackSelection)
     }, [trackSelection])
+
+    function handleSetSelectedKey(selectedKey) {
+        let allId
+        if (selectedKey === "all") {
+            allId = trackSelection.map(e => e.acadyear)
+            setSelectedKey(allId)
+        } else {
+            let values = [...selectedKey.values()]
+            if (values.length > 0) {
+                allId = []
+                values.map(e => {
+                    allId.push(trackSelection[parseInt(e)].acadyear)
+                })
+                setSelectedKey(allId)
+            } else {
+                setSelectedKey([])
+            }
+        }
+    }
 
     function handleSearch(query) {
         setSearchQuery(query);
@@ -36,7 +55,7 @@ const TrackSelectTable = ({ trackSelection, setSelectedKey, handleOpen, handleDe
     const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
     const currentData = filteredData.slice(startIndex, endIndex);
     return (
-        <div>
+        <div className='my-[30px]'>
             <div className="flex flex-col md:flex-row justify-end gap-3 mb-3">
                 <div className="flex justify-end">
                     <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
@@ -63,7 +82,10 @@ const TrackSelectTable = ({ trackSelection, setSelectedKey, handleOpen, handleDe
                     </Button>
                     <Button
                         className="bg-red-400 text-white w-1/2"
-                        onClick={() => { }}
+                        onPress={async () => {
+                            await handleSelectedDel(selectedKey)
+                            setSelectedKey([])
+                        }}
                     >
                         Delete Select
                         <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
@@ -74,7 +96,7 @@ const TrackSelectTable = ({ trackSelection, setSelectedKey, handleOpen, handleDe
                 <Table
                     removeWrapper
                     selectionMode="multiple"
-                    onSelectionChange={setSelectedKeys}
+                    onSelectionChange={handleSetSelectedKey}
                     onRowAction={() => { }}
                     aria-label="track selection table">
                     <TableHeader>
@@ -124,7 +146,7 @@ const TrackSelectTable = ({ trackSelection, setSelectedKey, handleOpen, handleDe
                                 </TableRow>
                             ))}
                         </TableBody> :
-                        <TableBody emptyContent={"No rows to display."}>{[]}</TableBody>}
+                        <TableBody emptyContent={"ไม่มีข้อมูลคัดเลือกแทรค"}>{[]}</TableBody>}
                 </Table> : <>Loading....</>
             }
         </div>

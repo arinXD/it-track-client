@@ -24,7 +24,7 @@ export async function fetchData(url) {
     } catch (error) {
         console.error(error);
         return []
-    } 
+    }
 }
 
 export async function fetchDataObj(url) {
@@ -42,5 +42,5 @@ export async function fetchDataObj(url) {
     } catch (error) {
         console.error(error);
         return {}
-    } 
+    }
 }

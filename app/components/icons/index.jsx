@@ -9,7 +9,11 @@ import ChevronDownIcon from "./ChevronDownIcon"
 import EyeIcon from "./EyeIcon"
 import HomeIcon from "./HomeIcon"
 import RightArrow from "./RightArrow"
+import ChartPie from "./ChartPie"
+import ChartPieBold from "./ChartPieBold"
 export {
+    ChartPie,
+    ChartPieBold,
     RightArrow,
     HomeIcon,
     EyeIcon,

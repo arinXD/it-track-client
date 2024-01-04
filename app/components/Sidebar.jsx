@@ -6,6 +6,8 @@ import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } 
 import { GoHome, GoHomeFill } from "react-icons/go";
 import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
 import { useSession } from "next-auth/react"
+import { ChartPie, ChartPieBold } from './icons';
+import { Icon } from '@iconify/react';
 
 const Sidebar = () => {
     const { data: session } = useSession();
@@ -17,20 +19,22 @@ const Sidebar = () => {
                     <ul className="font-medium space-y-1">
                         <li className="">
                             {session?.user?.role == "admin" ?
-                                <Link href={"/admin"}
-                                    className={`${url.includes("admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                                >
-                                    {url.includes("admin") ?
-                                        <GoHomeFill
-                                            className="w-5 h-5"
-                                            set="bulk" stroke="bold" />
-                                        :
-                                        <GoHome
-                                            className="w-5 h-5"
-                                            set="bulk" stroke="bold" />
-                                    }
-                                    <span className="ml-3 text-sm">Admin Panel</span>
-                                </Link>
+                                <>
+                                    <Link href={"/admin"}
+                                        className={`${url.includes("admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                    >
+                                        {url.includes("admin") ?
+                                            <GoHomeFill
+                                                className="w-5 h-5"
+                                                set="bulk" stroke="bold" />
+                                            :
+                                            <GoHome
+                                                className="w-5 h-5"
+                                                set="bulk" stroke="bold" />
+                                        }
+                                        <span className="ml-3 text-sm">Admin Panel</span>
+                                    </Link>
+                                </>
                                 :
                                 <Link href={"/"}
                                     className={`${url == "/" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
@@ -45,6 +49,22 @@ const Sidebar = () => {
                                             set="bulk" stroke="bold" />
                                     }
                                     <span className="ml-3 text-sm">หน้าหลัก</span>
+                                </Link>
+                            }
+                        </li>
+                        <li>
+                            {session?.user?.role == "admin" &&
+                                <Link href={"/dashboard"}
+                                    className={`${url.includes("dashboard") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                >
+                                    {url.includes("dashboard") ?
+                                        <Icon icon="mingcute:chart-pie-2-fill"
+                                            className="w-5 h-5 text-white" />
+                                        :
+                                        <Icon icon="mingcute:chart-pie-2-line"
+                                            className="w-5 h-5" />
+                                    }
+                                    <span className="ml-3 text-sm">Dashboard</span>
                                 </Link>
                             }
                         </li>

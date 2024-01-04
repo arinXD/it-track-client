@@ -26,6 +26,13 @@ const auth = withAuth(
                 new URL("/permission/Teacher-account", req.url)
             )
         }
+        if (path.startsWith("/dashboard")
+            && req.nextauth.token.role !== "teacher"
+            && req.nextauth.token.role !== "admin") {
+            return NextResponse.rewrite(
+                new URL("/permission/Admin-account", req.url)
+            )
+        }
         if (path.startsWith("/admin")
             && req.nextauth.token.role !== "admin") {
             return NextResponse.rewrite(
@@ -55,6 +62,7 @@ export const config = {
         "/student/:path*",
         "/teacher/:path*",
         "/admin/:path*",
+        "/dashboard"
     ]
 }
 
