@@ -1,5 +1,5 @@
 import React from 'react'
-export default function PlusIcon({ size = 24, width, height, ...props }) {
+export default function PlusIcon({ size = 24, width, height, color, ...props }) {
     return (
         <svg
             aria-hidden="true"
@@ -22,7 +22,7 @@ export default function PlusIcon({ size = 24, width, height, ...props }) {
                 <path d="M12 18V6" />
             </g>
         </svg>
-    );
+    )
 }
 // const PlusIcon = ({ className }) => {
 //     return (

@@ -125,9 +125,10 @@ const Page = () => {
     // Google sign in
     // ======================
     const signInGoogle = async () => {
-        await signIn("google", {
-            redirect: false,
+        await signIn("google", undefined, {
+            redirect: true,
             callbackUrl: callbackUrl,
+            prompt: 'select_account',
         })
     }
 

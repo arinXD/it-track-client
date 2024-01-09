@@ -18,7 +18,6 @@ const TrackSelectDetail = ({ trackSelect }) => {
         setStartAd(trackSelect.startAt)
         setExpiredAt(trackSelect.expiredAt)
         setHasFinished(trackSelect.has_finished)
-        console.log("Call data");
     }, [trackSelect])
     return (
         <div>

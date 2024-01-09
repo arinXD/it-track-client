@@ -8,7 +8,7 @@ import Swal from 'sweetalert2'
 import { Button } from "@nextui-org/react";
 import { DeleteIcon } from '@/app/components/icons'
 import { dmy, dmyt } from '@/src/util/dateFormater'
-
+import confetti from 'canvas-confetti';
 
 const TrackSelectionForm = ({ enrollments, userData }) => {
     const initOrder = {
@@ -140,6 +140,16 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             payload: value,
         });
     };
+
+    const handleConfetti = () => {
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#ef4444', '#fbbf24', '#f97316', '#a78bfa', '#60a5fa', '#84cc16'],
+        });
+    };
+
     useEffect(() => {
         if ([orders.order1, orders.order2, orders.order3].filter(e => e).length === 2) {
             const trackArr = [orders.order1, orders.order2, orders.order3]
@@ -347,16 +357,15 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             </p>
                                         </label>
                                     </div>
-                                    <button
-                                        className="mt-4 block w-full select-none rounded-lg bg-blue-500 py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+
+                                    <Button
+                                        className='bg-blue-500 mt-4 block w-full text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none'
                                         type="submit"
-                                        data-ripple-light="true"
                                         disabled={!isConfirm || processing}
+                                        onPress={handleConfetti}
                                     >
                                         {!processing ? "ตกลง" : "บันทึกข้อมูล..."}
-
-                                    </button>
-
+                                    </Button>
                                 </form>
                             </>
                         }

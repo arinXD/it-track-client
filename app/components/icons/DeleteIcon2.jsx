@@ -1,5 +1,5 @@
 import React from "react";
-export default function DeleteIcon2({ size = 24, width, height, ...props }) {
+export default function DeleteIcon2({ size = 24, width, height, className, ...props }) {
     return (<svg
         aria-hidden="true"
         fill="none"
@@ -8,6 +8,7 @@ export default function DeleteIcon2({ size = 24, width, height, ...props }) {
         role="presentation"
         viewBox="0 0 24 24"
         width={size || width}
+        className={className}
         {...props}
     >
         <path

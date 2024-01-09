@@ -12,11 +12,6 @@ const nextConfig = {
                 protocol: "http",
                 hostname: "*.localhost",
             },
-            {
-                // www.melivecode.com
-                protocol: "https",
-                hostname: "*.melivecode.com",
-            },
         ],
     },
 }

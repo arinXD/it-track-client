@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { dMyt } from '@/src/util/dateFormater'
-import { Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
-import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
+import { Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
+import { PlusIcon, CheckIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon, ConfirmIcon, ClockIcon } from "@/app/components/icons";
+import { Icon } from '@iconify/react';
 
-const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSelectedDel }) => {
+const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSelectedDel, handleStartSelect }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState(trackSelection);
     const [itemsPerPage, setItemPerPage] = useState(10);
@@ -78,7 +79,7 @@ const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSele
                         color="primary"
                     >
                         Add New
-                        <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
+                        <PlusIcon className={'w-5 h-5 text-white md:block md:w-6 md:h-6'} />
                     </Button>
                     <Button
                         className="bg-red-400 text-white w-1/2"
@@ -88,7 +89,8 @@ const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSele
                         }}
                     >
                         Delete Select
-                        <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
+                        {/* <Icon icon="solar:trash-bin-minimalistic-linear" className='w-5 h-5 text-white hidden md:block md:w-8 md:h-8' /> */}
+                        <DeleteIcon className={'w-5 h-5 text-white md:w-8 md:h-8'} />
                     </Button>
                 </div>
             </div>
@@ -106,6 +108,7 @@ const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSele
                         <TableColumn>เริ่มต้น</TableColumn>
                         <TableColumn>สิ้นสุด</TableColumn>
                         <TableColumn>Action</TableColumn>
+                        <TableColumn></TableColumn>
                     </TableHeader>
                     {filteredData.length > 0 ?
                         <TableBody>
@@ -114,34 +117,56 @@ const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSele
                                     <TableCell>{e.acadyear}</TableCell>
                                     <TableCell className="w-1/3">
                                         <Link
-                                            href={`/admin/track-selection/${e.id}`}
+                                            href={`/admin/track-selection/${e.acadyear}?track_select_id=${e.id}`}
+                                            // as={`/admin/track-selection/${e.id}`}
                                             className='text-blue-500'
                                         >{e.title}
                                         </Link>
                                     </TableCell>
-                                    <TableCell>{e.has_finished}</TableCell>
+                                    <TableCell>
+                                        {e.has_finished ?
+                                            <Chip startContent={<CheckIcon size={18} />} color="success" variant="flat">เสร็จสิ้น</Chip>
+                                            :
+                                            <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">ดำเนินการ</Chip>
+                                        }
+                                    </TableCell>
                                     <TableCell>{dMyt(e.startAt)}</TableCell>
                                     <TableCell>{dMyt(e.expiredAt)}</TableCell>
                                     <TableCell>
                                         <div className="relative flex items-center gap-2">
                                             <Tooltip content="รายละเอียด">
-                                                <Link href={`/admin/track-selection/${e.id}`} className='focus:outline-none'>
+                                                <Link
+                                                    href={`/admin/track-selection/${e.acadyear}?track_select_id=${e.id}`}
+                                                    // as={`/admin/track-selection/${e.id}`}
+                                                    className='focus:outline-none'>
                                                     <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                                        <EyeIcon />
+                                                        {/* <EyeIcon /> */}
+                                                        <Icon icon="solar:eye-linear" className='w-[22px] h-[22px]' />
                                                     </span>
                                                 </Link>
                                             </Tooltip>
                                             <Tooltip content="แก้ไข">
                                                 <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                                    <EditIcon2 />
+                                                    <Icon icon="ph:pencil-simple-line" className='w-[22px] h-[22px]' />
                                                 </span>
                                             </Tooltip>
                                             <Tooltip color="danger" content="ลบ">
                                                 <span onClick={() => handleDelete(e.acadyear)} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                    <DeleteIcon2 />
+                                                    {/* <DeleteIcon2 /> */}
+                                                    <Icon icon="solar:trash-bin-minimalistic-linear" className='w-[22px] h-[22px]' />
                                                 </span>
                                             </Tooltip>
                                         </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        {!(e.has_finished) ?
+                                            <Button onPress={() => handleStartSelect(e.id)} color="primary" variant="solid" className='h-8'>
+                                                เริ่มคัดเลือก
+                                            </Button>
+                                            :
+                                            <Button onPress={() => handleStartSelect(e.id)} color="warning" variant="solid" className='h-8 bg-amber-400'>
+                                                แก้ไขสถานะ
+                                            </Button>}
                                     </TableCell>
                                 </TableRow>
                             ))}

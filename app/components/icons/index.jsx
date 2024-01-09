@@ -11,7 +11,13 @@ import HomeIcon from "./HomeIcon"
 import RightArrow from "./RightArrow"
 import ChartPie from "./ChartPie"
 import ChartPieBold from "./ChartPieBold"
+import CheckIcon from "./CheckIcon"
+import ClockIcon from "./ClockIcon"
+import ConfirmIcon from "./ConfirmIcon"
 export {
+    ClockIcon,
+    ConfirmIcon,
+    CheckIcon,
     ChartPie,
     ChartPieBold,
     RightArrow,

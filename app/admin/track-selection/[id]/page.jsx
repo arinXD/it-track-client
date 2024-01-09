@@ -2,8 +2,8 @@ import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchDataObj } from '../../action'
 import TrackSelectDetail from './TrackSelectDetail'
 
-const page = async ({ params }) => {
-    const { id } = params
+const page = async ({ params, searchParams }) => {
+    const id = searchParams.track_select_id
     const trackSelect = await fetchDataObj(`/api/tracks/selects/${id}/subjects/students`)
     return (
         <>
@@ -13,7 +13,8 @@ const page = async ({ params }) => {
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
-                <TrackSelectDetail trackSelect={trackSelect} />
+                {trackSelect ? <TrackSelectDetail trackSelect={trackSelect} />
+                    : <p>No data</p>}
             </ContentWrap>
         </>
     )

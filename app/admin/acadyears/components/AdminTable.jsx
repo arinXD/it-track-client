@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import React from 'react';
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input, Chip } from "@nextui-org/react";
 import { PlusIcon, EditIcon, DeleteIcon, SearchIcon } from "@/app/components/icons";
 import { destroyAcadYear, destroyMultipleAcadYear } from './action';
 import Swal from 'sweetalert2'
@@ -264,9 +264,7 @@ export default function AdminTable({
                                                                 (
                                                                     <div className="flex flex-col md:flex-row justify-center items-center gap-1 md:gap-3">
                                                                         {checkCurrentYear(e[column]) &&
-                                                                            <span className="block text-sm text-gray-400 py-[.05em] px-[.4em] border border-gray-200 rounded-full">
-                                                                                current
-                                                                            </span>
+                                                                            <Chip color="success" variant="flat">current</Chip>
                                                                         }
                                                                         <span className="block">{e[column]}</span>
                                                                     </div>

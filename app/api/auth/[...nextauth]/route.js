@@ -124,6 +124,11 @@ const handler = NextAuth({
             }
             return user
         },
+        async signOut({ token, session }) {
+            res.setHeader("Set-Cookie", "");
+            token = {};
+            session = {};
+        },
         async jwt({ token, user, trigger, session }) {
             if (trigger === "update") {
                 if (session.action == "verify signin") {

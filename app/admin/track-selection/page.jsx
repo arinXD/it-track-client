@@ -50,10 +50,6 @@ const Page = () => {
         const acadData = await fetchData("/api/acadyear")
         let subjData = await fetchData("/api/subjects")
         subjData = subjData.filter(element => element.subject_code.includes('SC') || element.subject_code.includes('CP'))
-        data = data.map(e => {
-            let status = !e.has_finished ? "กำลังดำเนินการ" : "สิ้นสุด";
-            return { ...e, has_finished: status };
-        })
         setTrackSelection(data)
         setAcadyear(acadData)
         setSubjects(subjData)
@@ -126,6 +122,7 @@ const Page = () => {
             }
         });
     }
+
     async function handleSelectedDel(acad) {
         if (acad.length == 0) return
         Swal.fire({
@@ -182,6 +179,29 @@ const Page = () => {
         });
     }
 
+    async function handleStartSelect(id) {
+        const token = await getToken()
+        const options = {
+            url: `${hostname}/api/tracks/selects/selected/${id}`,
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                "authorization": `${token}`,
+            },
+        };
+        axios(options)
+            .then(async result => {
+                const { ok, message } = result.data
+                showToastMessage(ok, message)
+                await callData()
+            })
+            .catch(error => {
+                const message = error.response.data.message
+                showToastMessage(false, message)
+            })
+    }
+
     return (
         <>
             <header>
@@ -207,6 +227,7 @@ const Page = () => {
                     handleOpen={handleOpen}
                     trackSelection={trackSelection}
                     handleSelectedDel={handleSelectedDel}
+                    handleStartSelect={handleStartSelect}
                 />
 
 
