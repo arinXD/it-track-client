@@ -70,6 +70,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         const result = await createTrackSelection(formData)
         const data = result.data
         if (result.ok) {
+            // จุดพลุฉลอง
+            handleConfetti()
             Swal.fire({
                 title: "บันทึกข้อมูลการคัดเลือก",
                 text: `บันทึกข้อมูลการคัดเลือกของคุณ ณ วันที่ ${dmyt(data.updatedAt)}`,
@@ -362,7 +364,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         className='bg-blue-500 mt-4 block w-full text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none'
                                         type="submit"
                                         disabled={!isConfirm || processing}
-                                        onPress={handleConfetti}
                                     >
                                         {!processing ? "ตกลง" : "บันทึกข้อมูล..."}
                                     </Button>

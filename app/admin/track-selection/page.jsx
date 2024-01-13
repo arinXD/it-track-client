@@ -45,18 +45,24 @@ const Page = () => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    async function callData() {
-        let data = await fetchData("/api/tracks/selects")
-        const acadData = await fetchData("/api/acadyear")
-        let subjData = await fetchData("/api/subjects")
-        subjData = subjData.filter(element => element.subject_code.includes('SC') || element.subject_code.includes('CP'))
-        setTrackSelection(data)
-        setAcadyear(acadData)
-        setSubjects(subjData)
+    async function callTrackSelection() {
+        let trackSelections = await fetchData("/api/tracks/selects")
+        setTrackSelection(trackSelections)
+    }
+    async function callAcadamicYear() {
+        let academicYears = await fetchData("/api/acadyear")
+        setAcadyear(academicYears)
+    }
+    async function callSubject() {
+        let subjects = await fetchData("/api/subjects")
+        const filterSubjects = subjects.filter(subject => subject.subject_code.includes('SC') || subject.subject_code.includes('CP'))
+        setSubjects(filterSubjects)
     }
 
     useEffect(() => {
-        callData()
+        callTrackSelection()
+        callAcadamicYear()
+        callSubject()
     }, [])
 
     function handleOpen() {
@@ -78,7 +84,10 @@ const Page = () => {
             };
             const result = await axios(options)
             const { ok, message } = result.data
-            await callData()
+
+            // refresh track selection data
+            callTrackSelection()
+
             showToastMessage(ok, message)
             return
         } catch (error) {
@@ -113,7 +122,9 @@ const Page = () => {
                     .then(async result => {
                         const { ok, message } = result.data
                         showToastMessage(ok, message)
-                        await callData()
+
+                        // refresh track selection data
+                        callTrackSelection()
                     })
                     .catch(error => {
                         const message = error.response.data.message
@@ -152,7 +163,10 @@ const Page = () => {
                     .then(async result => {
                         const { ok, message } = result.data
                         showToastMessage(ok, message)
-                        await callData()
+
+                        // refresh track selection data
+                        callTrackSelection()
+
                         // Select All
                         const selectAllElement = document.querySelectorAll('[aria-label="Select All"]')
                         const selectElement = document.querySelectorAll('[aria-label="Select"]')
@@ -194,7 +208,9 @@ const Page = () => {
             .then(async result => {
                 const { ok, message } = result.data
                 showToastMessage(ok, message)
-                await callData()
+
+                // refresh track selection data
+                callTrackSelection()
             })
             .catch(error => {
                 const message = error.response.data.message

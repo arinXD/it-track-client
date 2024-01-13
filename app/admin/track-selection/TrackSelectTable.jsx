@@ -102,38 +102,30 @@ const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSele
                     onRowAction={() => { }}
                     aria-label="track selection table">
                     <TableHeader>
-                        <TableColumn>ปีการศึกษา</TableColumn>
+                        <TableColumn></TableColumn>
+                        <TableColumn>Action</TableColumn>
                         <TableColumn>ชื่อ</TableColumn>
+                        <TableColumn>ปีการศึกษา</TableColumn>
                         <TableColumn>สถานะ</TableColumn>
                         <TableColumn>เริ่มต้น</TableColumn>
                         <TableColumn>สิ้นสุด</TableColumn>
-                        <TableColumn>Action</TableColumn>
-                        <TableColumn></TableColumn>
                     </TableHeader>
                     {filteredData.length > 0 ?
                         <TableBody>
                             {filteredData.map((e, index) => (
                                 <TableRow key={index}>
-                                    <TableCell>{e.acadyear}</TableCell>
-                                    <TableCell className="w-1/3">
-                                        <Link
-                                            href={`/admin/track-selection/${e.acadyear}?track_select_id=${e.id}`}
-                                            // as={`/admin/track-selection/${e.id}`}
-                                            className='text-blue-500'
-                                        >{e.title}
-                                        </Link>
-                                    </TableCell>
                                     <TableCell>
-                                        {e.has_finished ?
-                                            <Chip startContent={<CheckIcon size={18} />} color="success" variant="flat">เสร็จสิ้น</Chip>
+                                        {!(e.has_finished) ?
+                                            <Button size='sm' onPress={() => handleStartSelect(e.id)} color="primary" variant="solid" className=''>
+                                                เริ่มคัดเลือก
+                                            </Button>
                                             :
-                                            <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">ดำเนินการ</Chip>
-                                        }
+                                            <Button size='sm' onPress={() => handleStartSelect(e.id)} color="warning" variant="solid" className='bg-amber-400'>
+                                                แก้ไขสถานะ
+                                            </Button>}
                                     </TableCell>
-                                    <TableCell>{dMyt(e.startAt)}</TableCell>
-                                    <TableCell>{dMyt(e.expiredAt)}</TableCell>
                                     <TableCell>
-                                        <div className="relative flex items-center gap-2">
+                                        <div className="relative flex items-center gap-4">
                                             <Tooltip content="รายละเอียด">
                                                 <Link
                                                     href={`/admin/track-selection/${e.acadyear}?track_select_id=${e.id}`}
@@ -158,16 +150,27 @@ const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSele
                                             </Tooltip>
                                         </div>
                                     </TableCell>
-                                    <TableCell>
-                                        {!(e.has_finished) ?
-                                            <Button onPress={() => handleStartSelect(e.id)} color="primary" variant="solid" className='h-8'>
-                                                เริ่มคัดเลือก
-                                            </Button>
-                                            :
-                                            <Button onPress={() => handleStartSelect(e.id)} color="warning" variant="solid" className='h-8 bg-amber-400'>
-                                                แก้ไขสถานะ
-                                            </Button>}
+
+                                    <TableCell className="w-1/3">
+                                        <Link
+                                            href={`/admin/track-selection/${e.acadyear}?track_select_id=${e.id}`}
+                                            className='text-blue-500'
+                                        >{e.title}
+                                        </Link>
                                     </TableCell>
+
+                                    <TableCell>{e.acadyear}</TableCell>
+
+                                    <TableCell>
+                                        {e.has_finished ?
+                                            <Chip startContent={<CheckIcon size={18} />} color="success" variant="flat">เสร็จสิ้น</Chip>
+                                            :
+                                            <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">ดำเนินการ</Chip>
+                                        }
+                                    </TableCell>
+
+                                    <TableCell>{dMyt(e.startAt)}</TableCell>
+                                    <TableCell>{dMyt(e.expiredAt)}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody> :
