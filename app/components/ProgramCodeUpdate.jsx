@@ -7,7 +7,7 @@ import { hostname } from '@/app/api/hostname';
 import Select from 'react-select';
 
 export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCodeId }) {
-    const [programCodeTitle, setUpdatedTitle] = useState('');
+    const [program_code, setUpdatedTitle] = useState('');
     const [description, setDescription] = useState('');
     const [version, setVersion] = useState('');
     const [selectedProgram, setSelectedProgram] = useState(null);
@@ -17,31 +17,23 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
         const fetchProgramCode = async () => {
             try {
                 const response = await axios.get(`${hostname}/api/programcodes/${programCodeId}`);
-                const programCodeData = response.data.data;
+                setVersion(response.data.data.version);
+                setUpdatedTitle(response.data.data.program_code);
+                setDescription(response.data.data.desc);
 
-                // setUpdatedTitle(programCodeData.program_title);
-                // setDescription(programCodeData.desc);
-                // setVersion(programCodeData.version);
-
-                // // Assuming `program` is an object with `id` and `program_title`
-                // const selectedProgramOption = {
-                //     value: programCodeData.program.id,
-                //     label: programCodeData.program.program_title,
-                // };
-                // setSelectedProgram(selectedProgramOption);
                 const programsResult = await axios.get(`${hostname}/api/programs`);
                 const programs = programsResult.data.data;
 
                 // Map categories for react-select
                 const options = programs.map(program => ({
-                    value: program.id,
-                    label: program.program_title
+                    value: program.program,
+                    label: program.title_th
                 }));
 
                 setPrograms(options);
 
                 // Find the selected category based on the current group's category ID
-                const selectedProgram = options.find(option => option.value === response.data.data.program_id);
+                const selectedProgram = options.find(option => option.value === response.data.data.program);
                 setSelectedProgram(selectedProgram);
             } catch (error) {
                 console.error('Error fetching program code:', error);
@@ -72,10 +64,10 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
     const handleUpdateProgramCode = async () => {
         try {
             await axios.post(`${hostname}/api/programcodes/updateProgramCode/${programCodeId}`, {
-                program_title: programCodeTitle,
+                program_code: program_code,
                 desc: description,
                 version: version,
-                program_id: selectedProgram.value, // Add the selected program ID
+                program: selectedProgram.value, // Add the selected program ID
                 // Add other fields as needed
             });
 
@@ -98,7 +90,7 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
                     <input
                         type="text"
                         id="updatedTitle"
-                        value={programCodeTitle}
+                        value={program_code}
                         onChange={(e) => setUpdatedTitle(e.target.value)}
                     />
                     <label htmlFor="description">Description:</label>

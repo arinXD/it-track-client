@@ -7,15 +7,17 @@ import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 
 export default function ProgramUpdate({ isOpen, onClose, onUpdate, programId }) {
-    const [program_title, setProgramTitle] = useState('');
-    const [currentProgram, setCurrentProgram] = useState({});
+    const [program, setProgram] = useState('');
+    const [title_en, setProgramTitleEn] = useState('');
+    const [title_th, setProgramTitleTh] = useState('');
 
     useEffect(() => {
         const fetchProgram = async () => {
             try {
                 const response = await axios.get(`${hostname}/api/programs/${programId}`);
-                setCurrentProgram(response.data.data);
-                setProgramTitle(response.data.data.program_title);
+                setProgram(response.data.data.program);
+                setProgramTitleEn(response.data.data.title_en);
+                setProgramTitleTh(response.data.data.title_th);
             } catch (error) {
                 console.error('Error fetching program:', error);
             }
@@ -26,8 +28,10 @@ export default function ProgramUpdate({ isOpen, onClose, onUpdate, programId }) 
 
     const handleUpdateProgram = async () => {
         try {
-            await axios.post(`${hostname}/api/programs/updateProgram/${programId}`, {
-                program_title: program_title,
+            await axios.put(`${hostname}/api/programs/updateProgram/${programId}`, {
+                program: program,
+                title_en: title_en,
+                title_th: title_th,
             });
 
             // Notify the parent component that data has been updated
@@ -45,12 +49,26 @@ export default function ProgramUpdate({ isOpen, onClose, onUpdate, programId }) 
             <ModalContent>
                 <ModalHeader className="flex flex-col gap-1">Update Program</ModalHeader>
                 <ModalBody>
-                    <label htmlFor="updatedTitle">Updated Program Title:</label>
+                    <label htmlFor="program">Updated Program Title:</label>
                     <input
                         type="text"
-                        id="updatedTitle"
-                        value={program_title}
-                        onChange={(e) => setProgramTitle(e.target.value)}
+                        id="program"
+                        value={program}
+                        onChange={(e) => setProgram(e.target.value)}
+                    />
+                    <label htmlFor="title_en">Updated Title EN:</label>
+                    <input
+                        type="text"
+                        id="title_en"
+                        value={title_en}
+                        onChange={(e) => setProgramTitleEn(e.target.value)}
+                    />
+                    <label htmlFor="title_th">Updated Title TH:</label>
+                    <input
+                        type="text"
+                        id="title_th"
+                        value={title_th}
+                        onChange={(e) => setProgramTitleTh(e.target.value)}
                     />
                 </ModalBody>
                 <ModalFooter>

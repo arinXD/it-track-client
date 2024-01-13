@@ -1,10 +1,27 @@
 "use client"
 
 // ExcelUpload.js
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Table,
+  TableHeader,
+  TableBody,
+  TableColumn,
+  TableRow,
+  TableCell,
+  Button,
+  Tooltip,
+  Pagination,
+  Skeleton
+} from '@nextui-org/react';
 
 function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
   const [data, setData] = useState([]);
@@ -14,23 +31,37 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
   const [originalHeaders, setOriginalHeaders] = useState([]);
 
   const handleFileUpload = (e) => {
+    e.preventDefault();
+
     const reader = new FileReader();
-    reader.readAsBinaryString(e.target.files[0]);
-    reader.onload = (e) => {
-      const data = e.target.result;
-      const workbook = XLSX.read(data, { type: "binary" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const parsedData = XLSX.utils.sheet_to_json(sheet);
-      setData(parsedData);
+    let file;
 
-      // Set initial headers based on the first row
-      const initialHeaders = Object.keys(parsedData[0]);
-      setDisplayHeaders([...initialHeaders]);
-      setOriginalHeaders([...initialHeaders]);
-    };
+    if (e.dataTransfer && e.dataTransfer.items) {
+      // Handle file drop
+      file = e.dataTransfer.items[0]?.getAsFile();
+    } else if (e.target.files) {
+      // Handle file input change
+      file = e.target.files[0];
+    }
+
+    if (file) {
+      reader.readAsBinaryString(file);
+
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const parsedData = XLSX.utils.sheet_to_json(sheet);
+        setData(parsedData);
+
+        // Set initial headers based on the first row
+        const initialHeaders = Object.keys(parsedData[0]);
+        setDisplayHeaders([...initialHeaders]);
+        setOriginalHeaders([...initialHeaders]);
+      };
+    }
   };
-
   const handleInsertSubject = async () => {
     try {
 
@@ -91,9 +122,25 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
     }
   };
 
+  const handleDrop = (e) => {
+    e.preventDefault();
+    handleFileUpload(e);
+  };
 
+  useEffect(() => {
+    // Attach the onDrop event listener to the document
+    document.addEventListener("drop", handleDrop);
+
+    // Clean up the event listener when the component is unmounted
+    return () => {
+      document.removeEventListener("drop", handleDrop);
+    };
+  }, []);
   return (
-    <div className="App">
+    <div
+      className="App"
+      onDragOver={(e) => e.preventDefault()}
+    >
       <input
         id="fileInput"
         type="file"
@@ -103,11 +150,11 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
 
       {data.length > 0 && (
         <>
-          <table className="table">
-            <thead>
-              <tr>
+          {data.length > 0 ? (
+            <Table>
+              <TableHeader>
                 {displayHeaders.map((header, index) => (
-                  <th key={index} onDoubleClick={() => handleDoubleClick(null, index)}>
+                  <TableColumn key={index} onDoubleClick={() => handleDoubleClick(null, index)}>
                     {editingCell && editingCell.columnIndex === index ? (
                       <input
                         value={header}
@@ -118,45 +165,45 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
                     ) : (
                       header
                     )}
-                  </th>
+                  </TableColumn>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {originalHeaders.map((originalHeader, columnIndex) => (
-                    <td
-                      key={columnIndex}
-                      onDoubleClick={() => handleCellDoubleClick(rowIndex, columnIndex)}
-                    >
-                      {editingTbody &&
-                        editingTbody.rowIndex === rowIndex &&
-                        editingTbody.columnIndex === columnIndex ? (
-                        <input
-                          value={row[originalHeader]}
-                          onChange={(e) =>
-                            handleCellInputChange(e, rowIndex, columnIndex)
-                          }
-                          onBlur={handleCellBlurTbody}
-                          autoFocus
-                        />
-                      ) : (
-                        row[originalHeader]
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </TableHeader>
+              <TableBody>
+                {data.map((row, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    {originalHeaders.map((originalHeader, columnIndex) => (
+                      <TableCell
+                        key={columnIndex}
+                        onDoubleClick={() => handleCellDoubleClick(rowIndex, columnIndex)}
+                      >
+                        {editingTbody &&
+                          editingTbody.rowIndex === rowIndex &&
+                          editingTbody.columnIndex === columnIndex ? (
+                          <input
+                            value={row[originalHeader]}
+                            onChange={(e) =>
+                              handleCellInputChange(e, rowIndex, columnIndex)
+                            }
+                            onBlur={handleCellBlurTbody}
+                            autoFocus
+                          />
+                        ) : (
+                          row[originalHeader]
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            // Skeleton for loading state
+            <Skeleton rows={5} height={40} />
+          )}
           <button onClick={handleInsertSubject}>Add to Database</button>
           <button onClick={handleClearFile}>Clear File</button>
         </>
       )}
-
-      <br /><br />
-      {/* ... additional UI or components ... */}
     </div>
   );
 }

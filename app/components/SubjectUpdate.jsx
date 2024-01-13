@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import { hostname } from '@/app/api/hostname';
+import { fetchData } from '../admin/action'
 
 export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) {
     const [semester, setSemester] = useState('');
@@ -13,28 +14,29 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
     const [title_th, setNewTitleTH] = useState('');
     const [title_en, setNewTitleEN] = useState('');
     const [information, setInformation] = useState('');
-    const [cradit, setCradit] = useState('');
+    const [credit, setCredit] = useState('');
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [groups, setGroups] = useState([]);
     const [selectedSubGroup, setSelectedSubGroup] = useState(null);
     const [subgroups, setSupGroups] = useState([]);
-    const [selectedProgramCode, setSelectedProgramCode] = useState(null);
-    const [programcodes, setProgramCode] = useState([]);
+
+    const [selectedAcadyears, setSelectedAcadyears] = useState(null);
+    const [acadyears, setAcadyears] = useState([]);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchDatas = async () => {
             try {
                 // Fetch the subject details
                 const subjectResult = await axios.get(`${hostname}/api/subjects/${subjectId}`);
                 const subjectData = subjectResult.data.data;
                 console.log(subjectData);
 
-                setSemester(subjectData.semester);
-                setSubjectCode(subjectData.subject_code);
-                setNewTitleTH(subjectData.title_th);
-                setNewTitleEN(subjectData.title_en);
-                setInformation(subjectData.information);
-                setCradit(subjectData.cradit);
+                setSemester(subjectData.semester ?? '');
+                setSubjectCode(subjectData.subject_code ?? '');
+                setNewTitleTH(subjectData.title_th ?? '');
+                setNewTitleEN(subjectData.title_en ?? '');
+                setInformation(subjectData.information ?? '');
+                setCredit(subjectData.credit ?? '');
 
                 // Fetch the list of groups
                 const groupResult = await axios.get(`${hostname}/api/groups`);
@@ -43,9 +45,8 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 const subgroupResult = await axios.get(`${hostname}/api/subgroups`);
                 const subgroups = subgroupResult.data.data;
 
-                const programcodeResult = await axios.get(`${hostname}/api/programcodes`);
-                const programcodes = programcodeResult.data.data;
-                // Map groups for react-select
+                const acadyears = await fetchData("/api/acadyear")
+
                 const optionsGroups = groups.map((group) => ({
                     value: group.id,
                     label: group.group_title
@@ -53,7 +54,6 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 setGroups(optionsGroups);
                 const selectedGroup = optionsGroups.find(option => option.value === subjectData.group_id);
                 setSelectedGroup(selectedGroup);
-
 
                 const optionsSubGroups = subgroups.map((subgroup) => ({
                     value: subgroup.id,
@@ -63,21 +63,20 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 const selectedSupGroup = optionsSubGroups.find(option => option.value === subjectData.sub_group_id);
                 setSelectedSubGroup(selectedSupGroup);
 
-                // Corrected variable names
-                const optionsProgramCodes = programcodes.map((programcode) => ({
-                    value: programcode.id,
-                    label: programcode.program_title
+                const optionsAcadyears = acadyears.map((acadyear) => ({
+                    value: acadyear.acadyear,
+                    label: acadyear.acadyear
                 }));
-                setProgramCode(optionsProgramCodes);
-                const selectedProgramCode = optionsProgramCodes.find(option => option.value === subjectData.program_code_id);
-                setSelectedProgramCode(selectedProgramCode);
+                setAcadyears(optionsAcadyears);
+                const selectedAcadyears = optionsAcadyears.find(option => option.value === subjectData.acadyear);
+                setSelectedAcadyears(selectedAcadyears);
 
             } catch (error) {
                 console.error('Error fetching subject details:', error);
             }
         };
 
-        fetchData();
+        fetchDatas();
     }, [subjectId]);
 
     const handleUpdateSubject = async () => {
@@ -88,10 +87,10 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 title_th: title_th ? title_th : null,
                 title_en: title_en ? title_en : null,
                 information: information ? information : null,
-                cradit: cradit ? cradit : null,
+                credit: credit ? credit : null,
                 sub_group_id: selectedSubGroup ? selectedSubGroup.value : null,
                 group_id: selectedGroup ? selectedGroup.value : null,
-                program_code_id: selectedProgramCode ? selectedProgramCode.value : null,
+                acadyear: selectedAcadyears ? selectedAcadyears.value : null,
             });
 
             // Notify the parent component that data has been updated
@@ -145,12 +144,12 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                         value={information}
                         onChange={(e) => setInformation(e.target.value)}
                     />
-                    <label htmlFor="cradit">New Subject cradit:</label>
+                    <label htmlFor="credit">New Subject credit:</label>
                     <input
                         type="text"
-                        id="cradit"
-                        value={cradit}
-                        onChange={(e) => setCradit(e.target.value)}
+                        id="credit"
+                        value={credit}
+                        onChange={(e) => setCredit(e.target.value)}
                     />
 
                     <label htmlFor="group">Select Group:</label>
@@ -171,12 +170,12 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                         isSearchable
                         isClearable
                     />
-                    <label htmlFor="programcode">Select ProgramCode:</label>
+                    <label htmlFor="acadyear">Select Acadyear:</label>
                     <Select
-                        id="programcode"
-                        value={selectedProgramCode}
-                        options={programcodes}
-                        onChange={(selectedOption) => setSelectedProgramCode(selectedOption)}
+                        id="acadyear"
+                        value={selectedAcadyears}
+                        options={acadyears}
+                        onChange={(selectedOption) => setSelectedAcadyears(selectedOption)}
                         isSearchable
                         isClearable
                     />

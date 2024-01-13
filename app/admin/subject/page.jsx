@@ -7,14 +7,34 @@ import { hostname } from '@/app/api/hostname';
 import Swal from 'sweetalert2';
 import { CSVLink } from 'react-csv';
 import * as XLSX from "xlsx";
+import { dmy } from "@/src/util/dateFormater";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableColumn,
+    TableRow,
+    TableCell,
+    Button,
+    Tooltip,
+    Pagination
+} from "@nextui-org/react";
+import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { LiaFileCsvSolid } from "react-icons/lia";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
 
-async function fetchData() {
+import { fetchData } from '../action'
+import { margin } from '@mui/system';
+
+async function fetchDatas() {
     try {
         const groupResult = await axios.get(`${hostname}/api/groups`);
         const groups = groupResult.data.data;
 
-        const programcodeResult = await axios.get(`${hostname}/api/programcodes`);
-        const programcodes = programcodeResult.data.data;
+        const acadyears = await fetchData("/api/acadyear")
 
         const subgroupResult = await axios.get(`${hostname}/api/subgroups`);
         const subgroups = subgroupResult.data.data;
@@ -25,31 +45,57 @@ async function fetchData() {
         const result = await axios.get(`${hostname}/api/subjects`);
         const subjects = result.data.data;
 
-        return { subjects, groups, programcodes, subgroups, programs }
+        return { subjects, groups, acadyears, subgroups, programs }
     } catch (error) {
-        console.log("fetch errpr:", error);
+        console.log("fetch error:", error);
     }
 }
 
 export default function Subject() {
     const [subjects, setSubjects] = useState([]);
     const [groups, setGroups] = useState([]);
-    const [programcodes, setProgramcodes] = useState([]);
+    const [acadyears, setAcadyears] = useState([]);
     const [subgroups, setSubgroups] = useState([]);
-    const [programs, setPrograms] = useState([]);
     const [isInsertModalOpen, setInsertModalOpen] = useState(false);
+    const [isImportModalOpen, setImportModalOpen] = useState(false);
     const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
     const [selectedSubjectForUpdate, setSelectedSupjectForUpdate] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
+    const showToastMessage = (ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
 
     useEffect(() => {
-        fetchData().then(data => {
+        fetchDatas().then(data => {
             console.log(data);
             setSubjects(data.subjects)
             setGroups(data.groups)
-            setProgramcodes(data.programcodes)
+            setAcadyears(data.acadyears);
             setSubgroups(data.subgroups)
-            setPrograms(data.programs)
+
         }).catch(err => {
             console.log("error on useeffect:", err);
         });
@@ -63,6 +109,16 @@ export default function Subject() {
         setInsertModalOpen(false);
     };
 
+    const handleImportModalOpen = () => {
+        setImportModalOpen(true);
+    };
+
+    const handleImportModalClose = () => {
+        setImportModalOpen(false);
+    };
+
+
+
     const handleUpdateModalOpen = (group) => {
         setSelectedSupjectForUpdate(group);
         setUpdateModalOpen(true);
@@ -74,106 +130,116 @@ export default function Subject() {
     };
 
     const handleDataUpdated = async () => {
-        // Fetch data again after updating to update the list
-        const data = await fetchData();
-        setSubjects(data.subjects)
-        setGroups(data.groups)
-        setProgramcodes(data.programcodes)
-        setSubgroups(data.subgroups)
-        setPrograms(data.programs)
-        // Close the modal after updating
-        handleUpdateModalClose();
+        try {
+            const data = await fetchDatas();
+            setSubjects(data.subjects)
+            setGroups(data.groups)
+            setAcadyears(data.acadyears)
+            setSubgroups(data.subgroups)
+            // Close the modal after updating
+            showToastMessage(true, `อัปเดตข้อมูลสำเร็จ`);
+            handleUpdateModalClose();
+
+        } catch (error) {
+            console.error('Error updating data:', error);
+            showToastMessage(false, "Error updating subject");
+
+        }
     };
 
     const handleDataInserted = async () => {
-        // Fetch data again after inserting to update the list
-        const data = await fetchData();
-        setSubjects(data.subjects)
-        setGroups(data.groups)
-        setProgramcodes(data.programcodes)
-        setSubgroups(data.subgroups)
-        setPrograms(data.programs)
-        // Close the modal after inserting
-        handleInsertModalClose();
+        try {
+            const data = await fetchDatas();
+            setSubjects(data.subjects)
+            setGroups(data.groups)
+            setAcadyears(data.acadyears)
+            setSubgroups(data.subgroups)
+            // Close the modal after inserting
+            handleInsertModalClose();
+            const lastsubsubject = data.subjects[data.subjects.length - 1];
+            const subjectTitle = lastsubsubject?.title_th || '`Unknown Subject`';
+            showToastMessage(true, `เพิ่มวิชา ${subjectTitle} สำเร็จ`);
+            handleImportModalClose()
+
+        } catch (error) {
+            console.error('Error inserting data:', error);
+
+            // Show warning toast message if there is an error
+            showToastMessage(false, "Error adding subject");
+        }
     };
 
 
     const handleDeleteSubject = async (subjectId) => {
         const { value } = await Swal.fire({
-            title: 'Are you sure?',
-            text: 'You won\'t be able to revert this!',
-            icon: 'warning',
+            text: `ต้องการลบวิชา ${subjectId.title_th} หรือไม่ ?`,
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก"
         });
 
         if (value) {
             try {
-                await axios.delete(`${hostname}/api/subjects/deleteSubject/${subjectId}`);
-                // Fetch data again after deleting to update the list
-                await handleDataInserted()
-                Swal.fire(
-                    'Deleted!',
-                    'Your Subject has been deleted.',
-                    'success'
-                );
+                const result = await axios.delete(`${hostname}/api/subjects/deleteSubject/${subjectId.subject_id}`);
+                const { ok, message } = result.data
+                showToastMessage(ok, `ลบวิชา ${subjectId.title_th} สำเร็จ`)
+                const data = await fetchDatas();
+                setSubjects(data.subjects);
+
             } catch (error) {
-                // Handle error if needed
-                console.error('Error deleting Subject:', error);
+                const message = error?.response?.data?.message
+                showToastMessage(false, message)
             }
         }
     };
 
     const handleExportCSV = () => {
-        const csvData = subjects.map(subject => [
-            getProgramTitle(subject.program_code_id),
-            getProgramCodeTitle(subject.program_code_id),
-            getGroupTitle(subject.group_id),
-            getSubGroupTitle(subject.sub_group_id),
-            subject.semester || "No data",
-            subject.subject_code || "No data",
-            subject.title_th || "No data",
-            subject.title_en || "No data",
-            subject.information || "No data",
-            subject.cradit || "No data",
-        ]);
+        try {
+            const csvData = subjects.map(subject => [
+                getAcadyearTitle(subject.acadyear),
+                getGroupTitle(subject.group_id),
+                getSubGroupTitle(subject.sub_group_id),
+                subject.semester || "No data",
+                subject.subject_code || "No data",
+                subject.title_th || "No data",
+                subject.title_en || "No data",
+                subject.information || "No data",
+                subject.credit || "No data",
+            ]);
 
-        // Add headers to the CSV data
-        const csvHeaders = [
-            'Program', 'Program Code', 'Group', 'SubGroup', 'Semester', 'Subject Code',
-            'Title (TH)', 'Title (EN)', 'Information', 'Credit'
-        ];
+            // Add headers to the CSV data
+            const csvHeaders = [
+                'Acadyear', 'Group', 'SubGroup', 'Semester', 'Subject Code',
+                'Title (TH)', 'Title (EN)', 'Information', 'Credit'
+            ];
 
-        csvData.unshift(csvHeaders);
+            csvData.unshift(csvHeaders);
 
-        // Trigger the CSV download
-        const csvFilename = 'subjects_data.csv';
-        const csvBlob = new Blob([csvData.map(row => row.join(',')).join('\n')], { type: 'text/csv' });
+            // Trigger the CSV download
+            const csvFilename = 'subjects_data.csv';
+            const csvBlob = new Blob([csvData.map(row => row.join(',')).join('\n')], { type: 'text/csv' });
 
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(csvBlob);
-        link.download = csvFilename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(csvBlob);
+            link.download = csvFilename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
 
-    const getProgramTitle = (programCodeId) => {
-        const programCode = programcodes.find(e => e.id === programCodeId);
-
-        if (programCode) {
-            const program = programs.find(p => p.id === programCode.program_id);
-            return program ? program.program_title : 'No Program';
+            showToastMessage(true, 'CSV export successful');
+        } catch (error) {
+            console.error('Error exporting CSV:', error);
+            showToastMessage(false, 'Error exporting CSV');
         }
-
-        return 'No Program';
     };
 
-    const getProgramCodeTitle = (programCodeId) => {
-        const programCode = programcodes.find(e => e.id === programCodeId);
-        return programCode ? programCode.program_title : 'No ProgramCode';
+
+    const getAcadyearTitle = (acadYearId) => {
+        const acadYear = acadyears.find(e => e.acadyear === acadYearId);
+        return acadYear ? acadYear.acadyear : 'No Acadyear';
     };
 
     const getGroupTitle = (groupId) => {
@@ -187,28 +253,62 @@ export default function Subject() {
     };
 
     const handleExportExcel = () => {
-        // Create a workbook with a worksheet
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(subjects.map(subject => ({
-            Program: getProgramTitle(subject.program_code_id),
-            'Program Code': getProgramCodeTitle(subject.program_code_id),
-            Group: getGroupTitle(subject.group_id),
-            SubGroup: getSubGroupTitle(subject.sub_group_id),
-            Semester: subject.semester || "No data",
-            'Subject Code': subject.subject_code || "No data",
-            'Title (TH)': subject.title_th || "No data",
-            'Title (EN)': subject.title_en || "No data",
-            Information: subject.information || "No data",
-            Credit: subject.cradit || "No data",
-        })));
+        try {
+            // Create a workbook with a worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(subjects.map(subject => ({
+                'Acadyear': getAcadyearTitle(subject.acadyear),
+                Group: getGroupTitle(subject.group_id),
+                SubGroup: getSubGroupTitle(subject.sub_group_id),
+                Semester: subject.semester || "No data",
+                'Subject Code': subject.subject_code || "No data",
+                'Title (TH)': subject.title_th || "No data",
+                'Title (EN)': subject.title_en || "No data",
+                Information: subject.information || "No data",
+                Credit: subject.credit || "No data",
+            })));
 
-        // Add the worksheet to the workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'Subjects');
+            // Add the worksheet to the workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Subjects');
 
-        // Save the workbook to a file
-        XLSX.writeFile(wb, 'subjects_data.xlsx');
+            // Save the workbook to a file
+            XLSX.writeFile(wb, 'subjects_data.xlsx');
+
+            showToastMessage(true, 'Excel export successful');
+        } catch (error) {
+            console.error('Error exporting Excel:', error);
+            showToastMessage(false, 'Error exporting Excel');
+        }
+    };
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 8;
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
     };
 
+
+    const handleSearch = (subject) => {
+        const searchFields = [
+            'acadyear',
+            'group_id',
+            'sub_group_id',
+            'semester',
+            'subject_code',
+            'title_th',
+            'title_en',
+            'information',
+            'credit',
+        ];
+
+        return searchFields.some((field) =>
+            subject[field]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    };
+
+    const visibleSubjects = subjects
+        .filter((subject) => handleSearch(subject))
+        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
         <>
@@ -218,74 +318,169 @@ export default function Subject() {
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
-                <h2>Subjects:</h2>
-                <button onClick={handleExportCSV}>Export to CSV</button>
-                <button onClick={handleExportExcel}>Export to Excel</button>
-                <div>
-                    {/* Render your subject data here */}
-                    {subjects.map((subject, index) => (
-                        <div key={index}>
-                            {/* Display subject information */}
-                            <p>
-                                id: {subject.subject_id} <br />
-                                Program: {subject.program_code_id ?
-                                    <>
-                                        {programcodes.map(programcode => (
-                                            programs.map(program => (
-                                                // เงื่อนไข
-                                                (subject.program_code_id === programcode.id &&
-                                                    programcode.program_id === program.id) &&
-                                                // แสดงผล
-                                                program.program_title
-                                            ))
-                                        ))}
-                                    </>
-                                    : 'No Program'}
-                            </p>
-                            <p>
-                                Program Code: {subject.program_code_id ?
-                                    <>
-                                        {programcodes.map(e => (
-                                            e.id === subject.program_code_id &&
-                                            e.program_title
-                                        ))}
-                                    </>
-                                    : 'No ProgramCode'}
-                            </p>
-                            <p>
-                                Group: {subject.group_id ?
-                                    <>
-                                        {groups.map(e => (
-                                            e.id === subject.group_id &&
-                                            e.group_title
-                                        ))}
-                                    </>
-                                    : 'No Group'}
-                            </p>
-                            <p>
-                                SubGroup: {subject.sub_group_id ?
-                                    <>
-                                        {subgroups.map(e => (
-                                            e.id === subject.sub_group_id &&
-                                            e.sub_group_title
-                                        ))}
-                                    </>
-                                    : 'No Group'}
-                            </p>
-                            <p>Semester: {subject.semester || "ไม่มีข้อมูล"}</p>
-                            <p>Subject Code: {subject.subject_code || "ไม่มีข้อมูล"}</p>
-                            <p>Title (TH): {subject.title_th || "ไม่มีข้อมูล"}</p>
-                            <p>Title (EN): {subject.title_en || "ไม่มีข้อมูล"}</p>
-                            <p>Information: {subject.information || "ไม่มีข้อมูล"}</p>
-                            <p>Cradit: {subject.cradit || "ไม่มีข้อมูล"}</p>
-                            <button onClick={() => handleUpdateModalOpen(subject)}>Update</button>
-                            <button onClick={() => handleDeleteSubject(subject.subject_id)}>Delete</button>
-                            <p>______________________________________________________________________</p>
+                <ToastContainer />
+                {/* <ExcelUpload onDataInsertXlsx={handleDataInserted} /> */}
+
+                <div className='my-[30px]'>
+                    <div className="flex flex-col md:flex-row justify-between gap-3 mb-3 ">
+                        <div className='flex justify-start'>
+                            <div className="flex md:flex-row gap-3">
+                                <Button
+                                    className=" text-white w-1/2"
+                                    onPress={handleExportExcel}
+                                    style={{ backgroundColor: '#107C41', color: 'white' }}
+                                >
+                                    Export to Excel
+                                    <RiFileExcel2Line className={'w-5 h-5 text-white hidden md:block md:w-5 md:h-5'} />
+                                </Button>
+                                <Button
+                                    className="text-white w-1/2"
+                                    onPress={handleExportCSV}
+                                    style={{ backgroundColor: '#149403', color: 'white' }}
+                                >
+                                    Export to CSV
+                                    <LiaFileCsvSolid className={'w-5 h-5 text-white hidden md:block md:w-5 md:h-5'} />
+                                </Button>
+                            </div>
                         </div>
-                    ))}
+                        <div className='flex justify-end'>
+                            <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
+                                <SearchIcon width={16} height={16} />
+                            </div>
+                            <input
+                                type="search"
+                                id="search"
+                                className="rounded-s-none pl-0 py-2 px-4 text-sm text-gray-900 rounded-lg bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Search..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            <div className="flex md:flex-row gap-3">
+                                <Button
+                                    className="w-1/2 ml-3"
+                                    onPress={handleInsertModalOpen}
+                                    color="primary"
+                                >
+                                    Add Group
+                                    <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
+                                </Button>
+                                <Button
+                                    className="w-1/2"
+                                    onPress={handleImportModalOpen}
+                                    onDataInsertXlsx={handleDataInserted}
+                                    isOpen={isImportModalOpen}
+                                    onClose={handleImportModalClose}
+                                    color="primary"
+                                >
+                                    Import Excel
+                                    <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
+                                </Button>
+                                <Button
+                                    className="bg-red-400 text-white w-1/2"
+
+                                >
+                                    Delete Select
+                                    <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                    <Table
+                        removeWrapper
+                        selectionMode="multiple"
+                        onRowAction={() => { }}
+                        aria-label="subject table">
+                        <TableHeader>
+                            <TableColumn>Actions</TableColumn>
+                            <TableColumn>ปีการศึกษา</TableColumn>
+                            <TableColumn>กลุ่มวิชา</TableColumn>
+                            <TableColumn>กลุ่มย่อยวิชา</TableColumn>
+                            <TableColumn>เทอม</TableColumn>
+                            <TableColumn>รหัสวิชา</TableColumn>
+                            <TableColumn>ชื่อไทย</TableColumn>
+                            <TableColumn>ชื่ออังกฤษ</TableColumn>
+                            <TableColumn>ข้อมูล</TableColumn>
+                            <TableColumn>หน่วยกิต</TableColumn>
+                            <TableColumn>วันที่สร้าง</TableColumn>
+                            <TableColumn>วันที่แก้ไข</TableColumn>
+                        </TableHeader>
+                        {visibleSubjects.length > 0 ? (
+                            <TableBody>
+                                {visibleSubjects.map((subject, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>
+                                            <div className='relative flex items-center gap-2'>
+                                                <Tooltip content="แก้ไข">
+                                                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                                        <EditIcon2 onClick={() => handleUpdateModalOpen(subject)} />
+                                                    </span>
+                                                </Tooltip>
+                                                <Tooltip color="danger" content="ลบ">
+                                                    <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                                                        <DeleteIcon2 onClick={() => handleDeleteSubject(subject)} />
+                                                    </span>
+                                                </Tooltip>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            {subject.acadyear ?
+                                                <>
+                                                    {acadyears.map(e => (
+                                                        e.acadyear === subject.acadyear &&
+                                                        e.acadyear
+                                                    ))}
+                                                </>
+                                                : 'ไม่มีปีการศึกษา'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {subject.group_id ?
+                                                <>
+                                                    {groups.map(e => (
+                                                        e.id === subject.group_id &&
+                                                        e.group_title
+                                                    ))}
+                                                </>
+                                                : 'ไม่มีกลุ่มวิชา'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {subject.sub_group_id ?
+                                                <>
+                                                    {subgroups.map(e => (
+                                                        e.id === subject.sub_group_id &&
+                                                        e.sub_group_title
+                                                    ))}
+                                                </>
+                                                : 'ไม่มีกลุ่มย่อยวิชา'}
+                                        </TableCell>
+                                        <TableCell>{subject.semester || "ไม่มีข้อมูล"}</TableCell>
+                                        <TableCell>{subject.subject_code || "ไม่มีข้อมูล"}</TableCell>
+                                        <TableCell>{subject.title_th || "ไม่มีข้อมูล"}</TableCell>
+                                        <TableCell>{subject.title_en || "ไม่มีข้อมูล"}</TableCell>
+                                        <TableCell>{subject.information || "ไม่มีข้อมูล"}</TableCell>
+                                        <TableCell>{subject.credit || "ไม่มีข้อมูล"}</TableCell>
+                                        {["createdAt", "updatedAt"].map(column => (
+                                            <TableCell key={column}>
+                                                <span>{column === "createdAt" || column === "updatedAt" ? dmy(subject[column]) : subject[column]}</span>
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        ) : (
+                            <TableBody emptyContent={"ไม่มีข้อมูลวิชา"}>{[]}</TableBody>
+                        )}
+                    </Table>
+                    <Pagination
+                        onChange={handlePageChange}
+                        current={currentPage}
+                        total={Math.ceil(subjects.length / itemsPerPage)}
+                        isCompact
+                        showControls
+                        loop
+                        className="flex justify-center mt-3"
+                    />
                 </div>
-                <button onClick={handleInsertModalOpen}>Add Subject</button>
-                <ExcelUpload onDataInsertXlsx={handleDataInserted} />
+
 
                 {/* Render the SubjectInsert modal */}
                 <SubjectInsert isOpen={isInsertModalOpen} onClose={handleInsertModalClose} onDataInserted={handleDataInserted} />
@@ -297,6 +492,31 @@ export default function Subject() {
                         subjectId={selectedSubjectForUpdate.subject_id}
                     />
                 }
+
+                <Modal
+                    backdrop="blur"
+                    isOpen={isImportModalOpen}
+                    onClose={handleImportModalClose}
+                    classNames={{
+                        backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20"
+                    }}
+                    size="4xl"
+                    placement="top"
+                    scrollBehavior="inside"
+
+                >
+                    <ModalContent>
+                        <ModalHeader>Import Excel</ModalHeader>
+                        <ModalBody>
+                            <ExcelUpload onDataInsertXlsx={handleDataInserted} />
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button onClick={handleImportModalClose} color="error">
+                                Close
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
             </ContentWrap>
 
         </>

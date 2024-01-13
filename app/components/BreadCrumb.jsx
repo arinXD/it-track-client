@@ -8,6 +8,7 @@ const links = {
     "admin": "หน้าหลัก",
     "acadyears": "ปีการศึกษา",
     "program": "หลักสูตร",
+    "programcode": "รหัสหลักสูตร",
     "category": "หมวดหมู่วิชา",
     "group": "กลุ่มวิชา",
     "subgroup": "กลุ่มย่อยวิชา",

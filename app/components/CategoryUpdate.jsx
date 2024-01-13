@@ -25,7 +25,7 @@ export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }
 
   const handleUpdateCategory = async () => {
     try {
-      await axios.post(`${hostname}/api/categories/updateCategory/${categoryId}`, {
+      await axios.put(`${hostname}/api/categories/updateCategory/${categoryId}`, {
         category_title: newTitle,
       });
 

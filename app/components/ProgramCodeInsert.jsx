@@ -8,7 +8,7 @@ import { hostname } from '@/app/api/hostname';
 import Select from 'react-select';
 
 export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
-    const [program_title, setProgramTitle] = useState('');
+    const [program_code, setProgramTitle] = useState('');
     const [desc, setDesc] = useState('');
     const [version, setVersion] = useState('');
     const [program_id, setProgramId] = useState('');
@@ -38,10 +38,10 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
             }
     
             const result = await axios.post(`${hostname}/api/programcodes/insertProgramCode`, {
-                program_title: program_title,
+                program_code: program_code,
                 desc: desc,
                 version: version,
-                program_id: selectedProgram.value 
+                program: selectedProgram.value 
             });
     
             console.log('Inserted program code:', result.data.data);
@@ -65,7 +65,7 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
                             <input
                                 type="text"
                                 id="programTitle"
-                                value={program_title}
+                                value={program_code}
                                 onChange={(e) => setProgramTitle(e.target.value)}
                             />
 
@@ -89,7 +89,7 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
                             <Select
                                 id="codeProgramId"
                                 value={selectedProgram}
-                                options={programs.map(program => ({ value: program.id, label: program.program_title }))}
+                                options={programs.map(program => ({ value: program.program, label: program.title_th }))}
                                 onChange={(selectedOption) => setSelectedProgram(selectedOption)}
                                 isSearchable
                             />

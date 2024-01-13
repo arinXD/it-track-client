@@ -7,12 +7,17 @@ import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 
 export default function ProgramInsert({ isOpen, onClose, onDataInserted }) {
-    const [program_title, setProgramTitle] = useState('');
+    const [program, setProgram] = useState('');
+    const [title_en, setProgramTitleEn] = useState('');
+    const [title_th, setProgramTitleTh] = useState('');
+    // const [program_title, setProgramTitle] = useState('');
 
     const handleInsertProgram = async () => {
         try {
             await axios.post(`${hostname}/api/programs/insertProgram`, {
-                program_title: program_title,
+                program: program,
+                title_en: title_en,
+                title_th: title_th,
             });
 
             // Notify the parent component that data has been inserted
@@ -31,12 +36,26 @@ export default function ProgramInsert({ isOpen, onClose, onDataInserted }) {
             <ModalContent>
                 <ModalHeader className="flex flex-col gap-1">Add Program</ModalHeader>
                 <ModalBody>
-                    <label htmlFor="programTitle">Program Title:</label>
+                    <label htmlFor="program">Program:</label>
                     <input
                         type="text"
-                        id="programTitle"
-                        value={program_title}
-                        onChange={(e) => setProgramTitle(e.target.value)}
+                        id="program"
+                        value={program}
+                        onChange={(e) => setProgram(e.target.value)}
+                    />
+                    <label htmlFor="title_en">Title EN:</label>
+                    <input
+                        type="text"
+                        id="title_en"
+                        value={title_en}
+                        onChange={(e) => setProgramTitleEn(e.target.value)}
+                    />
+                    <label htmlFor="title_th">Title TH:</label>
+                    <input
+                        type="text"
+                        id="title_th"
+                        value={title_th}
+                        onChange={(e) => setProgramTitleTh(e.target.value)}
                     />
                 </ModalBody>
                 <ModalFooter>

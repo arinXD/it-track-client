@@ -8,13 +8,15 @@ import axios from 'axios';
 import Select from 'react-select';
 import { hostname } from '@/app/api/hostname';
 
+import { fetchData } from '../admin/action'
+
 export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
     const [semester, setSemester] = useState('');
     const [subject_code, setSubjectCode] = useState('');
     const [title_th, setTitleTh] = useState('');
     const [title_en, setTitleEn] = useState('');
     const [information, setInformation] = useState('');
-    const [cradit, setCradit] = useState('');
+    const [credit, setCredit] = useState('');
 
     const [selectedSubGroup, setSelectedSubGroup] = useState(null);
     const [subgroups, setSubGroup] = useState([]);
@@ -22,8 +24,8 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [groups, setGroups] = useState([]);
 
-    const [selectedProgramCode, setSelectedProgramCode] = useState(null);
-    const [programscodes, setProgramCode] = useState([]);
+    const [selectedAcadYear, setSelectedAcadYear] = useState(null);
+    const [acadyears, setAcadYear] = useState([]);
 
     useEffect(() => {
         const fetchSubGroups = async () => {
@@ -56,25 +58,24 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                 console.error('Error fetching groups:', error);
             }
         };
-        const fetchProgramCodes = async () => {
+        const fetchAcadYear = async () => {
             try {
-                const result = await axios.get(`${hostname}/api/programcodes`);
-                const data = result.data.data;
+                const acadyears = await fetchData("/api/acadyear")
 
-                const programcodeOptions = data.map(programcode => ({
-                    value: programcode.id,
-                    label: programcode.program_title
+                const acadyearOptions = acadyears.map(acadyear => ({
+                    value: acadyear.acadyear,
+                    label: acadyear.acadyear
                 }));
 
-                setProgramCode(programcodeOptions);
+                setAcadYear(acadyearOptions);
             } catch (error) {
-                console.error('Error fetching programcode:', error);
+                console.error('Error fetching acadyears:', error);
             }
         };
 
         fetchSubGroups();
         fetchGroups();
-        fetchProgramCodes();
+        fetchAcadYear();
     }, []);
 
     const handleInsertSubject = async () => {
@@ -85,10 +86,10 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                 title_th: title_th ? title_th : null,
                 title_en: title_en ? title_en : null,
                 information: information ? information : null,
-                cradit: cradit ? cradit : null,
+                credit: credit ? credit : null,
                 sub_group_id: selectedSubGroup ? selectedSubGroup.value : null,
                 group_id: selectedGroup ? selectedGroup.value : null,
-                program_code_id: selectedProgramCode ? selectedProgramCode.value : null,
+                acadyear: selectedAcadYear ? selectedAcadYear.value : null,
             });
     
             console.log('Inserted subjects:', result.data.data);
@@ -140,12 +141,12 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                         value={information}
                         onChange={(e) => setInformation(e.target.value)}
                     />
-                    <label htmlFor="cradit">cradit:</label>
+                    <label htmlFor="credit">credit:</label>
                     <input
                         type="text"
-                        id="cradit"
-                        value={cradit}
-                        onChange={(e) => setCradit(e.target.value)}
+                        id="credit"
+                        value={credit}
+                        onChange={(e) => setCredit(e.target.value)}
                     />
 
                     <label htmlFor="group">Select Group:</label>
@@ -166,12 +167,12 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                         isSearchable
                         isClearable
                     />
-                    <label htmlFor="programcode">Select ProgramCode:</label>
+                    <label htmlFor="acadyear">Select Acadyear:</label>
                     <Select
-                        id="programcode"
-                        value={selectedProgramCode}
-                        options={programscodes}
-                        onChange={(selectedOption) => setSelectedProgramCode(selectedOption)}
+                        id="acadyear"
+                        value={selectedAcadYear}
+                        options={acadyears}
+                        onChange={(selectedOption) => setSelectedAcadYear(selectedOption)}
                         isSearchable
                         isClearable
                     />
