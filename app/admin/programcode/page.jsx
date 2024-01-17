@@ -212,9 +212,9 @@ export default function ProgramCode() {
                         aria-label="programcode table">
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>
-                            <TableColumn>Program</TableColumn>
-                            <TableColumn>Program Code</TableColumn>
-                            <TableColumn>Description</TableColumn>
+                            <TableColumn>หลักสูตร</TableColumn>
+                            <TableColumn>รหัสหลักสูตร</TableColumn>
+                            <TableColumn>คำอธิบาย</TableColumn>
                             <TableColumn>Version</TableColumn>
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>

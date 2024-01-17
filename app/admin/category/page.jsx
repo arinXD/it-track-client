@@ -14,7 +14,8 @@ import {
     TableRow,
     TableCell,
     Button,
-    Tooltip
+    Tooltip,
+    Pagination
 } from "@nextui-org/react";
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import { ToastContainer, toast } from "react-toastify";
@@ -158,7 +159,7 @@ export default function Category() {
 
             showToastMessage(true, `อัปเดตข้อมูลสำเร็จ`);
             handleUpdateModalClose()
-    
+
         } catch (error) {
             // Handle error if needed
             console.error('Error updating data:', error);
@@ -168,7 +169,7 @@ export default function Category() {
 
     const filteredCategories = categories.filter(category => {
         const queryLowerCase = searchQuery.toLowerCase();
-    
+
         return (
             category.category_title.toLowerCase().includes(queryLowerCase) ||
             category.createdAt.toLowerCase().includes(queryLowerCase) ||
@@ -176,7 +177,15 @@ export default function Category() {
             // Add more conditions for additional columns if needed
         );
     });
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredCategories.slice(indexOfFirstItem, indexOfLastItem);
 
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
     return (
         <>
             <header>
@@ -231,9 +240,9 @@ export default function Category() {
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
                         </TableHeader>
-                        {filteredCategories.length > 0 ? (
+                        {currentItems.length > 0 ? (
                             <TableBody>
-                                {filteredCategories.map((category, index) => (
+                                {currentItems.map((category, index) => (
                                     <TableRow key={category.id}>
                                         <TableCell className='w-1/12'>
                                             <div className='relative flex items-center gap-2'>
@@ -263,6 +272,15 @@ export default function Category() {
                             <TableBody emptyContent={"ไม่มีข้อมูลหมวดหมู่วิชา"}>{[]}</TableBody>
                         )}
                     </Table>
+                    <Pagination
+                        onChange={handlePageChange}
+                        current={currentPage}
+                        total={Math.ceil(filteredCategories.length / itemsPerPage)}
+                        isCompact
+                        showControls
+                        loop
+                        className="flex justify-center mt-3"
+                    />
                     <CategoryInsert isOpen={isModalOpen} onClose={handleModalClose} onDataInserted={handleDataInserted} />
 
                     <CategoryUpdate

@@ -21,7 +21,8 @@ import {
 } from "@nextui-org/react";
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import { RiFileExcel2Line } from "react-icons/ri";
-import { LiaFileCsvSolid } from "react-icons/lia";
+import { FaRegFile } from "react-icons/fa6";
+import { TbFileImport } from "react-icons/tb";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
@@ -339,7 +340,7 @@ export default function Subject() {
                                     style={{ backgroundColor: '#149403', color: 'white' }}
                                 >
                                     Export to CSV
-                                    <LiaFileCsvSolid className={'w-5 h-5 text-white hidden md:block md:w-5 md:h-5'} />
+                                    <FaRegFile className={'w-4 h-4 text-white hidden md:block'} />
                                 </Button>
                             </div>
                         </div>
@@ -361,7 +362,7 @@ export default function Subject() {
                                     onPress={handleInsertModalOpen}
                                     color="primary"
                                 >
-                                    Add Group
+                                    Add Subject
                                     <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
                                 </Button>
                                 <Button
@@ -370,10 +371,10 @@ export default function Subject() {
                                     onDataInsertXlsx={handleDataInserted}
                                     isOpen={isImportModalOpen}
                                     onClose={handleImportModalClose}
-                                    color="primary"
+                                    style={{ backgroundColor: '#24b565', color: 'white' }}
                                 >
                                     Import Excel
-                                    <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
+                                    <TbFileImport className={'w-5 h-5 text-white hidden md:block'} />
                                 </Button>
                                 <Button
                                     className="bg-red-400 text-white w-1/2"
@@ -494,16 +495,15 @@ export default function Subject() {
                 }
 
                 <Modal
-                    backdrop="blur"
+                    // backdrop="blur"
                     isOpen={isImportModalOpen}
                     onClose={handleImportModalClose}
-                    classNames={{
-                        backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20"
-                    }}
+                    // classNames={{
+                    //     backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20"
+                    // }}
                     size="4xl"
                     placement="top"
                     scrollBehavior="inside"
-
                 >
                     <ModalContent>
                         <ModalHeader>Import Excel</ModalHeader>

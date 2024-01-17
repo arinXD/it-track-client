@@ -23,15 +23,43 @@ import {
   Skeleton
 } from '@nextui-org/react';
 
+import { useDropzone } from 'react-dropzone';
+import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
+import '../style/excel.css';
+
 function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
   const [data, setData] = useState([]);
   const [editingCell, setEditingCell] = useState(null);
   const [editingTbody, setEditingTbody] = useState(null);
   const [displayHeaders, setDisplayHeaders] = useState([]);
   const [originalHeaders, setOriginalHeaders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
   const handleFileUpload = (e) => {
     e.preventDefault();
+    const dropContainer = document.getElementById("dropcontainer")
+    const fileInput = document.getElementById("fileInput")
+
+    dropContainer.addEventListener("dragover", (e) => {
+      // prevent default to allow drop
+      e.preventDefault()
+    }, false)
+
+    dropContainer.addEventListener("dragenter", () => {
+      dropContainer.classList.add("drag-active")
+    })
+
+    dropContainer.addEventListener("dragleave", () => {
+      dropContainer.classList.remove("drag-active")
+    })
+
+    dropContainer.addEventListener("drop", (e) => {
+      e.preventDefault()
+      dropContainer.classList.remove("drag-active")
+      fileInput.files = e.dataTransfer.files
+
+    })
 
     const reader = new FileReader();
     let file;
@@ -136,22 +164,74 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
       document.removeEventListener("drop", handleDrop);
     };
   }, []);
+
+  useEffect(() => {
+    // Filter data based on searchQuery
+    const lowerCaseSearchQuery = searchQuery.toLowerCase();
+    const filteredRows = data.filter((row) => {
+      return originalHeaders.some((header) =>
+        row[header].toLowerCase().includes(lowerCaseSearchQuery)
+      );
+    });
+    setFilteredData(filteredRows);
+  }, [data, originalHeaders, searchQuery]);
+
   return (
     <div
       className="App"
       onDragOver={(e) => e.preventDefault()}
     >
-      <input
-        id="fileInput"
-        type="file"
-        accept=".xlsx, .xls"
-        onChange={handleFileUpload}
-      />
+      <div className="drop-container" id="dropcontainer">
+        <span class="drop-title">Drop files here</span>
+        or
+        <input
+          id="fileInput"
+          type="file"
+          accept=".xlsx, .xls"
+          onChange={handleFileUpload}
+        />
+      </div>
 
       {data.length > 0 && (
         <>
+          <div className="flex flex-col md:flex-row justify-between gap-3 my-3">
+            <div className="flex justify-start">
+              <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
+                <SearchIcon width={16} height={16} />
+              </div>
+              <input
+                type="search"
+                id="search"
+                className="rounded-s-none pl-0 py-2 px-4 text-sm text-gray-900 rounded-lg bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className='flex justify-end'>
+              <div className="flex md:flex-row gap-3">
+                <Button
+                  className="w-1/2 ml-3"
+                  onClick={handleInsertSubject}
+                  color="primary"
+                >
+                  Add to Database
+                  <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
+                </Button>
+                <Button
+                  className="bg-red-400 text-white w-1/2"
+                  onClick={handleClearFile}
+                >
+                  Clear File
+                  <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-5 md:h-5'} />
+                </Button>
+              </div>
+
+            </div>
+          </div>
           {data.length > 0 ? (
-            <Table>
+            <Table
+              removeWrapper>
               <TableHeader>
                 {displayHeaders.map((header, index) => (
                   <TableColumn key={index} onDoubleClick={() => handleDoubleClick(null, index)}>
@@ -168,40 +248,43 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
                   </TableColumn>
                 ))}
               </TableHeader>
-              <TableBody>
-                {data.map((row, rowIndex) => (
-                  <TableRow key={rowIndex}>
-                    {originalHeaders.map((originalHeader, columnIndex) => (
-                      <TableCell
-                        key={columnIndex}
-                        onDoubleClick={() => handleCellDoubleClick(rowIndex, columnIndex)}
-                      >
-                        {editingTbody &&
-                          editingTbody.rowIndex === rowIndex &&
-                          editingTbody.columnIndex === columnIndex ? (
-                          <input
-                            value={row[originalHeader]}
-                            onChange={(e) =>
-                              handleCellInputChange(e, rowIndex, columnIndex)
-                            }
-                            onBlur={handleCellBlurTbody}
-                            autoFocus
-                          />
-                        ) : (
-                          row[originalHeader]
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
+              {filteredData.length > 0 ? (
+                <TableBody>
+                  {filteredData.map((row, rowIndex) => (
+                    <TableRow key={rowIndex}>
+                      {originalHeaders.map((originalHeader, columnIndex) => (
+                        <TableCell
+                          key={columnIndex}
+                          onDoubleClick={() => handleCellDoubleClick(rowIndex, columnIndex)}
+                        >
+                          {editingTbody &&
+                            editingTbody.rowIndex === rowIndex &&
+                            editingTbody.columnIndex === columnIndex ? (
+                            <input
+                              value={row[originalHeader]}
+                              onChange={(e) =>
+                                handleCellInputChange(e, rowIndex, columnIndex)
+                              }
+                              onBlur={handleCellBlurTbody}
+                              autoFocus
+                            />
+                          ) : (
+                            row[originalHeader]
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              ) : (
+                <TableBody emptyContent="ไม่มีข้อมูลวิชา" />
+              )}
             </Table>
           ) : (
             // Skeleton for loading state
             <Skeleton rows={5} height={40} />
           )}
-          <button onClick={handleInsertSubject}>Add to Database</button>
-          <button onClick={handleClearFile}>Clear File</button>
+
         </>
       )}
     </div>

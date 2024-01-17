@@ -18,7 +18,7 @@
     "@heroicons/react": "^2.0.18",
     "@iconscout/react-unicons": "^2.0.2",
     "@mui/icons-material": "^5.15.2",
-    "@mui/material": "^5.14.18",
+    "@mui/material": "^5.15.5",
     "@mui/styled-engine-sc": "^6.0.0-alpha.6",
     "@mui/system": "^5.15.2",
     "@mui/x-date-pickers": "^6.18.4",

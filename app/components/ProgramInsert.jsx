@@ -10,7 +10,6 @@ export default function ProgramInsert({ isOpen, onClose, onDataInserted }) {
     const [program, setProgram] = useState('');
     const [title_en, setProgramTitleEn] = useState('');
     const [title_th, setProgramTitleTh] = useState('');
-    // const [program_title, setProgramTitle] = useState('');
 
     const handleInsertProgram = async () => {
         try {
