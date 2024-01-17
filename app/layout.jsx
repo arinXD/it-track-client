@@ -1,16 +1,18 @@
+"use client"
 import './globals.css'
 import AuthProvider from './components/Authprovider'
-export default function RootLayout({
-    children
-}) {
+import { NextUIProvider } from "@nextui-org/react";
+export default function RootLayout({ children }) {
     return (
         // <html data-theme="winter">
         <html>
             <body suppressHydrationWarning={true}>
                 <main>
-                    <AuthProvider>
-                        {children}
-                    </AuthProvider>
+                    <NextUIProvider>
+                        <AuthProvider>
+                            {children}
+                        </AuthProvider>
+                    </NextUIProvider>
                 </main>
             </body>
         </html>

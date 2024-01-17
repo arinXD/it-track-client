@@ -42,6 +42,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 return state;
         }
     };
+    const [trackResult, setTrackResult] = useState("")
     const [isConfirm, setIsConfirm] = useState(false)
     const [trackSelect, setTrackSelect] = useState({})
     const [trackSubjects, setTrackSubjects] = useState([])
@@ -90,9 +91,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         }
         isProcessing(false)
     }
-    useEffect(() => {
-
-    }, [trackSelect])
 
     useEffect(() => {
         async function fetchData() {
@@ -105,6 +103,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 const data = response.data.data;
                 const trackData = trackResponse.data.data
                 if (selectedData) {
+                    setTrackResult(selectedData.result)
                     for (let index = 1; index < 4; index++) {
                         const type = `SET_ORDER_${index}`
                         dispatch({
@@ -170,14 +169,13 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         }
     }, [orders]);
 
-    if (userData?.track != null) {
-        console.log(userData);
+    if (trackResult != null && trackSelect.has_finished) {
         return (
             <div className='text-center'>
                 <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
                     {trackSelect.title}
                 </h4>
-                <p>แทรคของคุณคือ {userData?.track}</p>
+                <p>แทรคของคุณคือ {trackResult}</p>
             </div>
         )
     } else if ((userData?.acadyear !== trackSelect?.acadyear)

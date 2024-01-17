@@ -8,8 +8,6 @@ import Link from 'next/link';
 import { SignUp } from '@/app/components';
 import { Progress } from "@nextui-org/react";
 import { signToken, decodeToken } from '@/app/components/serverAction/TokenAction';
-// import { ToastContainer, toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
 
 const Page = () => {
     const router = useRouter()
@@ -25,6 +23,7 @@ const Page = () => {
     const [emptyEmail, setEmptyEmail] = useState(false)
     const [emptyPass, setEmptyPass] = useState(false)
     const [displayPass, setDisplayPass] = useState(false)
+
     /******************
     * Progess state
     ******************/
@@ -246,7 +245,7 @@ const Page = () => {
                                 className={`${(emptyPass) ? 'border-2 border-red-500' : 'border border-gray-400'} bg-gray-50 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 focus:outline-none`} />
                         </div>
                         <div className="flex items-center justify-end">
-                            <Link href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">ลืมรหัสผ่าน?</Link>
+                            <Link href="#" className="text-sm font-medium text-primary-600 hover:underline">ลืมรหัสผ่าน?</Link>
                         </div>
                         <button
                             disabled={isProcress}
@@ -270,7 +269,7 @@ const Page = () => {
                             </div>
                         </div>
 
-                        <p className="text-sm font-light text-gray-900 dark:text-gray-400">
+                        <p className="text-sm font-light text-gray-900">
                             ต้องการสร้างบัญชีผู้ใช้ ? <span onClick={() => setDisplaySignUp(!displaySignUp)} className="font-medium cursor-pointer text-gray-900 hover:underline">สร้างบัญชีผู้ใช้</span>
                         </p>
                     </form>

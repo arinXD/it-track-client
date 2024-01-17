@@ -8,8 +8,6 @@ import Link from 'next/link';
 import { NextUIProvider } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import CircularProgress from '@mui/material/CircularProgress';
-import axios from 'axios';
-import { hostname } from '@/app/api/hostname'
 import { signToken } from './serverAction/TokenAction';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { styled } from '@mui/material/styles';

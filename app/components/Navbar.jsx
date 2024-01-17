@@ -83,7 +83,7 @@ const Navbar = () => {
                     </div>
                     <div className="flex flex-1 items-center justify-center sm:justify-start gap-4">
                         <div className="flex flex-shrink-0 items-center">
-                            <Link href="/" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white group">
+                            <Link href="/" className="flex items-center p-2 text-gray-900 rounded-lg ">
                                 <img className="h-8 w-auto" src="/logo.png" alt="it kku" />
                                 <span className="ml-3 text-gray-900 font-bold"><code>KKU it track</code></span>
                             </Link>
@@ -117,7 +117,7 @@ const Navbar = () => {
                                     {
                                         session?.user?.role === "admin" &&
                                         <Link href="/admin">
-                                            <Button className='bg-amber-400 text-white font-medium text-sm'>
+                                            <Button className='bg-amber-400 text-white font-medium text-sm h-9'>
                                                 Admin panel
                                             </Button>
                                         </Link>

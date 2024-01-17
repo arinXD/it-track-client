@@ -1,9 +1,8 @@
-"use client"
 import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '../components';
 import React from 'react';
 import Link from 'next/link';
 
-const Page = () => {
+const Page = async () => {
     const acadLinks = [
         { href: "/admin/acadyears", lable: "ปีการศึกษา" },
         { href: "/admin/program", lable: "หลักสูตร" },
@@ -17,7 +16,7 @@ const Page = () => {
     const tracks = [
         { href: "/admin/track", lable: "ข้อมูลแทรค" },
         { href: "/admin/track-selection", lable: "คัดเลือกแทรค" },
-        { href: "/admin/track-student", lable: "รายชื่อนักศึกษาภายในแทรค" },
+        { href: "/admin/students", lable: "รายชื่อนักศึกษา" },
     ]
     return (
         <>

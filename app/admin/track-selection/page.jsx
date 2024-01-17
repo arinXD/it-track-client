@@ -193,29 +193,42 @@ const Page = () => {
         });
     }
 
-    async function handleStartSelect(id) {
-        const token = await getToken()
-        const options = {
-            url: `${hostname}/api/tracks/selects/selected/${id}`,
-            method: 'PUT',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                "authorization": `${token}`,
-            },
-        };
-        axios(options)
-            .then(async result => {
-                const { ok, message } = result.data
-                showToastMessage(ok, message)
+    async function handleStartSelect({ id, hasFinished }) {
+        Swal.fire({
+            text: `ต้องการ${hasFinished ? "เปลี่ยนสถานะการคัดเลือก" : "เริ่มคัดเลือก"}หรือไม่?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const token = await getToken()
+                const options = {
+                    url: `${hostname}/api/tracks/selects/selected/${id}`,
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        "authorization": `${token}`,
+                    },
+                };
+                axios(options)
+                    .then(async result => {
+                        const { ok, message } = result.data
 
-                // refresh track selection data
-                callTrackSelection()
-            })
-            .catch(error => {
-                const message = error.response.data.message
-                showToastMessage(false, message)
-            })
+                        // refresh track selection data
+                        callTrackSelection()
+
+                        showToastMessage(ok, message)
+                    })
+                    .catch(error => {
+                        const message = error.response.data.message
+                        showToastMessage(false, message)
+                    })
+            }
+        });
     }
 
     return (

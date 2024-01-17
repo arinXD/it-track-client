@@ -89,7 +89,6 @@ const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSele
                         }}
                     >
                         Delete Select
-                        {/* <Icon icon="solar:trash-bin-minimalistic-linear" className='w-5 h-5 text-white hidden md:block md:w-8 md:h-8' /> */}
                         <DeleteIcon className={'w-5 h-5 text-white md:w-8 md:h-8'} />
                     </Button>
                 </div>
@@ -103,9 +102,9 @@ const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSele
                     aria-label="track selection table">
                     <TableHeader>
                         <TableColumn></TableColumn>
-                        <TableColumn>Action</TableColumn>
-                        <TableColumn>ชื่อ</TableColumn>
+                        <TableColumn></TableColumn>
                         <TableColumn>ปีการศึกษา</TableColumn>
+                        <TableColumn>ชื่อ</TableColumn>
                         <TableColumn>สถานะ</TableColumn>
                         <TableColumn>เริ่มต้น</TableColumn>
                         <TableColumn>สิ้นสุด</TableColumn>
@@ -116,56 +115,46 @@ const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSele
                                 <TableRow key={index}>
                                     <TableCell>
                                         {!(e.has_finished) ?
-                                            <Button size='sm' onPress={() => handleStartSelect(e.id)} color="primary" variant="solid" className=''>
-                                                เริ่มคัดเลือก
+                                            <Button
+                                                size='sm'
+                                                onPress={() => handleStartSelect({ id: e.id, hasFinished: e.has_finished })}
+                                                color="warning" variant="solid" className='bg-amber-400'>
+                                                ปิดการคัดเลือก
                                             </Button>
                                             :
-                                            <Button size='sm' onPress={() => handleStartSelect(e.id)} color="warning" variant="solid" className='bg-amber-400'>
-                                                แก้ไขสถานะ
-                                            </Button>}
+                                            <Button
+                                                size='sm'
+                                                onPress={() => handleStartSelect({ id: e.id, hasFinished: e.has_finished })}
+                                                color="primary" variant="solid" className=''>
+                                                เปิดการคัดเลือก
+                                            </Button>
+                                        }
                                     </TableCell>
                                     <TableCell>
                                         <div className="relative flex items-center gap-4">
-                                            <Tooltip content="รายละเอียด">
-                                                <Link
-                                                    href={`/admin/track-selection/${e.acadyear}?track_select_id=${e.id}`}
-                                                    // as={`/admin/track-selection/${e.id}`}
-                                                    className='focus:outline-none'>
-                                                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                                        {/* <EyeIcon /> */}
-                                                        <Icon icon="solar:eye-linear" className='w-[22px] h-[22px]' />
-                                                    </span>
-                                                </Link>
-                                            </Tooltip>
-                                            <Tooltip content="แก้ไข">
-                                                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                                    <Icon icon="ph:pencil-simple-line" className='w-[22px] h-[22px]' />
-                                                </span>
-                                            </Tooltip>
                                             <Tooltip color="danger" content="ลบ">
                                                 <span onClick={() => handleDelete(e.acadyear)} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                    {/* <DeleteIcon2 /> */}
-                                                    <Icon icon="solar:trash-bin-minimalistic-linear" className='w-[22px] h-[22px]' />
+                                                    <DeleteIcon2 />
                                                 </span>
                                             </Tooltip>
                                         </div>
                                     </TableCell>
 
+                                    <TableCell>{e.acadyear}</TableCell>
+
                                     <TableCell className="w-1/3">
                                         <Link
-                                            href={`/admin/track-selection/${e.acadyear}?track_select_id=${e.id}`}
+                                            href={`/admin/track-selection/${e.acadyear}`}
                                             className='text-blue-500'
                                         >{e.title}
                                         </Link>
                                     </TableCell>
 
-                                    <TableCell>{e.acadyear}</TableCell>
-
                                     <TableCell>
                                         {e.has_finished ?
                                             <Chip startContent={<CheckIcon size={18} />} color="success" variant="flat">เสร็จสิ้น</Chip>
                                             :
-                                            <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">ดำเนินการ</Chip>
+                                            <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">กำลังดำเนินการ</Chip>
                                         }
                                     </TableCell>
 
