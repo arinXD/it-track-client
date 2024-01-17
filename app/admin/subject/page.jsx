@@ -281,36 +281,55 @@ export default function Subject() {
             showToastMessage(false, 'Error exporting Excel');
         }
     };
+
+    // const handleSearch = (subject) => {
+    //     const searchFields = [
+    //         'acadyear',
+    //         'group_id',
+    //         'sub_group_id',
+    //         'semester',
+    //         'subject_code',
+    //         'title_th',
+    //         'title_en',
+    //         'information',
+    //         'credit',
+    //     ];
+
+    //     return searchFields.some((field) =>
+    //         subject[field]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    //     );
+    // };
+
+    // const visibleSubjects = subjects
+    //     .filter((subject) => handleSearch(subject))
+    //     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const filteredSubject = subjects.filter(subject => {
+        const queryLowerCase = searchQuery.toLowerCase();
+    
+        return (
+            (subject.acadyear && subject.acadyear.acadyear.toLowerCase().includes(queryLowerCase)) ||
+            (subject.group_id && subject.group_id.group_title && subject.group_id.group_title.toLowerCase().includes(queryLowerCase)) ||
+            (subject.sub_group_id && subject.sub_group_id.sub_group_title && subject.sub_group_id.sub_group_title.toLowerCase().includes(queryLowerCase)) ||
+            (subject.semester && subject.semester.toLowerCase().includes(queryLowerCase)) ||
+            (subject.subject_code && subject.subject_code.toLowerCase().includes(queryLowerCase)) ||
+            (subject.title_th && subject.title_th.toLowerCase().includes(queryLowerCase)) ||
+            (subject.title_en && subject.title_en.toLowerCase().includes(queryLowerCase)) ||
+            (subject.information && subject.information.toLowerCase().includes(queryLowerCase)) ||
+            (typeof subject.credit === 'string' && subject.credit.toLowerCase().includes(queryLowerCase)) ||
+            (subject.createdAt && subject.createdAt.toLowerCase().includes(queryLowerCase)) ||
+            (subject.updatedAt && subject.updatedAt.toLowerCase().includes(queryLowerCase))
+        );
+    });
+
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredSubject.slice(indexOfFirstItem, indexOfLastItem);
 
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
-
-
-    const handleSearch = (subject) => {
-        const searchFields = [
-            'acadyear',
-            'group_id',
-            'sub_group_id',
-            'semester',
-            'subject_code',
-            'title_th',
-            'title_en',
-            'information',
-            'credit',
-        ];
-
-        return searchFields.some((field) =>
-            subject[field]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    };
-
-    const visibleSubjects = subjects
-        .filter((subject) => handleSearch(subject))
-        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
     return (
         <>
             <header>
@@ -405,9 +424,9 @@ export default function Subject() {
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
                         </TableHeader>
-                        {visibleSubjects.length > 0 ? (
+                        {currentItems.length > 0 ? (
                             <TableBody>
-                                {visibleSubjects.map((subject, index) => (
+                                {currentItems.map((subject, index) => (
                                     <TableRow key={index}>
                                         <TableCell>
                                             <div className='relative flex items-center gap-2'>
@@ -474,7 +493,7 @@ export default function Subject() {
                     <Pagination
                         onChange={handlePageChange}
                         current={currentPage}
-                        total={Math.ceil(subjects.length / itemsPerPage)}
+                        total={Math.ceil(filteredSubject.length / itemsPerPage)}
                         isCompact
                         showControls
                         loop

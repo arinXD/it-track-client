@@ -23,7 +23,6 @@ import {
   Skeleton
 } from '@nextui-org/react';
 
-import { useDropzone } from 'react-dropzone';
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import '../style/excel.css';
 
@@ -92,7 +91,6 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
   };
   const handleInsertSubject = async () => {
     try {
-
       const formattedData = data.map(row => {
         const formattedRow = {};
         displayHeaders.forEach((header, index) => {
@@ -101,16 +99,23 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
         return formattedRow;
       });
 
-      const result = await axios.post(`${hostname}/api/subjects/insertSubjectsFromExcel`, formattedData);
-      console.log('Inserted subjects:', result.data.data);
+      // Check if subject_code is present for each row
+      if (formattedData.every(row => row.subject_code !== undefined && row.subject_code !== null)) {
+        const result = await axios.post(`${hostname}/api/subjects/insertSubjectsFromExcel`, formattedData);
+        console.log('Inserted subjects:', result.data.data);
 
-      onDataInsertXlsx();
-      handleClearFile();
+        onDataInsertXlsx();
+        handleClearFile();
+      } else {
+        console.error('Error inserting subjects: Some rows are missing subject_code');
+        // Handle error if needed
+      }
     } catch (error) {
       console.error('Error inserting subjects:', error);
       // Handle error if needed
     }
   };
+
 
   const handleClearFile = () => {
     setData([]);
@@ -166,15 +171,18 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
   }, []);
 
   useEffect(() => {
-    // Filter data based on searchQuery
-    const lowerCaseSearchQuery = searchQuery.toLowerCase();
-    const filteredRows = data.filter((row) => {
-      return originalHeaders.some((header) =>
-        row[header].toLowerCase().includes(lowerCaseSearchQuery)
-      );
-    });
-    setFilteredData(filteredRows);
-  }, [data, originalHeaders, searchQuery]);
+    const filteredResults = data.filter((row) =>
+      Object.values(row).some(
+        (value) =>
+          value &&
+          value
+            .toString()
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())
+      )
+    );
+    setFilteredData(filteredResults);
+  }, [data, searchQuery]);
 
   return (
     <div
@@ -229,15 +237,15 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
 
             </div>
           </div>
-          {data.length > 0 ? (
-            <Table
-              removeWrapper>
+          {filteredData.length > 0 ? (
+            <Table>
               <TableHeader>
                 {displayHeaders.map((header, index) => (
-                  <TableColumn key={index} onDoubleClick={() => handleDoubleClick(null, index)}>
+                  <TableColumn key={header} onDoubleClick={() => handleDoubleClick(null, index)}>
                     {editingCell && editingCell.columnIndex === index ? (
                       <input
                         value={header}
+                        type="text"
                         onChange={(e) => handleCellChange(e, null, index)}
                         onBlur={handleCellBlur}
                         autoFocus
@@ -254,13 +262,14 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
                     <TableRow key={rowIndex}>
                       {originalHeaders.map((originalHeader, columnIndex) => (
                         <TableCell
-                          key={columnIndex}
+                          key={originalHeader}
                           onDoubleClick={() => handleCellDoubleClick(rowIndex, columnIndex)}
                         >
                           {editingTbody &&
                             editingTbody.rowIndex === rowIndex &&
                             editingTbody.columnIndex === columnIndex ? (
                             <input
+                              type="text"
                               value={row[originalHeader]}
                               onChange={(e) =>
                                 handleCellInputChange(e, rowIndex, columnIndex)
@@ -277,7 +286,7 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
                   ))}
                 </TableBody>
               ) : (
-                <TableBody emptyContent="ไม่มีข้อมูลวิชา" />
+                <TableBody emptyContent={"ไม่มีข้อมูลวิชา"}>{[]}</TableBody>
               )}
             </Table>
           ) : (
