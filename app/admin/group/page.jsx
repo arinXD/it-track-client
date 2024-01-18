@@ -14,7 +14,8 @@ import {
     TableRow,
     TableCell,
     Button,
-    Tooltip
+    Tooltip,
+    Pagination
 } from "@nextui-org/react";
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import { ToastContainer, toast } from "react-toastify";
@@ -169,6 +170,16 @@ export default function Group() {
         );
     });
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredGroup.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
+
     return (
         <>
             <header>
@@ -223,9 +234,9 @@ export default function Group() {
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
                         </TableHeader>
-                        {filteredGroup.length > 0 ? (
+                        {currentItems.length > 0 ? (
                             <TableBody>
-                                {filteredGroup.map(group => (
+                                {currentItems.map(group => (
                                     <TableRow key={group.id}>
                                         <TableCell>
                                             <div className='relative flex items-center gap-2'>
@@ -255,6 +266,15 @@ export default function Group() {
                             <TableBody emptyContent={"ไม่มีข้อมูลกลุ่มวิชา"}>{[]}</TableBody>
                         )}
                     </Table>
+                    <Pagination
+                        onChange={handlePageChange}
+                        current={currentPage}
+                        total={Math.ceil(filteredGroup.length / itemsPerPage)}
+                        isCompact
+                        showControls
+                        loop
+                        className="flex justify-center mt-3"
+                    />
                 </div>
                 {/* Render the GroupInsert modal */}
                 <GroupInsert isOpen={isInsertModalOpen} onClose={handleInsertModalClose} onDataInserted={handleDataInserted} />
