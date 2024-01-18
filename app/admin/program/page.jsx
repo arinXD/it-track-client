@@ -190,7 +190,7 @@ export default function Program() {
                                     onPress={handleInsertModalOpen}
                                     color="primary"
                                 >
-                                    Add Group
+                                    เพิ่มหลักสูตร
                                     <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
                                 </Button>
                                 <Button
@@ -211,9 +211,9 @@ export default function Program() {
                     >
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>
-                            <TableColumn>Program</TableColumn>
-                            <TableColumn>Title (EN)</TableColumn>
-                            <TableColumn>Title (TH)</TableColumn>
+                            <TableColumn>หลักสูตร</TableColumn>
+                            <TableColumn>ชื่ออังกฤษ</TableColumn>
+                            <TableColumn>ชื่อไทย</TableColumn>
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
                         </TableHeader>
