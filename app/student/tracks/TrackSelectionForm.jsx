@@ -169,7 +169,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         }
     }, [orders]);
 
-    if (trackResult != null && trackSelect.has_finished) {
+    if (trackResult != null) {
         return (
             <div className='text-center'>
                 <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
@@ -274,7 +274,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         </div>
                                         <div>
                                             {/* {JSON.stringify([orders.order1, orders.order2, orders.order3].filter(e => e))} <br /> */}
-                                            {JSON.stringify([orders.order1, orders.order2, orders.order3])}
+                                            {/* {JSON.stringify([orders.order1, orders.order2, orders.order3])} */}
                                             {/* {JSON.stringify(tracks.filter((t) => ![orders.order1, orders.order2, orders.order3].includes(t.track)))} */}
                                         </div>
                                         <div>
