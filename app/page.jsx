@@ -1,9 +1,13 @@
-import { HomePage } from '@/app/components'
+import { ContentWrap, Navbar, News, Sidebar } from '@/app/components'
 
 import React from 'react';
 import axios from 'axios';
 import { getServerSession } from 'next-auth';
 import { hostname } from './api/hostname';
+import { Button, Input } from '@nextui-org/react';
+import { SearchIcon } from './components/icons';
+import { HiOutlineUserGroup } from "react-icons/hi2";
+import { BiBook } from "react-icons/bi";
 
 async function getData() {
     try {
@@ -23,12 +27,64 @@ const Page = async () => {
     const rootData = await getData()
     // console.log(rootData);
     console.log("Home page session: ", session);
-    // name: 'Arinchawut Kanlayanam',
-    // email: 'arinchawut.k@kkumail.com',
-    // image: 'image.com'
     return (
         <>
-            <HomePage data={rootData} />
+            <header>
+                <Navbar />
+            </header>
+            <Sidebar />
+            <ContentWrap>
+                <h1>ข่าวสารและประชาสัมพันธ์</h1>
+                <div className="flex flex-col gap-4 my-4">
+                    <div className="flex justify-between gap-3 items-end">
+                        <Input
+                            isClearable
+                            className="w-full sm:max-w-[44%] h-fit shadow-none"
+                            placeholder="Search by name..."
+                            variant='bordered'
+                            color="primary"
+                            size="sm"
+                            startContent={<SearchIcon />}
+                        // value={filterValue}
+                        // onClear={() => onClear()}
+                        // onValueChange={onSearchChange}
+                        />
+                        <div className="flex gap-6">
+                            <Button
+                                startContent={<BiBook className='w-5 h-5' />}
+                                className=''>
+                                ค้นหาวิชา
+                            </Button>
+                            <Button
+                                startContent={<HiOutlineUserGroup className='h-5 w-5' />}
+                                className=''>
+                                ค้นหาแทรค
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+                {/* <div className="flex justify-between gap-3 items-end my-3">
+                    <Input
+                        isClearable
+                        className=""
+                        placeholder="Search by name..."
+                        size="sm"
+                        startContent={<SearchIcon />}
+                    // value={filterValue}
+                    // onClear={() => onClear()}
+                    // onValueChange={onSearchChange}
+                    />
+                    <div className="flex gap-3">
+                        <Button className='block'>
+                            ค้นหาวิชา
+                        </Button>
+                        <Button className='block'>
+                            ค้นหาแทรค
+                        </Button>
+                    </div>
+                </div> */}
+                <News data={rootData} />
+            </ContentWrap>
         </>
     )
 }

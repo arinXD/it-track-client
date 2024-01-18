@@ -93,7 +93,7 @@ const Sidebar = () => {
                                     <MdOutlineQuiz
                                         className="w-5 h-5" />
                                 }
-                                <span className="ml-3 text-sm">หาแทรคที่เหมาะสม</span>
+                                <span className="ml-3 text-sm">แนะนำแทรค</span>
                             </Link>
                         </li>
                         <li className="">

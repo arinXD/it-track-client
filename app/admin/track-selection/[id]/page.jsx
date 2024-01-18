@@ -2,7 +2,7 @@
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchDataObj } from '../../action'
 import React, { useState, useEffect, useReducer, useRef } from 'react'
-import { Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
+import { Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,Pagination } from "@nextui-org/react";
 import { EditIcon2, EyeIcon, DeleteIcon2 } from "@/app/components/icons";
 import { dMy } from '@/src/util/dateFormater'
 import Link from 'next/link';

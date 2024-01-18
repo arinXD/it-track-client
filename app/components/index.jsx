@@ -3,7 +3,7 @@ import Navbar from "./Navbar"
 import Sidebar from "./Sidebar"
 import TablePagination from "./TablePagination"
 import SignUp from "./SignUp"
-import HomePage from "./HomePage"
+import News from "./News"
 import SignInButton from "./SignInButton"
 import VerifyEmail from "./VerifyEmail"
 import VerifyLogin from "./VerifyLogin"
@@ -33,7 +33,7 @@ export {
     VerifyLogin,
     VerifyEmail,
     AuthProvider,
-    HomePage,
+    News,
     Navbar,
     Sidebar,
     TablePagination,
