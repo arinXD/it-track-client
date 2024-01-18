@@ -95,7 +95,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await axios.get(`${hostname}/api/tracks/selects/get/last`);
+                const response = await axios.get(`${hostname}/api/tracks/selects/${userData.acadyear}`);
                 const trackResponse = await axios.get(`${hostname}/api/tracks`)
                 const selectDataResponse = await axios.get(`${hostname}/api/students/${userData.stu_id}/track/select`)
 
@@ -169,17 +169,17 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         }
     }, [orders]);
 
-    if (trackResult != null) {
+    if (trackResult && trackSelect.has_finished) {
         return (
             <div className='text-center'>
                 <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
                     {trackSelect.title}
                 </h4>
-                <p>แทรคของคุณคือ {trackResult}</p>
+                <p>แทรคของคุณคือ {String(trackResult)}</p>
             </div>
         )
     } else if ((userData?.acadyear !== trackSelect?.acadyear)
-        && (userData?.track === null)
+        && (trackResult === null)
         && (userData?.program === "IT")) {
         return (
             <div className='text-center'>
