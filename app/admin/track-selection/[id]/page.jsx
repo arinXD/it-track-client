@@ -1,10 +1,9 @@
 "use client"
-import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
+import { Navbar, Sidebar, ContentWrap, BreadCrumb, Loading } from '@/app/components'
 import { fetchDataObj } from '../../action'
-import React, { useState, useEffect, useReducer, useRef } from 'react'
-import { Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,Pagination } from "@nextui-org/react";
-import { EditIcon2, EyeIcon, DeleteIcon2 } from "@/app/components/icons";
-import { dMy } from '@/src/util/dateFormater'
+import React, { useState, useEffect} from 'react'
+import { Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
+import { DeleteIcon2 } from "@/app/components/icons";
 import Link from 'next/link';
 import { format } from 'date-fns';
 import Swal from 'sweetalert2'
@@ -13,12 +12,7 @@ import { getToken } from '@/app/components/serverAction/TokenAction';
 import { hostname } from '@/app/api/hostname';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useRouter, usePathname } from 'next/navigation'
-
-function displayNull(string) {
-    if (string) return string
-    return "-"
-}
+import StudentTrackTable from './StudentTrackTable';
 
 const showToastMessage = (ok, message) => {
     if (ok) {
@@ -47,7 +41,11 @@ const showToastMessage = (ok, message) => {
 };
 
 const Page = ({ params }) => {
+
     const [trackSelect, setTrackSelect] = useState({})
+    const [studentsBit, setStudentsBit] = useState({})
+    const [studentsNetwork, setStudentsNetwork] = useState({})
+    const [studentsWeb, setStudentsWeb] = useState({})
 
     const [starting, setStarting] = useState(false)
     const [updating, setUpdating] = useState(false)
@@ -59,18 +57,9 @@ const Page = ({ params }) => {
 
     const [valueChange, setValueChange] = useState(false)
 
-    async function getTrackSelection(id) {
-        try {
-            const trackSelect = await fetchDataObj(`/api/tracks/selects/${id}/subjects/students`)
-            return trackSelect
-        } catch (err) {
-            return {}
-        }
-    }
-
     async function initTrackSelect(id) {
         try {
-            const result = await getTrackSelection(id)
+            const result = await fetchDataObj(`/api/tracks/selects/${id}/subjects/students`)
             result.startAt = format(new Date(result?.startAt), 'yyyy-MM-dd HH:mm')
             result.expiredAt = format(new Date(result?.expiredAt), 'yyyy-MM-dd HH:mm')
             setTrackSelect(result)
@@ -89,11 +78,27 @@ const Page = ({ params }) => {
     }, []);
 
     useEffect(() => {
+        function getStudentCount(studentData) {
+            const studentCount = {
+                students: studentData,
+                normal: studentData.filter(stu => stu?.Student?.courses_type === "โครงการปกติ").length,
+                vip: studentData.filter(stu => stu?.Student?.courses_type === "โครงการพิเศษ").length
+            }
+            return studentCount
+        }
         if (Object.keys(trackSelect).length > 0) {
             setTitle(trackSelect.title)
             setStartAt(format(new Date(trackSelect?.startAt), 'yyyy-MM-dd HH:mm'))
             setExpiredAt(format(new Date(trackSelect?.expiredAt), 'yyyy-MM-dd HH:mm'))
             setHasFinished(trackSelect.has_finished)
+
+            const stuBit = trackSelect?.Selections?.filter(select => select.result == "BIT")
+            const stuNetwork = trackSelect?.Selections?.filter(select => select.result == "Network")
+            const stuWeb = trackSelect?.Selections?.filter(select => select.result == "WEB")
+
+            setStudentsBit(getStudentCount(stuBit))
+            setStudentsNetwork(getStudentCount(stuNetwork))
+            setStudentsWeb(getStudentCount(stuWeb))
         }
     }, [trackSelect]);
 
@@ -129,9 +134,8 @@ const Page = ({ params }) => {
                     const result = await axios(options)
                     const { ok, message } = result.data
                     showToastMessage(ok, message)
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000)
+                    initTrackSelect(trackSelect.acadyear)
+                    setValueChange(false)
                 } catch (error) {
                     showToastMessage(false, "message")
                 } finally {
@@ -167,12 +171,12 @@ const Page = ({ params }) => {
                     const result = await axios(options)
                     const { ok, message } = result.data
                     showToastMessage(ok, message)
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000)
+                    initTrackSelect(trackSelect.acadyear)
                 } catch (error) {
+                    console.error(error);
                     showToastMessage(false, "message")
                 } finally {
+                    setValueChange(false)
                     setStarting(false)
                 }
             }
@@ -226,12 +230,13 @@ const Page = ({ params }) => {
                     <div>
                         <ToastContainer />
                         {loading ?
-                            <>
-                                <p>Loading...</p>
-                            </>
+                            <div className='w-fit mx-auto mt-14'>
+                                <Loading />
+                            </div>
                             :
                             Object.keys(trackSelect).length > 0 ?
                                 <div className='space-y-8 mt-6'>
+                                    <Button className='fixed bottom-1 right-1 z-50'>UP</Button>
                                     <h1 className='font-bold text-2xl'>
                                         {title}
                                     </h1>
@@ -338,6 +343,56 @@ const Page = ({ params }) => {
                                             </div>
                                         </div>
                                     </div>
+                                    {
+                                        !parseInt(studentsBit?.normal + studentsNetwork?.normal + studentsWeb?.normal) ? null :
+                                            <table className='table-auto mx-auto'>
+                                                <caption className="caption-to mb-2">
+                                                    จำนวนนักศึกษาทั้งหมด
+                                                </caption>
+                                                <thead>
+                                                    <tr>
+                                                        <th className='px-4 py-2 border-1 w-[250px]'>Business Information Technology</th>
+                                                        <th className='px-4 py-2 border-1 w-[250px]'>IOT & Networking</th>
+                                                        <th className='px-4 py-2 border-1 w-[250px]'>Web Application & Mobile</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td className='px-4 py-2 border-1'>
+                                                            <div className='flex flex-col gap-1'>
+                                                                <div className='flex justify-between items-center'><span>ทั้งหมด</span> <span>{studentsBit?.students?.length} <span className='ms-3'>คน</span></span></div>
+                                                                <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsBit?.normal} <span className='ms-3'>คน</span></span></div>
+                                                                <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsBit?.vip} <span className='ms-3'>คน</span></span></div>
+                                                                <div>
+                                                                    <Link href={"#bit-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className='px-4 py-2 border-1'>
+                                                            <div className='flex flex-col gap-1'>
+                                                                <div className='flex justify-between items-center'><span>ทั้งหมด</span> <span>{studentsNetwork?.students?.length} <span className='ms-3'>คน</span></span></div>
+                                                                <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsNetwork?.normal} <span className='ms-3'>คน</span></span></div>
+                                                                <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsNetwork?.vip} <span className='ms-3'>คน</span></span></div>
+                                                                <div>
+                                                                    <Link href={"#network-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className='px-4 py-2 border-1'>
+                                                            <div className='flex flex-col gap-1'>
+                                                                <div className='flex justify-between items-center'><span>ทั้งหมด</span> <span>{studentsWeb?.students?.length} <span className='ms-3'>คน</span></span></div>
+                                                                <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsWeb?.normal} <span className='ms-3'>คน</span></span></div>
+                                                                <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsWeb?.vip} <span className='ms-3'>คน</span></span></div>
+                                                                <div>
+                                                                    <Link href={"#web-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                    }
                                     <div>
                                         <h2 className='mb-1'>วิชาที่ใช้ในการคัดเลือก</h2>
                                         {trackSelect?.Subjects &&
@@ -349,11 +404,11 @@ const Page = ({ params }) => {
                                                 onRowAction={() => { }}
                                                 aria-label="track selection subjects table">
                                                 <TableHeader>
-                                                    <TableColumn className='blue'></TableColumn>
-                                                    <TableColumn className='blue'>รหัสวิชา</TableColumn>
-                                                    <TableColumn className='blue'>ชื่อวิชา EN</TableColumn>
-                                                    <TableColumn className='blue'>ชื่อวิชา TH</TableColumn>
-                                                    <TableColumn className='blue'>หน่วยกิต</TableColumn>
+                                                    <TableColumn></TableColumn>
+                                                    <TableColumn>รหัสวิชา</TableColumn>
+                                                    <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                    <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                    <TableColumn>หน่วยกิต</TableColumn>
                                                 </TableHeader>
                                                 {trackSelect?.Subjects.length > 0 ?
                                                     <TableBody>
@@ -377,71 +432,13 @@ const Page = ({ params }) => {
                                             </Table>
                                         }
                                     </div>
-                                    <div>
-                                        <h2 className='mb-1'>รายชื่อนักศึกษา</h2>
-                                        {trackSelect?.Selections &&
-                                            <Table
-                                                isStriped
-                                                removeWrapper
-                                                selectionMode="multiple"
-                                                // onSelectionChange={setSelectedKeys}
-                                                onRowAction={() => { }}
-                                                aria-label="track selection table">
-                                                <TableHeader>
-                                                    <TableColumn className='blue'></TableColumn>
-                                                    <TableColumn className='blue'>No.</TableColumn>
-                                                    <TableColumn className='blue'>รหัสนักศึกษา</TableColumn>
-                                                    <TableColumn className='blue'>แทรคที่ได้</TableColumn>
-                                                    <TableColumn className='blue'>เลือกลำดับ 1</TableColumn>
-                                                    <TableColumn className='blue'>เลือกลำดับ 2</TableColumn>
-                                                    <TableColumn className='blue'>เลือกลำดับ 3</TableColumn>
-                                                    <TableColumn className='blue'>วันที่ยืนยัน</TableColumn>
-                                                </TableHeader>
-                                                {trackSelect?.Selections.length > 0 ?
-                                                    <TableBody>
-                                                        {trackSelect?.Selections.map((select, index) => (
-                                                            <TableRow key={index}>
-                                                                <TableCell>
-                                                                    <div className="relative flex items-center gap-3 w-fit">
-                                                                        <Tooltip content="รายละเอียด">
-                                                                            <Link href={``} className='focus:outline-none'>
-                                                                                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                                                                    <EyeIcon />
-                                                                                </span>
-                                                                            </Link>
-                                                                        </Tooltip>
-                                                                        <Tooltip content="แก้ไข">
-                                                                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                                                                <EditIcon2 />
-                                                                            </span>
-                                                                        </Tooltip>
-                                                                        <Tooltip color="danger" content="ลบ">
-                                                                            <span onClick={() => { }} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                                                <DeleteIcon2 />
-                                                                            </span>
-                                                                        </Tooltip>
-                                                                    </div>
-                                                                </TableCell>
-                                                                <TableCell>{index + 1}</TableCell>
-                                                                <TableCell>{select.stu_id}</TableCell>
-                                                                <TableCell>
-                                                                    {select.result ? select.result : "รอการคัดเลือก"}
-                                                                </TableCell>
-                                                                <TableCell>{displayNull(select.track_order_1)}</TableCell>
-                                                                <TableCell>{displayNull(select.track_order_2)}</TableCell>
-                                                                <TableCell>{displayNull(select.track_order_3)}</TableCell>
-                                                                <TableCell>{dMy(select.updatedAt)}</TableCell>
-                                                            </TableRow>
-                                                        ))}
-                                                    </TableBody> :
-                                                    <TableBody emptyContent={"ไม่มีรายชื่อนักศึกษา"}>{[]}</TableBody>}
-                                            </Table>
-                                        }
-                                    </div>
+                                    <StudentTrackTable studentData={studentsBit} track={"BIT"}/>
+                                    <StudentTrackTable studentData={studentsNetwork} track={"Network"}/>
+                                    <StudentTrackTable studentData={studentsWeb} track={"WEB"}/>
                                 </div>
                                 :
                                 <>
-                                    <p>ไม่มีข้อมูลคัดเลือกแทรค</p>
+                                    <p className='text-center'>ไม่มีข้อมูลคัดเลือกแทรค</p>
                                 </>
                         }
 

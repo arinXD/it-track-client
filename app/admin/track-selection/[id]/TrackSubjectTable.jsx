@@ -1,9 +1,9 @@
 import React from 'react'
 
-const TrackSubjectTable = () => {
-  return (
-    <div>TrackSubjectTable</div>
-  )
+const TrackSubjectTable = ({ studentData, track }) => {
+    return (
+        <></>
+    )
 }
 
 export default TrackSubjectTable

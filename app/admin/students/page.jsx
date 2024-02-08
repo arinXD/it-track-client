@@ -291,7 +291,7 @@ const Page = () => {
                 <BreadCrumb />
                 <div>
                     <Table
-                        aria-label="Example table with custom cells, pagination and sorting"
+                        aria-label="Student Table"
                         isHeaderSticky
                         bottomContent={bottomContent}
                         bottomContentPlacement="outside"

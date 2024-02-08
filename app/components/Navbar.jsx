@@ -8,9 +8,11 @@ import { RiSettings5Fill } from "react-icons/ri";
 import { MdOutlineLogout } from "react-icons/md";
 import { Button } from "@nextui-org/react";
 import { usePathname } from 'next/navigation';
-import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
-import { GoHome, GoHomeFill } from "react-icons/go";
+import { HiOutlineBars3, HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
+import { GoQuestion, GoHome, GoHomeFill } from "react-icons/go";
 import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
+
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem, User } from "@nextui-org/react";
 
 const Navbar = () => {
     const links = [
@@ -41,25 +43,8 @@ const Navbar = () => {
     ]
     const { data: session, status } = useSession();
     const [openToggle, setOpenToggle] = useState(false)
-    const [profileToggle, setProfileToggle] = useState(false)
     const url = usePathname();
 
-    const toggleProfile = () => {
-        setTimeout(() => {
-            if (profileToggle) {
-                setProfileToggle(false)
-            } else {
-                setProfileToggle(true)
-            }
-        }, 50)
-    }
-    // useEffect(() => {
-    //     window.onclick = () => {
-    //         if (profileToggle) {
-    //             setProfileToggle(false)
-    //         }
-    //     }
-    // })
     return (
         <nav className="bg-white fixed top-0 left-0 z-40 w-full border-b">
             <div className="px-2 sm:px-6 lg:ps-5 lg:pe-8">
@@ -82,10 +67,11 @@ const Navbar = () => {
                         </button>
                     </div>
                     <div className="flex flex-1 items-center justify-center sm:justify-start gap-4">
-                        <div className="flex flex-shrink-0 items-center">
+                        <div className="flex flex-shrink-0 gap-3 items-center">
+                            <HiOutlineBars3 className='w-6 h-6 ms-2.5' />
                             <Link href="/" className="flex items-center p-2 text-gray-900 rounded-lg ">
-                                <img className="h-8 w-auto" src="/logo.png" alt="it kku" />
-                                <span className="ml-3 text-gray-900 font-bold"><code>KKU it track</code></span>
+                                <img className="h-6 mb-2 w-auto" src="/regular_logo.svg" alt="it kku" />
+                                {/* <div className="ml-3 text-gray-900">KKU <sup>IT</sup></div> */}
                             </Link>
                         </div>
                     </div>
@@ -96,49 +82,85 @@ const Navbar = () => {
                                     {
                                         session?.user?.role === "admin" &&
                                         <Link href="/admin">
-                                            <Button className='bg-amber-400 text-white font-medium text-sm h-9'>
+                                            <Button className='rounded-[5px] bg-blue-500 text-white font-medium text-sm h-9'>
                                                 Admin panel
                                             </Button>
                                         </Link>
                                     }
-                                    <Image
-                                        onClick={toggleProfile}
-                                        className='rounded-full border-1 border-slate-300 active:scale-90 cursor-pointer'
-                                        src={session?.user?.image}
-                                        // src={'/image/user.png'}
-                                        width={40} height={40}
-                                        alt="user image"
-                                    />
-                                    <div className={`${profileToggle ? "block" : "hidden"} rounded absolute border w-[280px] p-4 top-[41px] right-0 bg-white`}>
-                                        <div className="flex gap-4 items-start mb-3 border-b pb-3">
+                                    <Dropdown
+                                        radius="sm"
+                                        classNames={{
+                                            content: "p-0 border-small border-divider bg-background shadow-none",
+                                        }}
+                                    >
+                                        <DropdownTrigger>
                                             <Image
-                                                className='rounded-full border-1 border-slate-300'
+                                                id='user-profile'
+                                                className='rounded-full active:scale-90 cursor-pointer'
                                                 src={session?.user?.image}
-                                                width={45} height={45}
+                                                width={40} height={40}
                                                 alt="user image"
                                             />
-                                            <div className='w-full'>
-                                                <div>{session.user.name}</div>
-                                                <div className='text-sm text-gray-500'>{session.user.email}</div>
-                                                <div className='mt-2'>
-                                                    <Link href={"/"} className='text-sm text-blue-500'>ดูโปรไฟล์</Link>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className='flex gap-3 cursor-pointer mb-1 rounded-md p-2 hover:bg-gray-200'>
-                                            <div className='p-[.3rem] bg-gray-800 text-white rounded-full'>
-                                                <RiSettings5Fill className='w-6 h-6' />
-                                            </div>
-                                            <button className=''>cPanel</button>
-                                        </div>
-                                        <div className='flex gap-3 cursor-pointer rounded-md p-2 hover:bg-gray-200' onClick={() => signOut()}>
-                                            <div className='p-[.3rem] bg-gray-800 text-white rounded-full'>
-                                                {/* <FontAwesomeIcon icon="fa-solid fa-right-from-bracket" /> */}
-                                                <MdOutlineLogout className='w-6 h-6' />
-                                            </div>
-                                            <button className=''>Sign out</button>
-                                        </div>
-                                    </div>
+                                        </DropdownTrigger>
+                                        <DropdownMenu
+                                            aria-label="Custom item styles"
+                                            disabledKeys={["profile"]}
+                                            className="p-2"
+                                            variant="flat"
+                                            itemClasses={{
+                                                base: [
+                                                    "rounded-md",
+                                                    "text-default-500",
+                                                    "transition-opacity",
+                                                    "data-[hover=true]:text-foreground",
+                                                    "data-[hover=true]:bg-default-100",
+                                                    "dark:data-[hover=true]:bg-default-50",
+                                                    "data-[selectable=true]:focus:bg-default-50",
+                                                    "data-[pressed=true]:opacity-70",
+                                                    "data-[focus-visible=true]:ring-default-500",
+                                                ],
+                                            }}
+                                        >
+                                            <DropdownSection aria-label="Profile & Actions" showDivider>
+                                                <DropdownItem
+                                                    isReadOnly
+                                                    key="profile"
+                                                    className="h-14 gap-2 opacity-100"
+                                                >
+                                                    <div className="flex gap-3 items-center">
+                                                        <Image
+                                                            className='rounded-full'
+                                                            src={session?.user?.image}
+                                                            width={40} height={40}
+                                                            alt="user image"
+                                                        />
+                                                        <div className='w-full'>
+                                                            <p className='text-medium text-default-900'>{session.user.name}</p>
+                                                            <p className='text-small text-default-500'>{session.user.email}</p>
+                                                        </div>
+                                                    </div>
+                                                </DropdownItem>
+                                            </DropdownSection>
+                                            <DropdownSection
+                                                aria-label="Help & Feedback"
+                                                className="mb-0"
+                                            >
+                                                <DropdownItem key="help_and_feedback" className='mb-1'>
+                                                    <div className='flex gap-3 items-center'>
+                                                        <GoQuestion className='w-5 h-5' />
+                                                        <span>Help & Feedback</span>
+
+                                                    </div>
+                                                </DropdownItem>
+                                                <DropdownItem key="logout" onClick={() => signOut()}>
+                                                    <div className='flex gap-3 items-center'>
+                                                        <MdOutlineLogout className='w-5 h-5' />
+                                                        <span>Log Out</span>
+                                                    </div>
+                                                </DropdownItem>
+                                            </DropdownSection>
+                                        </DropdownMenu>
+                                    </Dropdown>
                                 </div>
                                 :
                                 <div className='relative hidden sm:flex justify-center items-center gap-2'>
@@ -156,10 +178,10 @@ const Navbar = () => {
                                     </button>
                                 </div>
                             }
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        </div >
+                    </div >
+                </div >
+            </div >
             {openToggle &&
                 <div className="sm:hidden" id="mobile-menu">
                     <div className="space-y-1 p-2 border-t-1 border-t-gray-200">
