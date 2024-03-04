@@ -4,8 +4,9 @@ import { dMyt } from '@/src/util/dateFormater'
 import { Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import { PlusIcon, CheckIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon, ConfirmIcon, ClockIcon } from "@/app/components/icons";
 import { Icon } from '@iconify/react';
+import { Loading } from '@/app/components';
 
-const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSelectedDel, handleStartSelect }) => {
+const TrackSelectTable = ({ loading, trackSelection, handleOpen, handleDelete, handleSelectedDel, handleStartSelect }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState(trackSelection);
     const [itemsPerPage, setItemPerPage] = useState(10);
@@ -93,78 +94,83 @@ const TrackSelectTable = ({ trackSelection, handleOpen, handleDelete, handleSele
                     </Button>
                 </div>
             </div>
-            {trackSelection.length > 0 ?
-                <Table
-                    removeWrapper
-                    selectionMode="multiple"
-                    onSelectionChange={handleSetSelectedKey}
-                    onRowAction={() => { }}
-                    aria-label="track selection table">
-                    <TableHeader>
-                        <TableColumn></TableColumn>
-                        <TableColumn></TableColumn>
-                        <TableColumn>ปีการศึกษา</TableColumn>
-                        <TableColumn>ชื่อ</TableColumn>
-                        <TableColumn>สถานะ</TableColumn>
-                        <TableColumn>เริ่มต้น</TableColumn>
-                        <TableColumn>สิ้นสุด</TableColumn>
-                    </TableHeader>
-                    {filteredData.length > 0 ?
-                        <TableBody>
-                            {filteredData.map((e, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>
-                                        {!(e.has_finished) ?
-                                            <Button
-                                                size='sm'
-                                                onPress={() => handleStartSelect({ id: e.id, hasFinished: e.has_finished })}
-                                                color="warning" variant="solid" className='bg-amber-400'>
-                                                ปิดการคัดเลือก
-                                            </Button>
-                                            :
-                                            <Button
-                                                size='sm'
-                                                onPress={() => handleStartSelect({ id: e.id, hasFinished: e.has_finished })}
-                                                color="primary" variant="solid" className=''>
-                                                เปิดการคัดเลือก
-                                            </Button>
-                                        }
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="relative flex items-center gap-4">
-                                            <Tooltip color="danger" content="ลบ">
-                                                <span onClick={() => handleDelete(e.acadyear)} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                    <DeleteIcon2 />
-                                                </span>
-                                            </Tooltip>
-                                        </div>
-                                    </TableCell>
+            {
+                loading ?
+                    <div className='w-fit mx-auto mt-14'>
+                        <Loading />
+                    </div>
+                    :
+                    <Table
+                        removeWrapper
+                        selectionMode="multiple"
+                        onSelectionChange={handleSetSelectedKey}
+                        onRowAction={() => { }}
+                        aria-label="track selection table">
+                        <TableHeader>
+                            <TableColumn></TableColumn>
+                            <TableColumn></TableColumn>
+                            <TableColumn>ปีการศึกษา</TableColumn>
+                            <TableColumn>ชื่อ</TableColumn>
+                            <TableColumn>สถานะ</TableColumn>
+                            <TableColumn>เริ่มต้น</TableColumn>
+                            <TableColumn>สิ้นสุด</TableColumn>
+                        </TableHeader>
+                        {filteredData.length > 0 ?
+                            <TableBody>
+                                {filteredData.map((e, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>
+                                            {!(e.has_finished) ?
+                                                <Button
+                                                    size='sm'
+                                                    onPress={() => handleStartSelect({ id: e.id, hasFinished: e.has_finished })}
+                                                    color="warning" variant="solid" className='bg-amber-400'>
+                                                    ปิดการคัดเลือก
+                                                </Button>
+                                                :
+                                                <Button
+                                                    size='sm'
+                                                    onPress={() => handleStartSelect({ id: e.id, hasFinished: e.has_finished })}
+                                                    color="primary" variant="solid" className=''>
+                                                    เปิดการคัดเลือก
+                                                </Button>
+                                            }
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="relative flex items-center gap-4">
+                                                <Tooltip color="danger" content="ลบ">
+                                                    <span onClick={() => handleDelete(e.acadyear)} className="text-lg text-danger cursor-pointer active:opacity-50">
+                                                        <DeleteIcon2 />
+                                                    </span>
+                                                </Tooltip>
+                                            </div>
+                                        </TableCell>
 
-                                    <TableCell>{e.acadyear}</TableCell>
+                                        <TableCell>{e.acadyear}</TableCell>
 
-                                    <TableCell className="w-1/3">
-                                        <Link
-                                            href={`/admin/track-selection/${e.acadyear}`}
-                                            className='text-blue-500'
-                                        >{e.title}
-                                        </Link>
-                                    </TableCell>
+                                        <TableCell className="w-1/3">
+                                            <Link
+                                                href={`/admin/track-selection/${e.acadyear}`}
+                                                className='text-blue-500'
+                                            >{e.title}
+                                            </Link>
+                                        </TableCell>
 
-                                    <TableCell>
-                                        {e.has_finished ?
-                                            <Chip startContent={<CheckIcon size={18} />} color="success" variant="flat">เสร็จสิ้น</Chip>
-                                            :
-                                            <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">กำลังดำเนินการ</Chip>
-                                        }
-                                    </TableCell>
+                                        <TableCell>
+                                            {e.has_finished ?
+                                                <Chip startContent={<CheckIcon size={18} />} color="success" variant="flat">เสร็จสิ้น</Chip>
+                                                :
+                                                <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">กำลังดำเนินการ</Chip>
+                                            }
+                                        </TableCell>
 
-                                    <TableCell>{dMyt(e.startAt)}</TableCell>
-                                    <TableCell>{dMyt(e.expiredAt)}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody> :
-                        <TableBody emptyContent={"ไม่มีข้อมูลคัดเลือกแทรค"}>{[]}</TableBody>}
-                </Table> : <>Loading....</>
+                                        <TableCell>{dMyt(e.startAt)}</TableCell>
+                                        <TableCell>{dMyt(e.expiredAt)}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody> :
+                            <TableBody emptyContent={"ไม่มีข้อมูลคัดเลือกแทรค"}>{[]}</TableBody>}
+                    </Table>
             }
         </div>
     )

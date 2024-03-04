@@ -192,7 +192,7 @@ export default function ProgramCode() {
                                     onPress={handleInsertModalOpen}
                                     color="primary"
                                 >
-                                    Add Group
+                                    เพิ่มรหัสหลักสูตร
                                     <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
                                 </Button>
                                 <Button

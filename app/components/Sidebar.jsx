@@ -32,7 +32,7 @@ const Sidebar = () => {
                                                 className="w-5 h-5"
                                                 set="bulk" stroke="bold" />
                                         }
-                                        <span className="ml-3 text-sm">Admin Panel</span>
+                                        <span className="ml-3 text-sm">หน้าหลัก</span>
                                     </Link>
                                 </>
                                 :

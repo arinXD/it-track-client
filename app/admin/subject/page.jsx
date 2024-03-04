@@ -281,28 +281,6 @@ export default function Subject() {
             showToastMessage(false, 'Error exporting Excel');
         }
     };
-
-    // const handleSearch = (subject) => {
-    //     const searchFields = [
-    //         'acadyear',
-    //         'group_id',
-    //         'sub_group_id',
-    //         'semester',
-    //         'subject_code',
-    //         'title_th',
-    //         'title_en',
-    //         'information',
-    //         'credit',
-    //     ];
-
-    //     return searchFields.some((field) =>
-    //         subject[field]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
-    //     );
-    // };
-
-    // const visibleSubjects = subjects
-    //     .filter((subject) => handleSearch(subject))
-    //     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
     const filteredSubject = subjects.filter(subject => {
         const queryLowerCase = searchQuery.toLowerCase();
     
@@ -339,8 +317,6 @@ export default function Subject() {
             <ContentWrap>
                 <BreadCrumb />
                 <ToastContainer />
-                {/* <ExcelUpload onDataInsertXlsx={handleDataInserted} /> */}
-
                 <div className='my-[30px]'>
                     <div className="flex flex-col md:flex-row justify-between gap-3 mb-3 ">
                         <div className='flex justify-start'>
@@ -359,7 +335,7 @@ export default function Subject() {
                                     style={{ backgroundColor: '#149403', color: 'white' }}
                                 >
                                     Export to CSV
-                                    <FaRegFile className={'w-4 h-4 text-white hidden md:block'} />
+                                    <TbFileImport className={'w-5 h-5 text-white hidden md:block'} />
                                 </Button>
                             </div>
                         </div>
@@ -393,7 +369,7 @@ export default function Subject() {
                                     style={{ backgroundColor: '#24b565', color: 'white' }}
                                 >
                                     Import Excel
-                                    <TbFileImport className={'w-5 h-5 text-white hidden md:block'} />
+                                    <FaRegFile className={'w-4 h-4 text-white hidden md:block'} />
                                 </Button>
                                 <Button
                                     className="bg-red-400 text-white w-1/2"
@@ -493,11 +469,12 @@ export default function Subject() {
                     <Pagination
                         onChange={handlePageChange}
                         current={currentPage}
-                        total={Math.ceil(filteredSubject.length / itemsPerPage)}
                         isCompact
                         showControls
                         loop
                         className="flex justify-center mt-3"
+                        total={Math.ceil(filteredSubject.length / itemsPerPage)}
+                        initialPage={1}
                     />
                 </div>
 

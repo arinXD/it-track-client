@@ -174,7 +174,6 @@ const TablePagination = ({ data }) => {
                     <button
                         onClick={() => setCurrentPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        // {...totalItems > 0 ? "disabled" : ""}
                         className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover-bg-indigo-500 hover-text-white focus:z-20 focus:outline-offset-0"
                     >
                         <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

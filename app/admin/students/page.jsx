@@ -40,9 +40,7 @@ const Page = () => {
         direction: "ascending",
     });
     const [page, setPage] = React.useState(1);
-
     const hasSearchFilter = Boolean(filterValue);
-
     const headerColumns = React.useMemo(() => {
         if (visibleColumns === "all") return columns;
 
@@ -291,7 +289,7 @@ const Page = () => {
                 <BreadCrumb />
                 <div>
                     <Table
-                        aria-label="Example table with custom cells, pagination and sorting"
+                        aria-label="Student Table"
                         isHeaderSticky
                         bottomContent={bottomContent}
                         bottomContentPlacement="outside"

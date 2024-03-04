@@ -42,6 +42,7 @@ const Page = () => {
     const [trackSelection, setTrackSelection] = useState([])
     const [acadyear, setAcadyear] = useState([])
     const [subjects, setSubjects] = useState([])
+    const [loading, setLoading] = useState(true)
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -63,6 +64,7 @@ const Page = () => {
         callTrackSelection()
         callAcadamicYear()
         callSubject()
+        setLoading(false)
     }, [])
 
     function handleOpen() {
@@ -252,6 +254,7 @@ const Page = () => {
 
                 {/* table */}
                 <TrackSelectTable
+                    loading={loading}
                     handleDelete={handleDelete}
                     handleOpen={handleOpen}
                     trackSelection={trackSelection}

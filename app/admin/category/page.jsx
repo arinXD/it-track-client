@@ -25,12 +25,9 @@ async function fetchData() {
     try {
         const result = await axios.get(`${hostname}/api/categories`);
         const data = result.data.data;
-
-        if (data.length === 0) return [{ id: 1, "category_title": "ไม่มีข้อมูล" }]
         return data;
     } catch (error) {
         console.log(error);
-        return [{ "category_title": "ไม่มี" }];
     }
 }
 
@@ -215,7 +212,7 @@ export default function Category() {
                                     onPress={handleModalOpen}
                                     color="primary"
                                 >
-                                    Add Category
+                                    เพิ่มหมวดหมู่วิชา
                                     <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
                                 </Button>
                                 <Button

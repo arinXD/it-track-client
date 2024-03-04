@@ -24,10 +24,10 @@ import ProgramInsert from "./ProgramInsert"
 import ProgramUpdate from "./ProgramUpdate"
 import ProgramCodeInsert from "./ProgramCodeInsert"
 import ProgramCodeUpdate from "./ProgramCodeUpdate"
-
-
+import Loading from "./Loading"
 import BreadCrumb from "./BreadCrumb"
 export {
+    Loading,
     BreadCrumb,
     ContentWrap,
     VerifyLogin,

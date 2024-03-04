@@ -63,26 +63,6 @@ const Page = async () => {
                         </div>
                     </div>
                 </div>
-                {/* <div className="flex justify-between gap-3 items-end my-3">
-                    <Input
-                        isClearable
-                        className=""
-                        placeholder="Search by name..."
-                        size="sm"
-                        startContent={<SearchIcon />}
-                    // value={filterValue}
-                    // onClear={() => onClear()}
-                    // onValueChange={onSearchChange}
-                    />
-                    <div className="flex gap-3">
-                        <Button className='block'>
-                            ค้นหาวิชา
-                        </Button>
-                        <Button className='block'>
-                            ค้นหาแทรค
-                        </Button>
-                    </div>
-                </div> */}
                 <News data={rootData} />
             </ContentWrap>
         </>

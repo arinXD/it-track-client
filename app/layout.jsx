@@ -2,9 +2,9 @@
 import './globals.css'
 import AuthProvider from './components/Authprovider'
 import { NextUIProvider } from "@nextui-org/react";
+
 export default function RootLayout({ children }) {
     return (
-        // <html data-theme="winter">
         <html>
             <body suppressHydrationWarning={true}>
                 <main>

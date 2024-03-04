@@ -29,14 +29,15 @@ const shortMonths = {
 }
 
 function dmy(dateString) {
+    if (!dateString) return ""
     let [date, time] = dateString.split("T")
     let [y, m, d] = date.split("-")
-    let [h, min, s] = time.split(".")[0].split(":")
     const result = `${d} ${months[m]} ${y}`
     return result
 }
 
 function dmyt(dateString) {
+    if (!dateString) return ""
     let [date, time] = dateString.split("T")
     let [y, m, d] = date.split("-")
     let [h, min, s] = time.split(".")[0].split(":")
@@ -45,14 +46,16 @@ function dmyt(dateString) {
 }
 
 function dMy(dateString) {
+    if (!dateString) return ""
     let [date, time] = dateString.split("T")
-    let [y, m, d] = date.split("-")
-    let [h, min, s] = time.split(".")[0].split(":")
+    let [y, m, d] = `${date}`.split("-")
     const result = `${d} ${shortMonths[m]} ${y}`
+
     return result
 }
 
 function dMyt(dateString) {
+    if (!dateString) return ""
     let [date, time] = dateString.split("T")
     let [y, m, d] = date.split("-")
     let [h, min, s] = time.split(".")[0].split(":")

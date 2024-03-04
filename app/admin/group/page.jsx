@@ -209,7 +209,7 @@ export default function Group() {
                                     onPress={handleInsertModalOpen}
                                     color="primary"
                                 >
-                                    Add Group
+                                    เพิ่มกลุ่มวิชา
                                     <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
                                 </Button>
                                 <Button
