@@ -92,6 +92,7 @@ const handler = NextAuth({
     ],
     callbacks: {
         async signIn({ user, account }) {
+            console.log(user);
             if (account.provider === "google") {
                 const token = await signToken({ email: user.email })
                 const options = {

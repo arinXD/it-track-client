@@ -40,9 +40,7 @@ const Page = () => {
         direction: "ascending",
     });
     const [page, setPage] = React.useState(1);
-
     const hasSearchFilter = Boolean(filterValue);
-
     const headerColumns = React.useMemo(() => {
         if (visibleColumns === "all") return columns;
 

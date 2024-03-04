@@ -75,6 +75,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         if (result.ok) {
             // จุดพลุฉลอง
             handleConfetti()
+            console.log(data.updatedAt);
             Swal.fire({
                 title: "บันทึกข้อมูลการคัดเลือก",
                 text: `บันทึกข้อมูลการคัดเลือกของคุณ ณ วันที่ ${dmyt(data.updatedAt)}`,
@@ -97,7 +98,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await axios.get(`${hostname}/api/tracks/selects/${userData.acadyearn}`);
+                const response = await axios.get(`${hostname}/api/tracks/selects/${userData.acadyear}`);
                 const trackResponse = await axios.get(`${hostname}/api/tracks`)
                 const selectDataResponse = await axios.get(`${hostname}/api/students/${userData.stu_id}/track/select`)
 
@@ -185,17 +186,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         </div>
     }
 
-    if (userData?.acadyear !== trackSelect?.acadyear && trackSelect?.acadyear) {
-        return (
-            <div className='text-center'>
-                <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
-                    {trackSelect.title}
-                </h4>
-                <p>คุณไม่มีสิทธิ์เข้ารับการคัดเลือกในปีนี้ ติดต่อเพิ่มเติมที่อีเมล ittrack@gmail.com </p>
-            </div>
-        )
-    }
-
     else {
         return (
             <div className="relative flex flex-col rounded-xl bg-transparent bg-clip-border text-gray-700 shadow-none">
@@ -203,7 +193,9 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                     <Loading />
                     :
                     !(trackSelect?.id) ?
-                        <>รอการประกาศการคัดเลือกแทรคจากอาจารย์ครับ/ค่ะ</>
+                        <>
+                            รอการประกาศการคัดเลือกแทรคจากอาจารย์
+                        </>
                         :
                         <>
                             {(trackSelect.has_finished || (new Date(trackSelect.expiredAt) < new Date())) ?
@@ -287,7 +279,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             </div>
                                             <div>
                                                 {/* {JSON.stringify([orders.order1, orders.order2, orders.order3].filter(e => e))} <br /> */}
-                                                {JSON.stringify([orders.order1, orders.order2, orders.order3])}
+                                                {/* {JSON.stringify([orders.order1, orders.order2, orders.order3])} */}
                                                 {/* {JSON.stringify(tracks.filter((t) => ![orders.order1, orders.order2, orders.order3].includes(t.track)))} */}
                                             </div>
                                             <div>

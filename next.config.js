@@ -1,10 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: false
-    ,
+    reactStrictMode: false,
     images: {
-        remotePatterns: [
-            {
+        remotePatterns: [{
                 protocol: "https",
                 hostname: "*.googleusercontent.com",
             },

@@ -1,7 +1,7 @@
 "use client"
 import { Navbar, Sidebar, ContentWrap, BreadCrumb, Loading } from '@/app/components'
 import { fetchDataObj } from '../../action'
-import React, { useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import { DeleteIcon2 } from "@/app/components/icons";
 import Link from 'next/link';
@@ -236,7 +236,7 @@ const Page = ({ params }) => {
                             :
                             Object.keys(trackSelect).length > 0 ?
                                 <div className='space-y-8 mt-6'>
-                                    <Button className='fixed bottom-1 right-1 z-50'>UP</Button>
+                                    {/* <Button className='fixed bottom-1 right-1 z-50'>UP</Button> */}
                                     <h1 className='font-bold text-2xl'>
                                         {title}
                                     </h1>
@@ -394,7 +394,7 @@ const Page = ({ params }) => {
                                             </table>
                                     }
                                     <div>
-                                        <h2 className='mb-1'>วิชาที่ใช้ในการคัดเลือก</h2>
+                                        <h2 className='mb-3 text-small text-default-900'>วิชาที่ใช้ในการคัดเลือก</h2>
                                         {trackSelect?.Subjects &&
                                             <Table
                                                 isStriped
@@ -432,9 +432,9 @@ const Page = ({ params }) => {
                                             </Table>
                                         }
                                     </div>
-                                    <StudentTrackTable studentData={studentsBit} track={"BIT"}/>
-                                    <StudentTrackTable studentData={studentsNetwork} track={"Network"}/>
-                                    <StudentTrackTable studentData={studentsWeb} track={"WEB"}/>
+                                    <StudentTrackTable studentData={studentsBit} track={"BIT"} />
+                                    <StudentTrackTable studentData={studentsNetwork} track={"Network"} />
+                                    <StudentTrackTable studentData={studentsWeb} track={"WEB"} />
                                 </div>
                                 :
                                 <>
