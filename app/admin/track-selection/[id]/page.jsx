@@ -345,53 +345,186 @@ const Page = ({ params }) => {
                                     </div>
                                     {
                                         !parseInt(studentsBit?.normal + studentsNetwork?.normal + studentsWeb?.normal) ? null :
-                                            <table className='table-auto mx-auto'>
-                                                <caption className="caption-to mb-2">
-                                                    จำนวนนักศึกษาทั้งหมด
-                                                </caption>
-                                                <thead>
-                                                    <tr>
-                                                        <th className='px-4 py-2 border-1 w-[250px]'>Business Information Technology</th>
-                                                        <th className='px-4 py-2 border-1 w-[250px]'>IOT & Networking</th>
-                                                        <th className='px-4 py-2 border-1 w-[250px]'>Web Application & Mobile</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td className='px-4 py-2 border-1'>
-                                                            <div className='flex flex-col gap-1'>
-                                                                <div className='flex justify-between items-center'><span>ทั้งหมด</span> <span>{studentsBit?.students?.length} <span className='ms-3'>คน</span></span></div>
-                                                                <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsBit?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsBit?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                <div>
-                                                                    <Link href={"#bit-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
-                                                                </div>
+                                            <div className='grid grid-cols-3 gap-8 max-xl:grid-cols-2 max-lg:grid-cols-1'>
+                                                <div className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
+                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
+                                                        <div class="rounded-full flex relative">
+                                                            <div class="w-20 h-20 bg-red-100 rounded-full flex justify-center items-center">
+                                                                <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
                                                             </div>
-                                                        </td>
-                                                        <td className='px-4 py-2 border-1'>
-                                                            <div className='flex flex-col gap-1'>
-                                                                <div className='flex justify-between items-center'><span>ทั้งหมด</span> <span>{studentsNetwork?.students?.length} <span className='ms-3'>คน</span></span></div>
-                                                                <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsNetwork?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsNetwork?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                <div>
-                                                                    <Link href={"#network-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
-                                                                </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
+                                                        <table className='table-auto mx-auto'>
+                                                            <thead>
+                                                                <tr className=''>
+                                                                    <th className='text-lg'>Business Information Technology</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div className='flex flex-col gap-2 mt-3'>
+                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsBit?.normal} <span className='ms-3'>คน</span></span></div>
+                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsBit?.vip} <span className='ms-3'>คน</span></span></div>
+                                                                            <div>
+                                                                                <Link href={"#bit-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
+                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
+                                                        <div class="rounded-full flex relative">
+                                                            <div class="w-20 h-20 bg-blue-100 rounded-full flex justify-center items-center">
+                                                                <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
                                                             </div>
-                                                        </td>
-                                                        <td className='px-4 py-2 border-1'>
-                                                            <div className='flex flex-col gap-1'>
-                                                                <div className='flex justify-between items-center'><span>ทั้งหมด</span> <span>{studentsWeb?.students?.length} <span className='ms-3'>คน</span></span></div>
-                                                                <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsWeb?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsWeb?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                <div>
-                                                                    <Link href={"#web-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
-                                                                </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
+                                                        <table className='table-auto mx-auto'>
+                                                            <thead>
+                                                                <tr className=''>
+                                                                    <th className='text-xl'>IOT & Networking  <span className='invisible'>sssssssss</span></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div className='flex flex-col gap-2 mt-3'>
+                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsNetwork?.normal} <span className='ms-3'>คน</span></span></div>
+                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsNetwork?.vip} <span className='ms-3'>คน</span></span></div>
+                                                                            <div>
+                                                                                <Link href={"#network-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
+                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
+                                                        <div class="rounded-full flex relative">
+                                                            <div class="w-20 h-20 bg-green-100 rounded-full flex justify-center items-center">
+                                                                <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
                                                             </div>
-                                                        </td>
-
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
+                                                        <table className='table-auto mx-auto'>
+                                                            <thead>
+                                                                <tr className=''>
+                                                                    <th className='text-lg'>Web Application & Mobile</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div className='flex flex-col gap-2 mt-3'>
+                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsWeb?.normal} <span className='ms-3'>คน</span></span></div>
+                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsWeb?.vip} <span className='ms-3'>คน</span></span></div>
+                                                                            <div>
+                                                                                <Link href={"#web-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                {/* ver 2 */}
+                                                <Link href={"#bit-students"} className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
+                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
+                                                        <div class="rounded-full flex relative">
+                                                            <div class="w-20 h-20 bg-red-100 rounded-full flex justify-center items-center">
+                                                                <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
+                                                        <table className='table-auto mx-auto'>
+                                                            <thead>
+                                                                <tr className=''>
+                                                                    <th className='text-lg'>Business Information Technology</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div className='flex flex-col gap-2 mt-3'>
+                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsBit?.normal} <span className='ms-3'>คน</span></span></div>
+                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsBit?.vip} <span className='ms-3'>คน</span></span></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </Link>
+                                                <Link href={"#bit-students"} className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
+                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
+                                                        <div class="rounded-full flex relative">
+                                                            <div class="w-20 h-20 bg-blue-100 rounded-full flex justify-center items-center">
+                                                                <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
+                                                        <table className='table-auto mx-auto'>
+                                                            <thead>
+                                                                <tr className=''>
+                                                                    <th className='text-xl'>IOT & Networking</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div className='flex flex-col gap-2 mt-3'>
+                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsNetwork?.normal} <span className='ms-3'>คน</span></span></div>
+                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsNetwork?.vip} <span className='ms-3'>คน</span></span></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </Link>
+                                                <Link href={"#bit-students"} className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
+                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
+                                                        <div class="rounded-full flex relative">
+                                                            <div class="w-20 h-20 bg-green-100 rounded-full flex justify-center items-center">
+                                                                <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
+                                                        <table className='table-auto mx-auto'>
+                                                            <thead>
+                                                                <tr className=''>
+                                                                    <th className='text-lg'>Web Application & Mobile</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div className='flex flex-col gap-2 mt-3'>
+                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsWeb?.normal} <span className='ms-3'>คน</span></span></div>
+                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsWeb?.vip} <span className='ms-3'>คน</span></span></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </Link>
+                                            </div>
                                     }
                                     <div>
                                         <h2 className='mb-3 text-small text-default-900'>วิชาที่ใช้ในการคัดเลือก</h2>

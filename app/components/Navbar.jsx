@@ -68,9 +68,9 @@ const Navbar = () => {
                     </div>
                     <div className="flex flex-1 items-center justify-center sm:justify-start gap-4">
                         <div className="flex flex-shrink-0 gap-1 items-center">
-                            <div className='sm:block'>
-                                <HiOutlineBars3 className='w-6 h-6 ms-2.5' />
-                            </div>
+                            <button className='sm:block '>
+                                <HiOutlineBars3 className='w-6 h-6 ms-2.5 max-sm:hidden' />
+                            </button>
                             <Link href="/" className="flex items-center p-2 text-gray-900 rounded-lg ">
                                 <img className="h-6 mb-2 w-auto" src="/regular_logo.svg" alt="it kku" />
                             </Link>
