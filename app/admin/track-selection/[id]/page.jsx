@@ -13,6 +13,7 @@ import { hostname } from '@/app/api/hostname';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StudentTrackTable from './StudentTrackTable';
+import TrackCard from './TrackCard';
 
 const showToastMessage = (ok, message) => {
     if (ok) {
@@ -439,20 +440,19 @@ const Page = ({ params }) => {
                                                         </table>
                                                     </div>
                                                 </div>
-                                                {/* ver 2 */}
-                                                <Link href={"#bit-students"} className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
-                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
-                                                        <div class="rounded-full flex relative">
-                                                            <div class="w-20 h-20 bg-red-100 rounded-full flex justify-center items-center">
+                                                {/* <Link href="#bit-students" className="flex flex-row text-center rounded-l-full">
+                                                    <div className={`bg-purple-500 p-4 rounded-l-full grid place-content-center`}>
+                                                        <div class="rounded-full flex relative justify-center items-center">
+                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
                                                                 <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
+                                                    <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-purple-400 text-white`}>
                                                         <table className='table-auto mx-auto'>
                                                             <thead>
                                                                 <tr className=''>
-                                                                    <th className='text-lg'>Business Information Technology</th>
+                                                                    <th className='text-base'>Business Information Technology</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -468,19 +468,19 @@ const Page = ({ params }) => {
                                                         </table>
                                                     </div>
                                                 </Link>
-                                                <Link href={"#bit-students"} className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
-                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
-                                                        <div class="rounded-full flex relative">
-                                                            <div class="w-20 h-20 bg-blue-100 rounded-full flex justify-center items-center">
+                                                <Link href="#network-students" className="flex flex-row text-center rounded-l-full">
+                                                    <div className={`bg-emerald-500 p-4 rounded-l-full grid place-content-center`}>
+                                                        <div class="rounded-full flex relative justify-center items-center">
+                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
                                                                 <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
+                                                    <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-emerald-400 text-white`}>
                                                         <table className='table-auto mx-auto'>
                                                             <thead>
                                                                 <tr className=''>
-                                                                    <th className='text-xl'>IOT & Networking</th>
+                                                                    <th className='text-base'>IOT & Networking</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -496,19 +496,19 @@ const Page = ({ params }) => {
                                                         </table>
                                                     </div>
                                                 </Link>
-                                                <Link href={"#bit-students"} className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
-                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
-                                                        <div class="rounded-full flex relative">
-                                                            <div class="w-20 h-20 bg-green-100 rounded-full flex justify-center items-center">
+                                                <Link href="#web-students" className="flex flex-row text-center rounded-l-full">
+                                                    <div className={`bg-indigo-500 p-4 rounded-l-full grid place-content-center`}>
+                                                        <div class="rounded-full flex relative justify-center items-center">
+                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
                                                                 <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
+                                                    <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-indigo-400 text-white`}>
                                                         <table className='table-auto mx-auto'>
                                                             <thead>
                                                                 <tr className=''>
-                                                                    <th className='text-lg'>Web Application & Mobile</th>
+                                                                    <th className='text-base'>Web Application & Mobile</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -523,7 +523,10 @@ const Page = ({ params }) => {
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                                </Link>
+                                                </Link> */}
+                                                <TrackCard target="#bit-students" color={"purple"} title={"Business Information Technology"} studentArr={studentsBit} />
+                                                <TrackCard target="#network-students" color={"emerald"} title={"IOT & Networking"} studentArr={studentsNetwork} />
+                                                <TrackCard target="#web-students" color={"indigo"} title={"Web Application & Mobile"} studentArr={studentsWeb} />
                                             </div>
                                     }
                                     <div>

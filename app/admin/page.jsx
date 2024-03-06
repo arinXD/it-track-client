@@ -31,7 +31,7 @@ const Page = async () => {
                         <h2>ทั่วไป</h2>
                         <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-2'>
                             {acadLinks.map((e, index) => (
-                                <li key={index} className='bg-gray-900 text-white rounded-md overflow-hidden'>
+                                <li key={index} className='bg-blue-800 text-white rounded-md overflow-hidden'>
                                     <Link className='block w-full px-3 py-2' href={e.href}>{e.lable}</Link>
                                 </li>
                             ))}
@@ -41,7 +41,7 @@ const Page = async () => {
                         <h2>แทรค</h2>
                         <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-2'>
                             {tracks.map((e, index) => (
-                                <li key={index} className='bg-gray-900 text-white rounded-md overflow-hidden'>
+                                <li key={index} className='bg-blue-800 text-white rounded-md overflow-hidden'>
                                     <Link className='block w-full px-3 py-2' href={e.href}>{e.lable}</Link>
                                 </li>
                             ))}

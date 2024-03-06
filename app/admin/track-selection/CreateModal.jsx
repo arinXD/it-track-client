@@ -22,7 +22,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
 
     useEffect(() => {
         if (acadyear[0]) {
-            setAcadValue(acadyear[0].acadyear.toString())
+            setAcadValue(acadyear[0].toString())
         }
     }, [acadyear])
 
@@ -139,8 +139,8 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                                 เลือกปีการศึกษา
                                             </SelectItem>
                                             {acadyear.map((acad) => (
-                                                <SelectItem key={acad.acadyear.toString()} value={acad.acadyear.toString()}>
-                                                    {acad.acadyear.toString()}
+                                                <SelectItem key={acad.toString()} value={acad.toString()}>
+                                                    {acad.toString()}
                                                 </SelectItem>
                                             ))}
                                         </Select>

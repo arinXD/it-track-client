@@ -4,36 +4,37 @@ const columns = [{
         sortable: true
     },
     {
-        name: "NAME",
-        uid: "name",
+        name: "รหัสนักศึกษา",
+        uid: "stu_id",
         sortable: true
     },
     {
-        name: "AGE",
-        uid: "age",
+        name: "อีเมล",
+        uid: "email",
         sortable: true
     },
     {
-        name: "ROLE",
-        uid: "role",
+        name: "ชื่อ-สกุล",
+        uid: "fullName",
         sortable: true
     },
     {
-        name: "TEAM",
-        uid: "team"
-    },
-    {
-        name: "EMAIL",
-        uid: "email"
-    },
-    {
-        name: "STATUS",
-        uid: "status",
+        name: "โครงการ",
+        uid: "courses_type",
         sortable: true
     },
     {
-        name: "ACTIONS",
-        uid: "actions"
+        name: "หลักสูตร",
+        uid: "program"
+    },
+    {
+        name: "ปีการศึกษา",
+        uid: "acadyear",
+    },
+    {
+        name: "สถานะภาพ",
+        uid: "status_code",
+        sortable: true
     },
 ];
 

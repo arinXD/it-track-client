@@ -11,6 +11,7 @@ import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import { getToken } from '@/app/components/serverAction/TokenAction'
 import { useDisclosure } from "@nextui-org/react";
+import { getLastTenYear } from '@/src/util/academicYear';
 
 const Page = () => {
     const showToastMessage = (ok, message) => {
@@ -50,9 +51,9 @@ const Page = () => {
         let trackSelections = await fetchData("/api/tracks/selects")
         setTrackSelection(trackSelections)
     }
-    async function callAcadamicYear() {
-        let academicYears = await fetchData("/api/acadyear")
-        setAcadyear(academicYears)
+    function callAcadamicYear() {
+        const lastTenYears = getLastTenYear()
+        setAcadyear(lastTenYears)
     }
     async function callSubject() {
         let subjects = await fetchData("/api/subjects")

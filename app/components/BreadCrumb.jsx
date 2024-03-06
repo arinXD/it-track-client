@@ -17,6 +17,7 @@ const links = {
     "track-selection": "คัดเลือกแทรค",
     "track-student": "รายชื่อนักศึกษาภายในแทรค",
     "dashboard": "Dashboard",
+    "students":"รายชื่อนักศึกษา",
 };
 
 const BreadCrumb = () => {

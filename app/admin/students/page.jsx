@@ -1,26 +1,11 @@
 "use client"
-import React from "react";
-import {
-    Table,
-    TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
-    Input,
-    Button,
-    DropdownTrigger,
-    Dropdown,
-    DropdownMenu,
-    DropdownItem,
-    Chip,
-    User,
-    Pagination,
-} from "@nextui-org/react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, } from "@nextui-org/react";
 import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon } from "@/app/components/icons";
-import { columns, users, statusOptions } from "./data";
+import { columns, users } from "./data";
 import { capitalize } from "./utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
+import axios from "axios";
 
 const statusColorMap = {
     active: "success",
@@ -30,24 +15,44 @@ const statusColorMap = {
 const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions"];
 
 const Page = () => {
-    const [filterValue, setFilterValue] = React.useState("");
-    const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
-    const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = React.useState("all");
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [sortDescriptor, setSortDescriptor] = React.useState({
+    async function getStudentStatuses() {
+        const res = await axios.get("http://localhost:4000/api/students/statuses")
+        const statuses = res.data.data
+        setStatusOptions(statuses)
+    }
+    async function getStudents(program, acadyear) {
+        const res = await axios.get(`http://localhost:4000/api/students/programs/${program}/acadyear/${acadyear}`)
+        const statuses = res.data.data
+        setStatusOptions(statuses)
+    }
+
+    useEffect(() => {
+        getStudentStatuses()
+    }, [])
+
+    const [selectProgram, setSelectProgram] = useState(null)
+    const [selectAcadYear, setSelectAcadYear] = useState(null)
+    const [students, setStudents] = useState([])
+
+    const [statusOptions, setStatusOptions] = useState([])
+    const [filterValue, setFilterValue] = useState("");
+    const [selectedKeys, setSelectedKeys] = useState(new Set([]));
+    const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [sortDescriptor, setSortDescriptor] = useState({
         column: "age",
         direction: "ascending",
     });
-    const [page, setPage] = React.useState(1);
+    const [page, setPage] = useState(1);
     const hasSearchFilter = Boolean(filterValue);
-    const headerColumns = React.useMemo(() => {
+    const headerColumns = useMemo(() => {
         if (visibleColumns === "all") return columns;
 
         return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
-    const filteredItems = React.useMemo(() => {
+    const filteredItems = useMemo(() => {
         let filteredUsers = [...users];
 
         if (hasSearchFilter) {
@@ -66,14 +71,14 @@ const Page = () => {
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
-    const items = React.useMemo(() => {
+    const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage;
         const end = start + rowsPerPage;
 
         return filteredItems.slice(start, end);
     }, [page, filteredItems, rowsPerPage]);
 
-    const sortedItems = React.useMemo(() => {
+    const sortedItems = useMemo(() => {
         return [...items].sort((a, b) => {
             const first = a[sortDescriptor.column];
             const second = b[sortDescriptor.column];
@@ -83,7 +88,7 @@ const Page = () => {
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = React.useCallback((user, columnKey) => {
+    const renderCell = useCallback((user, columnKey) => {
         const cellValue = user[columnKey];
 
         switch (columnKey) {
@@ -132,24 +137,24 @@ const Page = () => {
         }
     }, []);
 
-    const onNextPage = React.useCallback(() => {
+    const onNextPage = useCallback(() => {
         if (page < pages) {
             setPage(page + 1);
         }
     }, [page, pages]);
 
-    const onPreviousPage = React.useCallback(() => {
+    const onPreviousPage = useCallback(() => {
         if (page > 1) {
             setPage(page - 1);
         }
     }, [page]);
 
-    const onRowsPerPageChange = React.useCallback((e) => {
+    const onRowsPerPageChange = useCallback((e) => {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
     }, []);
 
-    const onSearchChange = React.useCallback((value) => {
+    const onSearchChange = useCallback((value) => {
         if (value) {
             setFilterValue(value);
             setPage(1);
@@ -158,12 +163,12 @@ const Page = () => {
         }
     }, []);
 
-    const onClear = React.useCallback(() => {
+    const onClear = useCallback(() => {
         setFilterValue("")
         setPage(1)
     }, [])
 
-    const topContent = React.useMemo(() => {
+    const topContent = useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
                 <div className="flex justify-between gap-3 items-end">
@@ -220,7 +225,7 @@ const Page = () => {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Button color="primary" endContent={<PlusIcon width={16} height={16}/>}>
+                        <Button color="primary" endContent={<PlusIcon width={16} height={16} />}>
                             Add New
                         </Button>
                     </div>
@@ -251,7 +256,7 @@ const Page = () => {
         hasSearchFilter,
     ]);
 
-    const bottomContent = React.useMemo(() => {
+    const bottomContent = useMemo(() => {
         return (
             <div className="py-2 px-2 flex justify-between items-center">
                 <span className="w-[30%] text-small text-default-400">
