@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import { hostname } from '@/app/api/hostname';
-
+import { Input } from "@nextui-org/react";
 export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }) {
     const [newTitle, setNewTitle] = useState('');
     const [selectedGroup, setSelectedGroup] = useState(null);
@@ -65,31 +65,34 @@ export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }
     return (
         <Modal size="sm" isOpen={isOpen} onClose={onClose}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">Update SubGroup</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">แก้ไขกลุ่มย่อย</ModalHeader>
                 <ModalBody>
-                    <label htmlFor="newTitle">New SubGroup Title:</label>
-                    <input
-                        type="text"
-                        id="newTitle"
-                        value={newTitle}
-                        onChange={(e) => setNewTitle(e.target.value)}
-                    />
-
-                    <label htmlFor="group">Select Group:</label>
+                    <label htmlFor="group">เลือกกลุ่มวิชา</label>
                     <Select
                         id="group"
+                        className='z-50'
                         value={selectedGroup}
                         options={groups}
                         onChange={(selectedOption) => setSelectedGroup(selectedOption)}
                         isSearchable
+                        isClearable
                     />
+
+                    <Input
+                        type="text"
+                        id="newTitle"
+                        label="กลุ่มย่อยวิชา"
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                    />
+
                 </ModalBody>
                 <ModalFooter>
                     <Button color="danger" variant="light" onPress={onClose}>
-                        Close
+                        ยกเลิก
                     </Button>
                     <Button color="primary" onPress={handleUpdateSubGroup}>
-                        Update SubGroup
+                        บันทึก
                     </Button>
                 </ModalFooter>
             </ModalContent>

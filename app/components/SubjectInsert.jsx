@@ -9,6 +9,7 @@ import Select from 'react-select';
 import { hostname } from '@/app/api/hostname';
 
 import { fetchData } from '../admin/action'
+import { Input, Textarea } from "@nextui-org/react";
 
 export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
     const [semester, setSemester] = useState('');
@@ -82,7 +83,7 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
         try {
             const result = await axios.post(`${hostname}/api/subjects/insertSubject`, {
                 semester: semester ? semester : null,
-                subject_code: subject_code ?subject_code  : null,
+                subject_code: subject_code ? subject_code : null,
                 title_th: title_th ? title_th : null,
                 title_en: title_en ? title_en : null,
                 information: information ? information : null,
@@ -91,9 +92,9 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                 group_id: selectedGroup ? selectedGroup.value : null,
                 acadyear: selectedAcadYear ? selectedAcadYear.value : null,
             });
-    
+
             console.log('Inserted subjects:', result.data.data);
-    
+
             onDataInserted();
         } catch (error) {
             console.error('Error inserting subjects:', error);
@@ -102,87 +103,111 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
     };
 
     return (
-        <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+        <Modal size="2xl" isOpen={isOpen} onClose={onClose}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">Insert New SubGroup</ModalHeader>
-                <ModalBody>
-                    <label htmlFor="semester">semester:</label>
-                    <input
-                        type="text"
-                        id="semester"
-                        value={semester}
-                        onChange={(e) => setSemester(e.target.value)}
-                    />
-                    <label htmlFor="subject_code">subject_code:</label>
-                    <input
-                        type="text"
-                        id="subject_code"
-                        value={subject_code}
-                        onChange={(e) => setSubjectCode(e.target.value)}
-                    />
-                    <label htmlFor="title_th">title_th:</label>
-                    <input
+                <ModalHeader className="flex flex-col gap-1">เพิ่มวิชา</ModalHeader>
+                <ModalBody className='grid grid-cols-2 gap-4'>
+                    <div>
+                        <label htmlFor="group">กลุ่มรายวิชา</label>
+                        <Select
+                            className='z-50'
+                            id="group"
+                            value={selectedGroup}
+                            options={groups}
+                            onChange={(selectedOption) => setSelectedGroup(selectedOption)}
+                            isSearchable
+                            isClearable
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="subgroup">กลุ่มย่อย</label>
+                        <Select
+                            className='z-50'
+                            id="subgroup"
+                            value={selectedSubGroup}
+                            options={subgroups}
+                            onChange={(selectedOption) => setSelectedSubGroup(selectedOption)}
+                            isSearchable
+                            isClearable
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="acadyear">Select Acadyear:</label>
+                        <Select
+                            className='z-40'
+                            id="acadyear"
+                            value={selectedAcadYear}
+                            options={acadyears}
+                            onChange={(selectedOption) => setSelectedAcadYear(selectedOption)}
+                            isSearchable
+                            isClearable
+                        />
+                    </div>
+
+                    <Input
+                        className='col-span-2'
                         type="text"
                         id="title_th"
+                        label="ชื่อภาษาไทย"
                         value={title_th}
                         onChange={(e) => setTitleTh(e.target.value)}
                     />
-                    <label htmlFor="title_en">title_en:</label>
-                    <input
+
+                    <Input
+                        className='col-span-2'
                         type="text"
                         id="title_en"
+                        label="ชื่อภาษาอังกฤษ"
                         value={title_en}
                         onChange={(e) => setTitleEn(e.target.value)}
                     />
-                    <label htmlFor="information">information:</label>
-                    <input
+                    <Input
                         type="text"
+                        id="semester"
+                        label="เทอม"
+                        value={semester}
+                        onChange={(e) => setSemester(e.target.value)}
+                    />
+
+                    <Input
+                        type="text"
+                        id="subject_code"
+                        label="รหัสวิชา"
+                        value={subject_code}
+                        onChange={(e) => setSubjectCode(e.target.value)}
+                    />
+
+
+                    <Textarea
                         id="information"
+                        label="รายละเอียด"
+                        variant="bordered"
+                        placeholder="เพิ่มรายละเอียด"
                         value={information}
+                        disableAnimation
+                        disableAutosize
+                        classNames={{
+                            base: "max-w-xs",
+                            input: "resize-y min-h-[40px]",
+                        }}
                         onChange={(e) => setInformation(e.target.value)}
                     />
-                    <label htmlFor="credit">credit:</label>
-                    <input
+
+                    <Input
                         type="text"
                         id="credit"
+                        label="หน่วยกิต"
                         value={credit}
                         onChange={(e) => setCredit(e.target.value)}
                     />
 
-                    <label htmlFor="group">Select Group:</label>
-                    <Select
-                        id="group"
-                        value={selectedGroup}
-                        options={groups}
-                        onChange={(selectedOption) => setSelectedGroup(selectedOption)}
-                        isSearchable
-                        isClearable
-                    />
-                    <label htmlFor="subgroup">Select SubGroup:</label>
-                    <Select
-                        id="subgroup"
-                        value={selectedSubGroup}
-                        options={subgroups}
-                        onChange={(selectedOption) => setSelectedSubGroup(selectedOption)}
-                        isSearchable
-                        isClearable
-                    />
-                    <label htmlFor="acadyear">Select Acadyear:</label>
-                    <Select
-                        id="acadyear"
-                        value={selectedAcadYear}
-                        options={acadyears}
-                        onChange={(selectedOption) => setSelectedAcadYear(selectedOption)}
-                        isSearchable
-                        isClearable
-                    />
                 </ModalBody>
                 <ModalFooter>
                     <Button color="danger" variant="light" onPress={onClose}>
-                        Close
+                        ยกเลิก
                     </Button>
                     <Button color="primary" onPress={handleInsertSubject}>
-                        Insert Subject
+                        บันทึก
                     </Button>
                 </ModalFooter>
             </ModalContent>

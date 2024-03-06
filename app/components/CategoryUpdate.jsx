@@ -4,6 +4,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
+import { Input } from "@nextui-org/react";
 
 export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }) {
   const [newTitle, setNewTitle] = useState('');
@@ -43,12 +44,12 @@ export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }
   return (
     <Modal size="sm" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">Update Category</ModalHeader>
+        <ModalHeader className="flex flex-col gap-1">แก้ไขหมวดหมู่วิชา</ModalHeader>
         <ModalBody>
-          <label htmlFor="newTitle">New Category Title:</label>
-          <input
+          <Input
             type="text"
             id="newTitle"
+            label="หมวดหมู่วิชา"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
           />
@@ -56,10 +57,10 @@ export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }
         </ModalBody>
         <ModalFooter>
           <Button color="danger" variant="light" onPress={onClose}>
-            Close
+            ยกเลิก
           </Button>
           <Button color="primary" onPress={handleUpdateCategory}>
-            Update Category
+            บันทึก
           </Button>
         </ModalFooter>
       </ModalContent>

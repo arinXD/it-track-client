@@ -357,7 +357,7 @@ export default function Subject() {
                                     onPress={handleInsertModalOpen}
                                     color="primary"
                                 >
-                                    Add Subject
+                                    เพิ่มวิชา
                                     <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
                                 </Button>
                                 <Button

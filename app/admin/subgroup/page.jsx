@@ -233,9 +233,9 @@ export default function SubGroup() {
                         aria-label="subgroup table">
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>
-                            <TableColumn>หมวดหมู่วิชา</TableColumn>
-                            <TableColumn>กลุ่มวิชา</TableColumn>
                             <TableColumn>กลุ่มย่อยวิชา</TableColumn>
+                            <TableColumn>กลุ่มวิชา</TableColumn>
+                            <TableColumn>หมวดหมู่วิชา</TableColumn>
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
                         </TableHeader>
@@ -257,9 +257,9 @@ export default function SubGroup() {
                                                 </Tooltip>
                                             </div>
                                         </TableCell>
-                                        <TableCell>{subgroup.category ? subgroup.category.category_title : 'ไม่มีหมวดหมู่วิชา'}</TableCell>
-                                        <TableCell>{subgroup.group ? subgroup.group.group_title : 'ไม่มีกลุ่มวิชา'}</TableCell>
                                         <TableCell>{subgroup.sub_group_title}</TableCell>
+                                        <TableCell>{subgroup.group ? subgroup.group.group_title : 'ไม่มีกลุ่มวิชา'}</TableCell>
+                                        <TableCell>{subgroup.category ? subgroup.category.category_title : 'ไม่มีหมวดหมู่วิชา'}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(subgroup[column]) : subgroup[column]}</span>

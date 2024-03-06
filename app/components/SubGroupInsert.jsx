@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import { hostname } from '@/app/api/hostname';
+import { Input } from "@nextui-org/react";
 
 export default function SubGroupInsert({ isOpen, onClose, onDataInserted }) {
     const [subGroupTitle, setSubGroupTitle] = useState('');
@@ -39,14 +40,14 @@ export default function SubGroupInsert({ isOpen, onClose, onDataInserted }) {
                 alert('Please select a subgroup.');
                 return;
             }
-    
+
             const result = await axios.post(`${hostname}/api/subgroups/insertSubGroup`, {
                 sub_group_title: subGroupTitle,
                 group_id: selectedGroup.value
             });
-    
+
             console.log('Inserted subgroup:', result.data.data);
-    
+
             onDataInserted();
         } catch (error) {
             console.error('Error inserting subgroup:', error);
@@ -57,31 +58,32 @@ export default function SubGroupInsert({ isOpen, onClose, onDataInserted }) {
     return (
         <Modal size="sm" isOpen={isOpen} onClose={onClose}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">Insert New SubGroup</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">เพิ่มกลุ่มย่อย</ModalHeader>
                 <ModalBody>
-                    <label htmlFor="subGroupTitle">SubGroup Title:</label>
-                    <input
-                        type="text"
-                        id="subGroupTitle"
-                        value={subGroupTitle}
-                        onChange={(e) => setSubGroupTitle(e.target.value)}
-                    />
-
-                    <label htmlFor="group">Select Group:</label>
+                    <label htmlFor="group">กลุ่มวิชา</label>
                     <Select
+                        className='z-50'
                         id="group"
                         value={selectedGroup}
                         options={groups}
                         onChange={(selectedOption) => setSelectedGroup(selectedOption)}
                         isSearchable
+                        isClearable
+                    />
+                    <Input
+                        type="text"
+                        id="subGroupTitle"
+                        label="กลุ่มย่อยวิชา"
+                        value={subGroupTitle}
+                        onChange={(e) => setSubGroupTitle(e.target.value)}
                     />
                 </ModalBody>
                 <ModalFooter>
                     <Button color="danger" variant="light" onPress={onClose}>
-                        Close
+                        ยกเลิก
                     </Button>
                     <Button color="primary" onPress={handleInsertSubGroup}>
-                        Insert SubGroup
+                        บันทึก
                     </Button>
                 </ModalFooter>
             </ModalContent>
