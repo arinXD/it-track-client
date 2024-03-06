@@ -3,6 +3,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from
 import { useState } from 'react';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
+import {Input} from "@nextui-org/react";
 
 export default function CategoryInsert({ isOpen, onClose, onDataInserted }) {
     const [categoryTitle, setCategoryTitle] = useState('');
@@ -28,22 +29,22 @@ export default function CategoryInsert({ isOpen, onClose, onDataInserted }) {
             <ModalContent>
                 {(onClose) => (
                     <>
-                        <ModalHeader className="flex flex-col gap-1">Insert New Category</ModalHeader>
+                        <ModalHeader className="flex flex-col gap-1">เพิ่มหมวดหมู่วิชา</ModalHeader>
                         <ModalBody>
-                            <label htmlFor="categoryTitle">Category Title:</label>
-                            <input
+                            <Input
                                 type="text"
                                 id="categoryTitle"
+                                label="หมวดหมู่วิชา"
                                 value={categoryTitle}
                                 onChange={(e) => setCategoryTitle(e.target.value)}
                             />
                         </ModalBody>
                         <ModalFooter>
                             <Button color="danger" variant="light" onPress={onClose}>
-                                Close
+                                ยกเลิก
                             </Button>
                             <Button color="primary" onPress={handleInsertCategory}>
-                                Insert Category
+                                บันทึก
                             </Button>
                         </ModalFooter>
                     </>

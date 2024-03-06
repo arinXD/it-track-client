@@ -14,7 +14,7 @@ export default function Card1() {
                 component="img"
                 alt="card1 image"
                 height="140"
-                image="https://scontent-bkk1-2.xx.fbcdn.net/v/t1.15752-9/419907790_1441293393089626_2574240965683627478_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=8cd0a2&_nc_eui2=AeFa6QjbDoQ8N0wB17Ha_gyYMFa0KfUF5OMwVrQp9QXk4zrtxMHB9NksKCL2Jpsz3ApiCLBQrN8ZSE2Gq85G_tf-&_nc_ohc=kdjFPHeay7YAX_TQbjy&_nc_ht=scontent-bkk1-2.xx&cb_e2o_trans=q&oh=03_AdTmOWM3FHfBLMt02XPoQ1TtCUJgFhGb7fODvkzro-I3PQ&oe=65CF9539"
+                image="https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg"
             />
             <CardContent>
                 <Typography gutterBottom variant="h5" component="div">

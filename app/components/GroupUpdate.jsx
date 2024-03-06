@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';  // Import the Select component
 import { hostname } from '@/app/api/hostname';
-
+import { Input } from "@nextui-org/react";
 export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
     const [newTitle, setNewTitle] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -64,31 +64,33 @@ export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
     return (
         <Modal size="sm" isOpen={isOpen} onClose={onClose}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">Update Group</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">แก้ไขกลุ่มรายวิชา</ModalHeader>
                 <ModalBody>
-                    <label htmlFor="newTitle">New Group Title:</label>
-                    <input
-                        type="text"
-                        id="newTitle"
-                        value={newTitle}
-                        onChange={(e) => setNewTitle(e.target.value)}
-                    />
-
-                    <label htmlFor="category">Select Category:</label>
+                    <label htmlFor="category">เลือกหมวดหมู๋รายวิชา</label>
                     <Select
+                        className="z-50"
                         id="category"
                         value={selectedCategory}
                         options={categories}
                         onChange={(selectedOption) => setSelectedCategory(selectedOption)}
                         isSearchable
+                        isClearable
                     />
+                    <Input
+                        type="text"
+                        id="newTitle"
+                        label="กลุ่มรายวิชา"
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                    />
+
                 </ModalBody>
                 <ModalFooter>
                     <Button color="danger" variant="light" onPress={onClose}>
-                        Close
+                        ยกเลิก
                     </Button>
                     <Button color="primary" onPress={handleUpdateGroup}>
-                        Update Group
+                        บันทึก
                     </Button>
                 </ModalFooter>
             </ModalContent>

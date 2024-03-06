@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import Select from 'react-select';
+import { Input } from "@nextui-org/react";
 
 export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
     const [groupTitle, setGroupTitle] = useState('');
@@ -55,31 +56,32 @@ export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
             <ModalContent>
                 {(onClose) => (
                     <>
-                        <ModalHeader className="flex flex-col gap-1">Insert New Group</ModalHeader>
+                        <ModalHeader className="flex flex-col gap-1">เพิ่มกลุ่มรายวิชา</ModalHeader>
                         <ModalBody>
-                            <label htmlFor="groupTitle">Group Title:</label>
-                            <input
-                                type="text"
-                                id="groupTitle"
-                                value={groupTitle}
-                                onChange={(e) => setGroupTitle(e.target.value)}
-                            />
-
-                            <label htmlFor="category">Select Category:</label>
+                            <label htmlFor="category">เลือกหมวดหมู๋รายวิชา</label>
                             <Select
+                                className="z-50"
                                 id="category"
                                 value={selectedCategory}
                                 options={categories.map(category => ({ value: category.id, label: category.category_title }))}
                                 onChange={(selectedOption) => setSelectedCategory(selectedOption)}
                                 isSearchable
+                                isClearable
+                            />
+                            <Input
+                                type="text"
+                                id="groupTitle"
+                                label="กลุ่มรายวิชา"
+                                value={groupTitle}
+                                onChange={(e) => setGroupTitle(e.target.value)}
                             />
                         </ModalBody>
                         <ModalFooter>
                             <Button color="danger" variant="light" onPress={onClose}>
-                                Close
+                                ยกเลิก
                             </Button>
                             <Button color="primary" onPress={handleInsertGroup}>
-                                Insert Group
+                                บันทึก
                             </Button>
                         </ModalFooter>
                     </>
