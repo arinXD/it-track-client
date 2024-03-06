@@ -33,10 +33,10 @@ const columns = [{
     uid: "coursesType",
     sortable: true
 },
-{
-    name: "แทรคที่ได้",
-    uid: "result"
-},
+// {
+//     name: "แทรคที่ได้",
+//     uid: "result"
+// },
 {
     name: "เลือกลำดับ 1",
     uid: "track_order_1",
@@ -97,7 +97,7 @@ const StudentTrackTable = ({ studentData, track }) => {
                     stuId: student.stu_id,
                     fullName: `${student?.Student?.first_name} ${student?.Student?.last_name}`,
                     coursesType: student?.Student?.courses_type,
-                    result: student.result ? student.result : "รอการคัดเลือก",
+                    // result: student.result ? student.result : "รอการคัดเลือก",
                     track_order_1: displayNull(student.track_order_1),
                     track_order_2: displayNull(student.track_order_2),
                     track_order_3: displayNull(student.track_order_3),
