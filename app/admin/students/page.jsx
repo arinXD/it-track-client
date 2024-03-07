@@ -1,73 +1,93 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, } from "@nextui-org/react";
 import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon } from "@/app/components/icons";
-import { columns, users } from "./data";
+import { columns, students, statusOptions, columns2 } from "./data";
 import { capitalize } from "./utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
-import axios from "axios";
+import { fetchData } from '../action'
+import { getLastTenYear } from "@/src/util/academicYear";
 
 const statusColorMap = {
     active: "success",
     paused: "danger",
     vacation: "warning",
 };
-const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"];
 
 const Page = () => {
     async function getStudentStatuses() {
-        const res = await axios.get("http://localhost:4000/api/students/statuses")
-        const statuses = res.data.data
+        const filterStatus = [10, 50, 62]
+        let statuses = await fetchData("/api/students/statuses")
+        statuses = statuses.filter(e => filterStatus.includes(e.id))
         setStatusOptions(statuses)
     }
-    async function getStudents(program, acadyear) {
-        const res = await axios.get(`http://localhost:4000/api/students/programs/${program}/acadyear/${acadyear}`)
-        const statuses = res.data.data
-        setStatusOptions(statuses)
+    async function getStudents(program = "IT", acadyear = 2564) {
+        let students = await fetchData(`/api/students/programs/${program}/acadyear/${acadyear}`)
+        console.log(students[0]);
+        students.sort((a, b) => {
+            const order = {
+                "โครงการปกติ": 1,
+                "โครงการพิเศษ": 2
+            };
+            return order[a.courses_type] - order[b.courses_type];
+        });
+
+        setStudents(students);
+    }
+    async function getPrograms() {
+        const programs = await fetchData(`/api/programs`)
+        setPrograms(programs)
     }
 
     useEffect(() => {
         getStudentStatuses()
+        getStudents()
+        getPrograms()
     }, [])
 
+    const acadyears = getLastTenYear()
     const [selectProgram, setSelectProgram] = useState(null)
-    const [selectAcadYear, setSelectAcadYear] = useState(null)
+    const [selectAcadYear, setSelectAcadYear] = useState(acadyears[0])
     const [students, setStudents] = useState([])
+    const [programs, setPrograms] = useState([])
 
     const [statusOptions, setStatusOptions] = useState([])
     const [filterValue, setFilterValue] = useState("");
     const [selectedKeys, setSelectedKeys] = useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = useState("all");
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(50);
     const [sortDescriptor, setSortDescriptor] = useState({
-        column: "age",
+        column: "id",
         direction: "ascending",
     });
     const [page, setPage] = useState(1);
     const hasSearchFilter = Boolean(filterValue);
     const headerColumns = useMemo(() => {
-        if (visibleColumns === "all") return columns;
+        if (visibleColumns === "all") return columns2;
 
-        return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
+        return columns2.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
     const filteredItems = useMemo(() => {
-        let filteredUsers = [...users];
+        let filteredUsers = [...students];
 
         if (hasSearchFilter) {
-            filteredUsers = filteredUsers.filter((user) =>
-                user.name.toLowerCase().includes(filterValue.toLowerCase()),
+            filteredUsers = filteredUsers.filter((stu) =>
+                stu.first_name.toLowerCase().includes(filterValue.toLowerCase()) ||
+                stu.last_name.toLowerCase().includes(filterValue.toLowerCase()) ||
+                stu.stu_id.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
         if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-            filteredUsers = filteredUsers.filter((user) =>
-                Array.from(statusFilter).includes(user.status),
+            filteredUsers = filteredUsers.filter((stu) =>
+                Array.from(statusFilter).includes(String(stu.status_code)),
             );
         }
 
         return filteredUsers;
-    }, [users, filterValue, statusFilter]);
+    }, [students, filterValue, statusFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -88,33 +108,34 @@ const Page = () => {
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = useCallback((user, columnKey) => {
-        const cellValue = user[columnKey];
+    const renderCell = useCallback((stu, columnKey) => {
+        const cellValue = stu[columnKey];
 
         switch (columnKey) {
-            case "name":
+            case "stu_id":
                 return (
-                    <User
-                        avatarProps={{ radius: "lg", src: user.avatar }}
-                        description={user.email}
-                        name={cellValue}
-                    >
-                        {user.email}
-                    </User>
-                );
-            case "role":
-                return (
-                    <div className="flex flex-col">
-                        <p className="text-bold text-small capitalize">{cellValue}</p>
-                        <p className="text-bold text-tiny capitalize text-default-400">{user.team}</p>
+                    <div className="my-3">
+                        <User
+                            avatarProps={{ src: stu?.User?.image || "/image/user.png" }}
+                            description={(
+                                <Link className="ms-2" href={`https://mail.google.com/mail/?view=cm&fs=1&to=${stu.email}&authuser=1`} size="sm" isExternal>
+                                    {stu.email}
+                                </Link>
+                            )
+                            }
+                            name={(<p className="ms-2">{cellValue}</p>)}
+                        />
                     </div>
                 );
-            case "status":
+            case "fullName":
                 return (
-                    <Chip className="capitalize" color={statusColorMap[user.status]} size="sm" variant="flat">
-                        {cellValue}
-                    </Chip>
+                    <div className="flex flex-row gap-2">
+                        <p className="text-bold text-small capitalize">{stu.first_name}</p>
+                        <p className="text-bold text-small capitalize">{stu.last_name}</p>
+                    </div>
                 );
+            case "status_code":
+                return stu?.StudentStatus?.description
             case "actions":
                 return (
                     <div className="relative flex justify-end items-center gap-2">
@@ -133,7 +154,7 @@ const Page = () => {
                     </div>
                 );
             default:
-                return cellValue;
+                return cellValue
         }
     }, []);
 
@@ -198,8 +219,8 @@ const Page = () => {
                                 onSelectionChange={setStatusFilter}
                             >
                                 {statusOptions.map((status) => (
-                                    <DropdownItem key={status.uid} className="capitalize">
-                                        {capitalize(status.name)}
+                                    <DropdownItem key={status.id} className="capitalize">
+                                        {status.id} {status.description}
                                     </DropdownItem>
                                 ))}
                             </DropdownMenu>
@@ -218,7 +239,7 @@ const Page = () => {
                                 selectionMode="multiple"
                                 onSelectionChange={setVisibleColumns}
                             >
-                                {columns.map((column) => (
+                                {columns2.map((column) => (
                                     <DropdownItem key={column.uid} className="capitalize">
                                         {capitalize(column.name)}
                                     </DropdownItem>
@@ -231,16 +252,17 @@ const Page = () => {
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small">Total {users.length} users</span>
+                    <span className="text-default-400 text-small">Total {students.length} students</span>
                     <label className="flex items-center text-default-400 text-small">
                         Rows per page:
                         <select
                             className="bg-transparent outline-none text-default-400 text-small"
                             onChange={onRowsPerPageChange}
                         >
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="150">150</option>
+                            <option value={students?.length}>ทั้งหมด</option>
                         </select>
                     </label>
                 </div>
@@ -251,7 +273,7 @@ const Page = () => {
         statusFilter,
         visibleColumns,
         onRowsPerPageChange,
-        users.length,
+        students.length,
         onSearchChange,
         hasSearchFilter,
     ]);
@@ -284,6 +306,25 @@ const Page = () => {
             </div>
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+
+    const classNames = useMemo(
+        () => ({
+            th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
+            td: [
+                // changing the rows border radius
+                // first
+                "group-data-[first=true]:first:before:rounded-none",
+                "group-data-[first=true]:last:before:rounded-none",
+                // middle
+                "group-data-[middle=true]:before:rounded-none",
+                // last
+                "group-data-[last=true]:first:before:rounded-none",
+                "group-data-[last=true]:last:before:rounded-none",
+                "mb-4",
+            ],
+        }),
+        [],
+    );
     return (
         <>
             <header>
@@ -293,21 +334,56 @@ const Page = () => {
             <ContentWrap>
                 <BreadCrumb />
                 <div>
+                    <div className="flex gap-3 items-center mb-4">
+                        <select onInput={() => setSelectProgram(event.target.value)} defaultValue="" id="" className="px-2 pe-3 py-1 border-1 rounded-lg">
+                            <option value="" disabled hidden>หลักสูตร</option>
+                            {programs?.length && programs.map((program) => (
+                                <option key={program.program} value={program.program}>
+                                    {program.title_th} {program.program}
+                                </option>
+                            ))}
+                        </select>
+                        <select onInput={() => setSelectAcadYear(event.target.value)} defaultValue="" id="" className="px-2 pe-3 py-1 border-1 rounded-lg">
+                            <option value="" disabled hidden>ปีการศึกษา</option>
+                            {acadyears.map((acadyear) => (
+                                <option key={acadyear} value={acadyear}>
+                                    {acadyear}
+                                </option>
+                            ))}
+                        </select>
+                        <Button
+                            onClick={() => getStudents(selectProgram, selectAcadYear)}
+                            radius="lg"
+                            size="md"
+                            variant="solid"
+                            className="bg-gray-200"
+                            startContent={<SearchIcon />}
+                        >
+                            ค้นหา
+                        </Button>
+                    </div>
                     <Table
                         aria-label="Student Table"
-                        isHeaderSticky
+                        checkboxesProps={{
+                            classNames: {
+                                wrapper: "after:bg-blue-500 after:text-background text-background",
+                            },
+                        }}
+                        classNames={classNames}
+
                         bottomContent={bottomContent}
                         bottomContentPlacement="outside"
-                        classNames={{
-                            wrapper: "max-h-[382px]",
-                        }}
-                        selectedKeys={selectedKeys}
-                        selectionMode="multiple"
-                        sortDescriptor={sortDescriptor}
+
                         topContent={topContent}
                         topContentPlacement="outside"
+
+                        isCompact
+                        removeWrapper
+                        selectionMode="multiple"
+                        sortDescriptor={sortDescriptor}
                         onSelectionChange={setSelectedKeys}
                         onSortChange={setSortDescriptor}
+                        selectedKeys={selectedKeys}
                     >
                         <TableHeader columns={headerColumns}>
                             {(column) => (
@@ -320,7 +396,7 @@ const Page = () => {
                                 </TableColumn>
                             )}
                         </TableHeader>
-                        <TableBody emptyContent={"No users found"} items={sortedItems}>
+                        <TableBody emptyContent={"No students found"} items={sortedItems}>
                             {(item) => (
                                 <TableRow key={item.id}>
                                     {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
