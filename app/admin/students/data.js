@@ -1,4 +1,4 @@
-const columns = [{
+const columns2 = [{
         name: "ID",
         uid: "id",
         sortable: true
@@ -6,11 +6,6 @@ const columns = [{
     {
         name: "รหัสนักศึกษา",
         uid: "stu_id",
-        sortable: true
-    },
-    {
-        name: "อีเมล",
-        uid: "email",
         sortable: true
     },
     {
@@ -35,6 +30,57 @@ const columns = [{
         name: "สถานะภาพ",
         uid: "status_code",
         sortable: true
+    },
+    {
+        name: "ACTIONS",
+        uid: "actions"
+    },
+];
+{/* <div className="flex flex-row gap-3 items-center my-3">
+                        <Avatar src={stu?.User?.image || "/image/user.png"} size="sm" />
+                        <div className="flex flex-col">
+                            <p className="text-base">{cellValue}</p>
+                            <Link href={`https://mail.google.com/mail/?view=cm&fs=1&to=${stu.email}&authuser=1`} size="sm" isExternal>
+                                {stu.email}
+                            </Link>
+                        </div>
+                    </div> */}
+const columns = [{
+        name: "ID",
+        uid: "id",
+        sortable: true
+    },
+    {
+        name: "NAME",
+        uid: "name",
+        sortable: true
+    },
+    {
+        name: "AGE",
+        uid: "age",
+        sortable: true
+    },
+    {
+        name: "ROLE",
+        uid: "role",
+        sortable: true
+    },
+    {
+        name: "TEAM",
+        uid: "team"
+    },
+    {
+        name: "EMAIL",
+        uid: "email"
+    },
+    {
+        name: "STATUS",
+        uid: "status",
+        sortable: true
+    },
+    {
+        name: "ACTIONS",
+        uid: "actions"
     },
 ];
 
@@ -257,5 +303,6 @@ const users = [{
 export {
     columns,
     users,
-    statusOptions
+    statusOptions,
+    columns2
 };
