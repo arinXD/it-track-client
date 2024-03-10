@@ -2,19 +2,50 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, } from "@nextui-org/react";
 import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon } from "@/app/components/icons";
-import { columns, students, statusOptions, columns2 } from "./data";
 import { capitalize } from "./utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from '../action'
 import { getLastTenYear } from "@/src/util/academicYear";
 
-const statusColorMap = {
-    active: "success",
-    paused: "danger",
-    vacation: "warning",
-};
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"];
-
+const columns2 = [{
+    name: "ID",
+    uid: "id",
+    sortable: true
+},
+{
+    name: "รหัสนักศึกษา",
+    uid: "stu_id",
+    sortable: true
+},
+{
+    name: "ชื่อ-สกุล",
+    uid: "fullName",
+    sortable: true
+},
+{
+    name: "โครงการ",
+    uid: "courses_type",
+    sortable: true
+},
+{
+    name: "หลักสูตร",
+    uid: "program"
+},
+{
+    name: "ปีการศึกษา",
+    uid: "acadyear",
+},
+{
+    name: "สถานะภาพ",
+    uid: "status_code",
+    sortable: true
+},
+{
+    name: "ACTIONS",
+    uid: "actions"
+},
+];
 const Page = () => {
     async function getStudentStatuses() {
         const filterStatus = [10, 50, 62]
@@ -146,7 +177,9 @@ const Page = () => {
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
-                                <DropdownItem>View</DropdownItem>
+                                <DropdownItem href={`/admin/students/${stu?.stu_id}`}>
+                                    View
+                                </DropdownItem>
                                 <DropdownItem>Edit</DropdownItem>
                                 <DropdownItem>Delete</DropdownItem>
                             </DropdownMenu>
@@ -396,7 +429,7 @@ const Page = () => {
                                 </TableColumn>
                             )}
                         </TableHeader>
-                        <TableBody emptyContent={"No students found"} items={sortedItems}>
+                        <TableBody emptyContent={"ไม่มีข้อมูลนักศึกษา"} items={sortedItems}>
                             {(item) => (
                                 <TableRow key={item.id}>
                                     {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

@@ -29,37 +29,57 @@ const shortMonths = {
 }
 
 function dmy(dateString) {
-    if (!dateString) return ""
-    let [date, time] = dateString.split("T")
-    let [y, m, d] = date.split("-")
-    const result = `${d} ${months[m]} ${y}`
+    let result
+    try {
+        if (!dateString) return ""
+        let [date, time] = dateString.split("T")
+        let [y, m, d] = date.split("-")
+        result = `${d} ${months[m]} ${parseInt(y)+543}`
+    } catch (err) {
+        result = ""
+    }
     return result
 }
 
 function dmyt(dateString) {
-    if (!dateString) return ""
-    let [date, time] = dateString.split("T")
-    let [y, m, d] = date.split("-")
-    let [h, min, s] = time.split(".")[0].split(":")
-    const result = `${d} ${months[m]} ${y} ${h}:${min} น.`
+    let result
+    try {
+        if (!dateString) return ""
+        let [date, time] = dateString.split("T")
+        let [y, m, d] = date.split("-")
+        let [h, min, s] = time.split(".")[0].split(":")
+        result = `${d} ${months[m]} ${parseInt(y)+543} ${h}:${min} น.`
+    } catch (err) {
+        result = ""
+    }
     return result
 }
 
 function dMy(dateString) {
-    if (!dateString) return ""
-    let [date, time] = dateString.split("T")
-    let [y, m, d] = `${date}`.split("-")
-    const result = `${d} ${shortMonths[m]} ${y}`
+    let result
+    try {
+        if (!dateString) return ""
+        let [date, time] = dateString.split("T")
+        let [y, m, d] = `${date}`.split("-")
+        result = `${d} ${shortMonths[m]} ${y}`
+    } catch (err) {
+        result = ""
+    }
 
     return result
 }
 
 function dMyt(dateString) {
-    if (!dateString) return ""
-    let [date, time] = dateString.split("T")
-    let [y, m, d] = date.split("-")
-    let [h, min, s] = time.split(".")[0].split(":")
-    const result = `${d} ${shortMonths[m]} ${y} ${h}:${min} น.`
+    let result
+    try {
+        if (!dateString) return ""
+        let [date, time] = dateString.split("T")
+        let [y, m, d] = date.split("-")
+        let [h, min, s] = time.split(".")[0].split(":")
+        const result = `${d} ${shortMonths[m]} ${y} ${h}:${min} น.`
+    } catch (err) {
+        result = ""
+    }
     return result
 }
 
