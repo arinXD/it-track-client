@@ -26,7 +26,7 @@ const Page = async () => {
     const session = await getServerSession()
     const rootData = await getData()
     // console.log(rootData);
-    console.log("Home page session: ", session);
+    // console.log("Home page session: ", session);
     return (
         <>
             <header>

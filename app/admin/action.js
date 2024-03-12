@@ -33,7 +33,7 @@ export async function fetchDataObj(url) {
                 'authorization': `${token}`,
             },
         })
-        const data = res.data?.data
+        const data = res.data?.data || {}
         return data;
     } catch (error) {
         console.error(error);

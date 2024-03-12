@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useSession } from "next-auth/react"
 import { RiSettings5Fill } from "react-icons/ri";
 import { MdOutlineLogout } from "react-icons/md";
-import { Button } from "@nextui-org/react";
+import { Button, Skeleton } from "@nextui-org/react";
 import { usePathname } from 'next/navigation';
 import { HiOutlineBars3, HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoQuestion, GoHome, GoHomeFill } from "react-icons/go";
@@ -165,9 +165,7 @@ const Navbar = () => {
                                 </div>
                                 :
                                 <div className='relative hidden sm:flex justify-center items-center gap-2'>
-                                    <div className='w-[40px] h-[40px] border-1 rounded-full bg-gray-200'>
-
-                                    </div>
+                                    <Skeleton className="w-[40px] h-[40px] rounded-full" />
                                 </div>
 
                             }

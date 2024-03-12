@@ -1,18 +1,29 @@
-"use client"
+import { Inter } from 'next/font/google'
+import { getServerSession } from 'next-auth'
 import './globals.css'
-import AuthProvider from './components/Authprovider'
-import { NextUIProvider } from "@nextui-org/react";
+import { AuthProvider } from './components'
 
-export default function RootLayout({ children }) {
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata = {
+    title: 'IT Track',
+    description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
+}
+export default async function RootLayout({ children }) {
+    const session = await getServerSession()
     return (
         <html>
-            <body suppressHydrationWarning={true}>
+            <head>
+                <link rel="icon" href="/logo.png" sizes="any" />
+            </head>
+            <body
+                className={inter.className}
+                suppressHydrationWarning={true}
+            >
                 <main>
-                    <NextUIProvider>
-                        <AuthProvider>
-                            {children}
-                        </AuthProvider>
-                    </NextUIProvider>
+                    <AuthProvider session={session}>
+                        {children}
+                    </AuthProvider>
                 </main>
             </body>
         </html>

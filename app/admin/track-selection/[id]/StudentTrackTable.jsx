@@ -295,10 +295,13 @@ const StudentTrackTable = ({ studentData, track }) => {
                     aria-label={`Student Track Table`}
                     isStriped
                     removeWrapper
+
                     topContent={topContent}
                     topContentPlacement="outside"
+
                     bottomContent={bottomContent}
                     bottomContentPlacement="outside"
+                    
                     selectionMode="multiple"
                     classNames={{
                         wrapper: "max-h-[382px]",
