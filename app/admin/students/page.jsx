@@ -122,6 +122,8 @@ const Page = () => {
     const [students, setStudents] = useState([])
     const [programs, setPrograms] = useState([])
     const [delStdId, setDelStdId] = useState(null)
+    const [enableSelectDelete, setEnableSelectDelete] = useState(false)
+    const [selectedStudents, setSelectedStudents] = useState([])
 
     const [statusOptions, setStatusOptions] = useState([])
     const [filterValue, setFilterValue] = useState("");
@@ -341,7 +343,8 @@ const Page = () => {
                         </Button>
                         <Button
                             radius="sm"
-                            onPress={() => { }}
+                            disabled={enableSelectDelete}
+                            onPress={handleSelectDelete}
                             color="danger"
                             endContent={<DeleteIcon2 width={16} height={16} />}>
                             ลบรายการที่เลือก
@@ -433,8 +436,24 @@ const Page = () => {
 
     // Multiple deleted
     useEffect(() => {
-        console.log(selectedKeys);
+        let students
+        if (selectedKeys == "all") {
+            students = sortedItems.map(e => e.stu_id)
+        } else {
+            students = [...selectedKeys.values()];
+            if (students.length === 0) {
+                setEnableSelectDelete(false)
+            }
+            setEnableSelectDelete(true)
+        }
+        console.log(students);
+        setSelectedStudents(students)
+        console.log(selectedStudents);
     }, [selectedKeys])
+
+    function handleSelectDelete() {
+        console.log(selectedStudents);
+    }
 
     function openDeleteModal(stuId) {
         setDelStdId(stuId)

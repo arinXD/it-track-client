@@ -76,7 +76,7 @@ function dMyt(dateString) {
         let [date, time] = dateString.split("T")
         let [y, m, d] = date.split("-")
         let [h, min, s] = time.split(".")[0].split(":")
-        const result = `${d} ${shortMonths[m]} ${y} ${h}:${min} น.`
+        result = `${d} ${shortMonths[m]} ${y} ${h}:${min} น.`
     } catch (err) {
         result = ""
     }
