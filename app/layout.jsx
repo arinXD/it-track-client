@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata = {
     title: 'IT Track',
     description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
+    icons: {
+        icon: '/logo.png',
+      },
 }
 export default async function RootLayout({ children }) {
     const session = await getServerSession()
