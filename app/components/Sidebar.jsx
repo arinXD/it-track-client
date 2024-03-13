@@ -1,12 +1,10 @@
 'use client';
-import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoHome, GoHomeFill } from "react-icons/go";
 import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
 import { useSession } from "next-auth/react"
-import { ChartPie, ChartPieBold } from './icons';
 import { Icon } from '@iconify/react';
 
 const Sidebar = () => {

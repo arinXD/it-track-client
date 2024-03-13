@@ -58,11 +58,6 @@ const columns = [{
     sortable: true
 },
 ];
-const statusColorMap = {
-    active: "success",
-    paused: "danger",
-    vacation: "warning",
-};
 const INITIAL_VISIBLE_COLUMNS = columns.map(column => column.uid);
 
 const StudentTrackTable = ({ studentData, track }) => {
@@ -71,7 +66,7 @@ const StudentTrackTable = ({ studentData, track }) => {
     const [selectedKeys, setSelectedKeys] = useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = useState("all");
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortDescriptor, setSortDescriptor] = useState({
         column: "no",
         direction: "ascending",
@@ -214,10 +209,11 @@ const StudentTrackTable = ({ studentData, track }) => {
                             className="border border-gray-500 rounded-md outline-none ms-3 px-1 text-default-400 text-small"
                             onChange={onRowsPerPageChange}
                         >
-                            <option value="5">5</option>
                             <option value="10">10</option>
-                            <option value="15">15</option>
                             <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
                         </select>
                     </label>
                 </div>

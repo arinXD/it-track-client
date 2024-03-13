@@ -5,7 +5,7 @@ import { Button, Modal, ModalContent, ModalFooter, ModalHeader } from '@nextui-o
 import axios from 'axios'
 import React, { useState } from 'react'
 
-const DeleteModal = ({ showToastMessage, getStudents, delIsOpen, delOnClose, stuId }) => {
+const DeleteSelectModal = ({ setDisableSelectDelete, setSelectedStudents, showToastMessage, getStudents, delIsOpen, delOnClose, stuIdList }) => {
     const [deleting, setDeleting] = useState(false)
 
     async function handleDelete() {
@@ -13,19 +13,24 @@ const DeleteModal = ({ showToastMessage, getStudents, delIsOpen, delOnClose, stu
         try {
             const token = await getToken()
             const options = {
-                url: `${hostname}/api/students/${stuId}`,
+                url: `${hostname}/api/students/multiple/delete`,
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
                     'authorization': `${token}`,
                     'Content-Type': 'application/json;charset=UTF-8',
                 },
+                data: {
+                    students: stuIdList
+                }
             };
 
             const res = await axios(options)
             const { ok, message } = res.data
             await getStudents()
             await showToastMessage(ok, message)
+            setSelectedStudents([])
+            setDisableSelectDelete(true)
             delOnClose()
         } catch (error) {
             console.log(error);
@@ -50,7 +55,7 @@ const DeleteModal = ({ showToastMessage, getStudents, delIsOpen, delOnClose, stu
                         <>
                             <ModalHeader className="flex flex-col gap-1">
                                 <h2>ลบรายชื่อนักศึกษา</h2>
-                                <span className='text-base font-normal'>ต้องการลบรายชื่อนักศึกษา รหัส {stuId} หรือไม่ ?</span>
+                                <span className='text-base font-normal'>ต้องการลบรายการที่เลือกหรือไม่ ?</span>
                             </ModalHeader>
                             <ModalFooter>
                                 <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={delOnClose}>
@@ -76,4 +81,4 @@ const DeleteModal = ({ showToastMessage, getStudents, delIsOpen, delOnClose, stu
     )
 }
 
-export default DeleteModal
+export default DeleteSelectModal

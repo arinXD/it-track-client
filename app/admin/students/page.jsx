@@ -12,9 +12,11 @@ import DeleteModal from "./DeleteModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TbRestore } from "react-icons/tb";
+import DeleteSelectModal from "./DeleteSelectModal";
+import { tableClass } from "@/src/util/tableClass";
 
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"];
-const columns2 = [{
+const columns = [{
     name: "ID",
     uid: "id",
     sortable: true
@@ -78,9 +80,13 @@ function showToastMessage(ok, message) {
     }
 };
 const Page = () => {
+
+    // Modal state
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: delIsOpen, onOpen: delOnOpen, onClose: delOnClose } = useDisclosure();
+    const { isOpen: delsIsOpen, onOpen: delsOnOpen, onClose: delsOnClose } = useDisclosure();
 
+    // Fetching data
     async function getStudentStatuses() {
         const filterStatus = [10, 50, 62]
         let statuses = await fetchData("/api/statuses")
@@ -115,6 +121,7 @@ const Page = () => {
         init()
     }, [])
 
+    // State
     const [fetching, setFetching] = useState(true)
     const acadyears = getLastTenYear()
     const [selectProgram, setSelectProgram] = useState(null)
@@ -122,7 +129,7 @@ const Page = () => {
     const [students, setStudents] = useState([])
     const [programs, setPrograms] = useState([])
     const [delStdId, setDelStdId] = useState(null)
-    const [enableSelectDelete, setEnableSelectDelete] = useState(false)
+    const [disableSelectDelete, setDisableSelectDelete] = useState(false)
     const [selectedStudents, setSelectedStudents] = useState([])
 
     const [statusOptions, setStatusOptions] = useState([])
@@ -137,12 +144,15 @@ const Page = () => {
     });
     const [page, setPage] = useState(1);
     const hasSearchFilter = Boolean(filterValue);
-    const headerColumns = useMemo(() => {
-        if (visibleColumns === "all") return columns2;
 
-        return columns2.filter((column) => Array.from(visibleColumns).includes(column.uid));
+    // Init column
+    const headerColumns = useMemo(() => {
+        if (visibleColumns === "all") return columns;
+
+        return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
+    // Filtering handle
     const filteredItems = useMemo(() => {
         let filteredUsers = [...students];
 
@@ -163,6 +173,7 @@ const Page = () => {
         return filteredUsers;
     }, [students, filterValue, statusFilter]);
 
+    // Paging
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
     const items = useMemo(() => {
@@ -172,6 +183,7 @@ const Page = () => {
         return filteredItems.slice(start, end);
     }, [page, filteredItems, rowsPerPage]);
 
+    // Sorting data
     const sortedItems = useMemo(() => {
         return [...items].sort((a, b) => {
             const first = a[sortDescriptor.column];
@@ -182,6 +194,7 @@ const Page = () => {
         });
     }, [sortDescriptor, items]);
 
+    // Display table body
     const renderCell = useCallback((stu, columnKey) => {
         const cellValue = stu[columnKey];
 
@@ -212,7 +225,7 @@ const Page = () => {
                 return stu?.StudentStatus?.description
             case "actions":
                 return (
-                    <div className="relative flex justify-end items-center gap-2">
+                    <div className="relative flex justify-center items-center gap-2">
                         <Dropdown>
                             <DropdownTrigger>
                                 <Button isIconOnly size="sm" variant="light">
@@ -246,6 +259,7 @@ const Page = () => {
         }
     }, []);
 
+    // Pagination handle
     const onNextPage = useCallback(() => {
         if (page < pages) {
             setPage(page + 1);
@@ -263,6 +277,7 @@ const Page = () => {
         setPage(1);
     }, []);
 
+    // Searching handle
     const onSearchChange = useCallback((value) => {
         if (value) {
             setFilterValue(value);
@@ -327,7 +342,7 @@ const Page = () => {
                                 selectionMode="multiple"
                                 onSelectionChange={setVisibleColumns}
                             >
-                                {columns2.map((column) => (
+                                {columns.map((column) => (
                                     <DropdownItem key={column.uid} className="capitalize">
                                         {capitalize(column.name)}
                                     </DropdownItem>
@@ -343,7 +358,7 @@ const Page = () => {
                         </Button>
                         <Button
                             radius="sm"
-                            disabled={enableSelectDelete}
+                            isDisabled={disableSelectDelete}
                             onPress={handleSelectDelete}
                             color="danger"
                             endContent={<DeleteIcon2 width={16} height={16} />}>
@@ -354,16 +369,16 @@ const Page = () => {
                             onPress={() => { }}
                             color="default"
                             endContent={<TbRestore className="w-[18px] h-[18px]" />}>
-                            กู้คืนรายการที่ลบ
+                            รายการที่ถูกลบ
                         </Button>
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small">นักศึกาาทั้งหมด {students.length} คน</span>
+                    <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
                     <label className="flex items-center text-default-400 text-small">
                         Rows per page:
                         <select
-                            className="bg-transparent outline-none text-default-400 text-small"
+                            className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
                             onChange={onRowsPerPageChange}
                         >
                             <option value="50">50</option>
@@ -384,6 +399,7 @@ const Page = () => {
         onSearchChange,
         hasSearchFilter,
         fetching,
+        selectedStudents
     ]);
 
     const bottomContent = useMemo(() => {
@@ -415,44 +431,25 @@ const Page = () => {
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
-    const classNames = useMemo(
-        () => ({
-            th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
-            td: [
-                // changing the rows border radius
-                // first
-                "group-data-[first=true]:first:before:rounded-none",
-                "group-data-[first=true]:last:before:rounded-none",
-                // middle
-                "group-data-[middle=true]:before:rounded-none",
-                // last
-                "group-data-[last=true]:first:before:rounded-none",
-                "group-data-[last=true]:last:before:rounded-none",
-                "mb-4",
-            ],
-        }),
-        [],
-    );
-
     // Multiple deleted
     useEffect(() => {
         let students
         if (selectedKeys == "all") {
-            students = sortedItems.map(e => e.stu_id)
+            students = sortedItems.map(e => parseInt(e.stu_id))
         } else {
-            students = [...selectedKeys.values()];
+            students = [...selectedKeys.values()].map(id => parseInt(id))
             if (students.length === 0) {
-                setEnableSelectDelete(false)
+                setDisableSelectDelete(true)
+            } else {
+                setDisableSelectDelete(false)
             }
-            setEnableSelectDelete(true)
         }
-        console.log(students);
         setSelectedStudents(students)
-        console.log(selectedStudents);
+        console.log(disableSelectDelete);
     }, [selectedKeys])
 
     function handleSelectDelete() {
-        console.log(selectedStudents);
+        delsOnOpen()
     }
 
     function openDeleteModal(stuId) {
@@ -525,7 +522,7 @@ const Page = () => {
                                         wrapper: "after:bg-blue-500 after:text-background text-background",
                                     },
                                 }}
-                                classNames={classNames}
+                                classNames={tableClass}
 
                                 bottomContent={bottomContent}
                                 bottomContentPlacement="outside"
@@ -565,8 +562,26 @@ const Page = () => {
                 </div>
             </ContentWrap>
 
-            <InsertModal showToastMessage={showToastMessage} getStudents={getStudents} programs={programs} isOpen={isOpen} onClose={onClose} />
-            <DeleteModal showToastMessage={showToastMessage} getStudents={getStudents} delIsOpen={delIsOpen} delOnClose={delOnClose} stuId={delStdId} />
+            <InsertModal
+                showToastMessage={showToastMessage}
+                getStudents={getStudents}
+                programs={programs}
+                isOpen={isOpen}
+                onClose={onClose} />
+            <DeleteModal
+                showToastMessage={showToastMessage}
+                getStudents={getStudents}
+                delIsOpen={delIsOpen}
+                delOnClose={delOnClose}
+                stuId={delStdId} />
+            <DeleteSelectModal
+                setDisableSelectDelete={setDisableSelectDelete}
+                setSelectedStudents={setSelectedStudents}
+                showToastMessage={showToastMessage}
+                getStudents={getStudents}
+                delIsOpen={delsIsOpen}
+                delOnClose={delsOnClose}
+                stuIdList={selectedStudents} />
         </>
     )
 }
