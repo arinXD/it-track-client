@@ -19,6 +19,9 @@ import {
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { TbRestore } from "react-icons/tb";
+
+import Link from 'next/link';
 
 export default function ProgramCode() {
     const [isInsertModalOpen, setInsertModalOpen] = useState(false);
@@ -140,7 +143,7 @@ export default function ProgramCode() {
             try {
                 const result = await axios.delete(`${hostname}/api/programcodes/deleteProgramCode/${programCodeId.program_code}`);
                 const { ok, message } = result.data
-                showToastMessage(ok, `ลบรหัสหลักสูตร ${programCodeId.program_code} สำเร็จ`)
+                showToastMessage(true, `ลบรหัสหลักสูตร ${programCodeId.program_code} สำเร็จ`)
 
                 const data = await fetchData();
                 setProgramCodes(data);
@@ -152,16 +155,18 @@ export default function ProgramCode() {
     };
     const filteredProgramcode = programCodes.filter(programcode => {
         const queryLowerCase = searchQuery.toLowerCase();
-    
+
         return (
             (programcode.program.title_th && programcode.program.title_th.toLowerCase().includes(queryLowerCase)) ||
-            (programcode.program_code && programcode.program_code.toString().toLowerCase().includes(queryLowerCase)) ||
+            (programcode.program_code && programcode.program_code.toLowerCase().includes(queryLowerCase)) ||
             (programcode.desc && programcode.desc.toLowerCase().includes(queryLowerCase)) ||
             (programcode.version && programcode.version.toString().toLowerCase().includes(queryLowerCase)) ||
             (programcode.createdAt && programcode.createdAt.toLowerCase().includes(queryLowerCase)) ||
             (programcode.updatedAt && programcode.updatedAt.toLowerCase().includes(queryLowerCase))
         );
     });
+
+
 
     return (
         <>
@@ -193,15 +198,24 @@ export default function ProgramCode() {
                                     color="primary"
                                 >
                                     เพิ่มรหัสหลักสูตร
-                                    <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
+                                    <PlusIcon className={'w-10 h-10 text-white hidden md:block'} />
                                 </Button>
                                 <Button
                                     className="bg-red-400 text-white w-1/2"
 
                                 >
                                     Delete Select
-                                    <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
+                                    <DeleteIcon className={'w-5 h-5 text-white hidden md:block'} />
                                 </Button>
+
+                                <Link href={'/admin/programcode/restore'}>
+                                    <Button
+                                        className="bg-gray-300 text-black"
+                                        endContent={<TbRestore className={'w-[18px] h-[18px] text-black hidden md:block '} />}
+                                    >
+                                        รายการที่ถูกลบ
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -212,10 +226,10 @@ export default function ProgramCode() {
                         aria-label="programcode table">
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>
-                            <TableColumn>หลักสูตร</TableColumn>
                             <TableColumn>รหัสหลักสูตร</TableColumn>
+                            <TableColumn>หลักสูตร</TableColumn>
+                            <TableColumn>ปีการศึกษา</TableColumn>
                             <TableColumn>คำอธิบาย</TableColumn>
-                            <TableColumn>Version</TableColumn>
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
                         </TableHeader>
@@ -237,10 +251,10 @@ export default function ProgramCode() {
                                                 </Tooltip>
                                             </div>
                                         </TableCell>
-                                        <TableCell>{programcode.program ? programcode.program.title_th : 'ไม่มีหลักสูตร'}</TableCell>
                                         <TableCell>{programcode.program_code}</TableCell>
-                                        <TableCell>{programcode.desc}</TableCell>
-                                        <TableCell>{programcode.version}</TableCell>
+                                        <TableCell>{programcode.program ? programcode.program.title_th : 'ไม่มีหลักสูตร'}</TableCell>
+                                        <TableCell>{programcode.version || "-"}</TableCell>
+                                        <TableCell>{programcode.desc || "-"}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(programcode[column]) : programcode[column]}</span>
@@ -263,7 +277,7 @@ export default function ProgramCode() {
                     isOpen={isUpdateModalOpen}
                     onClose={handleUpdateModalClose}
                     onUpdate={handleDataUpdated}
-                    programCodeId={selectedProgramCodeForUpdate ? selectedProgramCodeForUpdate.program_code : null}
+                    programCodeId={selectedProgramCodeForUpdate ? selectedProgramCodeForUpdate.id : null}
                 />
             </ContentWrap>
         </>

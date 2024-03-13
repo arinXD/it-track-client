@@ -5,12 +5,37 @@ import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import Select from 'react-select';
 import { Input } from "@nextui-org/react";
+import { toast } from 'react-toastify';
 
 export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
     const [groupTitle, setGroupTitle] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [categories, setCategories] = useState([]);
-
+    const showToastMessage = (ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -25,31 +50,43 @@ export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
         fetchData();
     }, []);
 
+
     const handleInsertGroup = async () => {
         try {
             // Check if a category is selected
             if (!selectedCategory) {
-                alert('Please select a category.');
+                showToastMessage(false, 'โปรดเลือกหมวดหมู่');
+                return;
+            }
+
+            if (!groupTitle.trim()) {
+                showToastMessage(false, 'กลุ่มวิชาห้ามเป็นค่าว่าง');
                 return;
             }
 
             const result = await axios.post(`${hostname}/api/groups/insertGroup`, {
                 group_title: groupTitle,
-                catagory_id: selectedCategory.value // Assuming 'value' property contains the ID
+                category_id: selectedCategory.value // Assuming 'value' property contains the ID
             });
 
             console.log('Inserted group:', result.data.data);
 
-            // Notify the parent component that data has been inserted
             onDataInserted();
 
             // Close the modal after inserting
             onClose();
         } catch (error) {
-            console.error('Error inserting group:', error);
-            // Handle error if needed
+            showToastMessage(false, 'กลุ่มวิชาต้องห้ามซ้ำ');
         }
     };
+
+    useEffect(() => {
+        if (isOpen) {
+            // Clear all state values
+            setGroupTitle('');
+            setSelectedCategory(null);
+        }
+    }, [isOpen]);
 
     return (
         <Modal size="sm" isOpen={isOpen} onClose={onClose}>

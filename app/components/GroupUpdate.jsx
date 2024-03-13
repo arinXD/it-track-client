@@ -7,11 +7,39 @@ import axios from 'axios';
 import Select from 'react-select';  // Import the Select component
 import { hostname } from '@/app/api/hostname';
 import { Input } from "@nextui-org/react";
+
+import { toast } from 'react-toastify';
+
+
 export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
     const [newTitle, setNewTitle] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [categories, setCategories] = useState([]);
-
+    const showToastMessage = (ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
     // Fetch the current category title based on the category ID
     useEffect(() => {
         const fetchCategoryTitle = async () => {
@@ -32,7 +60,7 @@ export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
                 setCategories(options);
 
                 // Find the selected category based on the current group's category ID
-                const selectedCategory = options.find(option => option.value === response.data.data.catagory_id);
+                const selectedCategory = options.find(option => option.value === response.data.data.category_id);
                 setSelectedCategory(selectedCategory);
             } catch (error) {
                 // Handle error if needed
@@ -45,9 +73,20 @@ export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
 
     const handleUpdateGroup = async () => {
         try {
+
+            if (!selectedCategory) {
+                showToastMessage(false, 'โปรดเลือกหมวดหมู่');
+                return;
+            }
+
+            if (!newTitle.trim()) {
+                showToastMessage(false, 'กลุ่มวิชาห้ามเป็นค่าว่าง');
+                return;
+            }
+
             await axios.post(`${hostname}/api/groups/updateGroup/${groupId}`, {
                 group_title: newTitle,
-                catagory_id: selectedCategory.value,
+                category_id: selectedCategory.value,
             });
 
             // Notify the parent component that data has been updated

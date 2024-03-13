@@ -20,14 +20,15 @@ import {
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import Link from 'next/link';
+import { TbRestore } from "react-icons/tb";
 async function fetchData() {
     try {
         const result = await axios.get(`${hostname}/api/groups`);
         const data = result.data.data;
 
         const groupData = await Promise.all(data.map(async group => {
-            const categoryResult = await axios.get(`${hostname}/api/categories/${group.catagory_id}`);
+            const categoryResult = await axios.get(`${hostname}/api/categories/${group.category_id}`);
             const categoryData = categoryResult.data.data;
 
             return {
@@ -166,7 +167,6 @@ export default function Group() {
             group.group_title.toLowerCase().includes(queryLowerCase) ||
             group.createdAt.toLowerCase().includes(queryLowerCase) ||
             group.updatedAt.toLowerCase().includes(queryLowerCase)
-            // Add more conditions for additional columns if needed
         );
     });
 
@@ -219,6 +219,14 @@ export default function Group() {
                                     Delete Select
                                     <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
                                 </Button>
+                                <Link href={'/admin/group/restore'}>
+                                    <Button
+                                        className="bg-gray-300 text-black"
+                                        endContent={<TbRestore className={'w-[18px] h-[18px] text-black hidden md:block '} />}
+                                    >
+                                        รายการที่ถูกลบ
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -229,8 +237,8 @@ export default function Group() {
                         aria-label="group table">
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>
-                            <TableColumn>หมวดหมู่วิชา</TableColumn>
                             <TableColumn>กลุ่มวิชา</TableColumn>
+                            <TableColumn>หมวดหมู่วิชา</TableColumn>
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
                         </TableHeader>
@@ -252,8 +260,8 @@ export default function Group() {
                                                 </Tooltip>
                                             </div>
                                         </TableCell>
-                                        <TableCell>{group.category ? group.category.category_title : 'No Group'}</TableCell>
                                         <TableCell>{group.group_title}</TableCell>
+                                        <TableCell>{group.category ? group.category.category_title : 'No Group'}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(group[column]) : group[column]}</span>

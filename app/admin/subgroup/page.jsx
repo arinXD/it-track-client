@@ -21,7 +21,9 @@ import {
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { TbRestore } from "react-icons/tb";
 
+import Link from 'next/link';
 async function fetchData() {
     try {
         const result = await axios.get(`${hostname}/api/subgroups`);
@@ -32,7 +34,7 @@ async function fetchData() {
             const groupData = groupResult.data.data;
 
             // Fetch category details for each group
-            const categoryResult = await axios.get(`${hostname}/api/categories/${groupData.catagory_id}`);
+            const categoryResult = await axios.get(`${hostname}/api/categories/${groupData.category_id}`);
             const categoryData = categoryResult.data.data;
 
             return {
@@ -223,6 +225,14 @@ export default function SubGroup() {
                                     Delete Select
                                     <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
                                 </Button>
+                                <Link href={'/admin/subgroup/restore'}>
+                                    <Button
+                                        className="bg-gray-300 text-black"
+                                        endContent={<TbRestore className={'w-[18px] h-[18px] text-black hidden md:block '} />}
+                                    >
+                                        รายการที่ถูกลบ
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     </div>

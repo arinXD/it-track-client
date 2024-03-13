@@ -27,7 +27,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
 
-import { fetchData } from '../action'
+import { getAcadyears } from "@/src/util/academicYear";
+
 import { margin } from '@mui/system';
 
 async function fetchDatas() {
@@ -35,7 +36,10 @@ async function fetchDatas() {
         const groupResult = await axios.get(`${hostname}/api/groups`);
         const groups = groupResult.data.data;
 
-        const acadyears = await fetchData("/api/acadyear")
+        const acadyears = getAcadyears().map(acadyear => ({
+            value: acadyear,
+            label: acadyear
+        }));
 
         const subgroupResult = await axios.get(`${hostname}/api/subgroups`);
         const subgroups = subgroupResult.data.data;
@@ -155,11 +159,8 @@ export default function Subject() {
             setGroups(data.groups)
             setAcadyears(data.acadyears)
             setSubgroups(data.subgroups)
-            // Close the modal after inserting
+
             handleInsertModalClose();
-            const lastsubsubject = data.subjects[data.subjects.length - 1];
-            const subjectTitle = lastsubsubject?.title_th || '`Unknown Subject`';
-            showToastMessage(true, `เพิ่มวิชา ${subjectTitle} สำเร็จ`);
             handleImportModalClose()
 
         } catch (error) {
@@ -172,8 +173,9 @@ export default function Subject() {
 
 
     const handleDeleteSubject = async (subjectId) => {
+        console.log(subjectId);
         const { value } = await Swal.fire({
-            text: `ต้องการลบวิชา ${subjectId.title_th} หรือไม่ ?`,
+            text: `ต้องการลบวิชา ${subjectId.title_th ? subjectId.title_th : subjectId.subject_code} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -186,15 +188,30 @@ export default function Subject() {
             try {
                 const result = await axios.delete(`${hostname}/api/subjects/deleteSubject/${subjectId.subject_id}`);
                 const { ok, message } = result.data
-                showToastMessage(ok, `ลบวิชา ${subjectId.title_th} สำเร็จ`)
+                showToastMessage(true, `ลบวิชา ${subjectId.title_th ? subjectId.title_th : subjectId.subject_code} สำเร็จ`)
                 const data = await fetchDatas();
                 setSubjects(data.subjects);
 
             } catch (error) {
                 const message = error?.response?.data?.message
-                showToastMessage(false, message)
+                showToastMessage(false, "ข้อมูลถูกเชื่อมกับอีกตาราง")
             }
         }
+    };
+
+    const getAcadyearTitle = (acadYearId) => {
+        const acadYear = acadyears.find(e => e.acadyear === acadYearId);
+        return acadYear ? acadYear.acadyear : '-';
+    };
+
+    const getGroupTitle = (groupId) => {
+        const group = groups.find(e => e.id === groupId);
+        return group ? group.group_title : '-';
+    };
+
+    const getSubGroupTitle = (subGroupId) => {
+        const subGroup = subgroups.find(e => e.id === subGroupId);
+        return subGroup ? subGroup.sub_group_title : '-';
     };
 
     const handleExportCSV = () => {
@@ -203,15 +220,14 @@ export default function Subject() {
                 getAcadyearTitle(subject.acadyear),
                 getGroupTitle(subject.group_id),
                 getSubGroupTitle(subject.sub_group_id),
-                subject.semester || "No data",
-                subject.subject_code || "No data",
-                subject.title_th || "No data",
-                subject.title_en || "No data",
-                subject.information || "No data",
-                subject.credit || "No data",
+                subject.semester || "-",
+                subject.subject_code || "-",
+                subject.title_th || "-",
+                subject.title_en || "-",
+                subject.information || "-",
+                subject.credit || "-",
             ]);
 
-            // Add headers to the CSV data
             const csvHeaders = [
                 'Acadyear', 'Group', 'SubGroup', 'Semester', 'Subject Code',
                 'Title (TH)', 'Title (EN)', 'Information', 'Credit'
@@ -219,7 +235,6 @@ export default function Subject() {
 
             csvData.unshift(csvHeaders);
 
-            // Trigger the CSV download
             const csvFilename = 'subjects_data.csv';
             const csvBlob = new Blob([csvData.map(row => row.join(',')).join('\n')], { type: 'text/csv' });
 
@@ -237,22 +252,6 @@ export default function Subject() {
         }
     };
 
-
-    const getAcadyearTitle = (acadYearId) => {
-        const acadYear = acadyears.find(e => e.acadyear === acadYearId);
-        return acadYear ? acadYear.acadyear : 'No Acadyear';
-    };
-
-    const getGroupTitle = (groupId) => {
-        const group = groups.find(e => e.id === groupId);
-        return group ? group.group_title : 'No Group';
-    };
-
-    const getSubGroupTitle = (subGroupId) => {
-        const subGroup = subgroups.find(e => e.id === subGroupId);
-        return subGroup ? subGroup.sub_group_title : 'No SubGroup';
-    };
-
     const handleExportExcel = () => {
         try {
             // Create a workbook with a worksheet
@@ -261,12 +260,12 @@ export default function Subject() {
                 'Acadyear': getAcadyearTitle(subject.acadyear),
                 Group: getGroupTitle(subject.group_id),
                 SubGroup: getSubGroupTitle(subject.sub_group_id),
-                Semester: subject.semester || "No data",
-                'Subject Code': subject.subject_code || "No data",
-                'Title (TH)': subject.title_th || "No data",
-                'Title (EN)': subject.title_en || "No data",
-                Information: subject.information || "No data",
-                Credit: subject.credit || "No data",
+                Semester: subject.semester || "-",
+                'Subject Code': subject.subject_code || "-",
+                'Title (TH)': subject.title_th || "-",
+                'Title (EN)': subject.title_en || "-",
+                Information: subject.information || "-",
+                Credit: subject.credit || "-",
             })));
 
             // Add the worksheet to the workbook
@@ -283,9 +282,9 @@ export default function Subject() {
     };
     const filteredSubject = subjects.filter(subject => {
         const queryLowerCase = searchQuery.toLowerCase();
-    
+
         return (
-            (subject.acadyear && subject.acadyear.acadyear.toLowerCase().includes(queryLowerCase)) ||
+            (subject.acadyear && subject.acadyear.acadyear && subject.acadyear.acadyear.toLowerCase().includes(queryLowerCase)) ||
             (subject.group_id && subject.group_id.group_title && subject.group_id.group_title.toLowerCase().includes(queryLowerCase)) ||
             (subject.sub_group_id && subject.sub_group_id.sub_group_title && subject.sub_group_id.sub_group_title.toLowerCase().includes(queryLowerCase)) ||
             (subject.semester && subject.semester.toLowerCase().includes(queryLowerCase)) ||
@@ -308,6 +307,12 @@ export default function Subject() {
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        // Reset pagination to page 1 when search query changes
+        setCurrentPage(1);
+    };
+
     return (
         <>
             <header>
@@ -349,7 +354,7 @@ export default function Subject() {
                                 className="rounded-s-none pl-0 py-2 px-4 text-sm text-gray-900 rounded-lg bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Search..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(e) => handleSearchChange(e.target.value)}
                             />
                             <div className="flex md:flex-row gap-3">
                                 <Button
@@ -395,7 +400,7 @@ export default function Subject() {
                             <TableColumn>รหัสวิชา</TableColumn>
                             <TableColumn>ชื่อไทย</TableColumn>
                             <TableColumn>ชื่ออังกฤษ</TableColumn>
-                            <TableColumn>ข้อมูล</TableColumn>
+                            <TableColumn>รายละเอียด</TableColumn>
                             <TableColumn>หน่วยกิต</TableColumn>
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
@@ -418,16 +423,7 @@ export default function Subject() {
                                                 </Tooltip>
                                             </div>
                                         </TableCell>
-                                        <TableCell>
-                                            {subject.acadyear ?
-                                                <>
-                                                    {acadyears.map(e => (
-                                                        e.acadyear === subject.acadyear &&
-                                                        e.acadyear
-                                                    ))}
-                                                </>
-                                                : 'ไม่มีปีการศึกษา'}
-                                        </TableCell>
+                                        <TableCell>{subject.acadyear || "-"}</TableCell>
                                         <TableCell>
                                             {subject.group_id ?
                                                 <>
@@ -436,7 +432,7 @@ export default function Subject() {
                                                         e.group_title
                                                     ))}
                                                 </>
-                                                : 'ไม่มีกลุ่มวิชา'}
+                                                : '-'}
                                         </TableCell>
                                         <TableCell>
                                             {subject.sub_group_id ?
@@ -446,14 +442,14 @@ export default function Subject() {
                                                         e.sub_group_title
                                                     ))}
                                                 </>
-                                                : 'ไม่มีกลุ่มย่อยวิชา'}
+                                                : '-'}
                                         </TableCell>
-                                        <TableCell>{subject.semester || "ไม่มีข้อมูล"}</TableCell>
-                                        <TableCell>{subject.subject_code || "ไม่มีข้อมูล"}</TableCell>
-                                        <TableCell>{subject.title_th || "ไม่มีข้อมูล"}</TableCell>
-                                        <TableCell>{subject.title_en || "ไม่มีข้อมูล"}</TableCell>
-                                        <TableCell>{subject.information || "ไม่มีข้อมูล"}</TableCell>
-                                        <TableCell>{subject.credit || "ไม่มีข้อมูล"}</TableCell>
+                                        <TableCell>{subject.semester || "-"}</TableCell>
+                                        <TableCell>{subject.subject_code || "-"}</TableCell>
+                                        <TableCell>{subject.title_th || "-"}</TableCell>
+                                        <TableCell>{subject.title_en || "-"}</TableCell>
+                                        <TableCell>{subject.information || "-"}</TableCell>
+                                        <TableCell>{subject.credit || "-"}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(subject[column]) : subject[column]}</span>
