@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StudentTrackTable from './StudentTrackTable';
 import TrackCard from './TrackCard';
+import { tableClass } from '@/src/util/tableClass';
 
 const showToastMessage = (ok, message) => {
     if (ok) {
@@ -43,10 +44,12 @@ const showToastMessage = (ok, message) => {
 
 const Page = ({ params }) => {
 
+    const [trackSubj, setTrackSubj] = useState([])
     const [trackSelect, setTrackSelect] = useState({})
     const [studentsBit, setStudentsBit] = useState({})
     const [studentsNetwork, setStudentsNetwork] = useState({})
     const [studentsWeb, setStudentsWeb] = useState({})
+    const [studentsSelect, setStudentsSelect] = useState([])
 
     const [starting, setStarting] = useState(false)
     const [updating, setUpdating] = useState(false)
@@ -64,6 +67,7 @@ const Page = ({ params }) => {
             result.startAt = format(new Date(result?.startAt), 'yyyy-MM-dd HH:mm')
             result.expiredAt = format(new Date(result?.expiredAt), 'yyyy-MM-dd HH:mm')
             setTrackSelect(result)
+            setTrackSubj(result?.Subjects)
         } catch (err) {
             console.error("Error on init func:", err);
         }
@@ -96,10 +100,12 @@ const Page = ({ params }) => {
             const stuBit = trackSelect?.Selections?.filter(select => select.result == "BIT")
             const stuNetwork = trackSelect?.Selections?.filter(select => select.result == "Network")
             const stuWeb = trackSelect?.Selections?.filter(select => select.result == "Web and Mobile")
+            const stuSelect = trackSelect?.Selections?.filter(select => select.result == null)
 
             setStudentsBit(getStudentCount(stuBit))
             setStudentsNetwork(getStudentCount(stuNetwork))
             setStudentsWeb(getStudentCount(stuWeb))
+            setStudentsSelect(getStudentCount(stuSelect))
         }
     }, [trackSelect]);
 
@@ -354,9 +360,9 @@ const Page = ({ params }) => {
                                     }
                                     <div>
                                         <h2 className='mb-3 text-small text-default-900'>วิชาที่ใช้ในการคัดเลือก</h2>
-                                        {trackSelect?.Subjects &&
+                                        {trackSubj &&
                                             <Table
-                                                isStriped
+                                                classNames={tableClass}
                                                 removeWrapper
                                                 selectionMode="multiple"
                                                 // onSelectionChange={setSelectedKeys}
@@ -369,9 +375,9 @@ const Page = ({ params }) => {
                                                     <TableColumn>ชื่อวิชา TH</TableColumn>
                                                     <TableColumn>หน่วยกิต</TableColumn>
                                                 </TableHeader>
-                                                {trackSelect?.Subjects.length > 0 ?
+                                                {trackSubj.length > 0 ?
                                                     <TableBody>
-                                                        {trackSelect?.Subjects.map(subj => (
+                                                        {trackSubj.map(subj => (
                                                             <TableRow key={subj.subject_code}>
                                                                 <TableCell className=''>
                                                                     <Tooltip color="danger" content="ลบ">
@@ -391,9 +397,22 @@ const Page = ({ params }) => {
                                             </Table>
                                         }
                                     </div>
-                                    {studentsBit?.students?.length == 0 ? null : <StudentTrackTable studentData={studentsBit} track={"BIT"} />}
-                                    {studentsNetwork?.students?.length == 0 ? null : <StudentTrackTable studentData={studentsNetwork} track={"Network"} />}
-                                    {studentsWeb?.students?.length == 0 ? null : <StudentTrackTable studentData={studentsWeb} track={"Web and Mobile"} />}
+                                    {
+                                        studentsSelect?.students?.length > 0 ?
+                                            <div>
+                                                <p className='text-default-900 text-small'>รายชื่อนักศึกษาที่เข้ารับการคัดเลือก</p>
+                                                <StudentTrackTable trackSubj={trackSubj} studentData={studentsSelect} title={false} track={"กำลังคัดเลือก"} />
+                                            </div>
+                                            : (studentsBit?.students?.length == 0 &&
+                                                studentsNetwork?.students?.length == 0 &&
+                                                studentsWeb?.students?.length == 0) ?
+                                                <p>ยังไม่มีนักศึกษาเลือกแทรค</p>
+                                                :
+                                                null
+                                    }
+                                    {studentsBit?.students?.length == 0 ? null : <StudentTrackTable trackSubj={trackSubj} studentData={studentsBit} track={"BIT"} />}
+                                    {studentsNetwork?.students?.length == 0 ? null : <StudentTrackTable trackSubj={trackSubj} studentData={studentsNetwork} track={"Network"} />}
+                                    {studentsWeb?.students?.length == 0 ? null : <StudentTrackTable trackSubj={trackSubj} studentData={studentsWeb} track={"Web and Mobile"} />}
                                 </div>
                                 :
                                 <>

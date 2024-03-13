@@ -11,20 +11,18 @@ import { tableClass } from '@/src/util/tableClass'
 import Link from 'next/link'
 import EditModal from './EditModal'
 import { useSearchParams } from 'next/navigation'
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import DeleteModal from '../DeleteModal'
 
 export default function Page({ params }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: delIsOpen, onOpen: delOnOpen, onClose: delOnClose } = useDisclosure();
     const searchParams = useSearchParams()
     const editMode = searchParams.get('edit') || "0"
-
-    useEffect(() => {
-        if (editMode == "1") {
-            onOpen()
-        }
-    }, [editMode])
+    const [student, setStudent] = useState({})
 
     const { stu_id } = params
-    const [student, setStudent] = useState({})
     const [selectedKeys, setSelectedKeys] = useState([])
     const [gpa, setGpa] = useState(0)
     const [enrollmentsByYear, setEnrollmentsByYear] = useState([])
@@ -32,6 +30,14 @@ export default function Page({ params }) {
     const [programs, setPrograms] = useState([])
     const [status, setStatus] = useState([])
     const [updateData, setUpdateData] = useState({})
+
+    useEffect(() => {
+        if (fetching == false && Object.keys(student).length == 0) {
+            setTimeout(() => {
+                window.location.href = "/admin/students"
+            }, 1500)
+        }
+    }, [fetching, student])
 
     async function getStudentData() {
         const student = await fetchDataObj(`/api/students/${stu_id}`)
@@ -120,12 +126,16 @@ export default function Page({ params }) {
         return typeof number == "number"
     }
 
-    useEffect(() => {
+    async function initData() {
         setFetching(true)
-        getStudentData()
-        getPrograms()
-        getStudentStatuses()
+        await getStudentData()
+        await getPrograms()
+        await getStudentStatuses()
         setFetching(false)
+    }
+
+    useEffect(() => {
+        initData()
     }, [])
 
     function showToastMessage(ok, message) {
@@ -154,8 +164,14 @@ export default function Page({ params }) {
         }
     };
 
-    // Acadyear
-    
+
+    useEffect(() => {
+        if (editMode == "1" && Object.keys(student).length && Object.keys(programs).length && Object.keys(status).length) {
+            handleEdit()
+        } else {
+            onClose()
+        }
+    }, [editMode, student, programs, status])
 
     function handleEdit() {
         const updatedStudent = { ...student };
@@ -166,6 +182,7 @@ export default function Page({ params }) {
 
     return (
         <>
+            <ToastContainer />
             <header>
                 <Navbar />
             </header>
@@ -180,6 +197,12 @@ export default function Page({ params }) {
                     student={updateData}
                     isOpen={isOpen}
                     onClose={onClose} />
+                <DeleteModal
+                    showToastMessage={showToastMessage}
+                    callData={initData}
+                    delIsOpen={delIsOpen}
+                    delOnClose={delOnClose}
+                    stuId={stu_id} />
                 <div>
                     {
                         fetching ?
@@ -217,7 +240,8 @@ export default function Page({ params }) {
                                                     radius='sm'
                                                     color="primary"
                                                     startContent={<DeleteIcon2 />}
-                                                    variant='solid'>
+                                                    variant='solid'
+                                                    onPress={delOnOpen}>
                                                     ลบรายชื่อนักศึกษา
                                                 </Button>
                                             </div>

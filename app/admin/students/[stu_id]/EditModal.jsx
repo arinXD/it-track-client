@@ -149,14 +149,14 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
     async function editStudent(event) {
         setEditing(true)
         event.preventDefault()
+
         const formData = {
-            stu_id,
             email,
             first_name,
             last_name,
-            acadyear,
-            program,
             courses_type,
+            program,
+            acadyear,
             status_code
         }
         if (!validInput(formData)) {
@@ -166,9 +166,10 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
 
         try {
             const token = await getToken()
+            console.log(formData);
             const options = {
-                url: `${hostname}/api/students`,
-                method: 'POST',
+                url: `${hostname}/api/students/${stu_id}`,
+                method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
                     'authorization': `${token}`,
@@ -177,12 +178,12 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
                 data: formData
             };
 
-            // const res = await axios(options)
-            // const { ok, message } = res.data
-            // showToastMessage(ok, message)
-            // getStudentData()
-            closeForm()
+            const res = await axios(options)
+            const { ok, message } = res.data
+            showToastMessage(ok, message)
+            getStudentData()
         } catch (error) {
+            console.log(error);
             const { ok, message } = error.response.data
             showToastMessage(ok, message)
         } finally {
@@ -240,6 +241,7 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
                                             value={stu_id}
                                             onValueChange={setStuId}
                                             isInvalid={invalid.stu_id}
+                                            isReadOnly={true}
                                         />
                                         <Input
                                             type="email"

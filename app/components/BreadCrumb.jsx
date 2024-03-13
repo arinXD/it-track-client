@@ -18,6 +18,7 @@ const links = {
     "track-student": "รายชื่อนักศึกษาภายในแทรค",
     "dashboard": "Dashboard",
     "students":"รายชื่อนักศึกษา",
+    "restore":"กู้คืนข้อมูล",
 };
 
 const BreadCrumb = () => {
