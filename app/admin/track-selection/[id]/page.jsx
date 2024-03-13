@@ -248,21 +248,21 @@ const Page = ({ params }) => {
                                         {title}
                                     </h1>
                                     <div className='my-4 flex flex-row gap-4 w-full'>
-                                        <div className='space-y-3 border-1 rounded-md p-3 w-[50%]'>
+                                        <div className='space-y-3 border-1 rounded-md p-3 w-[70%]'>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[18%] text-end'>ปีการศึกษา: </span>
+                                                <span className='inline-block w-[12%] text-end'>ปีการศึกษา: </span>
                                                 <input
                                                     type='number'
                                                     readOnly
                                                     value={trackSelect.acadyear}
-                                                    className='select-none w-[82%] border-1 px-2 py-1.5 rounded-md border-gray-300' />
+                                                    className='select-none w-[88%] border-1 px-2 py-1.5 rounded-md border-gray-300' />
                                             </div>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[18%] text-end'>เริ่มต้น: </span>
+                                                <span className='inline-block w-[12%] text-end'>เริ่มต้น: </span>
                                                 <input
                                                     type='datetime-local'
                                                     required
-                                                    className='w-[82%] border-1 px-2 py-1.5 rounded-md border-gray-300'
+                                                    className='w-[88%] border-1 px-2 py-1.5 rounded-md border-gray-300'
                                                     value={startAt}
                                                     onChange={(e) => {
                                                         setStartAt(e.target.value)
@@ -270,11 +270,11 @@ const Page = ({ params }) => {
                                                     }} />
                                             </div>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[18%] text-end'>สิ้นสุด: </span>
+                                                <span className='inline-block w-[12%] text-end'>สิ้นสุด: </span>
                                                 <input
                                                     type='datetime-local'
                                                     required
-                                                    className='w-[82%] border-1 px-2 py-1.5 rounded-md border-gray-300'
+                                                    className='w-[88%] border-1 px-2 py-1.5 rounded-md border-gray-300'
                                                     value={expiredAt}
                                                     onChange={(e) => {
                                                         setExpiredAt(e.target.value)
@@ -282,7 +282,7 @@ const Page = ({ params }) => {
                                                     }} />
                                             </div>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[18%] text-end'>สถานะ: </span>
+                                                <span className='inline-block w-[12%] text-end'>สถานะ: </span>
                                                 <input
                                                     type="radio"
                                                     name='hasFinished'
@@ -307,20 +307,20 @@ const Page = ({ params }) => {
                                                 <span>สิ้นสุด</span>
                                             </div>
                                         </div>
-                                        <div className='w-[50%] flex flex-col justify-between'>
+                                        <div className='w-[30%] flex flex-col justify-between'>
                                             <div>
                                                 {!(trackSelect.has_finished) ?
                                                     <Button size='md'
                                                         isLoading={starting}
                                                         onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
-                                                        color="default" variant="bordered" className='w-full'>
+                                                        color="primary" variant="solid" className='bg-blue-500 w-full'>
                                                         {starting ? "ปิดการคัดเลือก..." : "ปิดการคัดเลือก"}
                                                     </Button>
                                                     :
                                                     <Button size='md'
                                                         isLoading={starting}
                                                         onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
-                                                        color="default" variant="bordered" className='w-full'>
+                                                        color="primary" variant="solid" className='bg-blue-500 w-full'>
                                                         {starting ? "เปิดการคัดเลือก..." : "เปิดการคัดเลือก"}
                                                     </Button>}
                                             </div>
