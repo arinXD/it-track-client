@@ -2,18 +2,18 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, } from "@nextui-org/react";
 import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } from "@/app/components/icons";
-import { capitalize } from "./utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
-import { fetchData } from '../action'
-import { getLastTenYear } from "@/src/util/academicYear";
-import InsertModal from "./InsertModal";
+import { fetchData } from "../../action";
 import { Skeleton } from "@nextui-org/react";
-import DeleteModal from "./DeleteModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { TbRestore } from "react-icons/tb";
-import DeleteSelectModal from "./DeleteSelectModal";
 import { tableClass } from "@/src/util/tableClass";
+import { capitalize } from "../utils";
+import { TbRestore } from "react-icons/tb";
+import { getToken } from "@/app/components/serverAction/TokenAction";
+import { hostname } from "@/app/api/hostname";
+import axios from "axios";
+import DeleteModal from "./DeleteModal";
 
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"];
 const columns = [{
@@ -93,29 +93,16 @@ const Page = () => {
         statuses = statuses.filter(e => filterStatus.includes(e.id))
         setStatusOptions(statuses)
     }
-    async function getStudents(program = "IT", acadyear = 2564) {
-        let students = await fetchData(`/api/students/programs/${program}/acadyear/${acadyear}`)
-        students.sort((a, b) => {
-            const order = {
-                "โครงการปกติ": 1,
-                "โครงการพิเศษ": 2
-            };
-            return order[a.courses_type] - order[b.courses_type];
-        });
-
+    async function getStudents() {
+        let students = await fetchData(`/api/students/get/restores`)
         setStudents(students);
-    }
-    async function getPrograms() {
-        const programs = await fetchData(`/api/programs`)
-        setPrograms(programs)
     }
 
     useEffect(() => {
         async function init() {
             setFetching(true)
-            await getStudentStatuses()
             await getStudents()
-            await getPrograms()
+            await getStudentStatuses()
             setFetching(false)
         }
         init()
@@ -123,14 +110,10 @@ const Page = () => {
 
     // State
     const [fetching, setFetching] = useState(true)
-    const acadyears = getLastTenYear()
-    const [selectProgram, setSelectProgram] = useState(null)
-    const [selectAcadYear, setSelectAcadYear] = useState(acadyears[0])
     const [students, setStudents] = useState([])
-    const [programs, setPrograms] = useState([])
-    const [delStdId, setDelStdId] = useState(null)
     const [disableSelectDelete, setDisableSelectDelete] = useState(false)
     const [selectedStudents, setSelectedStudents] = useState([])
+    const [delStdId, setDelStdId] = useState(null)
 
     const [statusOptions, setStatusOptions] = useState([])
     const [filterValue, setFilterValue] = useState("");
@@ -161,6 +144,10 @@ const Page = () => {
                 stu.first_name.toLowerCase().includes(filterValue.toLowerCase()) ||
                 stu.last_name.toLowerCase().includes(filterValue.toLowerCase()) ||
                 stu.stu_id.toLowerCase().includes(filterValue.toLowerCase()) ||
+                stu.acadyear.toString().toLowerCase().includes(filterValue.toLowerCase()) ||
+                stu.courses_type.toLowerCase().includes(filterValue.toLowerCase()) ||
+                stu.program.toLowerCase().includes(filterValue.toLowerCase()) ||
+                stu?.StudentStatus?.description.toLowerCase().includes(filterValue.toLowerCase()) ||
                 stu.email.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
@@ -226,7 +213,7 @@ const Page = () => {
             case "actions":
                 return (
                     <div className="relative flex justify-center items-center gap-2">
-                        <Dropdown>
+                        <Dropdown aria-label={`${stu?.stu_id} actions`}>
                             <DropdownTrigger>
                                 <Button isIconOnly size="sm" variant="light">
                                     <VerticalDotsIcon className="text-default-300" />
@@ -235,20 +222,20 @@ const Page = () => {
                             <DropdownMenu
                                 onAction={
                                     (key) => {
-                                        if (key == "delete") {
+                                        if (key == "restore") {
+                                            restoreStudent(stu?.stu_id)
+                                        }
+                                        else if (key == "delete") {
                                             openDeleteModal(stu?.stu_id)
                                         }
                                     }
                                 }
                             >
-                                <DropdownItem href={`/admin/students/${stu?.stu_id}`}>
-                                    View
-                                </DropdownItem>
-                                <DropdownItem href={`/admin/students/${stu?.stu_id}?edit=1`}>
-                                    Edit
+                                <DropdownItem key={"restore"}>
+                                    กู้คืน
                                 </DropdownItem>
                                 <DropdownItem key="delete" className="text-danger" color="danger">
-                                    Delete
+                                    ลบ
                                 </DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
@@ -307,7 +294,7 @@ const Page = () => {
                         onValueChange={onSearchChange}
                     />
                     <div className="flex gap-3">
-                        <Dropdown>
+                        <Dropdown aria-label="select status">
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button radius="sm" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
                                     Status
@@ -328,7 +315,7 @@ const Page = () => {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Dropdown>
+                        <Dropdown aria-label="select column">
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button radius="sm" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
                                     Columns
@@ -349,33 +336,27 @@ const Page = () => {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Button
-                            radius="sm"
-                            onPress={() => onOpen()}
-                            color="primary"
-                            endContent={<PlusIcon width={16} height={16} />}>
-                            เพิ่มรายชื่อนักศึกษา
-                        </Button>
+
                         <Button
                             radius="sm"
                             isDisabled={disableSelectDelete}
-                            onPress={handleSelectDelete}
+                            onPress={() => { }}
                             color="danger"
                             endContent={<DeleteIcon2 width={16} height={16} />}>
                             ลบรายการที่เลือก
                         </Button>
-                        <Link href="/admin/students/restore">
-                            <Button
-                                radius="sm"
-                                color="default"
-                                endContent={<TbRestore className="w-[18px] h-[18px]" />}>
-                                รายการที่ถูกลบ
-                            </Button>
-                        </Link>
+                        <Button
+                            radius="sm"
+                            isDisabled={disableSelectDelete}
+                            onPress={() => { }}
+                            color="default"
+                            endContent={<TbRestore className="w-[18px] h-[18px]" />}>
+                            กู้คืนรายการที่เลือก
+                        </Button>
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
+                    <span className="text-default-400 text-small">ข้อมูลทั้งหมด {students.length} แถว</span>
                     <label className="flex items-center text-default-400 text-small">
                         Rows per page:
                         <select
@@ -448,6 +429,30 @@ const Page = () => {
         setSelectedStudents(students)
     }, [selectedKeys])
 
+    async function restoreStudent(id) {
+        try {
+            const token = await getToken()
+            const options = {
+                url: `${hostname}/api/students/${id}/restore`,
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'authorization': `${token}`,
+                    'Content-Type': 'application/json;charset=UTF-8',
+                },
+            };
+
+            const res = await axios(options)
+            const { ok, message } = res.data
+            await getStudents()
+            showToastMessage(ok, message)
+        } catch (error) {
+            console.log(error);
+            const { ok, message } = error.response.data
+            showToastMessage(ok, message)
+        }
+    }
+
     function handleSelectDelete() {
         delsOnOpen()
     }
@@ -465,11 +470,16 @@ const Page = () => {
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
+                <DeleteModal
+                    showToastMessage={showToastMessage}
+                    callData={getStudents}
+                    delIsOpen={delIsOpen}
+                    delOnClose={delOnClose}
+                    stuId={delStdId} />
                 <div>
                     <ToastContainer />
                     {fetching ?
                         <div className="space-y-3">
-                            <Skeleton className="h-10 w-[40%] rounded-lg" />
                             <div className="flex gap-5">
                                 <Skeleton className="h-10 w-[50%] rounded-lg" />
                                 <Skeleton className="h-10 w-[50%] rounded-lg" />
@@ -486,35 +496,6 @@ const Page = () => {
                         </div>
                         :
                         <>
-
-                            <div className="flex gap-3 items-center mb-4">
-                                <select onInput={() => setSelectProgram(event.target.value)} defaultValue="" id="" className="px-2 pe-3 py-1 border-1 rounded-lg">
-                                    <option value="" disabled hidden>หลักสูตร</option>
-                                    {programs?.length && programs.map((program) => (
-                                        <option key={program.program} value={program.program}>
-                                            {program.title_th} {program.program}
-                                        </option>
-                                    ))}
-                                </select>
-                                <select onInput={() => setSelectAcadYear(event.target.value)} defaultValue="" id="" className="px-2 pe-3 py-1 border-1 rounded-lg">
-                                    <option value="" disabled hidden>ปีการศึกษา</option>
-                                    {acadyears.map((acadyear) => (
-                                        <option key={acadyear} value={acadyear}>
-                                            {acadyear}
-                                        </option>
-                                    ))}
-                                </select>
-                                <Button
-                                    onClick={() => getStudents(selectProgram, selectAcadYear)}
-                                    radius="sm"
-                                    size="md"
-                                    variant="solid"
-                                    className="bg-gray-200"
-                                    startContent={<SearchIcon />}
-                                >
-                                    ค้นหา
-                                </Button>
-                            </div>
                             <Table
                                 aria-label="Student Table"
                                 checkboxesProps={{
@@ -562,26 +543,6 @@ const Page = () => {
                 </div>
             </ContentWrap>
 
-            <InsertModal
-                showToastMessage={showToastMessage}
-                getStudents={getStudents}
-                programs={programs}
-                isOpen={isOpen}
-                onClose={onClose} />
-            <DeleteModal
-                showToastMessage={showToastMessage}
-                callData={getStudents}
-                delIsOpen={delIsOpen}
-                delOnClose={delOnClose}
-                stuId={delStdId} />
-            <DeleteSelectModal
-                setDisableSelectDelete={setDisableSelectDelete}
-                setSelectedStudents={setSelectedStudents}
-                showToastMessage={showToastMessage}
-                getStudents={getStudents}
-                delIsOpen={delsIsOpen}
-                delOnClose={delsOnClose}
-                stuIdList={selectedStudents} />
         </>
     )
 }

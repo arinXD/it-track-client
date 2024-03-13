@@ -5,6 +5,7 @@ import { Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, Tabl
 import { PlusIcon, CheckIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon, ConfirmIcon, ClockIcon } from "@/app/components/icons";
 import { Icon } from '@iconify/react';
 import { Loading } from '@/app/components';
+import { tableClass } from '@/src/util/tableClass';
 
 const TrackSelectTable = ({ loading, trackSelection, handleOpen, handleDelete, handleSelectedDel, handleStartSelect }) => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -75,22 +76,21 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen, handleDelete, h
                 </div>
                 <div className="flex md:flex-row gap-3">
                     <Button
-                        className="w-1/2"
+                        radius="sm"
                         onPress={handleOpen}
                         color="primary"
-                    >
-                        Add New
-                        <PlusIcon className={'w-5 h-5 text-white md:block md:w-6 md:h-6'} />
+                        endContent={<PlusIcon width={16} height={16} />}>
+                        เพิ่มการคัดเลือกแทรค
                     </Button>
                     <Button
-                        className="bg-red-400 text-white w-1/2"
+                        radius="sm"
                         onPress={async () => {
                             await handleSelectedDel(selectedKey)
                             setSelectedKey([])
                         }}
-                    >
-                        Delete Select
-                        <DeleteIcon className={'w-5 h-5 text-white md:w-8 md:h-8'} />
+                        color="danger"
+                        endContent={<DeleteIcon2 width={16} height={16} />}>
+                        ลบรายการที่เลือก
                     </Button>
                 </div>
             </div>
@@ -101,6 +101,7 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen, handleDelete, h
                     </div>
                     :
                     <Table
+                        classNames={tableClass}
                         removeWrapper
                         selectionMode="multiple"
                         onSelectionChange={handleSetSelectedKey}
@@ -172,7 +173,7 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen, handleDelete, h
                             <TableBody emptyContent={"ไม่มีข้อมูลคัดเลือกแทรค"}>{[]}</TableBody>}
                     </Table>
             }
-        </div>
+        </div >
     )
 }
 

@@ -44,7 +44,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
     }, [subjects])
 
     useEffect(() => {
-        setTitle(`การคัดเลือกความเชี่ยวชาญ วิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ ปีการศึกษา ${acadyear[0]?.acadyear}`)
+        setTitle(`การคัดเลือกความเชี่ยวชาญ วิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ ปีการศึกษา ${acadyear[0]}`)
     }, [acadyear])
 
     useEffect(() => {
@@ -63,7 +63,11 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
         const newAcad = e.target.value.toString()
         setAcadValue((prevVale) => {
             setTitle(prvTitle => {
-                return prvTitle.replace(prevVale, newAcad);
+                if (prevVale) {
+                    return prvTitle.replace(prevVale, newAcad);
+                } else {
+                    return prvTitle + " " + newAcad
+                }
             })
             return newAcad
         });
@@ -121,7 +125,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                         <form onSubmit={createAcad}>
                             <ModalHeader className="flex flex-col gap-1">เพิ่มการคัดเลือกแทรค</ModalHeader>
                             <ModalBody>
-                                <div className='grid grid-cols-2 gap-1'>
+                                <div className='grid grid-cols-2 gap-3'>
                                     <div className='flex flex-col gap-3'>
                                         <Select
                                             isRequired
@@ -129,10 +133,12 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                             labelPlacement="outside"
                                             placeholder="เลือกปีการศึกษา"
                                             selectedKeys={[acadValue]}
-                                            className="max-w-xs"
                                             radius={"sm"}
                                             name={"acadyear"}
                                             disabledKeys={[""]}
+                                            scrollShadowProps={{
+                                                isEnabled: false
+                                            }}
                                             onChange={handleSelectionChange}
                                         >
                                             <SelectItem key={""} value={""}>
@@ -150,7 +156,6 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                             label="title"
                                             labelPlacement="outside"
                                             placeholder=""
-                                            className="max-w-xs"
                                             name="title"
                                             onChange={(e) => setTitle(e.target.value)}
                                             value={title}
@@ -160,11 +165,10 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                         <Input
                                             isRequired
                                             radius={"sm"}
-                                            label="เริ่มต้น"
+                                            label="เริ่มต้น (เดือน/วัน/ปี)"
                                             value={startValue}
                                             labelPlacement="outside"
                                             type="datetime-local"
-                                            className="max-w-xs"
                                             name="startAt"
                                             onChange={(e) => {
                                                 setStartValue(e.target.value)
@@ -173,11 +177,10 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                         <Input
                                             isRequired
                                             radius={"sm"}
-                                            label="สิ้นสุด"
+                                            label="สิ้นสุด (เดือน/วัน/ปี)"
                                             value={expiredValue}
                                             labelPlacement="outside"
                                             type="datetime-local"
-                                            className="max-w-xs"
                                             name="expiredAt"
                                             onChange={(e) => {
                                                 setExpiredValue(e.target.value)
@@ -185,56 +188,73 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                         />
                                     </div>
                                 </div>
-                                <div className='flex flex-row gap-1 mt-3'>
-                                    <ul className='h-[210px] w-1/2 overflow-y-auto flex flex-col gap-1 p-2 border-1'>
+                                <div className='flex flex-row gap-3 mt-3'>
+                                    <div className='w-1/2 flex flex-col'>
                                         <p>วิชาที่ใช้ในการคัดเลือก</p>
-                                        {trackSubj.length > 0 ?
-                                            trackSubj.map((sbj, index) => (
-                                                <li key={index} className='relative p-1 gap-2 border-1 border-b-gray-300 rounded-sm'>
-                                                    <input
-                                                        readOnly
-                                                        className='block focus:outline-none font-bold'
-                                                        type="text"
-                                                        name="trackSubj[]"
-                                                        value={sbj.subject_code} />
-                                                    <p className='flex flex-col text-sm'>
-                                                        <span>{sbj.title_en}</span>
-                                                    </p>
-                                                    <Icon onClick={() => delSubj(sbj.subject_code)} icon="lets-icons:dell-duotone" className="absolute top-1 right-1 w-6 h-6 cursor-pointer active:scale-95 hover:opacity-80" />
-                                                </li>
-                                            ))
-                                            :
-                                            <li>ยังไม่มีวิชาในการคัดเลือก</li>}
-                                    </ul>
-                                    <div className='w-1/2'>
-                                        <input
-                                            className='border-1 w-full px-2 focus:outline-none mb-1'
-                                            type="search"
-                                            value={searchSubj}
-                                            onChange={(e) => setSearchSubj(e.target.value)}
-                                            placeholder='ค้นหาวิชา' />
-
-                                        <ul className='border-1 h-[180px] overflow-y-auto p-2 flex flex-col gap-1'>
-                                            {filterSubj.map((subject, index) => (
-                                                !(trackSubj.map(z => z.subject_code).includes(subject.subject_code)) &&
-                                                <li onClick={() => addSubj(subject)} key={index} className='flex flex-row gap-2 p-1 border-1 border-b-gray-300 cursor-pointer'>
-                                                    <strong className='block'>{subject.subject_code}</strong>
-                                                    <p className='flex flex-col text-sm'>
-                                                        <span>{subject.title_en}</span>
-                                                        <span>{subject.title_th}</span>
-                                                    </p>
-                                                </li>
-                                            ))}
+                                        <ul className='h-[210px] overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
+                                            {trackSubj.length > 0 ?
+                                                trackSubj.map((sbj, index) => (
+                                                    <li key={index} className='bg-gray-100 rounded-md relative p-1 gap-2 border-1 border-b-gray-300'>
+                                                        <input
+                                                            readOnly
+                                                            className='bg-gray-100 block focus:outline-none font-bold'
+                                                            type="text"
+                                                            name="trackSubj[]"
+                                                            value={sbj.subject_code} />
+                                                        <p className='flex flex-col text-sm'>
+                                                            <span>{sbj.title_th}</span>
+                                                        </p>
+                                                        <Icon onClick={() => delSubj(sbj.subject_code)} icon="lets-icons:dell-duotone" className="absolute top-1 right-1 w-6 h-6 cursor-pointer active:scale-95 hover:opacity-80" />
+                                                    </li>
+                                                ))
+                                                :
+                                                <li>ยังไม่มีวิชาในการคัดเลือก</li>}
                                         </ul>
+                                    </div>
+                                    <div className='w-1/2'>
+                                        <p>ค้นหาวิชาเพื่อเพิ่ม</p>
+                                        <div className='flex flex-col'>
+                                            <input
+                                                className='rounded-md border-1 w-full px-2 focus:outline-none mb-1'
+                                                type="search"
+                                                value={searchSubj}
+                                                onChange={(e) => setSearchSubj(e.target.value)}
+                                                placeholder='ค้นหาวิชา' />
+
+                                            <ul className='rounded-md border-1 h-[180px] overflow-y-auto p-2 flex flex-col gap-1'>
+                                                {filterSubj.map((subject, index) => (
+                                                    !(trackSubj.map(z => z.subject_code).includes(subject.subject_code)) &&
+                                                    <li onClick={() => addSubj(subject)} key={index} className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border-1 border-b-gray-300 cursor-pointer'>
+                                                        <strong className='block'>{subject.subject_code}</strong>
+                                                        <p className='flex flex-col text-sm'>
+                                                            <span>{subject.title_en}</span>
+                                                            <span>{subject.title_th}</span>
+                                                        </p>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                <Button color="danger" type="button" variant="light" onPress={onClose}>
-                                    Close
+                                <Button
+                                    type='button'
+                                    className='border-1 py-4'
+                                    radius='sm'
+                                    color="primary"
+                                    variant='bordered'
+                                    onPress={onClose}>
+                                    ยกเลิก
                                 </Button>
-                                <Button color="primary" type="submit" onPress={onClose}>
-                                    Action
+                                <Button
+                                    className='py-4 ms-4'
+                                    radius='sm'
+                                    color="primary"
+                                    variant='solid'
+                                    type="submit"
+                                    onPress={onClose}>
+                                    เพิ่ม
                                 </Button>
                             </ModalFooter>
                         </form>

@@ -1,11 +1,13 @@
 "use client"
-import React from 'react'
 import { SessionProvider } from 'next-auth/react'
+import { NextUIProvider } from "@nextui-org/react";
 
 const AuthProvider = ({ children }) => {
     return (
         <SessionProvider>
-            {children}
+            <NextUIProvider>
+                {children}
+            </NextUIProvider>
         </SessionProvider>
     )
 }
