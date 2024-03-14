@@ -22,20 +22,23 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from 'next/link';
 import { TbRestore } from "react-icons/tb";
+
 async function fetchData() {
     try {
         const result = await axios.get(`${hostname}/api/groups`);
         const data = result.data.data;
+        let groupData = []
+        if (data.length) {
+            groupData = await Promise.all(data.map(async group => {
+                const categoryResult = await axios.get(`${hostname}/api/categories/${group.category_id}`);
+                const categoryData = categoryResult.data.data;
 
-        const groupData = await Promise.all(data.map(async group => {
-            const categoryResult = await axios.get(`${hostname}/api/categories/${group.category_id}`);
-            const categoryData = categoryResult.data.data;
-
-            return {
-                ...group,
-                category: categoryData
-            };
-        }));
+                return {
+                    ...group,
+                    category: categoryData
+                };
+            }));
+        }
 
         return groupData;
     } catch (error) {
