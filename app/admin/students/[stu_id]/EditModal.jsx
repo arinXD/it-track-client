@@ -1,6 +1,6 @@
 import { hostname } from '@/app/api/hostname'
 import { getToken } from '@/app/components/serverAction/TokenAction'
-import { getLastTenYear } from '@/src/util/academicYear'
+import { getAcadyears } from '@/src/util/academicYear'
 import { Autocomplete, AutocompleteItem, Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup } from '@nextui-org/react'
 import axios from 'axios'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -40,7 +40,7 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
     })
 
     useEffect(() => {
-        const acads = getLastTenYear();
+        const acads = getAcadyears();
         const result = acads.map(acad => ({
             acadyear: String(acad)
         }));
