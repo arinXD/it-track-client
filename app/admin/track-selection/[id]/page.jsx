@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StudentTrackTable from './StudentTrackTable';
 import TrackCard from './TrackCard';
+import { tableClass } from '@/src/util/tableClass';
 
 const showToastMessage = (ok, message) => {
     if (ok) {
@@ -43,10 +44,12 @@ const showToastMessage = (ok, message) => {
 
 const Page = ({ params }) => {
 
+    const [trackSubj, setTrackSubj] = useState([])
     const [trackSelect, setTrackSelect] = useState({})
     const [studentsBit, setStudentsBit] = useState({})
     const [studentsNetwork, setStudentsNetwork] = useState({})
     const [studentsWeb, setStudentsWeb] = useState({})
+    const [studentsSelect, setStudentsSelect] = useState([])
 
     const [starting, setStarting] = useState(false)
     const [updating, setUpdating] = useState(false)
@@ -64,6 +67,7 @@ const Page = ({ params }) => {
             result.startAt = format(new Date(result?.startAt), 'yyyy-MM-dd HH:mm')
             result.expiredAt = format(new Date(result?.expiredAt), 'yyyy-MM-dd HH:mm')
             setTrackSelect(result)
+            setTrackSubj(result?.Subjects)
         } catch (err) {
             console.error("Error on init func:", err);
         }
@@ -95,11 +99,13 @@ const Page = ({ params }) => {
 
             const stuBit = trackSelect?.Selections?.filter(select => select.result == "BIT")
             const stuNetwork = trackSelect?.Selections?.filter(select => select.result == "Network")
-            const stuWeb = trackSelect?.Selections?.filter(select => select.result == "WEB")
+            const stuWeb = trackSelect?.Selections?.filter(select => select.result == "Web and Mobile")
+            const stuSelect = trackSelect?.Selections?.filter(select => select.result == null)
 
             setStudentsBit(getStudentCount(stuBit))
             setStudentsNetwork(getStudentCount(stuNetwork))
             setStudentsWeb(getStudentCount(stuWeb))
+            setStudentsSelect(getStudentCount(stuSelect))
         }
     }, [trackSelect]);
 
@@ -242,21 +248,21 @@ const Page = ({ params }) => {
                                         {title}
                                     </h1>
                                     <div className='my-4 flex flex-row gap-4 w-full'>
-                                        <div className='space-y-3 border-1 rounded-md p-3 w-[50%]'>
+                                        <div className='space-y-3 border-1 rounded-md p-3 w-[70%]'>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[18%] text-end'>ปีการศึกษา: </span>
+                                                <span className='inline-block w-[12%] text-end'>ปีการศึกษา: </span>
                                                 <input
                                                     type='number'
                                                     readOnly
                                                     value={trackSelect.acadyear}
-                                                    className='select-none w-[82%] border-1 px-2 py-1.5 rounded-md border-gray-300' />
+                                                    className='select-none w-[88%] border-1 px-2 py-1.5 rounded-md border-gray-300' />
                                             </div>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[18%] text-end'>เริ่มต้น: </span>
+                                                <span className='inline-block w-[12%] text-end'>เริ่มต้น: </span>
                                                 <input
                                                     type='datetime-local'
                                                     required
-                                                    className='w-[82%] border-1 px-2 py-1.5 rounded-md border-gray-300'
+                                                    className='w-[88%] border-1 px-2 py-1.5 rounded-md border-gray-300'
                                                     value={startAt}
                                                     onChange={(e) => {
                                                         setStartAt(e.target.value)
@@ -264,11 +270,11 @@ const Page = ({ params }) => {
                                                     }} />
                                             </div>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[18%] text-end'>สิ้นสุด: </span>
+                                                <span className='inline-block w-[12%] text-end'>สิ้นสุด: </span>
                                                 <input
                                                     type='datetime-local'
                                                     required
-                                                    className='w-[82%] border-1 px-2 py-1.5 rounded-md border-gray-300'
+                                                    className='w-[88%] border-1 px-2 py-1.5 rounded-md border-gray-300'
                                                     value={expiredAt}
                                                     onChange={(e) => {
                                                         setExpiredAt(e.target.value)
@@ -276,7 +282,7 @@ const Page = ({ params }) => {
                                                     }} />
                                             </div>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[18%] text-end'>สถานะ: </span>
+                                                <span className='inline-block w-[12%] text-end'>สถานะ: </span>
                                                 <input
                                                     type="radio"
                                                     name='hasFinished'
@@ -301,20 +307,20 @@ const Page = ({ params }) => {
                                                 <span>สิ้นสุด</span>
                                             </div>
                                         </div>
-                                        <div className='w-[50%] flex flex-col justify-between'>
+                                        <div className='w-[30%] flex flex-col justify-between'>
                                             <div>
                                                 {!(trackSelect.has_finished) ?
                                                     <Button size='md'
                                                         isLoading={starting}
                                                         onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
-                                                        color="default" variant="bordered" className='w-full'>
+                                                        color="primary" variant="solid" className='bg-blue-500 w-full'>
                                                         {starting ? "ปิดการคัดเลือก..." : "ปิดการคัดเลือก"}
                                                     </Button>
                                                     :
                                                     <Button size='md'
                                                         isLoading={starting}
                                                         onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
-                                                        color="default" variant="bordered" className='w-full'>
+                                                        color="primary" variant="solid" className='bg-blue-500 w-full'>
                                                         {starting ? "เปิดการคัดเลือก..." : "เปิดการคัดเลือก"}
                                                     </Button>}
                                             </div>
@@ -347,183 +353,6 @@ const Page = ({ params }) => {
                                     {
                                         !parseInt(studentsBit?.normal + studentsNetwork?.normal + studentsWeb?.normal) ? null :
                                             <div className='grid grid-cols-3 gap-8 max-xl:grid-cols-2 max-lg:grid-cols-1'>
-                                                <div className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
-                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
-                                                        <div class="rounded-full flex relative">
-                                                            <div class="w-20 h-20 bg-red-100 rounded-full flex justify-center items-center">
-                                                                <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
-                                                        <table className='table-auto mx-auto'>
-                                                            <thead>
-                                                                <tr className=''>
-                                                                    <th className='text-lg'>Business Information Technology</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className='flex flex-col gap-2 mt-3'>
-                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsBit?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsBit?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                            <div>
-                                                                                <Link href={"#bit-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
-                                                                            </div>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
-                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
-                                                        <div class="rounded-full flex relative">
-                                                            <div class="w-20 h-20 bg-blue-100 rounded-full flex justify-center items-center">
-                                                                <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
-                                                        <table className='table-auto mx-auto'>
-                                                            <thead>
-                                                                <tr className=''>
-                                                                    <th className='text-xl'>IOT & Networking  <span className='invisible'>sssssssss</span></th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className='flex flex-col gap-2 mt-3'>
-                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsNetwork?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsNetwork?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                            <div>
-                                                                                <Link href={"#network-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
-                                                                            </div>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div className="grid grid-cols-3 text-center shadow-lg rounded-l-full">
-                                                    <div className='p-4 border-l-8 border-t-8 border-b-8 rounded-l-full bg-white grid place-content-center '>
-                                                        <div class="rounded-full flex relative">
-                                                            <div class="w-20 h-20 bg-green-100 rounded-full flex justify-center items-center">
-                                                                <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="py-4 pr-4 col-span-2 bg-white border-y-8 border-r-8 flex">
-                                                        <table className='table-auto mx-auto'>
-                                                            <thead>
-                                                                <tr className=''>
-                                                                    <th className='text-lg'>Web Application & Mobile</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className='flex flex-col gap-2 mt-3'>
-                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsWeb?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsWeb?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                            <div>
-                                                                                <Link href={"#web-students"}><Button className='w-full mt-2' color='primary'>รายละเอียด</Button></Link>
-                                                                            </div>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                {/* <Link href="#bit-students" className="flex flex-row text-center rounded-l-full">
-                                                    <div className={`bg-purple-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div class="rounded-full flex relative justify-center items-center">
-                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
-                                                                <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-purple-400 text-white`}>
-                                                        <table className='table-auto mx-auto'>
-                                                            <thead>
-                                                                <tr className=''>
-                                                                    <th className='text-base'>Business Information Technology</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className='flex flex-col gap-2 mt-3'>
-                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsBit?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsBit?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </Link>
-                                                <Link href="#network-students" className="flex flex-row text-center rounded-l-full">
-                                                    <div className={`bg-emerald-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div class="rounded-full flex relative justify-center items-center">
-                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
-                                                                <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-emerald-400 text-white`}>
-                                                        <table className='table-auto mx-auto'>
-                                                            <thead>
-                                                                <tr className=''>
-                                                                    <th className='text-base'>IOT & Networking</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className='flex flex-col gap-2 mt-3'>
-                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsNetwork?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsNetwork?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </Link>
-                                                <Link href="#web-students" className="flex flex-row text-center rounded-l-full">
-                                                    <div className={`bg-indigo-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div class="rounded-full flex relative justify-center items-center">
-                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
-                                                                <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-indigo-400 text-white`}>
-                                                        <table className='table-auto mx-auto'>
-                                                            <thead>
-                                                                <tr className=''>
-                                                                    <th className='text-base'>Web Application & Mobile</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className='flex flex-col gap-2 mt-3'>
-                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsWeb?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsWeb?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </Link> */}
                                                 <TrackCard target="#bit-students" color={"purple"} title={"Business Information Technology"} studentArr={studentsBit} />
                                                 <TrackCard target="#network-students" color={"emerald"} title={"IOT & Networking"} studentArr={studentsNetwork} />
                                                 <TrackCard target="#web-students" color={"indigo"} title={"Web Application & Mobile"} studentArr={studentsWeb} />
@@ -531,9 +360,9 @@ const Page = ({ params }) => {
                                     }
                                     <div>
                                         <h2 className='mb-3 text-small text-default-900'>วิชาที่ใช้ในการคัดเลือก</h2>
-                                        {trackSelect?.Subjects &&
+                                        {trackSubj &&
                                             <Table
-                                                isStriped
+                                                classNames={tableClass}
                                                 removeWrapper
                                                 selectionMode="multiple"
                                                 // onSelectionChange={setSelectedKeys}
@@ -546,9 +375,9 @@ const Page = ({ params }) => {
                                                     <TableColumn>ชื่อวิชา TH</TableColumn>
                                                     <TableColumn>หน่วยกิต</TableColumn>
                                                 </TableHeader>
-                                                {trackSelect?.Subjects.length > 0 ?
+                                                {trackSubj.length > 0 ?
                                                     <TableBody>
-                                                        {trackSelect?.Subjects.map(subj => (
+                                                        {trackSubj.map(subj => (
                                                             <TableRow key={subj.subject_code}>
                                                                 <TableCell className=''>
                                                                     <Tooltip color="danger" content="ลบ">
@@ -568,9 +397,22 @@ const Page = ({ params }) => {
                                             </Table>
                                         }
                                     </div>
-                                    <StudentTrackTable studentData={studentsBit} track={"BIT"} />
-                                    <StudentTrackTable studentData={studentsNetwork} track={"Network"} />
-                                    <StudentTrackTable studentData={studentsWeb} track={"WEB"} />
+                                    {
+                                        studentsSelect?.students?.length > 0 ?
+                                            <div>
+                                                <p className='text-default-900 text-small'>รายชื่อนักศึกษาที่เข้ารับการคัดเลือก</p>
+                                                <StudentTrackTable trackSubj={trackSubj} studentData={studentsSelect} title={false} track={"กำลังคัดเลือก"} />
+                                            </div>
+                                            : (studentsBit?.students?.length == 0 &&
+                                                studentsNetwork?.students?.length == 0 &&
+                                                studentsWeb?.students?.length == 0) ?
+                                                <p>ยังไม่มีนักศึกษาเลือกแทรค</p>
+                                                :
+                                                null
+                                    }
+                                    {studentsBit?.students?.length == 0 ? null : <StudentTrackTable trackSubj={trackSubj} studentData={studentsBit} track={"BIT"} />}
+                                    {studentsNetwork?.students?.length == 0 ? null : <StudentTrackTable trackSubj={trackSubj} studentData={studentsNetwork} track={"Network"} />}
+                                    {studentsWeb?.students?.length == 0 ? null : <StudentTrackTable trackSubj={trackSubj} studentData={studentsWeb} track={"Web and Mobile"} />}
                                 </div>
                                 :
                                 <>

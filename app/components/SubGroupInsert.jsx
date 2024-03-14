@@ -7,12 +7,37 @@ import axios from 'axios';
 import Select from 'react-select';
 import { hostname } from '@/app/api/hostname';
 import { Input } from "@nextui-org/react";
+import { toast } from 'react-toastify';
 
 export default function SubGroupInsert({ isOpen, onClose, onDataInserted }) {
     const [subGroupTitle, setSubGroupTitle] = useState('');
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [groups, setGroups] = useState([]);
-
+    const showToastMessage = (ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
     useEffect(() => {
         const fetchGroups = async () => {
             try {
@@ -37,7 +62,12 @@ export default function SubGroupInsert({ isOpen, onClose, onDataInserted }) {
         try {
             // Check if a group is selected
             if (!selectedGroup) {
-                alert('Please select a subgroup.');
+                showToastMessage(false, 'โปรดเลือกกลุ่มวิชา');
+                return;
+            }
+
+            if (!subGroupTitle.trim()) {
+                showToastMessage(false, 'กลุ่มย่อยห้ามเป็นค่าว่าง');
                 return;
             }
 
@@ -46,14 +76,21 @@ export default function SubGroupInsert({ isOpen, onClose, onDataInserted }) {
                 group_id: selectedGroup.value
             });
 
-            console.log('Inserted subgroup:', result.data.data);
+            // showToastMessage(true, `เพิ่มกลุ่มย่อยวิชา ${result.data.data.sub_group_title} สำเร็จ`);
 
             onDataInserted();
         } catch (error) {
-            console.error('Error inserting subgroup:', error);
-            // Handle error if needed
+            showToastMessage(false, 'กลุ่มย่อยวิชาซ้ำ');
         }
     };
+
+    useEffect(() => {
+        if (isOpen) {
+            // Clear all state values
+            setSubGroupTitle('');
+            setSelectedGroup(null);
+        }
+    }, [isOpen]);
 
     return (
         <Modal size="sm" isOpen={isOpen} onClose={onClose}>

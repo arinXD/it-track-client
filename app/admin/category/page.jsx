@@ -20,7 +20,8 @@ import {
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import Link from 'next/link';
+import { TbRestore } from "react-icons/tb";
 async function fetchData() {
     try {
         const result = await axios.get(`${hostname}/api/categories`);
@@ -160,7 +161,7 @@ export default function Category() {
         } catch (error) {
             // Handle error if needed
             console.error('Error updating data:', error);
-            showToastMessage(false, "Error updating category");
+            showToastMessage(false, "ไม่สามารถอัปเดตข้อมูลได้");
         }
     };
 
@@ -213,15 +214,23 @@ export default function Category() {
                                     color="primary"
                                 >
                                     เพิ่มหมวดหมู่วิชา
-                                    <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
+                                    <PlusIcon className={'w-[18px] h-[18px] text-white hidden md:block md:w-6 md:h-6'} />
                                 </Button>
                                 <Button
                                     className="bg-red-400 text-white w-1/2"
 
                                 >
                                     Delete Select
-                                    <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
+                                    <DeleteIcon className={'w-[18px] h-[18px] text-white hidden md:block md:w-8 md:h-8'} />
                                 </Button>
+                                <Link href={'/admin/category/restore'}>
+                                    <Button
+                                        className="bg-gray-300 text-black"
+                                        endContent={<TbRestore className={'w-[18px] h-[18px] text-black hidden md:block '} />}
+                                    >
+                                        รายการที่ถูกลบ
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -256,7 +265,7 @@ export default function Category() {
                                             </div>
                                         </TableCell>
                                         {/* <TableCell>{index + 1}</TableCell> */}
-                                        <TableCell className='text-blue-500 w-1/2'>{category.category_title}</TableCell>
+                                        <TableCell className='text-black w-1/2'>{category.category_title}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(category[column]) : category[column]}</span>

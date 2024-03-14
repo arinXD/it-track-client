@@ -11,6 +11,10 @@ import { hostname } from '@/app/api/hostname';
 import { fetchData } from '../admin/action'
 import { Input, Textarea } from "@nextui-org/react";
 
+import { getAcadyears } from "@/src/util/academicYear";
+
+import { toast } from 'react-toastify';
+
 export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
     const [semester, setSemester] = useState('');
     const [subject_code, setSubjectCode] = useState('');
@@ -28,6 +32,31 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
     const [selectedAcadYear, setSelectedAcadYear] = useState(null);
     const [acadyears, setAcadYear] = useState([]);
 
+    const showToastMessage = (ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
     useEffect(() => {
         const fetchSubGroups = async () => {
             try {
@@ -59,46 +88,65 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                 console.error('Error fetching groups:', error);
             }
         };
-        const fetchAcadYear = async () => {
-            try {
-                const acadyears = await fetchData("/api/acadyear")
 
-                const acadyearOptions = acadyears.map(acadyear => ({
-                    value: acadyear.acadyear,
-                    label: acadyear.acadyear
-                }));
 
-                setAcadYear(acadyearOptions);
-            } catch (error) {
-                console.error('Error fetching acadyears:', error);
-            }
-        };
+        const acadyearOptions = getAcadyears().map(acadyear => ({
+            value: acadyear,
+            label: acadyear
+        }));
+
+        setAcadYear(acadyearOptions);
 
         fetchSubGroups();
         fetchGroups();
-        fetchAcadYear();
     }, []);
+
+    useEffect(() => {
+        if (isOpen) {
+            // Clear all state values
+            setSemester('');
+            setSubjectCode('');
+            setTitleTh('');
+            setTitleEn('');
+            setInformation('');
+            setCredit('');
+            setSelectedSubGroup(null);
+            setSelectedGroup(null);
+            setSelectedAcadYear(null);
+        }
+    }, [isOpen]);
 
     const handleInsertSubject = async () => {
         try {
+
+            if (semester < 0 || credit < 0) {
+                showToastMessage(false, 'เทอมหรือหน่วยกิตต้องเป็นเลขบวกเท่านั้น');
+                return;
+            }
+
+            if (!subject_code.trim()) {
+                showToastMessage(false, 'รหัสวิชาห้ามเป็นค่าว่าง');
+                return;
+            }
+
             const result = await axios.post(`${hostname}/api/subjects/insertSubject`, {
-                semester: semester ? semester : null,
                 subject_code: subject_code ? subject_code : null,
                 title_th: title_th ? title_th : null,
                 title_en: title_en ? title_en : null,
                 information: information ? information : null,
+                semester: semester ? semester : null,
                 credit: credit ? credit : null,
                 sub_group_id: selectedSubGroup ? selectedSubGroup.value : null,
                 group_id: selectedGroup ? selectedGroup.value : null,
                 acadyear: selectedAcadYear ? selectedAcadYear.value : null,
             });
 
-            console.log('Inserted subjects:', result.data.data);
-
             onDataInserted();
+            showToastMessage(true, `เพิ่มวิชา ${result.data.data.subject_code} สำเร็จ`);
         } catch (error) {
             console.error('Error inserting subjects:', error);
-            // Handle error if needed
+            showToastMessage(false, 'รหัสวิชาซ้ำ');
+
         }
     };
 
@@ -106,8 +154,8 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
         <Modal size="2xl" isOpen={isOpen} onClose={onClose}>
             <ModalContent>
                 <ModalHeader className="flex flex-col gap-1">เพิ่มวิชา</ModalHeader>
-                <ModalBody className='grid grid-cols-2 gap-4'>
-                    <div>
+                <ModalBody className='grid grid-cols-9 gap-4'>
+                    <div className='col-span-3'>
                         <label htmlFor="group">กลุ่มรายวิชา</label>
                         <Select
                             className='z-50'
@@ -119,7 +167,7 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                             isClearable
                         />
                     </div>
-                    <div>
+                    <div className='col-span-3'>
                         <label htmlFor="subgroup">กลุ่มย่อย</label>
                         <Select
                             className='z-50'
@@ -130,9 +178,9 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                             isSearchable
                             isClearable
                         />
-                    </div>
-                    <div>
-                        <label htmlFor="acadyear">Select Acadyear:</label>
+                    </div >
+                    <div className='col-span-3'>
+                        <label htmlFor="acadyear">ปีการศึกษา</label>
                         <Select
                             className='z-40'
                             id="acadyear"
@@ -145,7 +193,31 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                     </div>
 
                     <Input
-                        className='col-span-2'
+                        className='col-span-3'
+                        type="text"
+                        id="subject_code"
+                        label="รหัสวิชา"
+                        value={subject_code}
+                        onChange={(e) => setSubjectCode(e.target.value)}
+                    />
+                    <Input
+                        className='col-span-3'
+                        type="number"
+                        id="semester"
+                        label="เทอม"
+                        value={semester}
+                        onChange={(e) => setSemester(e.target.value)}
+                    />
+                    <Input
+                        className='col-span-3'
+                        type="number"
+                        id="credit"
+                        label="หน่วยกิต"
+                        value={credit}
+                        onChange={(e) => setCredit(e.target.value)}
+                    />
+                    <Input
+                        className='col-span-9'
                         type="text"
                         id="title_th"
                         label="ชื่อภาษาไทย"
@@ -154,31 +226,17 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                     />
 
                     <Input
-                        className='col-span-2'
+                        className='col-span-9'
                         type="text"
                         id="title_en"
                         label="ชื่อภาษาอังกฤษ"
                         value={title_en}
                         onChange={(e) => setTitleEn(e.target.value)}
                     />
-                    <Input
-                        type="text"
-                        id="semester"
-                        label="เทอม"
-                        value={semester}
-                        onChange={(e) => setSemester(e.target.value)}
-                    />
-
-                    <Input
-                        type="text"
-                        id="subject_code"
-                        label="รหัสวิชา"
-                        value={subject_code}
-                        onChange={(e) => setSubjectCode(e.target.value)}
-                    />
 
 
                     <Textarea
+                        className='col-span-9'
                         id="information"
                         label="รายละเอียด"
                         variant="bordered"
@@ -187,19 +245,12 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                         disableAnimation
                         disableAutosize
                         classNames={{
-                            base: "max-w-xs",
+                            base: "",
                             input: "resize-y min-h-[40px]",
                         }}
                         onChange={(e) => setInformation(e.target.value)}
                     />
 
-                    <Input
-                        type="text"
-                        id="credit"
-                        label="หน่วยกิต"
-                        value={credit}
-                        onChange={(e) => setCredit(e.target.value)}
-                    />
 
                 </ModalBody>
                 <ModalFooter>

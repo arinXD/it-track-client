@@ -18,6 +18,7 @@ const links = {
     "track-student": "รายชื่อนักศึกษาภายในแทรค",
     "dashboard": "Dashboard",
     "students":"รายชื่อนักศึกษา",
+    "restore":"รายการที่ถูกลบ",
 };
 
 const BreadCrumb = () => {

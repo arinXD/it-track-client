@@ -6,18 +6,23 @@ import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import Select from 'react-select';
 
+import { Input, Textarea } from "@nextui-org/react";
+
+import { getAcadyears } from "@/src/util/academicYear";
+
 export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCodeId }) {
     const [program_code, setUpdatedTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [version, setVersion] = useState('');
     const [selectedProgram, setSelectedProgram] = useState(null);
     const [programs, setPrograms] = useState([]);
 
+    const [selectedAcadyears, setSelectedAcadyears] = useState(null);
+    const [acadyears, setAcadyears] = useState([]);
     useEffect(() => {
+
         const fetchProgramCode = async () => {
             try {
                 const response = await axios.get(`${hostname}/api/programcodes/${programCodeId}`);
-                setVersion(response.data.data.version);
                 setUpdatedTitle(response.data.data.program_code);
                 setDescription(response.data.data.desc);
 
@@ -35,6 +40,17 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
                 // Find the selected category based on the current group's category ID
                 const selectedProgram = options.find(option => option.value === response.data.data.program);
                 setSelectedProgram(selectedProgram);
+
+                const acadyearOptions = getAcadyears().map(acadyear => ({
+                    value: acadyear,
+                    label: acadyear
+                }));
+
+                setAcadyears(acadyearOptions);
+
+                const selectedAcadyear = acadyearOptions.find(option => option.value === response.data.data.version);
+                setSelectedAcadyears(selectedAcadyear);
+
             } catch (error) {
                 console.error('Error fetching program code:', error);
             }
@@ -63,66 +79,92 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
 
     const handleUpdateProgramCode = async () => {
         try {
+
+            if (!selectedProgram) {
+                showToastMessage(false, 'โปรดเลือกหลักสูตร');
+                return;
+            }
+
             await axios.post(`${hostname}/api/programcodes/updateProgramCode/${programCodeId}`, {
                 program_code: program_code,
                 desc: description,
-                version: version,
-                program: selectedProgram.value, // Add the selected program ID
-                // Add other fields as needed
+                version: selectedAcadyears.value,
+                program: selectedProgram.value,
+
             });
 
-            // Notify the parent component that data has been updated
             onUpdate();
 
-            // Close the modal after updating
             onClose();
         } catch (error) {
             console.error('Error updating program code:', error);
+            showToastMessage(false, 'รหัสหลักสูตรห้ามซ้ำ');
         }
     };
 
     return (
-        <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+        <Modal size="2xl" isOpen={isOpen} onClose={onClose}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">Update Program Code</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">แก้ไขรหัสหลักสูตร</ModalHeader>
                 <ModalBody>
-                    <label htmlFor="updatedTitle">Updated Program Code Title:</label>
-                    <input
+                    <div className='grid grid-cols-4 gap-4'>
+                        <div className='col-span-2'>
+                            <label htmlFor="group">หลักสูตร</label>
+                            <Select
+                                className='z-50'
+                                id="program"
+                                value={selectedProgram}
+                                options={programs}
+                                onChange={(selectedOption) => setSelectedProgram(selectedOption)}
+                                isSearchable
+                            />
+                        </div>
+                        <div className='col-span-2'>
+                            <label htmlFor="acadyear">ปีการศึกษา</label>
+                            <Select
+                                className='z-40'
+                                id="acadyear"
+                                value={selectedAcadyears}
+                                options={acadyears}
+                                onChange={(selectedOption) => setSelectedAcadyears(selectedOption)}
+                                isSearchable
+                                isClearable
+                            />
+                        </div>
+                    </div>
+
+                    <Input
+                        className='col-span-4 my-1'
                         type="text"
+                        disabled
                         id="updatedTitle"
+                        label="รหัสหลักสูตร"
                         value={program_code}
                         onChange={(e) => setUpdatedTitle(e.target.value)}
                     />
-                    <label htmlFor="description">Description:</label>
-                    <input
-                        type="text"
-                        id="description"
+
+                    <Textarea
+                        className='col-span-4'
+                        label="คำอธิบาย"
+                        variant="bordered"
+                        placeholder="เพิ่มรายละเอียด"
                         value={description}
+                        disableAnimation
+                        disableAutosize
+                        classNames={{
+                            base: "",
+                            input: "resize-y min-h-[40px]",
+                        }}
                         onChange={(e) => setDescription(e.target.value)}
                     />
-                    <label htmlFor="version">Version:</label>
-                    <input
-                        type="text"
-                        id="version"
-                        value={version}
-                        onChange={(e) => setVersion(e.target.value)}
-                    />
-                    <label htmlFor="program">Select Program:</label>
-                    <Select
-                        id="program"
-                        value={selectedProgram}
-                        options={programs}
-                        onChange={(selectedOption) => setSelectedProgram(selectedOption)}
-                        isSearchable
-                    />
-                    {/* Add other form fields as needed */}
+
                 </ModalBody>
                 <ModalFooter>
                     <Button color="danger" variant="light" onPress={onClose}>
-                        Close
+                        ยกเลิก
                     </Button>
                     <Button color="primary" onPress={handleUpdateProgramCode}>
-                        Update Program Code
+                        บันทึก
                     </Button>
                 </ModalFooter>
             </ModalContent>

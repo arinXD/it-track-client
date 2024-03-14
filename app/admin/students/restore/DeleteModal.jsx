@@ -13,7 +13,7 @@ const DeleteModal = ({ showToastMessage, callData, delIsOpen, delOnClose, stuId 
         try {
             const token = await getToken()
             const options = {
-                url: `${hostname}/api/students/${stuId}`,
+                url: `${hostname}/api/students/${stuId}/force`,
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',

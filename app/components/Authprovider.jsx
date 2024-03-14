@@ -2,9 +2,9 @@
 import { SessionProvider } from 'next-auth/react'
 import { NextUIProvider } from "@nextui-org/react";
 
-const AuthProvider = ({ session, children }) => {
+const AuthProvider = ({ children }) => {
     return (
-        <SessionProvider session={session}>
+        <SessionProvider>
             <NextUIProvider>
                 {children}
             </NextUIProvider>

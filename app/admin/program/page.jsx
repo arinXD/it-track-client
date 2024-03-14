@@ -20,7 +20,10 @@ import {
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { TbRestore } from "react-icons/tb";
 
+import Link from 'next/link';
+import { tableClass } from '@/src/util/tableClass';
 async function fetchData() {
     try {
         const programResult = await axios.get(`${hostname}/api/programs`);
@@ -88,7 +91,6 @@ export default function Program() {
             const data = await fetchData();
             setPrograms(data.program)
 
-            showToastMessage(true, `เพิ่มหลักสูตรสำเร็จ`);
             handleInsertModalClose();
 
         } catch (error) {
@@ -113,7 +115,6 @@ export default function Program() {
         try {
             const data = await fetchData();
             setPrograms(data.program)
-            showToastMessage(true, `อัปเดตข้อมูลสำเร็จ`);
             handleUpdateModalClose();
 
         } catch (error) {
@@ -124,7 +125,7 @@ export default function Program() {
 
     const handleDeleteProgram = async (program) => {
         const { value } = await Swal.fire({
-            text: `ต้องการลบหลักสูตร ${program.title_th} หรือไม่ ?`,
+            text: `ต้องการลบหลักสูตร ${program.title_th ? program.title_th : program.program} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -138,7 +139,7 @@ export default function Program() {
                 const result = await axios.delete(`${hostname}/api/programs/deleteProgram/${program.program}`);
 
                 const { ok, message } = result.data
-                showToastMessage(ok, `ลบหลักสูตร ${program.title_th} สำเร็จ`)
+                showToastMessage(ok, `ลบหลักสูตร ${program.title_th ? program.title_th : program.program} สำเร็จ`)
                 const data = await fetchData();
 
                 setPrograms(data.program);
@@ -200,6 +201,14 @@ export default function Program() {
                                     Delete Select
                                     <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
                                 </Button>
+                                <Link href={'/admin/program/restore'}>
+                                    <Button
+                                        className="bg-gray-300 text-black"
+                                        endContent={<TbRestore className={'w-[18px] h-[18px] text-black hidden md:block '} />}
+                                    >
+                                        รายการที่ถูกลบ
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -235,9 +244,9 @@ export default function Program() {
                                                 </Tooltip>
                                             </div>
                                         </TableCell>
-                                        <TableCell>{program.program}</TableCell>
-                                        <TableCell>{program.title_en}</TableCell>
-                                        <TableCell>{program.title_th}</TableCell>
+                                        <TableCell>{program.program || "-"}</TableCell>
+                                        <TableCell>{program.title_en || "-"}</TableCell>
+                                        <TableCell>{program.title_th || "-"}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(program[column]) : program[column]}</span>

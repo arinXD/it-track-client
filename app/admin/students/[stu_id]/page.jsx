@@ -1,18 +1,43 @@
 "use client"
 import React, { useEffect, useMemo, useState } from 'react'
-import { fetchDataObj } from '../../action'
-import { ContentWrap, Navbar, Sidebar } from '@/app/components'
+import { fetchData, fetchDataObj } from '../../action'
+import { BreadCrumb, ContentWrap, Navbar, Sidebar } from '@/app/components'
 import Image from 'next/image'
 import { dmy } from '@/src/util/dateFormater'
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
-import { VerticalDotsIcon } from '@/app/components/icons'
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useDisclosure } from '@nextui-org/react'
+import { DeleteIcon, DeleteIcon2, EditIcon2, VerticalDotsIcon } from '@/app/components/icons'
+import { Spinner } from "@nextui-org/react";
+import { tableClass } from '@/src/util/tableClass'
+import Link from 'next/link'
+import EditModal from './EditModal'
+import { useSearchParams } from 'next/navigation'
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import DeleteModal from '../DeleteModal'
 
 export default function Page({ params }) {
-    const { stu_id } = params
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: delIsOpen, onOpen: delOnOpen, onClose: delOnClose } = useDisclosure();
+    const searchParams = useSearchParams()
+    const editMode = searchParams.get('edit') || "0"
     const [student, setStudent] = useState({})
+
+    const { stu_id } = params
     const [selectedKeys, setSelectedKeys] = useState([])
     const [gpa, setGpa] = useState(0)
     const [enrollmentsByYear, setEnrollmentsByYear] = useState([])
+    const [fetching, setFetching] = useState(true)
+    const [programs, setPrograms] = useState([])
+    const [status, setStatus] = useState([])
+    const [updateData, setUpdateData] = useState({})
+
+    useEffect(() => {
+        if (fetching == false && Object.keys(student).length == 0) {
+            setTimeout(() => {
+                window.location.href = "/admin/students"
+            }, 1500)
+        }
+    }, [fetching, student])
 
     async function getStudentData() {
         const student = await fetchDataObj(`/api/students/${stu_id}`)
@@ -54,6 +79,18 @@ export default function Page({ params }) {
         }
     }
 
+    async function getPrograms() {
+        const programs = await fetchData(`/api/programs`)
+        setPrograms(programs)
+    }
+
+    async function getStudentStatuses() {
+        const filterStatus = [10, 50, 62]
+        let statuses = await fetchData("/api/statuses")
+        statuses = statuses.filter(e => filterStatus.includes(e.id))
+        setStatus(statuses)
+    }
+
     function calGrade(grade) {
         const grades = {
             "A": 4,
@@ -89,125 +126,210 @@ export default function Page({ params }) {
         return typeof number == "number"
     }
 
+    async function initData() {
+        setFetching(true)
+        await getStudentData()
+        await getPrograms()
+        await getStudentStatuses()
+        setFetching(false)
+    }
+
     useEffect(() => {
-        getStudentData()
+        initData()
     }, [])
 
-    const tableClass = useMemo(
-        () => ({
-            wrapper: ["max-h-[382px]", "max-w-3xl"],
-            th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
-            td: [
-                "group-data-[first=true]:first:before:rounded-none",
-                "group-data-[first=true]:last:before:rounded-none",
+    function showToastMessage(ok, message) {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
 
-                "group-data-[middle=true]:before:rounded-none",
 
-                "group-data-[last=true]:first:before:rounded-none",
-                "group-data-[last=true]:last:before:rounded-none",
-            ],
-        }),
-        [],
-    );
+    useEffect(() => {
+        if (editMode == "1" && Object.keys(student).length && Object.keys(programs).length && Object.keys(status).length) {
+            handleEdit()
+        } else {
+            onClose()
+        }
+    }, [editMode, student, programs, status])
+
+    function handleEdit() {
+        const updatedStudent = { ...student };
+        delete updatedStudent.Enrollments;
+        setUpdateData(updatedStudent);
+        onOpen();
+    }
+
     return (
         <>
+            <ToastContainer />
             <header>
                 <Navbar />
             </header>
             <Sidebar />
             <ContentWrap>
+                <BreadCrumb />
+                <EditModal
+                    status={status}
+                    programs={programs}
+                    showToastMessage={showToastMessage}
+                    getStudentData={getStudentData}
+                    student={updateData}
+                    isOpen={isOpen}
+                    onClose={onClose} />
+                <DeleteModal
+                    showToastMessage={showToastMessage}
+                    callData={initData}
+                    delIsOpen={delIsOpen}
+                    delOnClose={delOnClose}
+                    stuId={stu_id} />
                 <div>
-                    <h1>Student Data</h1>
-                    {Object.keys(student).length ?
-                        <>
-                            <div className='flex gap-8'>
-                                <div className="w-[30%] border-1 flex justify-center items-center">
-                                    <Image
-                                        priority={true}
-                                        alt='student image'
-                                        width={100}
-                                        height={100}
-                                        src={student?.User?.image || "/image/user.png"}
-                                    />
-                                </div>
-                                <div className='w-[70%] border-1 flex flex-col space-y-3'>
-                                    <h1 className='text-lg'>{student.first_name} {student.last_name}</h1>
-                                    <div>
-                                        <p>Email {student.email}</p>
-                                        <p>นักศึกษาหลักสูตร {student?.Program?.title_th} {student?.courses_type}</p>
-                                        <p>สถานะภาพ {student?.StudentStatus?.description} ({student?.StudentStatus?.id})</p>
-                                        <p>GPA {gpa}</p>
-                                        <p>เข้าใช้เมื่อ {dmy(student?.User?.createdAt) || "-"}</p>
-                                    </div>
-                                </div>
+                    {
+                        fetching ?
+                            <div className='w-full flex justify-center h-[70vh]'>
+                                <Spinner label="กำลังโหลด..." color="primary" />
                             </div>
-                            <div>
-                                <p>รายวิชาที่ลงทะเบียน</p>
-                                {
-                                    Object.keys(enrollmentsByYear).length &&
-                                    Object.keys(enrollmentsByYear).map((year) => (
-                                        <div className='my-2' key={year}>
-                                            <p>ปีการศึกษา {year}</p>
-                                            <Table
-                                                isCompact
-                                                removeWrapper
-                                                aria-label="รายวิชาที่ลงทะเบียน"
-                                                checkboxesProps={{
-                                                    classNames: {
-                                                        wrapper: "after:bg-blue-500 after:text-background text-background",
-                                                    },
-                                                }}
-                                                classNames={tableClass}
-                                                // selectedKeys={selectedKeys}
-                                                selectionMode="multiple"
-                                                onSelectionChange={setSelectedKeys}
-                                            >
-                                                <TableHeader>
-                                                    <TableColumn>รหัสวิชา</TableColumn>
-                                                    <TableColumn>ชื่อวิชา</TableColumn>
-                                                    <TableColumn>หน่วยกิต</TableColumn>
-                                                    <TableColumn>เกรด</TableColumn>
-                                                    <TableColumn>เกรด</TableColumn>
-                                                    <TableColumn align="center">Action</TableColumn>
-                                                </TableHeader>
-                                                <TableBody emptyContent={"ไม่มีรายวิชาที่ลงทะเบียน"} items={enrollmentsByYear[year] || []}>
-                                                    {(item) => (
-                                                        <TableRow key={item.id}>
-                                                            <TableCell>{item?.subject_code}</TableCell>
-                                                            <TableCell>{item?.Subject?.title_en} <br /> {item?.Subject?.title_th}</TableCell>
-                                                            <TableCell>{item?.Subject?.credit}</TableCell>
-                                                            <TableCell>{item?.grade || "-"}</TableCell>
-                                                            <TableCell>{calGrade(item?.grade) == null ? "-" : isNumber(calGrade(item?.grade)) ? String(calGrade(item?.grade)) : calGrade(item?.grade)}</TableCell>
-                                                            <TableCell>
-                                                                <div className="relative flex justify-end items-center gap-2">
-                                                                    <Dropdown>
-                                                                        <DropdownTrigger>
-                                                                            <Button isIconOnly size="sm" variant="light">
-                                                                                <VerticalDotsIcon className="text-default-300" />
-                                                                            </Button>
-                                                                        </DropdownTrigger>
-                                                                        <DropdownMenu>
-                                                                            <DropdownItem href={``}>
-                                                                                View
-                                                                            </DropdownItem>
-                                                                            <DropdownItem>Edit</DropdownItem>
-                                                                            <DropdownItem>Delete</DropdownItem>
-                                                                        </DropdownMenu>
-                                                                    </Dropdown>
-                                                                </div>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    )}
-                                                </TableBody>
-                                            </Table>
+                            :
+                            Object.keys(student).length ?
+                                <>
+                                    <div className='flex gap-8 py-6'>
+                                        <div className="w-[30%] flex flex-col justify-center items-center">
+                                            <Image
+                                                priority={true}
+                                                alt='student image'
+                                                width={100}
+                                                height={100}
+                                                src={student?.User?.image || "/image/user.png"}
+                                            />
                                         </div>
-                                    ))
-                                }
-                            </div>
-                        </>
-
-                        :
-                        <>ไม่พบข้อมูลนักศึกษา</>
+                                        <div className='w-[70%] flex flex-col space-y-2'>
+                                            <div className='flex flex-2 gap-3 mb-2'>
+                                                <Button
+                                                    type='button'
+                                                    className=''
+                                                    radius='sm'
+                                                    color="primary"
+                                                    variant='solid'
+                                                    startContent={<EditIcon2 />}
+                                                    onPress={handleEdit}>
+                                                    แก้ไขรายชื่อนักศึกษา
+                                                </Button>
+                                                <Button
+                                                    type='button'
+                                                    className=''
+                                                    radius='sm'
+                                                    color="primary"
+                                                    startContent={<DeleteIcon2 />}
+                                                    variant='solid'
+                                                    onPress={delOnOpen}>
+                                                    ลบรายชื่อนักศึกษา
+                                                </Button>
+                                            </div>
+                                            <h1 className='text-lg'>{student.first_name} {student.last_name}</h1>
+                                            <div className='space-y-1'>
+                                                <p>
+                                                    อีเมล:
+                                                    <Link className='text-blue-500 ms-2' target='_blank' href={`https://mail.google.com/mail/?view=cm&fs=1&to=${student.email}&authuser=1`} >
+                                                        {student.email}
+                                                    </Link>
+                                                </p>
+                                                <p>นักศึกษาหลักสูตร {student?.Program?.title_th} {student?.courses_type}</p>
+                                                <p>สถานะภาพ: <span className='ms-1'>{student?.StudentStatus?.description} ({student?.StudentStatus?.id})</span></p>
+                                                <p>GPA: <span className='ms-1'>{gpa}</span></p>
+                                                {
+                                                    student?.User?.createdAt &&
+                                                    <p>เข้าใช้เมื่อ {dmy(student?.User?.createdAt) || "-"}</p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className='my-5 space-y-3'>
+                                        <p>รายวิชาที่ลงทะเบียน</p>
+                                        {
+                                            Object.keys(enrollmentsByYear).length == 0 ?
+                                                <>ไม่มีรายวิชาที่ลงทะเบียน</>
+                                                :
+                                                Object.keys(enrollmentsByYear).map((year) => (
+                                                    <div key={year}>
+                                                        <p className='mb-2'>ปีการศึกษา {year}</p>
+                                                        <Table
+                                                            isCompact
+                                                            removeWrapper
+                                                            aria-label="รายวิชาที่ลงทะเบียน"
+                                                            checkboxesProps={{
+                                                                classNames: {
+                                                                    wrapper: "after:bg-blue-500 after:text-background text-background",
+                                                                },
+                                                            }}
+                                                            classNames={tableClass}
+                                                            // selectedKeys={selectedKeys}
+                                                            selectionMode="multiple"
+                                                            onSelectionChange={setSelectedKeys}
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>รหัสวิชา</TableColumn>
+                                                                <TableColumn>ชื่อวิชา</TableColumn>
+                                                                <TableColumn>หน่วยกิต</TableColumn>
+                                                                <TableColumn>เกรด</TableColumn>
+                                                                <TableColumn>เกรด</TableColumn>
+                                                                <TableColumn align="center">Action</TableColumn>
+                                                            </TableHeader>
+                                                            <TableBody emptyContent={"ไม่มีรายวิชาที่ลงทะเบียน"} items={enrollmentsByYear[year] || []}>
+                                                                {(item) => (
+                                                                    <TableRow key={item.id}>
+                                                                        <TableCell>{item?.subject_code}</TableCell>
+                                                                        <TableCell>{item?.Subject?.title_en} <br /> {item?.Subject?.title_th}</TableCell>
+                                                                        <TableCell>{item?.Subject?.credit}</TableCell>
+                                                                        <TableCell>{item?.grade || "-"}</TableCell>
+                                                                        <TableCell>{calGrade(item?.grade) == null ? "-" : isNumber(calGrade(item?.grade)) ? String(calGrade(item?.grade)) : calGrade(item?.grade)}</TableCell>
+                                                                        <TableCell>
+                                                                            <div className="relative flex justify-center items-center gap-2">
+                                                                                <Dropdown>
+                                                                                    <DropdownTrigger>
+                                                                                        <Button isIconOnly size="sm" variant="light">
+                                                                                            <VerticalDotsIcon className="text-default-300" />
+                                                                                        </Button>
+                                                                                    </DropdownTrigger>
+                                                                                    <DropdownMenu>
+                                                                                        <DropdownItem>Edit</DropdownItem>
+                                                                                        <DropdownItem key="delete" className="text-danger" color="danger">
+                                                                                            Delete
+                                                                                        </DropdownItem>
+                                                                                    </DropdownMenu>
+                                                                                </Dropdown>
+                                                                            </div>
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                )}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </div>
+                                                ))
+                                        }
+                                    </div>
+                                </>
+                                :
+                                <>ไม่พบข้อมูลนักศึกษา</>
                     }
                 </div>
             </ContentWrap>

@@ -1,13 +1,13 @@
-function getLastTenYear() {
+function getAcadyears() {
     const currentYear = new Date().getFullYear();
-    const lastTenYears = [];
+    const getAcadyears = [];
 
-    for (let i = currentYear; i >= currentYear - 10; i--) {
-        lastTenYears.push(i + 543);
+    for (let i = currentYear; i >= currentYear - 20; i--) {
+        getAcadyears.push(i + 543);
     }
 
-    return lastTenYears
+    return getAcadyears
 }
 module.exports = {
-    getLastTenYear,
+    getAcadyears,
 }

@@ -2,19 +2,50 @@
 
 // ProgramCodeInsert.js
 import React, { useState, useEffect } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Autocomplete, AutocompleteSection, AutocompleteItem } from '@nextui-org/react';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import Select from 'react-select';
+import { Input, Textarea } from "@nextui-org/react";
 
+import { getAcadyears } from "@/src/util/academicYear";
+
+import { toast } from 'react-toastify';
 export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
     const [program_code, setProgramTitle] = useState('');
     const [desc, setDesc] = useState('');
     const [version, setVersion] = useState('');
-    const [program_id, setProgramId] = useState('');
     const [programs, setPrograms] = useState([]);
     const [selectedProgram, setSelectedProgram] = useState(null);
 
+    const [acadyears, setAcadYear] = useState([]);
+    const [selectedAcadYear, setSelectedAcadYear] = useState(null);
+
+    const showToastMessage = (ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -25,81 +56,127 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
                 console.error('Error fetching programs:', error);
             }
         };
+        const acadyearOptions = getAcadyears().map(acadyear => ({
+            value: acadyear,
+            label: acadyear
+        }));
 
+        setAcadYear(acadyearOptions);
         fetchData();
     }, []);
 
     const handleInsertProgramCode = async () => {
         try {
-            // Check if a program is selected
-            if (!selectedProgram) {
-                alert('Please select a subgroup.');
+
+            if (!program_code.trim()) {
+                showToastMessage(false, 'รหัสหลักสูตรห้ามเป็นค่าว่าง');
                 return;
             }
-    
+
+            if (!selectedProgram) {
+                showToastMessage(false, 'โปรดเลือกหลักสูตร');
+                return;
+            }
+
+            if (!selectedAcadYear) {
+                showToastMessage(false, 'โปรดเลือกปีการศึกษา');
+                return;
+            }
+
+            if (program_code < 0 || version < 0) {
+                showToastMessage(false, 'รหัสหลักสูตรต้องเป็นเลขบวกเท่านั้น');
+                return;
+            }
+
             const result = await axios.post(`${hostname}/api/programcodes/insertProgramCode`, {
                 program_code: program_code,
                 desc: desc,
-                version: version,
-                program: selectedProgram.value 
+                version: selectedAcadYear.value,
+                program: selectedProgram.value
             });
-    
-            console.log('Inserted program code:', result.data.data);
-    
-            // Notify the parent component that data has been inserted
+
             onDataInserted();
         } catch (error) {
-            console.error('Error inserting program code:', error);
-            // Handle error if needed
+            showToastMessage(false, 'รหัสหลักสูตรต้องห้ามซ้ำ');
         }
     };
 
+    useEffect(() => {
+        if (isOpen) {
+            // Clear all state values
+            setProgramTitle('');
+            setDesc('');
+            setSelectedProgram(null);
+            setSelectedAcadYear(null);
+
+        }
+    }, [isOpen]);
+
     return (
-        <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+        <Modal size="2xl" isOpen={isOpen} onClose={onClose}>
             <ModalContent>
                 {(onClose) => (
                     <>
-                        <ModalHeader className="flex flex-col gap-1">Insert New Program Code</ModalHeader>
+                        <ModalHeader className="flex flex-col gap-1">เพิ่มรหัสหลักสูตร</ModalHeader>
                         <ModalBody>
-                            <label htmlFor="programTitle">Program Code Title:</label>
-                            <input
+                            <div className='grid grid-cols-4 gap-4'>
+                                <div className='col-span-2'>
+                                    <label htmlFor="group">หลักสูตร</label>
+                                    <Select
+                                        className='z-50'
+                                        id="codeProgramId"
+                                        value={selectedProgram}
+                                        options={programs.map(program => ({ value: program.program, label: program.title_th }))}
+                                        onChange={(selectedOption) => setSelectedProgram(selectedOption)}
+                                        isSearchable
+                                        isClearable
+                                    />
+                                </div>
+                                <div className='col-span-2'>
+                                    <label htmlFor="acadyear">ปีการศึกษา</label>
+                                    <Select
+                                        className='z-40'
+                                        id="acadyear"
+                                        value={selectedAcadYear}
+                                        options={acadyears}
+                                        onChange={(selectedOption) => setSelectedAcadYear(selectedOption)}
+                                        isSearchable
+                                        isClearable
+                                    />
+                                </div>
+                            </div>
+
+                            <Input
+                                className='col-span-4 my-1'
                                 type="text"
+                                label="รหัสหลักสูตร"
                                 id="programTitle"
                                 value={program_code}
                                 onChange={(e) => setProgramTitle(e.target.value)}
                             />
 
-                            <label htmlFor="codeDesc">Description:</label>
-                            <input
-                                type="text"
-                                id="codeDesc"
+                            <Textarea
+                                className='col-span-4'
+                                label="คำอธิบาย"
+                                variant="bordered"
+                                placeholder="เพิ่มรายละเอียด"
                                 value={desc}
+                                disableAnimation
+                                disableAutosize
+                                classNames={{
+                                    base: "",
+                                    input: "resize-y min-h-[40px]",
+                                }}
                                 onChange={(e) => setDesc(e.target.value)}
                             />
 
-                            <label htmlFor="codeVersion">Version:</label>
-                            <input
-                                type="text"
-                                id="codeVersion"
-                                value={version}
-                                onChange={(e) => setVersion(e.target.value)}
-                            />
-
-                            <label htmlFor="codeProgramId">Program ID:</label>
-                            <Select
-                                id="codeProgramId"
-                                value={selectedProgram}
-                                options={programs.map(program => ({ value: program.program, label: program.title_th }))}
-                                onChange={(selectedOption) => setSelectedProgram(selectedOption)}
-                                isSearchable
-                            />
                         </ModalBody>
                         <ModalFooter>
                             <Button color="danger" variant="light" onPress={onClose}>
-                                Close
+                                ยกเลิก
                             </Button>
                             <Button color="primary" onPress={handleInsertProgramCode}>
-                                Insert Program Code
+                                บันทึก
                             </Button>
                         </ModalFooter>
                     </>

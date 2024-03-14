@@ -1,12 +1,10 @@
 'use client';
-import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoHome, GoHomeFill } from "react-icons/go";
 import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
 import { useSession } from "next-auth/react"
-import { ChartPie, ChartPieBold } from './icons';
 import { Icon } from '@iconify/react';
 
 const Sidebar = () => {
@@ -14,7 +12,7 @@ const Sidebar = () => {
     const url = usePathname();
     return (
         <>
-            <aside style={{ top: "65px" }} id="default-sidebar" className="border-r fixed top-16 left-0 z-10 w-[240px] h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+            <aside style={{ top: "65px" }} id="default-sidebar" className="border-r fixed top-16 left-0 z-50 w-[240px] h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
                 <div className="h-full px-3 py-4 lg:px-5 overflow-y-auto bg-white">
                     <ul className="font-medium space-y-1">
                         <li className="">

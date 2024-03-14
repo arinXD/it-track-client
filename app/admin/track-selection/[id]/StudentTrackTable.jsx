@@ -1,106 +1,131 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Input, Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from "@nextui-org/react";
 import { EyeIcon, SearchIcon } from "@/app/components/icons";
 import Link from 'next/link';
 import { dMy } from '@/src/util/dateFormater'
+import { tableClass } from '@/src/util/tableClass';
 
 function displayNull(string) {
     if (string) return string
     return "-"
 }
-const columns = [{
-    name: "",
-    uid: "action",
-},
-{
-    name: "No.",
-    uid: "no",
-    sortable: true
-},
-{
-    name: "รหัสนักศึกษา",
-    uid: "stuId",
-    sortable: true
-},
-{
-    name: "ชื่อ - สกุล",
-    uid: "fullName",
-    sortable: true
-},
-{
-    name: "โครงการ",
-    uid: "coursesType",
-    sortable: true
-},
-// {
-//     name: "แทรคที่ได้",
-//     uid: "result"
-// },
-{
-    name: "เลือกลำดับ 1",
-    uid: "track_order_1",
-    sortable: true
-},
-{
-    name: "เลือกลำดับ 2",
-    uid: "track_order_2",
-    sortable: true
-},
-{
-    name: "เลือกลำดับ 3",
-    uid: "track_order_3",
-    sortable: true
-},
-{
-    name: "วันที่ยืนยัน",
-    uid: "updatedAt",
-    sortable: true
-},
+const initColumns = [
+    {
+        name: "No.",
+        uid: "no",
+        sortable: true
+    },
+    {
+        name: "รหัสนักศึกษา",
+        uid: "stuId",
+        sortable: true
+    },
+    {
+        name: "ชื่อ - สกุล",
+        uid: "fullName",
+        sortable: true
+    },
+    {
+        name: "โครงการ",
+        uid: "coursesType",
+        sortable: true
+    },
+    {
+        name: "เกรด",
+        uid: "score",
+        sortable: true
+    },
+    {
+        name: "เลือกลำดับ 1",
+        uid: "track_order_1",
+        sortable: true
+    },
+    {
+        name: "เลือกลำดับ 2",
+        uid: "track_order_2",
+        sortable: true
+    },
+    {
+        name: "เลือกลำดับ 3",
+        uid: "track_order_3",
+        sortable: true
+    },
+    {
+        name: "วันที่ยืนยัน",
+        uid: "updatedAt",
+        sortable: true
+    },
 ];
-const statusColorMap = {
-    active: "success",
-    paused: "danger",
-    vacation: "warning",
-};
-const INITIAL_VISIBLE_COLUMNS = columns.map(column => column.uid);
 
-const StudentTrackTable = ({ studentData, track }) => {
+const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
+    const subjects = trackSubj.map(subj => {
+        return {
+            name: subj.subject_code,
+            uid: subj.subject_code,
+        }
+    })
+    // const columns = [...initColumns, ...subjects]
+    const columns = [...initColumns.slice(0, 4), ...subjects, ...initColumns.slice(4, initColumns.length)];
     const students = studentData?.students
     const [filterValue, setFilterValue] = useState("");
     const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-    const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = useState("all");
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [visibleColumns, setVisibleColumns] = useState(new Set(columns.map(column => column.uid)));
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortDescriptor, setSortDescriptor] = useState({
         column: "no",
         direction: "ascending",
     });
-    const [page, setPage] = React.useState(1);
+    const [page, setPage] = useState(1);
 
     const hasSearchFilter = Boolean(filterValue);
 
-    const headerColumns = React.useMemo(() => {
+    const headerColumns = useMemo(() => {
         if (visibleColumns === "all") return columns;
 
         return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
-    const filteredItems = React.useMemo(() => {
+    function convertGrade(grade) {
+        const grades = {
+            "A": 4,
+            "B+": 3.5,
+            "B": 3,
+            "C+": 2.5,
+            "C": 2,
+            "D+": 1.5,
+            "D": 1,
+            "F": 0,
+        }
+        return grades[grade] || 0
+    }
+
+    const filteredItems = useMemo(() => {
         let filteredUsers
         if (studentData?.students?.length) {
             let counter = 0;
             filteredUsers = students.map(student => {
+                const grade = []
+                let totalScore = 0
+                student?.SelectionDetails?.forEach(element => {
+                    const g = {}
+                    g[element.subject_code] = element.grade
+                    grade.push(g)
+                    totalScore += convertGrade(element.grade)
+                });
+                const score = (totalScore / (grade.length || 1)).toFixed(2)
                 return {
                     action: student.stu_id,
-                    no: ++counter,
+                    no: String(++counter),
                     stuId: student.stu_id,
                     fullName: `${student?.Student?.first_name} ${student?.Student?.last_name}`,
                     coursesType: student?.Student?.courses_type,
-                    // result: student.result ? student.result : "รอการคัดเลือก",
+                    grade: grade,
+                    score: score,
                     track_order_1: displayNull(student.track_order_1),
                     track_order_2: displayNull(student.track_order_2),
                     track_order_3: displayNull(student.track_order_3),
+                    // result: student.result ? student.result : "รอการคัดเลือก",
                     updatedAt: dMy(student.updatedAt),
                 }
             })
@@ -110,29 +135,23 @@ const StudentTrackTable = ({ studentData, track }) => {
         if (hasSearchFilter) {
             filteredUsers = filteredUsers.filter((user) => {
                 if (
-                    user.no.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    user.stuId.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    user.fullName.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    user.coursesType.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    user.result.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    user.updatedAt.toLowerCase().includes(filterValue.toLowerCase())
+                    user.no?.toLowerCase().includes(filterValue.toLowerCase()) ||
+                    user.stuId?.toLowerCase().includes(filterValue.toLowerCase()) ||
+                    user.fullName?.toLowerCase().includes(filterValue.toLowerCase()) ||
+                    user.coursesType?.toLowerCase().includes(filterValue.toLowerCase()) ||
+                    user.result?.toLowerCase().includes(filterValue.toLowerCase()) ||
+                    user.updatedAt?.toLowerCase().includes(filterValue.toLowerCase())
                 ) return user
 
             }
             );
         }
-        if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-            filteredUsers = filteredUsers.filter((user) =>
-                Array.from(statusFilter).includes(user.status),
-            );
-        }
-
         return filteredUsers;
-    }, [students, filterValue, statusFilter]);
+    }, [students, filterValue]);
 
     const [pages, setPages] = useState(0)
 
-    const items = React.useMemo(() => {
+    const items = useMemo(() => {
         if (filteredItems?.length) {
             const start = (page - 1) * rowsPerPage;
             const end = start + rowsPerPage;
@@ -143,7 +162,7 @@ const StudentTrackTable = ({ studentData, track }) => {
         }
     }, [page, filteredItems, rowsPerPage]);
 
-    const sortedItems = React.useMemo(() => {
+    const sortedItems = useMemo(() => {
         return [...items].sort((a, b) => {
             const first = a[sortDescriptor.column];
             const second = b[sortDescriptor.column];
@@ -160,24 +179,24 @@ const StudentTrackTable = ({ studentData, track }) => {
     }, [filteredItems, rowsPerPage])
 
 
-    const onNextPage = React.useCallback(() => {
+    const onNextPage = useCallback(() => {
         if (page < pages) {
             setPage(page + 1);
         }
     }, [page, pages]);
 
-    const onPreviousPage = React.useCallback(() => {
+    const onPreviousPage = useCallback(() => {
         if (page > 1) {
             setPage(page - 1);
         }
     }, [page]);
 
-    const onRowsPerPageChange = React.useCallback((e) => {
+    const onRowsPerPageChange = useCallback((e) => {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
     }, []);
 
-    const onSearchChange = React.useCallback((value) => {
+    const onSearchChange = useCallback((value) => {
         if (value) {
             setFilterValue(value);
             setPage(1);
@@ -186,15 +205,12 @@ const StudentTrackTable = ({ studentData, track }) => {
         }
     }, []);
 
-    const onClear = React.useCallback(() => {
+    const onClear = useCallback(() => {
         setFilterValue("")
         setPage(1)
     }, [])
 
-    const topContent = React.useMemo(() => {
-        if (!sortedItems.length) {
-            return null
-        }
+    const topContent = useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
                 <div className="flex justify-between items-center">
@@ -214,10 +230,11 @@ const StudentTrackTable = ({ studentData, track }) => {
                             className="border border-gray-500 rounded-md outline-none ms-3 px-1 text-default-400 text-small"
                             onChange={onRowsPerPageChange}
                         >
-                            <option value="5">5</option>
                             <option value="10">10</option>
-                            <option value="15">15</option>
                             <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
                         </select>
                     </label>
                 </div>
@@ -225,7 +242,6 @@ const StudentTrackTable = ({ studentData, track }) => {
         );
     }, [
         filterValue,
-        statusFilter,
         visibleColumns,
         onRowsPerPageChange,
         students?.length,
@@ -233,7 +249,7 @@ const StudentTrackTable = ({ studentData, track }) => {
         hasSearchFilter,
     ]);
 
-    const bottomContent = React.useMemo(() => {
+    const bottomContent = useMemo(() => {
         if (!sortedItems.length) {
             return null
         }
@@ -263,37 +279,16 @@ const StudentTrackTable = ({ studentData, track }) => {
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
-    const renderCell = React.useCallback((item, columnKey) => {
-        const cellValue = item[columnKey];
-        switch (columnKey) {
-            case "action":
-                return (
-                    <div className="relative flex items-center gap-3 w-fit">
-                        <Tooltip content="รายละเอียด">
-                            <Link href={`#${cellValue}`} className='focus:outline-none'>
-                                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                    <EyeIcon />
-                                </span>
-                            </Link>
-                        </Tooltip>
-                    </div>
-                )
-            default:
-                return cellValue;
-        }
-    }, []);
-
     return (
         <div>
             <h2 id={`${track.toLowerCase()}-students`} className='mb-3 text-default-900 text-small'>
-                รายชื่อนักศึกษาแทรค {track} จำนวน {studentData?.students?.length} คน
+                {title && <> รายชื่อนักศึกษาแทรค {track} จำนวน {studentData?.students?.length} คน</>}
                 {studentData?.normal > 0 && <>โครงการปกติ {studentData?.normal} คน</>}
                 {studentData?.vip > 0 && <>โครงการพิเศษ {studentData?.vip} คน</>}
             </h2>
             {studentData &&
                 <Table
                     aria-label={`Student Track Table`}
-                    isStriped
                     removeWrapper
 
                     topContent={topContent}
@@ -301,11 +296,9 @@ const StudentTrackTable = ({ studentData, track }) => {
 
                     bottomContent={bottomContent}
                     bottomContentPlacement="outside"
-                    
+
                     selectionMode="multiple"
-                    classNames={{
-                        wrapper: "max-h-[382px]",
-                    }}
+                    classNames={{ ...tableClass, wrapper: "w-full", }}
                     // onSelectionChange={setSelectedKeys}
                     onSortChange={setSortDescriptor}
                     sortDescriptor={sortDescriptor}
@@ -323,7 +316,22 @@ const StudentTrackTable = ({ studentData, track }) => {
                     <TableBody emptyContent={"ไม่มีรายชื่อนักศึกษา"} items={sortedItems}>
                         {(item) => (
                             <TableRow key={item.stuId}>
-                                {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                                <TableCell>{item?.no}</TableCell>
+                                <TableCell>{item?.stuId}</TableCell>
+                                <TableCell>{item?.fullName}</TableCell>
+                                <TableCell>{item?.coursesType}</TableCell>
+                                {
+                                    item.grade.map((g, index) => (
+                                        <TableCell key={index}>
+                                            {g[subjects[index].uid]}
+                                        </TableCell>
+                                    ))
+                                }
+                                <TableCell>{item?.score}</TableCell>
+                                <TableCell>{item?.track_order_1}</TableCell>
+                                <TableCell>{item?.track_order_2}</TableCell>
+                                <TableCell>{item?.track_order_3}</TableCell>
+                                <TableCell>{item?.updatedAt}</TableCell>
                             </TableRow>
                         )}
                     </TableBody>

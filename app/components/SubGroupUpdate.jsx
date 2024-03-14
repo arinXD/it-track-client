@@ -7,11 +7,37 @@ import axios from 'axios';
 import Select from 'react-select';
 import { hostname } from '@/app/api/hostname';
 import { Input } from "@nextui-org/react";
+import { toast } from 'react-toastify';
+
 export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }) {
     const [newTitle, setNewTitle] = useState('');
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [groups, setGroups] = useState([]);
-
+    const showToastMessage = (ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -46,6 +72,17 @@ export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }
 
     const handleUpdateSubGroup = async () => {
         try {
+
+            if (!selectedGroup) {
+                showToastMessage(false, 'โปรดเลือกกลุ่มวิชา');
+                return;
+            }
+
+            if (!newTitle.trim()) {
+                showToastMessage(false, 'กลุ่มย่อยห้ามเป็นค่าว่าง');
+                return;
+            }
+
             await axios.post(`${hostname}/api/subgroups/updateSubGroup/${subGroupId}`, {
                 sub_group_title: newTitle,
                 group_id: selectedGroup.value
@@ -59,6 +96,7 @@ export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }
         } catch (error) {
             console.error('Error updating subgroup:', error);
             // Handle error if needed
+            showToastMessage(false, 'กลุ่มย่อยวิชาห้ามซ้ำ');
         }
     };
 

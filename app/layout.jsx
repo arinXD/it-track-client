@@ -1,19 +1,18 @@
+"use client"
 import { Inter } from 'next/font/google'
-import { getServerSession } from 'next-auth'
 import './globals.css'
 import { AuthProvider } from './components'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
-    title: 'IT Track',
-    description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
-    icons: {
-        icon: '/logo.png',
-      },
-}
-export default async function RootLayout({ children }) {
-    const session = await getServerSession()
+// export const metadata = {
+//     title: 'IT Track',
+//     description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
+//     icons: {
+//         icon: '/logo.png',
+//       },
+// }
+export default function RootLayout({ children }) {
     return (
         <html>
             <head>
@@ -24,7 +23,7 @@ export default async function RootLayout({ children }) {
                 suppressHydrationWarning={true}
             >
                 <main>
-                    <AuthProvider session={session}>
+                    <AuthProvider>
                         {children}
                     </AuthProvider>
                 </main>

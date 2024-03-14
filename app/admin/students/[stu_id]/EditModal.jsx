@@ -1,21 +1,32 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Autocomplete, AutocompleteItem, RadioGroup, Radio } from "@nextui-org/react";
-import { getAcadyears } from '@/src/util/academicYear';
-import axios from 'axios';
-import { hostname } from '@/app/api/hostname';
-import { getToken } from '@/app/components/serverAction/TokenAction';
+import { hostname } from '@/app/api/hostname'
+import { getToken } from '@/app/components/serverAction/TokenAction'
+import { getLastTenYear } from '@/src/util/academicYear'
+import { Autocomplete, AutocompleteItem, Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup } from '@nextui-org/react'
+import axios from 'axios'
+import React, { useEffect, useMemo, useState } from 'react'
 
-const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose }) => {
-    const [stu_id, setStuId] = useState(null)
-    const [email, setEmail] = useState(null)
-    const [first_name, setFname] = useState(null)
-    const [last_name, setLname] = useState(null)
+const EditModal = ({ status, programs, showToastMessage, getStudentData, student, isOpen, onClose, }) => {
+    const [stu_id, setStuId] = useState("")
+    const [email, setEmail] = useState("")
+    const [first_name, setFname] = useState("")
+    const [last_name, setLname] = useState("")
     const [acadyears, setAcadyears] = useState([])
-    const [acadyear, setAcadyear] = useState(null);
-    const [program, setProgram] = useState(null);
-    const [courses_type, setCourseType] = useState(null);
-    const [inserting, setInserting] = useState(false)
+    const [acadyear, setAcadyear] = useState("");
+    const [program, setProgram] = useState("");
+    const [courses_type, setCourseType] = useState("");
+    const [status_code, setStatusCode] = useState("");
+    const [editing, setEditing] = useState(false)
+
+    useEffect(() => {
+        setStuId(student.stu_id)
+        setEmail(student.email)
+        setFname(student.first_name)
+        setLname(student.last_name)
+        setProgram(student.program);
+        setAcadyear(student.acadyear);
+        setCourseType(student.courses_type)
+        setStatusCode(student.status_code)
+    }, [student])
 
     const [invalid, setInvalid] = useState({
         stu_id: false,
@@ -25,10 +36,11 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
         acadyear: false,
         program: false,
         courses_type: false,
+        status_code: false
     })
 
     useEffect(() => {
-        const acads = getAcadyears();
+        const acads = getLastTenYear();
         const result = acads.map(acad => ({
             acadyear: String(acad)
         }));
@@ -64,28 +76,100 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
         return bool;
     }
 
-    async function insertStudent(event) {
-        setInserting(true)
+    // Acadyear
+    const AutoCompleteAcadyear = useMemo(() => {
+        return (
+            <Autocomplete
+                label="ปีการศึกษา"
+                variant="bordered"
+                defaultItems={acadyears}
+                placeholder="เลือกปีการศึกษา"
+                className="max-w-xs"
+                labelPlacement='outside'
+                defaultSelectedKey={String(student.acadyear)}
+                onSelectionChange={setAcadyear}
+                scrollShadowProps={{
+                    isEnabled: false
+                }}
+                isInvalid={invalid.acadyear}
+            >
+                {(item) => <AutocompleteItem key={item.acadyear}>{item.acadyear}</AutocompleteItem>}
+            </Autocomplete>
+        );
+    }, [student, invalid]);
+
+    // Program
+    const AutoCompleteProgram = useMemo(() => {
+        return (
+            <Autocomplete
+                label="หลักสูตร"
+                variant="bordered"
+                defaultItems={programs}
+                placeholder="เลือกหลักสูตร"
+                className="max-w-xs"
+                labelPlacement='outside'
+                defaultSelectedKey={student.program}
+                onSelectionChange={setProgram}
+                scrollShadowProps={{
+                    isEnabled: false
+                }}
+                isInvalid={invalid.program}
+            >
+                {(item) => <AutocompleteItem key={item.program}>{item.program}</AutocompleteItem>}
+            </Autocomplete>
+        );
+    }, [student, invalid]);
+
+    // Status
+    const AutoCompleteStatus = useMemo(() => {
+        return (
+            <Autocomplete
+                label="สถานะภาพ"
+                variant="bordered"
+                defaultItems={status}
+                placeholder="เลือกสถานะภาพ"
+                className="max-w-xs"
+                labelPlacement='outside'
+                defaultSelectedKey={String(student.status_code)}
+                onSelectionChange={setStatusCode}
+                scrollShadowProps={{
+                    isEnabled: false
+                }}
+                isInvalid={invalid.status_code}
+                allowsCustomValue={true}
+            >
+                {(item) =>
+                    <AutocompleteItem key={String(item.id)}>
+                        {String(item.id)}
+                    </AutocompleteItem>}
+            </Autocomplete>
+        );
+    }, [student, invalid]);
+
+    async function editStudent(event) {
+        setEditing(true)
         event.preventDefault()
+
         const formData = {
-            stu_id,
             email,
             first_name,
             last_name,
-            acadyear,
-            program,
             courses_type,
+            program,
+            acadyear,
+            status_code
         }
         if (!validInput(formData)) {
-            setInserting(false)
+            setEditing(false)
             return
         }
 
         try {
             const token = await getToken()
+            console.log(formData);
             const options = {
-                url: `${hostname}/api/students`,
-                method: 'POST',
+                url: `${hostname}/api/students/${stu_id}`,
+                method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
                     'authorization': `${token}`,
@@ -97,13 +181,13 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
             const res = await axios(options)
             const { ok, message } = res.data
             showToastMessage(ok, message)
-            getStudents()
-            closeForm()
+            getStudentData()
         } catch (error) {
+            console.log(error);
             const { ok, message } = error.response.data
             showToastMessage(ok, message)
         } finally {
-            setInserting(false)
+            setEditing(false)
         }
     }
 
@@ -117,15 +201,7 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
             program: false,
             courses_type: false,
         })
-        setStuId(null)
-        setEmail(null)
-        setFname(null)
-        setLname(null)
-        setAcadyear(null)
-        setProgram(null)
-        setCourseType(null)
         onClose()
-
     }
 
     return (
@@ -148,10 +224,10 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <form onSubmit={insertStudent} className=''>
+                            <form onSubmit={editStudent} className=''>
                                 <ModalHeader className="flex flex-col gap-1">
-                                    <h2>เพิ่มรายชื่อนักศึกษา</h2>
-                                    <span className='text-base font-normal'>แบบฟอร์มเพิ่มรายชื่อนักศึกษา</span>
+                                    <h2>แก้ไขรายชื่อนักศึกษา</h2>
+                                    <span className='text-base font-normal'>แบบฟอร์มแก้ไขรายชื่อนักศึกษา</span>
                                 </ModalHeader>
                                 <ModalBody>
                                     <div className='flex flex-row gap-4 mt-0'>
@@ -165,6 +241,7 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
                                             value={stu_id}
                                             onValueChange={setStuId}
                                             isInvalid={invalid.stu_id}
+                                            isReadOnly={true}
                                         />
                                         <Input
                                             type="email"
@@ -203,57 +280,32 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
                                         />
                                     </div>
                                     <div className='flex flex-row gap-4'>
-                                        <Autocomplete
-                                            label="ปีการศึกษา"
-                                            variant="bordered"
-                                            defaultItems={acadyears}
-                                            placeholder="เลือกปีการศึกษา"
-                                            className="max-w-xs"
-                                            labelPlacement='outside'
-                                            onSelectionChange={setAcadyear}
-                                            scrollShadowProps={{
-                                                isEnabled: false
-                                            }}
-                                            isInvalid={invalid.acadyear}
-                                        >
-                                            {(item) => <AutocompleteItem key={item.acadyear}>{item.acadyear}</AutocompleteItem>}
-                                        </Autocomplete>
-                                        <Autocomplete
-                                            label="หลักสูตร"
-                                            variant="bordered"
-                                            defaultItems={programs}
-                                            placeholder="เลือกหลักสูตร"
-                                            className="max-w-xs"
-                                            labelPlacement='outside'
-                                            onSelectionChange={setProgram}
-                                            scrollShadowProps={{
-                                                isEnabled: false
-                                            }}
-                                            isInvalid={invalid.program}
-                                        >
-                                            {(item) => <AutocompleteItem key={item.program}>{item.program}</AutocompleteItem>}
-                                        </Autocomplete>
+                                        {AutoCompleteAcadyear}
+                                        {AutoCompleteProgram}
                                     </div>
-                                    <div>
-                                        <p className='text-sm mb-2'>เลือกโครงการ</p>
-                                        <RadioGroup
-                                            isInvalid={invalid.courses_type}
-                                            className='flex flex-col'
-                                            orientation="horizontal"
-                                            value={courses_type}
-                                            onValueChange={setCourseType}
-                                        >
-                                            <Radio value="โครงการปกติ">โครงการปกติ</Radio>
-                                            <Radio className='ms-3' value="โครงการพิเศษ">โครงการพิเศษ</Radio>
-                                        </RadioGroup>
+                                    <div className='flex flex-row gap-4'>
+                                        <div className='w-[100%]'>
+                                            <p className='text-sm mb-2'>เลือกโครงการ</p>
+                                            <RadioGroup
+                                                isInvalid={invalid.courses_type}
+                                                className='flex flex-col'
+                                                orientation="horizontal"
+                                                value={courses_type}
+                                                onValueChange={setCourseType}
+                                            >
+                                                <Radio value="โครงการปกติ">โครงการปกติ</Radio>
+                                                <Radio className='ms-3' value="โครงการพิเศษ">โครงการพิเศษ</Radio>
+                                            </RadioGroup>
+                                        </div>
+                                        {AutoCompleteStatus}
                                     </div>
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={closeForm}>
                                         ยกเลิก
                                     </Button>
-                                    <Button disabled={inserting} isLoading={inserting} type='submit' className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid'>
-                                        เพิ่ม
+                                    <Button disabled={editing} isLoading={editing} type='submit' className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid'>
+                                        แก้ไข
                                     </Button>
                                 </ModalFooter>
                             </form>
@@ -265,4 +317,4 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
     )
 }
 
-export default InsertModal
+export default EditModal
