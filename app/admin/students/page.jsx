@@ -242,13 +242,13 @@ const Page = () => {
                                 }
                             >
                                 <DropdownItem href={`/admin/students/${stu?.stu_id}`}>
-                                    View
+                                    รายละเอียด
                                 </DropdownItem>
                                 <DropdownItem href={`/admin/students/${stu?.stu_id}?edit=1`}>
-                                    Edit
+                                    แก้ไข
                                 </DropdownItem>
                                 <DropdownItem key="delete" className="text-danger" color="danger">
-                                    Delete
+                                    ลบ
                                 </DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
