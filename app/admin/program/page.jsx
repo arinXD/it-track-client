@@ -23,6 +23,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { TbRestore } from "react-icons/tb";
 
 import Link from 'next/link';
+import { tableClass } from '@/src/util/tableClass';
 async function fetchData() {
     try {
         const programResult = await axios.get(`${hostname}/api/programs`);
@@ -124,7 +125,7 @@ export default function Program() {
 
     const handleDeleteProgram = async (program) => {
         const { value } = await Swal.fire({
-            text: `ต้องการลบหลักสูตร ${program.title_th ? program.title_th:program.program} หรือไม่ ?`,
+            text: `ต้องการลบหลักสูตร ${program.title_th ? program.title_th : program.program} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",

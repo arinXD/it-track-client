@@ -265,7 +265,7 @@ export default function Category() {
                                             </div>
                                         </TableCell>
                                         {/* <TableCell>{index + 1}</TableCell> */}
-                                        <TableCell className='text-blue-500 w-1/2'>{category.category_title}</TableCell>
+                                        <TableCell className='text-black w-1/2'>{category.category_title}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(category[column]) : category[column]}</span>

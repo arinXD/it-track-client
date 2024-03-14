@@ -5,7 +5,7 @@ import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } 
 import { capitalize } from "./utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from '../action'
-import { getLastTenYear } from "@/src/util/academicYear";
+import { getAcadyears } from "@/src/util/academicYear";
 import InsertModal from "./InsertModal";
 import { Skeleton } from "@nextui-org/react";
 import DeleteModal from "./DeleteModal";
@@ -123,7 +123,7 @@ const Page = () => {
 
     // State
     const [fetching, setFetching] = useState(true)
-    const acadyears = getLastTenYear()
+    const acadyears = getAcadyears()
     const [selectProgram, setSelectProgram] = useState(null)
     const [selectAcadYear, setSelectAcadYear] = useState(acadyears[0])
     const [students, setStudents] = useState([])

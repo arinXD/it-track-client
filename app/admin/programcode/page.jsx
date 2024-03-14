@@ -204,7 +204,7 @@ export default function ProgramCode() {
                                     className="bg-red-400 text-white w-1/2"
 
                                 >
-                                    Delete Select
+                                    ลบรายการที่เลือก
                                     <DeleteIcon className={'w-5 h-5 text-white hidden md:block'} />
                                 </Button>
 

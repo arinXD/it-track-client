@@ -98,6 +98,7 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
             onClose();
         } catch (error) {
             console.error('Error updating program code:', error);
+            showToastMessage(false, 'รหัสหลักสูตรห้ามซ้ำ');
         }
     };
 

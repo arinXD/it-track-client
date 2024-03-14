@@ -4,19 +4,19 @@ import Link from 'next/link';
 
 const Page = async () => {
     const acadLinks = [
-        { href: "/admin/acadyears", lable: "ปีการศึกษา" },
+        // { href: "/admin/acadyears", lable: "ปีการศึกษา" },
         { href: "/admin/program", lable: "หลักสูตร" },
         { href: "/admin/programcode", lable: "รหัสหลักสูตร" },
         { href: "/admin/category", lable: "หมวดหมู่วิชา" },
         { href: "/admin/group", lable: "กลุ่มวิชา" },
         { href: "/admin/subgroup", lable: "กลุ่มย่อยวิชา" },
         { href: "/admin/subject", lable: "วิชา" },
+        { href: "/admin/students", lable: "รายชื่อนักศึกษา" },
     ]
 
     const tracks = [
         { href: "/admin/track", lable: "ข้อมูลแทรค" },
         { href: "/admin/track-selection", lable: "คัดเลือกแทรค" },
-        { href: "/admin/students", lable: "รายชื่อนักศึกษา" },
     ]
     return (
         <>

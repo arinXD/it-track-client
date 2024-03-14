@@ -96,6 +96,7 @@ export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }
         } catch (error) {
             console.error('Error updating subgroup:', error);
             // Handle error if needed
+            showToastMessage(false, 'กลุ่มย่อยวิชาห้ามซ้ำ');
         }
     };
 

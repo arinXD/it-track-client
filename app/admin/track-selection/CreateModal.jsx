@@ -50,9 +50,9 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
     useEffect(() => {
         if (searchSubj) {
             const data = subjects.filter(e =>
-                e.subject_code.includes(searchSubj.toUpperCase()) ||
-                e.title_en.includes(searchSubj.toUpperCase()) ||
-                e.title_th.includes(searchSubj.toUpperCase()))
+                e.subject_code?.includes(searchSubj.toUpperCase()) ||
+                e.title_en?.includes(searchSubj.toUpperCase()) ||
+                e.title_th?.includes(searchSubj.toUpperCase()))
             setFilterSubj(data)
             return
         }

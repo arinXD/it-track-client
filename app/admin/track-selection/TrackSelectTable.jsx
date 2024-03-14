@@ -101,7 +101,6 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen, handleDelete, h
                     </div>
                     :
                     <Table
-                        classNames={tableClass}
                         removeWrapper
                         selectionMode="multiple"
                         onSelectionChange={handleSetSelectedKey}

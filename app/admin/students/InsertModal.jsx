@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Autocomplete, AutocompleteItem, RadioGroup, Radio } from "@nextui-org/react";
-import { getLastTenYear } from '@/src/util/academicYear';
+import { getAcadyears } from '@/src/util/academicYear';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import { getToken } from '@/app/components/serverAction/TokenAction';
@@ -28,7 +28,7 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
     })
 
     useEffect(() => {
-        const acads = getLastTenYear();
+        const acads = getAcadyears();
         const result = acads.map(acad => ({
             acadyear: String(acad)
         }));
