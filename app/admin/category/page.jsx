@@ -86,35 +86,34 @@ export default function Category() {
 
     const handleDataInserted = async () => {
         try {
-            // Fetch data again after inserting to update the list
+
             const data = await fetchData();
             setCategories(data);
-
-            // Close the modal after inserting
             handleModalClose();
-
-            const lastInsertedCategory = data[data.length - 1];
-            const categoryTitle = lastInsertedCategory?.category_title || 'Unknown Category';
-            showToastMessage(true, `เพิ่มหมวดหมู่วิชา ${categoryTitle} สำเร็จ`);
         } catch (error) {
             // Handle error if needed
             console.error('Error inserting data:', error);
-
-            // Show warning toast message if there is an error
             showToastMessage(false, "Error adding category");
         }
     };
 
     const handleDeleteCategory = async (category) => {
-        // Show a confirmation dialog using SweetAlert2
-        const { value } = await Swal.fire({
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+            },
+            buttonsStyling: false
+        });
+        const { value } = await swal.fire({
             text: `ต้องการลบหมวดหมู่วิชา ${category.category_title} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก"
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
         });
 
         // If the user clicks on "Yes, delete it!", proceed with deletion
@@ -207,27 +206,25 @@ export default function Category() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)} // Step 2
                             />
-                            <div className="flex md:flex-row gap-3">
+                            <div className="flex md:flex-row gap-3 ml-3">
                                 <Button
-                                    className="w-1/2 ml-3"
+                                    radius="sm"
                                     onPress={handleModalOpen}
                                     color="primary"
-                                >
-                                    เพิ่มหมวดหมู่วิชา
-                                    <PlusIcon className={'w-[18px] h-[18px] text-white hidden md:block md:w-6 md:h-6'} />
+                                    endContent={<PlusIcon width={16} height={16} />}>
+                                    เพิ่มรหัสหลักสูตร
                                 </Button>
                                 <Button
-                                    className="bg-red-400 text-white w-1/2"
-
-                                >
-                                    Delete Select
-                                    <DeleteIcon className={'w-[18px] h-[18px] text-white hidden md:block md:w-8 md:h-8'} />
+                                    radius="sm"
+                                    color="danger"
+                                    endContent={<DeleteIcon2 width={16} height={16} />}>
+                                    ลบรายการที่เลือก
                                 </Button>
                                 <Link href={'/admin/category/restore'}>
                                     <Button
-                                        className="bg-gray-300 text-black"
-                                        endContent={<TbRestore className={'w-[18px] h-[18px] text-black hidden md:block '} />}
-                                    >
+                                        radius="sm"
+                                        color="default"
+                                        endContent={<TbRestore className="w-[18px] h-[18px]" />}>
                                         รายการที่ถูกลบ
                                     </Button>
                                 </Link>

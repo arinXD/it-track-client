@@ -118,6 +118,11 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 return;
             }
 
+            if (!subject_code.trim()) {
+                showToastMessage(false, 'รหัสวิชาห้ามเป็นค่าว่าง');
+                return;
+            }
+
             await axios.post(`${hostname}/api/subjects/updateSubject/${subjectId}`, {
                 semester: semester ? semester : null,
                 subject_code: subject_code ? subject_code : null,
@@ -142,16 +147,33 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
     };
 
     return (
-        <Modal size="2xl" isOpen={isOpen} onClose={onClose}>
+        <Modal
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            size="2xl"
+            isOpen={isOpen}
+            onClose={onClose}
+            classNames={{
+                body: "py-6",
+                backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                base: "border-gray-300",
+                header: "border-b-[1.5px] border-gray-300",
+                footer: "border-t-[1.5px] border-gray-300",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">แก้ไขวิชา</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">
+                    <h2>แก้ไขวิชา</h2>
+                    <span className='text-base font-normal'>แบบฟอร์มแก้ไขวิชา</span>
+                </ModalHeader>
                 <ModalBody className='grid grid-cols-9 gap-4'>
                     <div className='col-span-3'>
-                        <label htmlFor="group">กลุ่มรายวิชา</label>
+                        <label htmlFor="group">กลุ่มวิชา</label>
                         <Select
                             className='z-50'
                             id="group"
                             value={selectedGroup}
+                            placeholder="เลือกกลุ่มยวิชา"
                             options={groups}
                             onChange={(selectedOption) => setSelectedGroup(selectedOption)}
                             isSearchable
@@ -164,6 +186,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                             className='z-50'
                             id="subgroup"
                             value={selectedSubGroup}
+                            placeholder="เลือกกลุ่มย่อยวิชา"
                             options={subgroups}
                             onChange={(selectedOption) => setSelectedSubGroup(selectedOption)}
                             isSearchable
@@ -177,6 +200,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                             className='z-40'
                             id="acadyear"
                             value={selectedAcadyears}
+                            placeholder="เลือกปีการศึกษา"
                             options={acadyears}
                             onChange={(selectedOption) => setSelectedAcadyears(selectedOption)}
                             isSearchable
@@ -187,8 +211,11 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                         disabled
                         className='col-span-3'
                         type="text"
-                        id="subject_code"
+                        radius='sm'
+                        variant="bordered"
                         label="รหัสวิชา"
+                        labelPlacement="outside"
+                        placeholder="รหัสวิชา"
                         value={subject_code}
                         onChange={(e) => setSubjectCode(e.target.value)}
                     />
@@ -196,16 +223,22 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                     <Input
                         className='col-span-3'
                         type="number"
-                        id="credit"
+                        radius='sm'
+                        variant="bordered"
                         label="หน่วยกิต"
+                        labelPlacement="outside"
+                        placeholder="กรอกหน่วยกิต"
                         value={credit}
                         onChange={(e) => setCredit(e.target.value)}
                     />
                     <Input
                         className='col-span-3'
-                        type="text"
-                        id="semester"
+                        type="number"
+                        radius='sm'
+                        variant="bordered"
                         label="เทอม"
+                        labelPlacement="outside"
+                        placeholder="กรอกเทอม"
                         value={semester}
                         onChange={(e) => setSemester(e.target.value)}
                     />
@@ -213,8 +246,11 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                     <Input
                         className='col-span-9'
                         type="text"
-                        id="title_th"
+                        radius='sm'
+                        variant="bordered"
                         label="ชื่อภาษาไทย"
+                        labelPlacement="outside"
+                        placeholder="กรอกชื่อภาษาไทย"
                         value={title_th}
                         onChange={(e) => setNewTitleTH(e.target.value)}
                     />
@@ -222,8 +258,11 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                     <Input
                         className='col-span-9'
                         type="text"
-                        id="title_en"
+                        radius='sm'
+                        variant="bordered"
                         label="ชื่อภาษาอังกฤษ"
+                        labelPlacement="outside"
+                        placeholder="กรอกชื่อภาษาอังกฤษ"
                         value={title_en}
                         onChange={(e) => setNewTitleEN(e.target.value)}
                     />
@@ -234,6 +273,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                         label="รายละเอียด"
                         variant="bordered"
                         placeholder="เพิ่มรายละเอียด"
+                        labelPlacement='outside'
                         value={information}
                         disableAnimation
                         disableAutosize
@@ -247,10 +287,10 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
 
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                         ยกเลิก
                     </Button>
-                    <Button color="primary" onPress={handleUpdateSubject}>
+                    <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleUpdateSubject}>
                         บันทึก
                     </Button>
                 </ModalFooter>

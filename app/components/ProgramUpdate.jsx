@@ -70,40 +70,64 @@ export default function ProgramUpdate({ isOpen, onClose, onUpdate, programId }) 
     };
 
     return (
-        <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+        <Modal
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            size="md"
+            isOpen={isOpen}
+            onClose={onClose}
+            classNames={{
+                body: "py-6",
+                backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                base: "border-gray-300",
+                header: "border-b-[1.5px] border-gray-300",
+                footer: "border-t-[1.5px] border-gray-300",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">แก้ไขหลักสูตร</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">
+                    <h2>แก้ไขหลักสูตร</h2>
+                    <span className='text-base font-normal'>แบบฟอร์มแก้ไขหลักสูตร</span>
+                </ModalHeader>
                 <ModalBody>
                     <Input
-                        isDisabled
+                        disabled
                         type="text"
+                        radius='sm'
+                        variant="bordered"
                         label="หลักสูตร"
-                        id="program"
+                        labelPlacement="outside"
+                        placeholder="กรอกหลักสูตร"
                         value={program}
                         onChange={(e) => setProgram(e.target.value)}
                     />
 
                     <Input
                         type="text"
-                        label="ชื่อภาษาอังกฤษ"
-                        id="title_en"
-                        value={title_en}
-                        onChange={(e) => setProgramTitleEn(e.target.value)}
+                        radius='sm'
+                        variant="bordered"
+                        label="ชื่อภาษาไทย"
+                        labelPlacement="outside"
+                        placeholder="กรอกชื่อภาษาไทย"
+                        value={title_th}
+                        onChange={(e) => setProgramTitleTh(e.target.value)}
                     />
 
                     <Input
                         type="text"
-                        label="ชื่อภาษาไทย"
-                        id="title_th"
-                        value={title_th}
-                        onChange={(e) => setProgramTitleTh(e.target.value)}
+                        radius='sm'
+                        variant="bordered"
+                        label="ชื่อภาษาอังกฤษ"
+                        labelPlacement="outside"
+                        placeholder="กรอกชื่อภาษาอังกฤษ"
+                        onChange={(e) => setProgramTitleEn(e.target.value)}
                     />
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                         ยกเลิก
                     </Button>
-                    <Button color="primary" onPress={handleUpdateProgram}>
+                    <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleUpdateProgram}>
                         บันทึก
                     </Button>
                 </ModalFooter>

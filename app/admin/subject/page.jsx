@@ -165,23 +165,28 @@ export default function Subject() {
 
         } catch (error) {
             console.error('Error inserting data:', error);
-
-            // Show warning toast message if there is an error
             showToastMessage(false, "Error adding subject");
         }
     };
 
 
     const handleDeleteSubject = async (subjectId) => {
-        console.log(subjectId);
-        const { value } = await Swal.fire({
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+            },
+            buttonsStyling: false
+        });
+        const { value } = await swal.fire({
             text: `ต้องการลบวิชา ${subjectId.title_th ? subjectId.title_th : subjectId.subject_code} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก"
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
         });
 
         if (value) {
@@ -327,20 +332,18 @@ export default function Subject() {
                         <div className='flex justify-start'>
                             <div className="flex md:flex-row gap-3">
                                 <Button
-                                    className=" text-white w-1/2"
+                                    radius="sm"
                                     onPress={handleExportExcel}
                                     style={{ backgroundColor: '#107C41', color: 'white' }}
-                                >
+                                    endContent={<RiFileExcel2Line width={16} height={16} />}>
                                     Export to Excel
-                                    <RiFileExcel2Line className={'w-5 h-5 text-white hidden md:block md:w-5 md:h-5'} />
                                 </Button>
                                 <Button
-                                    className="text-white w-1/2"
+                                    radius="sm"
                                     onPress={handleExportCSV}
                                     style={{ backgroundColor: '#149403', color: 'white' }}
-                                >
+                                    endContent={<TbFileImport width={16} height={16} />}>
                                     Export to CSV
-                                    <TbFileImport className={'w-5 h-5 text-white hidden md:block'} />
                                 </Button>
                             </div>
                         </div>
@@ -356,32 +359,29 @@ export default function Subject() {
                                 value={searchQuery}
                                 onChange={(e) => handleSearchChange(e.target.value)}
                             />
-                            <div className="flex md:flex-row gap-3">
+                            <div className="flex md:flex-row gap-3 ml-3">
                                 <Button
-                                    className="w-1/2 ml-3"
+                                    radius="sm"
                                     onPress={handleInsertModalOpen}
                                     color="primary"
-                                >
+                                    endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มวิชา
-                                    <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
                                 </Button>
                                 <Button
-                                    className="w-1/2"
+                                    radius="sm"
                                     onPress={handleImportModalOpen}
                                     onDataInsertXlsx={handleDataInserted}
                                     isOpen={isImportModalOpen}
                                     onClose={handleImportModalClose}
                                     style={{ backgroundColor: '#24b565', color: 'white' }}
-                                >
+                                    endContent={<FaRegFile width={16} height={16} />}>
                                     Import Excel
-                                    <FaRegFile className={'w-4 h-4 text-white hidden md:block'} />
                                 </Button>
                                 <Button
-                                    className="bg-red-400 text-white w-1/2"
-
-                                >
-                                    Delete Select
-                                    <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
+                                    radius="sm"
+                                    color="danger"
+                                    endContent={<DeleteIcon2 width={16} height={16} />}>
+                                    ลบรายการที่เลือก
                                 </Button>
                             </div>
                         </div>
@@ -393,15 +393,15 @@ export default function Subject() {
                         aria-label="subject table">
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>
-                            <TableColumn>ปีการศึกษา</TableColumn>
-                            <TableColumn>กลุ่มวิชา</TableColumn>
-                            <TableColumn>กลุ่มย่อยวิชา</TableColumn>
-                            <TableColumn>เทอม</TableColumn>
                             <TableColumn>รหัสวิชา</TableColumn>
                             <TableColumn>ชื่อไทย</TableColumn>
                             <TableColumn>ชื่ออังกฤษ</TableColumn>
-                            <TableColumn>รายละเอียด</TableColumn>
+                            <TableColumn>ปีการศึกษา</TableColumn>
+                            <TableColumn>เทอม</TableColumn>
                             <TableColumn>หน่วยกิต</TableColumn>
+                            <TableColumn>กลุ่มวิชา</TableColumn>
+                            <TableColumn>กลุ่มย่อยวิชา</TableColumn>
+                            <TableColumn>รายละเอียด</TableColumn>
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
                         </TableHeader>
@@ -423,7 +423,12 @@ export default function Subject() {
                                                 </Tooltip>
                                             </div>
                                         </TableCell>
+                                        <TableCell>{subject.subject_code || "-"}</TableCell>
+                                        <TableCell>{subject.title_th || "-"}</TableCell>
+                                        <TableCell>{subject.title_en || "-"}</TableCell>
                                         <TableCell>{subject.acadyear || "-"}</TableCell>
+                                        <TableCell>{subject.semester || "-"}</TableCell>
+                                        <TableCell>{subject.credit || "-"}</TableCell>
                                         <TableCell>
                                             {subject.group_id ?
                                                 <>
@@ -444,12 +449,7 @@ export default function Subject() {
                                                 </>
                                                 : '-'}
                                         </TableCell>
-                                        <TableCell>{subject.semester || "-"}</TableCell>
-                                        <TableCell>{subject.subject_code || "-"}</TableCell>
-                                        <TableCell>{subject.title_th || "-"}</TableCell>
-                                        <TableCell>{subject.title_en || "-"}</TableCell>
                                         <TableCell>{subject.information || "-"}</TableCell>
-                                        <TableCell>{subject.credit || "-"}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(subject[column]) : subject[column]}</span>

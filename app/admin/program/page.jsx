@@ -124,14 +124,22 @@ export default function Program() {
     };
 
     const handleDeleteProgram = async (program) => {
-        const { value } = await Swal.fire({
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+            },
+            buttonsStyling: false
+        });
+        const { value } = await swal.fire({
             text: `ต้องการลบหลักสูตร ${program.title_th ? program.title_th : program.program} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก"
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
         });
 
         if (value) {
@@ -185,27 +193,25 @@ export default function Program() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <div className="flex md:flex-row gap-3">
+                            <div className="flex md:flex-row gap-3 ml-3">
                                 <Button
-                                    className="w-1/2 ml-3"
+                                    radius="sm"
                                     onPress={handleInsertModalOpen}
                                     color="primary"
-                                >
+                                    endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มหลักสูตร
-                                    <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
                                 </Button>
                                 <Button
-                                    className="bg-red-400 text-white w-1/2"
-
-                                >
-                                    Delete Select
-                                    <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
+                                    radius="sm"
+                                    color="danger"
+                                    endContent={<DeleteIcon2 width={16} height={16} />}>
+                                    ลบรายการที่เลือก
                                 </Button>
                                 <Link href={'/admin/program/restore'}>
                                     <Button
-                                        className="bg-gray-300 text-black"
-                                        endContent={<TbRestore className={'w-[18px] h-[18px] text-black hidden md:block '} />}
-                                    >
+                                        radius="sm"
+                                        color="default"
+                                        endContent={<TbRestore className="w-[18px] h-[18px]" />}>
                                         รายการที่ถูกลบ
                                     </Button>
                                 </Link>
@@ -221,8 +227,8 @@ export default function Program() {
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>
                             <TableColumn>หลักสูตร</TableColumn>
-                            <TableColumn>ชื่ออังกฤษ</TableColumn>
                             <TableColumn>ชื่อไทย</TableColumn>
+                            <TableColumn>ชื่ออังกฤษ</TableColumn>
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
                         </TableHeader>
@@ -245,8 +251,8 @@ export default function Program() {
                                             </div>
                                         </TableCell>
                                         <TableCell>{program.program || "-"}</TableCell>
-                                        <TableCell>{program.title_en || "-"}</TableCell>
                                         <TableCell>{program.title_th || "-"}</TableCell>
+                                        <TableCell>{program.title_en || "-"}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(program[column]) : program[column]}</span>
