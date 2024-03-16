@@ -1,13 +1,16 @@
-import { ContentWrap, Navbar, News, Sidebar } from '@/app/components'
+import { ContentWrap, Navbar, Sidebar } from '@/app/components'
+import dynamic from 'next/dynamic'
 
 import React from 'react';
 import axios from 'axios';
 import { getServerSession } from 'next-auth';
 import { hostname } from './api/hostname';
-import { Button, Input } from '@nextui-org/react';
 import { SearchIcon } from './components/icons';
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { BiBook } from "react-icons/bi";
+import { Input, Button } from "@nextui-org/react";
+
+const News = dynamic(() => import('./components/News'), { ssr: false })
 
 async function getData() {
     try {
@@ -63,7 +66,7 @@ const Page = async () => {
                         </div>
                     </div>
                 </div>
-                <News data={rootData} />
+                <News />
             </ContentWrap>
         </>
     )
