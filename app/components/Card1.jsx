@@ -4,12 +4,12 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import { Button } from '@nextui-org/react';
 
-export default function Card1() {
+export default function Card1({src, }) {
     return (
-        <Card sx={{ maxWidth: 345 }}>
+        <Card sx={{ borderRadius:"8px",boxShadow: "none", border: "1px solid #cbd5e1" ,maxWidth: 345 }}>
             <CardMedia
                 component="img"
                 alt="card1 image"
@@ -24,10 +24,6 @@ export default function Card1() {
                     Lorem, ipsum dolor sit amet consectetur adipisicing elit. Reiciendis, vel beatae? Doloribus aut id soluta, dolores excepturi accusamus, ex corrupti eligendi, sint necessitatibus odit reprehenderit autem quisquam et ab quas eius maxime adipisci iure nihil distinctio doloremque illo. Accusantium dolore consequatur aut quos natus quibusdam repellat facilis possimus sed ducimus.
                 </Typography>
             </CardContent>
-            <CardActions>
-                <Button size="small">Share</Button>
-                <Button size="small">Learn More</Button>
-            </CardActions>
         </Card>
     );
 }
