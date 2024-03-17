@@ -68,10 +68,10 @@ export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }
       }
 
       const isDuplicate = await checkDuplicateCategory(newTitle);
-            if (isDuplicate) {
-                showToastMessage(false, 'หมวดหมู่วิชานี้มีอยู่แล้ว');
-                return;
-            }
+      if (isDuplicate) {
+        showToastMessage(false, 'หมวดหมู่วิชานี้มีอยู่แล้ว');
+        return;
+      }
 
       await axios.put(`${hostname}/api/categories/updateCategory/${categoryId}`, {
         category_title: newTitle,
@@ -89,24 +89,43 @@ export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }
   };
 
   return (
-    <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+    <Modal
+      isDismissable={false}
+      isKeyboardDismissDisabled={true}
+      size="sm"
+      isOpen={isOpen}
+      onClose={onClose}
+      classNames={{
+        body: "py-6",
+        backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+        base: "border-gray-300",
+        header: "border-b-[1.5px] border-gray-300",
+        footer: "border-t-[1.5px] border-gray-300",
+        closeButton: "hover:bg-white/5 active:bg-white/10",
+      }}>
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">แก้ไขหมวดหมู่วิชา</ModalHeader>
+        <ModalHeader className="flex flex-col gap-1">
+          <h2>แก้ไขหมวดหมู่วิชา</h2>
+          <span className='text-base font-normal'>แบบฟอร์มแก้ไขหมวดหมู่วิชา</span>
+        </ModalHeader>
         <ModalBody>
           <Input
             type="text"
-            id="newTitle"
+            radius='sm'
+            variant="bordered"
             label="หมวดหมู่วิชา"
+            labelPlacement="outside"
+            placeholder="กรอกหมวดหมู่วิชา"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
           />
           {/* <p>Current Title: {currentTitle}</p> */}
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" variant="light" onPress={onClose}>
+          <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
             ยกเลิก
           </Button>
-          <Button color="primary" onPress={handleUpdateCategory}>
+          <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleUpdateCategory}>
             บันทึก
           </Button>
         </ModalFooter>

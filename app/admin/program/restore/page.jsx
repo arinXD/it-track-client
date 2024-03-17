@@ -76,14 +76,22 @@ export default function RestoreProgramCode() {
     }, []);
 
     const handleRestore = async (program) => {
-        const { value } = await Swal.fire({
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+            },
+            buttonsStyling: false
+        });
+        const { value } = await swal.fire({
             text: `ต้องการคืนค่าหลักสูตร ${program} หรือไม่ ?`,
-            icon: "warning",
+            icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก"
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
         });
         if (value) {
             try {
@@ -134,10 +142,11 @@ export default function RestoreProgramCode() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             <Button
-                                className="bg-gray-300 text-black w-1/2 ml-3"
-                            >
-                                คืนค่ารายการทั้งหมด
-                                <TbRestore className={'w-5 h-5 text-black hidden md:block '} />
+                                className='ml-3'
+                                radius="sm"
+                                color="default"
+                                endContent={<TbRestore className="w-[18px] h-[18px]" />}>
+                                กู้คืนรายการที่เลือก
                             </Button>
 
                         </div>
@@ -151,8 +160,8 @@ export default function RestoreProgramCode() {
                         <TableHeader>
                             <TableColumn>#</TableColumn>
                             <TableColumn>หลักสูตร</TableColumn>
-                            <TableColumn>ชื่ออังกฤษ</TableColumn>
                             <TableColumn>ชื่อไทย</TableColumn>
+                            <TableColumn>ชื่ออังกฤษ</TableColumn>
                             <TableColumn>วันที่ลบ</TableColumn>
                             <TableColumn>Action</TableColumn>
                         </TableHeader>
@@ -162,8 +171,8 @@ export default function RestoreProgramCode() {
                                     <TableRow key={program.program}>
                                         <TableCell>{index + 1}</TableCell>
                                         <TableCell>{program.program}</TableCell>
-                                        <TableCell>{program.title_en || "-"}</TableCell>
                                         <TableCell>{program.title_th || "-"}</TableCell>
+                                        <TableCell>{program.title_en || "-"}</TableCell>
                                         <TableCell>{dmy(program.deletedAt || "-")}</TableCell>
                                         <TableCell>
                                             <div className='relative flex items-center gap-2'>

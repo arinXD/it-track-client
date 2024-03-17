@@ -308,8 +308,8 @@ const Page = ({ params }) => {
                                     <h1 className='font-bold text-2xl'>
                                         {title}
                                     </h1>
-                                    <div className='my-4 flex flex-row gap-4 w-full'>
-                                        <div className='space-y-3 border-1 rounded-md p-3 w-[70%]'>
+                                    <div className='my-4 grid grid-cols-3 justify-stretch justify-items-stretch gap-4 w-full'>
+                                        <div className='space-y-3 border-1 rounded-md p-3 w-full col-span-2 max-lg:col-span-3'>
                                             <div className='w-full flex justify-start items-center gap-4'>
                                                 <span className='inline-block w-[12%] text-end'>ปีการศึกษา: </span>
                                                 <input
@@ -368,8 +368,8 @@ const Page = ({ params }) => {
                                                 <span>สิ้นสุด</span>
                                             </div>
                                         </div>
-                                        <div className='w-[30%] flex flex-col justify-between'>
-                                            <div className='flex flex-col gap-3'>
+                                        <div className='w-full flex flex-col justify-between max-lg:col-span-3'>
+                                            <div>
                                                 {!(trackSelect.has_finished) ?
                                                     <Button size='md'
                                                         isLoading={starting}
@@ -384,29 +384,30 @@ const Page = ({ params }) => {
                                                         color="primary" variant="solid" className='bg-blue-500 w-full'>
                                                         {starting ? "เปิดการคัดเลือก..." : "เปิดการคัดเลือก"}
                                                     </Button>}
-                                                <Button
-                                                    isLoading={updating}
-                                                    disabled={!valueChange}
-                                                    onClick={handleUpdate}
-                                                    className={`w-full h-[40px] px-[16px] rounded-[12px] text-white ${!valueChange ? "bg-indigo-200" : "bg-blue-500 hover:bg-blue-600"}`}>
-                                                    {updating ? "ยืนยันการแก้ไข..." : "ยืนยันการแก้ไข"}
-                                                </Button>
-                                                <Button
-                                                    disabled={!valueChange}
-                                                    onClick={handleUnsave}
-                                                    className={`w-full h-[40px] px-[16px] rounded-[12px] ${!valueChange ? "bg-gray-200 text-gray-400" : "bg-gray-400 hover:bg-gray-500"}`}>
-                                                    ยกเลิกการแก้ไข
-                                                </Button>
-                                                <Button
-                                                    isLoading={deleting}
-                                                    isDisabled={deleting}
-                                                    startContent={""}
-                                                    size='md'
-                                                    onPress={() => handleDelete()}
-                                                    color="danger" variant="solid"
-                                                    className='w-full bg-red-600'>
-                                                    ลบ
-                                                </Button>
+                                            </div>
+                                            <Button startContent={""}
+                                                size='md'
+                                                onPress={""}
+                                                color="danger" variant="solid"
+                                                className='w-full bg-red-600 max-lg:my-3'>
+                                                ลบ
+                                            </Button>
+                                            <div className="block">
+                                                <div className='flex flex-col gap-3'>
+                                                    <Button
+                                                        isLoading={updating}
+                                                        disabled={!valueChange}
+                                                        onClick={handleUpdate}
+                                                        className={`w-full h-[40px] px-[16px] rounded-[12px] text-white ${!valueChange ? "bg-indigo-200" : "bg-indigo-500 hover:bg-indigo-600"}`}>
+                                                        {updating ? "ยืนยันการแก้ไข..." : "ยืนยันการแก้ไข"}
+                                                    </Button>
+                                                    <Button
+                                                        disabled={!valueChange}
+                                                        onClick={handleUnsave}
+                                                        className={`w-full h-[40px] px-[16px] rounded-[12px] ${!valueChange ? "bg-gray-200 text-gray-400" : "bg-gray-400 hover:bg-gray-500"}`}>
+                                                        ยกเลิกการแก้ไข
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

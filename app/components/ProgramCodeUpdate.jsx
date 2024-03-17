@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Autocomplete, AutocompleteSection, AutocompleteItem } from '@nextui-org/react';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import Select from 'react-select';
@@ -9,6 +9,7 @@ import Select from 'react-select';
 import { Input, Textarea } from "@nextui-org/react";
 
 import { getAcadyears } from "@/src/util/academicYear";
+import { toast } from 'react-toastify';
 
 export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCodeId }) {
     const [program_code, setUpdatedTitle] = useState('');
@@ -18,38 +19,66 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
 
     const [selectedAcadyears, setSelectedAcadyears] = useState(null);
     const [acadyears, setAcadyears] = useState([]);
+
+    const showToastMessage = (ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
+
     useEffect(() => {
 
         const fetchProgramCode = async () => {
             try {
+
                 const response = await axios.get(`${hostname}/api/programcodes/${programCodeId}`);
-                setUpdatedTitle(response.data.data.program_code);
-                setDescription(response.data.data.desc);
+                const data = response.data?.data;
+                setUpdatedTitle(data?.program_code);
+                setDescription(data?.desc);
 
                 const programsResult = await axios.get(`${hostname}/api/programs`);
-                const programs = programsResult.data.data;
+                const programs = programsResult?.data?.data;
 
                 // Map categories for react-select
                 const options = programs.map(program => ({
                     value: program.program,
                     label: program.title_th
                 }));
-
+                // console.log(options);
                 setPrograms(options);
 
-                // Find the selected category based on the current group's category ID
-                const selectedProgram = options.find(option => option.value === response.data.data.program);
+                const selectedProgram = options.find(option => option.value === data?.program);
                 setSelectedProgram(selectedProgram);
 
                 const acadyearOptions = getAcadyears().map(acadyear => ({
                     value: acadyear,
                     label: acadyear
                 }));
-
                 setAcadyears(acadyearOptions);
 
-                const selectedAcadyear = acadyearOptions.find(option => option.value === response.data.data.version);
+                const selectedAcadyear = acadyearOptions.find(option => option.value === data?.version);
                 setSelectedAcadyears(selectedAcadyear);
+                console.log(selectedAcadyear);
 
             } catch (error) {
                 console.error('Error fetching program code:', error);
@@ -80,8 +109,14 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
     const handleUpdateProgramCode = async () => {
         try {
 
+
             if (!selectedProgram) {
                 showToastMessage(false, 'โปรดเลือกหลักสูตร');
+                return;
+            }
+
+            if (!selectedAcadyears) {
+                showToastMessage(false, 'โปรดเลือกปีการศึกษา');
                 return;
             }
 
@@ -103,9 +138,25 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
     };
 
     return (
-        <Modal size="2xl" isOpen={isOpen} onClose={onClose}>
+        <Modal
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            size="2xl"
+            isOpen={isOpen}
+            onClose={onClose}
+            classNames={{
+                body: "py-6",
+                backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                base: "border-gray-300",
+                header: "border-b-[1.5px] border-gray-300",
+                footer: "border-t-[1.5px] border-gray-300",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">แก้ไขรหัสหลักสูตร</ModalHeader>
+                <ModalHeader
+                    className="flex flex-col gap-1"><h2>แก้ไขรหัสหลักสูตร</h2>
+                    <span className='text-base font-normal'>แบบฟอร์มแก้ไขรหัสหลักสูตร</span>
+                </ModalHeader>
                 <ModalBody>
                     <div className='grid grid-cols-4 gap-4'>
                         <div className='col-span-2'>
@@ -115,9 +166,29 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
                                 id="program"
                                 value={selectedProgram}
                                 options={programs}
+                                placeholder="เลือกหลักสูตร"
                                 onChange={(selectedOption) => setSelectedProgram(selectedOption)}
                                 isSearchable
                             />
+                            {/* <Autocomplete
+                                label="หลักสูตร"
+                                variant="bordered"
+                                defaultItems={programs.map(program => ({ value: program.program, label: program.title_th }))}
+                                placeholder="เลือกหลักสูตร"
+                                className="max-w-xs"
+                                labelPlacement='outside'
+
+                                onSelectionChange={setSelectedProgram}
+                                scrollShadowProps={{
+                                    isEnabled: false
+                                }}
+                            >
+                                {programs.map(item => (
+                                    <AutocompleteItem key={item.value} value={item.value}>
+                                        {item.label}
+                                    </AutocompleteItem>
+                                ))}
+                            </Autocomplete> */}
                         </div>
                         <div className='col-span-2'>
                             <label htmlFor="acadyear">ปีการศึกษา</label>
@@ -126,19 +197,42 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
                                 id="acadyear"
                                 value={selectedAcadyears}
                                 options={acadyears}
+                                placeholder="เลือกปีการศึกษา"
                                 onChange={(selectedOption) => setSelectedAcadyears(selectedOption)}
                                 isSearchable
                                 isClearable
                             />
+                            {/* <Autocomplete
+                                label="ปีการศึกษา"
+                                variant="bordered"
+                                defaultItems={acadyears}
+                                placeholder="เลือกปีการศึกษา"
+                                className="max-w-xs"
+                                labelPlacement='outside'
+                                defaultSelectedKey={selectedAcadyears?.acadyear}
+                                onSelectionChange={setSelectedAcadyears}
+                                scrollShadowProps={{
+                                    isEnabled: false
+                                }}
+                            >
+                                {(item) => (
+                                    <AutocompleteItem key={item.acadyear} value={item.acadyear}>
+                                        {item.acadyear}
+                                    </AutocompleteItem>
+                                )}
+                            </Autocomplete> */}
                         </div>
                     </div>
 
                     <Input
-                        className='col-span-4 my-1'
-                        type="text"
                         disabled
-                        id="updatedTitle"
+                        className='col-span-4'
+                        type="text"
+                        radius='sm'
+                        variant="bordered"
                         label="รหัสหลักสูตร"
+                        labelPlacement="outside"
+                        placeholder="กรอกรหัสหลักสูตร"
                         value={program_code}
                         onChange={(e) => setUpdatedTitle(e.target.value)}
                     />
@@ -147,10 +241,11 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
                         className='col-span-4'
                         label="คำอธิบาย"
                         variant="bordered"
-                        placeholder="เพิ่มรายละเอียด"
+                        placeholder="เพิ่มคำอธิบาย"
                         value={description}
                         disableAnimation
                         disableAutosize
+                        labelPlacement='outside'
                         classNames={{
                             base: "",
                             input: "resize-y min-h-[40px]",
@@ -160,10 +255,10 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
 
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                         ยกเลิก
                     </Button>
-                    <Button color="primary" onPress={handleUpdateProgramCode}>
+                    <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleUpdateProgramCode}>
                         บันทึก
                     </Button>
                 </ModalFooter>
