@@ -1,6 +1,7 @@
 "use client"
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react'
 import React, { useState } from 'react'
+import Select from 'react-select';
 
 const InsertSubjectModal = ({ isOpen, onClose }) => {
      const [inserting, setInserting] = useState(false)
@@ -35,7 +36,16 @@ const InsertSubjectModal = ({ isOpen, onClose }) => {
                                         </ModalHeader>
                                         <ModalBody>
                                              <div className='flex flex-row gap-4 mt-0'>
-
+                                             <label htmlFor="group">กลุ่มรายวิชา</label>
+                                                  <Select
+                                                       className='z-50'
+                                                       id="group"
+                                                       value={selectedGroup}
+                                                       options={groups}
+                                                       onChange={(selectedOption) => setSelectedGroup(selectedOption)}
+                                                       isSearchable
+                                                       isClearable
+                                                  />
                                              </div>
                                         </ModalBody>
                                         <ModalFooter>
