@@ -10,7 +10,7 @@ const Page = () => {
             <Sidebar />
             <ContentWrap>
                 <div>
-                    <p>หาความเหมาะสมในอาชีพ</p>
+                    <p>แนะนำแทรคที่เหมาะสมกับคุณ</p>
                 </div>
             </ContentWrap>
         </>

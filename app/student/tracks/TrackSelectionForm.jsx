@@ -10,6 +10,7 @@ import { DeleteIcon } from '@/app/components/icons'
 import { dmy, dmyt } from '@/src/util/dateFormater'
 import confetti from 'canvas-confetti';
 import { Loading } from '@/app/components'
+import TMonlicaEmail from '@/app/components/TMonlicaEmail'
 
 const TrackSelectionForm = ({ enrollments, userData }) => {
     const initOrder = {
@@ -182,7 +183,9 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
                 {trackSelect.title}
             </h4>
-            <p>คุณไม่มีสิทธิ์เข้ารับการคัดเลือกแทรคในหลักสูตรเทคโนโลยีสารสนเทศ ติดต่อเพิ่มเติมที่อีเมล ittrack@gmail.com </p>
+            <p>
+                คุณไม่มีสิทธิ์เข้ารับการคัดเลือกแทรคในหลักสูตรเทคโนโลยีสารสนเทศ ติดต่อ <TMonlicaEmail />
+            </p>
         </div>
     }
 
@@ -194,7 +197,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                     :
                     !(trackSelect?.id) ?
                         <>
-                            รอการประกาศการคัดเลือกแทรคจากอาจารย์
+                            รอการประกาศการคัดเลือกแทรคจากอาจารย์ครับ/ค่ะ
                         </>
                         :
                         <>
@@ -213,7 +216,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         <p>
                                             การคัดเลือกความเชี่ยวชาญ หลักสูตรเทคโนโลยีสารสนเทศ
                                             <strong> จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
-                                            ระบบจะทำการสุ่มให้ หากมีคำถามเพิ่มเติมติดต่อได้ที่ ittrack@mail.com
+                                            ระบบจะทำการสุ่มให้ หากมีคำถามเพิ่มเติมติดต่อ <TMonlicaEmail />
                                         </p>
                                     )
                                 :
