@@ -9,8 +9,8 @@ const Page = () => {
             </header>
             <Sidebar />
             <ContentWrap>
-                <div>
-                    <p>หาความเหมาะสมในอาชีพ</p>
+                <div className='text-center'>
+                    <h1 className='text-5xl my-9'>แบบทดสอบกลุ่มความเชี่ยวชาญ</h1>
                 </div>
             </ContentWrap>
         </>

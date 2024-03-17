@@ -142,7 +142,7 @@ export default function RestoreProgramCode() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             <Button
-                            className='ml-3'
+                                className='ml-3'
                                 radius="sm"
                                 color="default"
                                 endContent={<TbRestore className="w-[18px] h-[18px]" />}>

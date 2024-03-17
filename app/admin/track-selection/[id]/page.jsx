@@ -247,8 +247,8 @@ const Page = ({ params }) => {
                                     <h1 className='font-bold text-2xl'>
                                         {title}
                                     </h1>
-                                    <div className='my-4 flex flex-row gap-4 w-full'>
-                                        <div className='space-y-3 border-1 rounded-md p-3 w-[70%]'>
+                                    <div className='my-4 grid grid-cols-3 justify-stretch justify-items-stretch gap-4 w-full'>
+                                        <div className='space-y-3 border-1 rounded-md p-3 w-full col-span-2 max-lg:col-span-3'>
                                             <div className='w-full flex justify-start items-center gap-4'>
                                                 <span className='inline-block w-[12%] text-end'>ปีการศึกษา: </span>
                                                 <input
@@ -307,7 +307,7 @@ const Page = ({ params }) => {
                                                 <span>สิ้นสุด</span>
                                             </div>
                                         </div>
-                                        <div className='w-[30%] flex flex-col justify-between'>
+                                        <div className='w-full flex flex-col justify-between max-lg:col-span-3'>
                                             <div>
                                                 {!(trackSelect.has_finished) ?
                                                     <Button size='md'
@@ -328,7 +328,7 @@ const Page = ({ params }) => {
                                                 size='md'
                                                 onPress={""}
                                                 color="danger" variant="solid"
-                                                className='w-full bg-red-600'>
+                                                className='w-full bg-red-600 max-lg:my-3'>
                                                 ลบ
                                             </Button>
                                             <div className="block">

@@ -31,7 +31,7 @@ async function fetchData() {
         console.log(error);
     }
 }
-
+import { getToken } from '@/app/components/serverAction/TokenAction'
 export default function Category() {
     const showToastMessage = (ok, message) => {
         if (ok) {
@@ -61,6 +61,8 @@ export default function Category() {
     const [categories, setCategories] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+
+    const [selectedKey, setSelectedKey] = useState([])
 
     useEffect(() => {
         const getData = async () => {
@@ -164,6 +166,7 @@ export default function Category() {
         }
     };
 
+    //
     const filteredCategories = categories.filter(category => {
         const queryLowerCase = searchQuery.toLowerCase();
 
@@ -174,6 +177,8 @@ export default function Category() {
             // Add more conditions for additional columns if needed
         );
     });
+
+    //pagination 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -183,6 +188,89 @@ export default function Category() {
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
+
+    // function handleSetSelectedKey(selectedKey) {
+    //     let allId;
+    //     if (selectedKey === "all") {
+    //         if (categories && categories.length > 0) {
+    //             allId = categories.map(e => e.id);
+    //             setSelectedKey(allId);
+    //         }
+    //     } else {
+    //         let values = [...selectedKey.values()];
+    //         if (values.length > 0) {
+    //             allId = [];
+    //             values.map(e => {
+    //                 if (categories && categories[parseInt(e)]) {
+    //                     allId.push(categories[parseInt(e)].id);
+    //                 }
+    //             });
+    //             setSelectedKey(allId);
+    //         } else {
+    //             setSelectedKey([]);
+    //         }
+    //     }
+    // }
+
+    // async function handleSelectedDel(id) {
+    //     if (id.length == 0) return
+    //     Swal.fire({
+    //         text: `ต้องการลบหมวดหมู่ ${id.join(", ")} หรือไม่ ?`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#3085d6",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: "ตกลง",
+    //         cancelButtonText: "ยกเลิก"
+    //     }).then(async (result) => {
+    //         if (result.isConfirmed) {
+    //             const token = await getToken()
+    //             const options = {
+    //                 url: `${hostname}/api/categories/selected`,
+    //                 method: 'DELETE',
+    //                 headers: {
+    //                     'Accept': 'application/json',
+    //                     'Content-Type': 'application/json;charset=UTF-8',
+    //                     "authorization": `${token}`,
+    //                 },
+    //                 data: {
+    //                     categoriesArr: id
+    //                 }
+    //             };
+    //             axios(options)
+    //                 .then(async result => {
+    //                     const { ok, message } = result.data
+    //                     showToastMessage(ok, message)
+
+    //                     const data = await fetchData();
+    //                     setCategories(data);
+
+    //                     // Select All
+    //                     const selectAllElement = document.querySelectorAll('[aria-label="Select All"]')
+    //                     const selectElement = document.querySelectorAll('[aria-label="Select"]')
+    //                     selectElement.forEach(element => {
+    //                         if (element.tagName === "input") {
+    //                             element.checked = false
+    //                         } else {
+    //                             element.setAttribute("data-selected", false)
+    //                         }
+    //                     });
+    //                     selectAllElement.forEach(element => {
+    //                         if (element.tagName === "input") {
+    //                             element.checked = false
+    //                         } else {
+    //                             element.setAttribute("data-selected", false)
+    //                         }
+    //                     });
+    //                 })
+    //                 .catch(error => {
+    //                     const message = error.response.data.message
+    //                     showToastMessage(false, message)
+    //                 })
+    //         }
+    //     });
+    // }
+
     return (
         <>
             <header>
@@ -217,6 +305,10 @@ export default function Category() {
                                 <Button
                                     radius="sm"
                                     color="danger"
+                                    // onPress={async () => {
+                                    //     await handleSelectedDel(selectedKey)
+                                    //     setSelectedKey([])
+                                    // }}
                                     endContent={<DeleteIcon2 width={16} height={16} />}>
                                     ลบรายการที่เลือก
                                 </Button>
@@ -235,6 +327,7 @@ export default function Category() {
                         removeWrapper
                         selectionMode="multiple"
                         onRowAction={() => { }}
+                        // onSelectionChange={handleSetSelectedKey}
                         aria-label="category table">
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>
@@ -246,7 +339,7 @@ export default function Category() {
                         {currentItems.length > 0 ? (
                             <TableBody>
                                 {currentItems.map((category, index) => (
-                                    <TableRow key={category.id}>
+                                    <TableRow key={index}>
                                         <TableCell className='w-1/12'>
                                             <div className='relative flex items-center gap-2'>
                                                 <Tooltip content="แก้ไข">
