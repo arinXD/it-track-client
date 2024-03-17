@@ -31,7 +31,7 @@ async function fetchData() {
         console.log(error);
     }
 }
-
+import { getToken } from '@/app/components/serverAction/TokenAction'
 export default function Category() {
     const showToastMessage = (ok, message) => {
         if (ok) {
@@ -62,6 +62,8 @@ export default function Category() {
     const [isModalOpen, setModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
+    const [selectedKey, setSelectedKey] = useState([])
+
     useEffect(() => {
         const getData = async () => {
             try {
@@ -86,35 +88,34 @@ export default function Category() {
 
     const handleDataInserted = async () => {
         try {
-            // Fetch data again after inserting to update the list
+
             const data = await fetchData();
             setCategories(data);
-
-            // Close the modal after inserting
             handleModalClose();
-
-            const lastInsertedCategory = data[data.length - 1];
-            const categoryTitle = lastInsertedCategory?.category_title || 'Unknown Category';
-            showToastMessage(true, `เพิ่มหมวดหมู่วิชา ${categoryTitle} สำเร็จ`);
         } catch (error) {
             // Handle error if needed
             console.error('Error inserting data:', error);
-
-            // Show warning toast message if there is an error
             showToastMessage(false, "Error adding category");
         }
     };
 
     const handleDeleteCategory = async (category) => {
-        // Show a confirmation dialog using SweetAlert2
-        const { value } = await Swal.fire({
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+            },
+            buttonsStyling: false
+        });
+        const { value } = await swal.fire({
             text: `ต้องการลบหมวดหมู่วิชา ${category.category_title} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก"
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
         });
 
         // If the user clicks on "Yes, delete it!", proceed with deletion
@@ -165,6 +166,7 @@ export default function Category() {
         }
     };
 
+    //
     const filteredCategories = categories.filter(category => {
         const queryLowerCase = searchQuery.toLowerCase();
 
@@ -175,6 +177,8 @@ export default function Category() {
             // Add more conditions for additional columns if needed
         );
     });
+
+    //pagination 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -184,6 +188,89 @@ export default function Category() {
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
+
+    // function handleSetSelectedKey(selectedKey) {
+    //     let allId;
+    //     if (selectedKey === "all") {
+    //         if (categories && categories.length > 0) {
+    //             allId = categories.map(e => e.id);
+    //             setSelectedKey(allId);
+    //         }
+    //     } else {
+    //         let values = [...selectedKey.values()];
+    //         if (values.length > 0) {
+    //             allId = [];
+    //             values.map(e => {
+    //                 if (categories && categories[parseInt(e)]) {
+    //                     allId.push(categories[parseInt(e)].id);
+    //                 }
+    //             });
+    //             setSelectedKey(allId);
+    //         } else {
+    //             setSelectedKey([]);
+    //         }
+    //     }
+    // }
+
+    // async function handleSelectedDel(id) {
+    //     if (id.length == 0) return
+    //     Swal.fire({
+    //         text: `ต้องการลบหมวดหมู่ ${id.join(", ")} หรือไม่ ?`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#3085d6",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: "ตกลง",
+    //         cancelButtonText: "ยกเลิก"
+    //     }).then(async (result) => {
+    //         if (result.isConfirmed) {
+    //             const token = await getToken()
+    //             const options = {
+    //                 url: `${hostname}/api/categories/selected`,
+    //                 method: 'DELETE',
+    //                 headers: {
+    //                     'Accept': 'application/json',
+    //                     'Content-Type': 'application/json;charset=UTF-8',
+    //                     "authorization": `${token}`,
+    //                 },
+    //                 data: {
+    //                     categoriesArr: id
+    //                 }
+    //             };
+    //             axios(options)
+    //                 .then(async result => {
+    //                     const { ok, message } = result.data
+    //                     showToastMessage(ok, message)
+
+    //                     const data = await fetchData();
+    //                     setCategories(data);
+
+    //                     // Select All
+    //                     const selectAllElement = document.querySelectorAll('[aria-label="Select All"]')
+    //                     const selectElement = document.querySelectorAll('[aria-label="Select"]')
+    //                     selectElement.forEach(element => {
+    //                         if (element.tagName === "input") {
+    //                             element.checked = false
+    //                         } else {
+    //                             element.setAttribute("data-selected", false)
+    //                         }
+    //                     });
+    //                     selectAllElement.forEach(element => {
+    //                         if (element.tagName === "input") {
+    //                             element.checked = false
+    //                         } else {
+    //                             element.setAttribute("data-selected", false)
+    //                         }
+    //                     });
+    //                 })
+    //                 .catch(error => {
+    //                     const message = error.response.data.message
+    //                     showToastMessage(false, message)
+    //                 })
+    //         }
+    //     });
+    // }
+
     return (
         <>
             <header>
@@ -207,27 +294,29 @@ export default function Category() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)} // Step 2
                             />
-                            <div className="flex md:flex-row gap-3">
+                            <div className="flex md:flex-row gap-3 ml-3">
                                 <Button
-                                    className="w-1/2 ml-3"
+                                    radius="sm"
                                     onPress={handleModalOpen}
                                     color="primary"
-                                >
-                                    เพิ่มหมวดหมู่วิชา
-                                    <PlusIcon className={'w-[18px] h-[18px] text-white hidden md:block md:w-6 md:h-6'} />
+                                    endContent={<PlusIcon width={16} height={16} />}>
+                                    เพิ่มรหัสหลักสูตร
                                 </Button>
                                 <Button
-                                    className="bg-red-400 text-white w-1/2"
-
-                                >
-                                    Delete Select
-                                    <DeleteIcon className={'w-[18px] h-[18px] text-white hidden md:block md:w-8 md:h-8'} />
+                                    radius="sm"
+                                    color="danger"
+                                    // onPress={async () => {
+                                    //     await handleSelectedDel(selectedKey)
+                                    //     setSelectedKey([])
+                                    // }}
+                                    endContent={<DeleteIcon2 width={16} height={16} />}>
+                                    ลบรายการที่เลือก
                                 </Button>
                                 <Link href={'/admin/category/restore'}>
                                     <Button
-                                        className="bg-gray-300 text-black"
-                                        endContent={<TbRestore className={'w-[18px] h-[18px] text-black hidden md:block '} />}
-                                    >
+                                        radius="sm"
+                                        color="default"
+                                        endContent={<TbRestore className="w-[18px] h-[18px]" />}>
                                         รายการที่ถูกลบ
                                     </Button>
                                 </Link>
@@ -238,6 +327,7 @@ export default function Category() {
                         removeWrapper
                         selectionMode="multiple"
                         onRowAction={() => { }}
+                        // onSelectionChange={handleSetSelectedKey}
                         aria-label="category table">
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>
@@ -249,7 +339,7 @@ export default function Category() {
                         {currentItems.length > 0 ? (
                             <TableBody>
                                 {currentItems.map((category, index) => (
-                                    <TableRow key={category.id}>
+                                    <TableRow key={index}>
                                         <TableCell className='w-1/12'>
                                             <div className='relative flex items-center gap-2'>
                                                 <Tooltip content="แก้ไข">

@@ -103,8 +103,6 @@ export default function ProgramCode() {
         try {
             const data = await fetchData();
             setProgramCodes(data);
-
-            showToastMessage(true, `เพิ่มรหัสหลักสูตรสำเร็จ`);
             handleInsertModalClose();
 
         } catch (error) {
@@ -129,14 +127,22 @@ export default function ProgramCode() {
     };
 
     const handleDeleteProgramCode = async (programCodeId) => {
-        const { value } = await Swal.fire({
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+            },
+            buttonsStyling: false
+        });
+        const { value } = await swal.fire({
             text: `ต้องการลบรหัสหลักสูตร ${programCodeId.program_code} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก"
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
         });
 
         if (value) {
@@ -191,28 +197,25 @@ export default function ProgramCode() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <div className="flex md:flex-row gap-3">
+                            <div className="flex md:flex-row gap-3 ml-3">
                                 <Button
-                                    className="w-1/2 ml-3"
+                                    radius="sm"
                                     onPress={handleInsertModalOpen}
                                     color="primary"
-                                >
+                                    endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มรหัสหลักสูตร
-                                    <PlusIcon className={'w-10 h-10 text-white hidden md:block'} />
                                 </Button>
                                 <Button
-                                    className="bg-red-400 text-white w-1/2"
-
-                                >
+                                    radius="sm"
+                                    color="danger"
+                                    endContent={<DeleteIcon2 width={16} height={16} />}>
                                     ลบรายการที่เลือก
-                                    <DeleteIcon className={'w-5 h-5 text-white hidden md:block'} />
                                 </Button>
-
                                 <Link href={'/admin/programcode/restore'}>
                                     <Button
-                                        className="bg-gray-300 text-black"
-                                        endContent={<TbRestore className={'w-[18px] h-[18px] text-black hidden md:block '} />}
-                                    >
+                                        radius="sm"
+                                        color="default"
+                                        endContent={<TbRestore className="w-[18px] h-[18px]" />}>
                                         รายการที่ถูกลบ
                                     </Button>
                                 </Link>

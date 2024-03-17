@@ -37,21 +37,9 @@ const Page = async () => {
             </header>
             <Sidebar />
             <ContentWrap>
-                <h1>ข่าวสารและประชาสัมพันธ์</h1>
                 <div className="flex flex-col gap-4 my-4">
-                    <div className="flex justify-between gap-3 items-end">
-                        <Input
-                            isClearable
-                            className="w-full sm:max-w-[44%] h-fit shadow-none"
-                            placeholder="Search by name..."
-                            variant='bordered'
-                            color="primary"
-                            size="sm"
-                            startContent={<SearchIcon />}
-                        // value={filterValue}
-                        // onClear={() => onClear()}
-                        // onValueChange={onSearchChange}
-                        />
+                    <div className="flex justify-between gap-3 items-start">
+                        <h1>ข่าวสารและประชาสัมพันธ์</h1>
                         <div className="flex gap-6">
                             <Button
                                 startContent={<BiBook className='w-5 h-5' />}

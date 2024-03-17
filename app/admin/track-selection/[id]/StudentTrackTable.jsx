@@ -12,11 +12,6 @@ function displayNull(string) {
 }
 const initColumns = [
     {
-        name: "No.",
-        uid: "no",
-        sortable: true
-    },
-    {
         name: "รหัสนักศึกษา",
         uid: "stuId",
         sortable: true
@@ -52,8 +47,8 @@ const initColumns = [
         sortable: true
     },
     {
-        name: "วันที่ยืนยัน",
-        uid: "updatedAt",
+        name: "result",
+        uid: "result",
         sortable: true
     },
 ];
@@ -73,7 +68,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
     const [visibleColumns, setVisibleColumns] = useState(new Set(columns.map(column => column.uid)));
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortDescriptor, setSortDescriptor] = useState({
-        column: "no",
+        column: "coursesType",
         direction: "ascending",
     });
     const [page, setPage] = useState(1);
@@ -116,7 +111,6 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                 const score = (totalScore / (grade.length || 1)).toFixed(2)
                 return {
                     action: student.stu_id,
-                    no: String(++counter),
                     stuId: student.stu_id,
                     fullName: `${student?.Student?.first_name} ${student?.Student?.last_name}`,
                     coursesType: student?.Student?.courses_type,
@@ -125,8 +119,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     track_order_1: displayNull(student.track_order_1),
                     track_order_2: displayNull(student.track_order_2),
                     track_order_3: displayNull(student.track_order_3),
-                    // result: student.result ? student.result : "รอการคัดเลือก",
-                    updatedAt: dMy(student.updatedAt),
+                    result: student.result ? student.result : "รอการคัดเลือก",
                 }
             })
 
@@ -135,12 +128,10 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
         if (hasSearchFilter) {
             filteredUsers = filteredUsers.filter((user) => {
                 if (
-                    user.no?.toLowerCase().includes(filterValue.toLowerCase()) ||
                     user.stuId?.toLowerCase().includes(filterValue.toLowerCase()) ||
                     user.fullName?.toLowerCase().includes(filterValue.toLowerCase()) ||
                     user.coursesType?.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    user.result?.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    user.updatedAt?.toLowerCase().includes(filterValue.toLowerCase())
+                    user.result?.toLowerCase().includes(filterValue.toLowerCase())
                 ) return user
 
             }
@@ -231,10 +222,10 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                             onChange={onRowsPerPageChange}
                         >
                             <option value="10">10</option>
-                            <option value="20">20</option>
                             <option value="30">30</option>
-                            <option value="40">40</option>
                             <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="150">150</option>
                         </select>
                     </label>
                 </div>
@@ -297,7 +288,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     bottomContent={bottomContent}
                     bottomContentPlacement="outside"
 
-                    selectionMode="multiple"
+                    // selectionMode="multiple"
                     classNames={{ ...tableClass, wrapper: "w-full", }}
                     // onSelectionChange={setSelectedKeys}
                     onSortChange={setSortDescriptor}
@@ -316,7 +307,6 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     <TableBody emptyContent={"ไม่มีรายชื่อนักศึกษา"} items={sortedItems}>
                         {(item) => (
                             <TableRow key={item.stuId}>
-                                <TableCell>{item?.no}</TableCell>
                                 <TableCell>{item?.stuId}</TableCell>
                                 <TableCell>{item?.fullName}</TableCell>
                                 <TableCell>{item?.coursesType}</TableCell>
@@ -331,7 +321,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                                 <TableCell>{item?.track_order_1}</TableCell>
                                 <TableCell>{item?.track_order_2}</TableCell>
                                 <TableCell>{item?.track_order_3}</TableCell>
-                                <TableCell>{item?.updatedAt}</TableCell>
+                                <TableCell>{item?.result}</TableCell>
                             </TableRow>
                         )}
                     </TableBody>

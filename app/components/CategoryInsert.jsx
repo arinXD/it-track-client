@@ -1,6 +1,6 @@
 "use client"
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import { Input } from "@nextui-org/react";
@@ -59,7 +59,8 @@ export default function CategoryInsert({ isOpen, onClose, onDataInserted }) {
             const result = await axios.post(`${hostname}/api/categories/insertCategory`, {
                 category_title: categoryTitle,
             });
-
+            
+            showToastMessage(true, `เพิ่มหมวดหมู่วิชา ${categoryTitle} สำเร็จ`);
             onDataInserted();
         } catch (error) {
             showToastMessage(false, 'หมวดหมู่วิชาต้องห้ามซ้ำ');
@@ -74,25 +75,45 @@ export default function CategoryInsert({ isOpen, onClose, onDataInserted }) {
     }, [isOpen]);
 
     return (
-        <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+        <Modal
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            size="sm"
+            isOpen={isOpen}
+            onClose={onClose}
+            classNames={{
+                body: "py-6",
+                backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                base: "border-gray-300",
+                header: "border-b-[1.5px] border-gray-300",
+                footer: "border-t-[1.5px] border-gray-300",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}>
             <ModalContent>
                 {(onClose) => (
                     <>
-                        <ModalHeader className="flex flex-col gap-1">เพิ่มหมวดหมู่วิชา</ModalHeader>
+                        <ModalHeader className="flex flex-col gap-1">
+                            <h2>เพิ่มหมวดหมู่วิชา</h2>
+                            <span className='text-base font-normal'>แบบฟอร์มเพิ่มหมวดหมู่วิชา</span>
+                        </ModalHeader>
                         <ModalBody>
                             <Input
+                                className='col-span-4 my-1'
                                 type="text"
-                                id="categoryTitle"
+                                radius='sm'
+                                variant="bordered"
                                 label="หมวดหมู่วิชา"
+                                labelPlacement="outside"
+                                placeholder="กรอกหมวดหมู่วิชา"
                                 value={categoryTitle}
                                 onChange={(e) => setCategoryTitle(e.target.value)}
                             />
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="danger" variant="light" onPress={onClose}>
+                            <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                                 ยกเลิก
                             </Button>
-                            <Button color="primary" onPress={handleInsertCategory}>
+                            <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleInsertCategory}>
                                 บันทึก
                             </Button>
                         </ModalFooter>

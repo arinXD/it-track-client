@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, } from "@nextui-org/react";
 import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } from "@/app/components/icons";
-import { capitalize } from "./utils";
+import { capitalize } from "@/src/util/utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from '../action'
 import { getAcadyears } from "@/src/util/academicYear";

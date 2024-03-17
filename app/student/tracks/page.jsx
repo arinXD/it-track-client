@@ -4,6 +4,8 @@ import { Navbar, Sidebar, ContentWrap } from '@/app/components';
 import { useSession } from "next-auth/react"
 import TrackSelectionForm from './TrackSelectionForm';
 import StudentEnrollment from './StudentEnrollment';
+import Link from 'next/link';
+import TMonlicaEmail from '@/app/components/TMonlicaEmail';
 const Page = () => {
     const [userData, setUserData] = useState({})
     const [enrollments, setEnrollment] = useState([])
@@ -17,7 +19,7 @@ const Page = () => {
                 <Sidebar />
                 <ContentWrap>
                     <div>
-                        ไม่สามารถเข้าถึงข้อมูลของคุณได้ กรุณาติดต่อ ittrack@gmail.com
+                        ไม่สามารถเข้าถึงข้อมูลของคุณได้ กรุณาติดต่อ <TMonlicaEmail />
                     </div>
                 </ContentWrap>
             </>

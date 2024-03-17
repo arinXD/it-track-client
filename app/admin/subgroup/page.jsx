@@ -101,13 +101,8 @@ export default function SubGroup() {
             const data = await fetchData();
             setSubGroups(data);
             handleInsertModalClose();
-            const lastsubgroup = data[data.length - 1];
-            const subgroupTitle = lastsubgroup?.sub_group_title || '`Unknown SubGroup`';
-            showToastMessage(true, `เพิ่มกลุ่มย่อย ${subgroupTitle} สำเร็จ`);
         } catch (error) {
             console.error('Error inserting data:', error);
-
-            // Show warning toast message if there is an error
             showToastMessage(false, "Error adding subgroup");
         }
     };
@@ -136,14 +131,22 @@ export default function SubGroup() {
     };
 
     const handleDeleteSubGroup = async (subgroupId) => {
-        const { value } = await Swal.fire({
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+            },
+            buttonsStyling: false
+        });
+        const { value } = await swal.fire({
             text: `ต้องการลบกลุ่มย่อย ${subgroupId.sub_group_title} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก"
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
         });
 
         if (value) {
@@ -209,27 +212,25 @@ export default function SubGroup() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <div className="flex md:flex-row gap-3">
+                            <div className="flex md:flex-row gap-3 ml-3">
                                 <Button
-                                    className="w-1/2 ml-3"
+                                    radius="sm"
                                     onPress={handleInsertModalOpen}
                                     color="primary"
-                                >
-                                    เพิ่มกลุ่มย่อย
-                                    <PlusIcon className={'w-5 h-5 text-white hidden md:block md:w-6 md:h-6'} />
+                                    endContent={<PlusIcon width={16} height={16} />}>
+                                    เพิ่มกลุ่มย่อยวิชา
                                 </Button>
                                 <Button
-                                    className="bg-red-400 text-white w-1/2"
-
-                                >
-                                    Delete Select
-                                    <DeleteIcon className={'w-5 h-5 text-white hidden md:block md:w-8 md:h-8'} />
+                                    radius="sm"
+                                    color="danger"
+                                    endContent={<DeleteIcon2 width={16} height={16} />}>
+                                    ลบรายการที่เลือก
                                 </Button>
                                 <Link href={'/admin/subgroup/restore'}>
                                     <Button
-                                        className="bg-gray-300 text-black"
-                                        endContent={<TbRestore className={'w-[18px] h-[18px] text-black hidden md:block '} />}
-                                    >
+                                        radius="sm"
+                                        color="default"
+                                        endContent={<TbRestore className="w-[18px] h-[18px]" />}>
                                         รายการที่ถูกลบ
                                     </Button>
                                 </Link>

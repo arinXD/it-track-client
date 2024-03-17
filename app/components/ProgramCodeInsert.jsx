@@ -94,7 +94,7 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
                 version: selectedAcadYear.value,
                 program: selectedProgram.value
             });
-
+            showToastMessage(true, `เพิ่มรหัสหลักสูตร ${program_code} สำเร็จ`);
             onDataInserted();
         } catch (error) {
             showToastMessage(false, 'รหัสหลักสูตรต้องห้ามซ้ำ');
@@ -113,22 +113,39 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
     }, [isOpen]);
 
     return (
-        <Modal size="2xl" isOpen={isOpen} onClose={onClose}>
+        <Modal
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            size="2xl"
+            isOpen={isOpen}
+            onClose={onClose}
+            classNames={{
+                body: "py-6",
+                backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                base: "border-gray-300",
+                header: "border-b-[1.5px] border-gray-300",
+                footer: "border-t-[1.5px] border-gray-300",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}>
             <ModalContent>
                 {(onClose) => (
                     <>
-                        <ModalHeader className="flex flex-col gap-1">เพิ่มรหัสหลักสูตร</ModalHeader>
+                        <ModalHeader className="flex flex-col gap-1">
+                            <h2>เพิ่มรหัสหลักสูตร</h2>
+                            <span className='text-base font-normal'>แบบฟอร์มเพิ่มรหัสหลักสูตร</span>
+                        </ModalHeader>
                         <ModalBody>
                             <div className='grid grid-cols-4 gap-4'>
                                 <div className='col-span-2'>
                                     <label htmlFor="group">หลักสูตร</label>
                                     <Select
-                                        className='z-50'
+                                        className='z-50 active:outline-black'
                                         id="codeProgramId"
                                         value={selectedProgram}
                                         options={programs.map(program => ({ value: program.program, label: program.title_th }))}
                                         onChange={(selectedOption) => setSelectedProgram(selectedOption)}
                                         isSearchable
+                                        placeholder="เลือกหลักสูตร"
                                         isClearable
                                     />
                                 </div>
@@ -139,6 +156,7 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
                                         id="acadyear"
                                         value={selectedAcadYear}
                                         options={acadyears}
+                                        placeholder="เลือกปีการศึกษา"
                                         onChange={(selectedOption) => setSelectedAcadYear(selectedOption)}
                                         isSearchable
                                         isClearable
@@ -147,10 +165,13 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
                             </div>
 
                             <Input
-                                className='col-span-4 my-1'
+                                className='col-span-4 mt-1'
                                 type="text"
-                                label="รหัสหลักสูตร"
-                                id="programTitle"
+                                radius='sm'
+                                variant="bordered"
+                                label="หลักสูตร"
+                                labelPlacement="outside"
+                                placeholder="กรอกหลักสูตร"
                                 value={program_code}
                                 onChange={(e) => setProgramTitle(e.target.value)}
                             />
@@ -159,10 +180,11 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
                                 className='col-span-4'
                                 label="คำอธิบาย"
                                 variant="bordered"
-                                placeholder="เพิ่มรายละเอียด"
+                                placeholder="เพิ่มคำอธิบาย"
                                 value={desc}
                                 disableAnimation
                                 disableAutosize
+                                labelPlacement='outside'
                                 classNames={{
                                     base: "",
                                     input: "resize-y min-h-[40px]",
@@ -172,10 +194,10 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
 
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="danger" variant="light" onPress={onClose}>
+                            <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                                 ยกเลิก
                             </Button>
-                            <Button color="primary" onPress={handleInsertProgramCode}>
+                            <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleInsertProgramCode}>
                                 บันทึก
                             </Button>
                         </ModalFooter>

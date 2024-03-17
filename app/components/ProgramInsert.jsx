@@ -1,7 +1,7 @@
 "use client"
 
 // ProgramInsert.js
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from '@nextui-org/react';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
@@ -69,37 +69,63 @@ export default function ProgramInsert({ isOpen, onClose, onDataInserted }) {
     }, [isOpen]);
 
     return (
-        <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+        <Modal
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            size="md"
+            isOpen={isOpen}
+            onClose={onClose}
+            classNames={{
+                body: "py-6",
+                backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                base: "border-gray-300",
+                header: "border-b-[1.5px] border-gray-300",
+                footer: "border-t-[1.5px] border-gray-300",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}
+        >
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">เพิ่มหลักสูตร</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">
+                    <h2>เพิ่มหลักสูตร</h2>
+                    <span className='text-base font-normal'>แบบฟอร์มเพิ่มหลักสูตร</span>
+                </ModalHeader>
                 <ModalBody>
                     <Input
                         type="text"
+                        radius='sm'
+                        variant="bordered"
                         label="หลักสูตร"
-                        id="program"
+                        labelPlacement="outside"
+                        placeholder="กรอกหลักสูตร"
                         value={program}
                         onChange={(e) => setProgram(e.target.value)}
                     />
                     <Input
                         type="text"
-                        id="title_en"
-                        label="ชื่อภาษาอังกฤษ"
-                        value={title_en}
-                        onChange={(e) => setProgramTitleEn(e.target.value)}
-                    />
-                    <Input
-                        type="text"
-                        id="title_th"
+                        radius='sm'
+                        variant="bordered"
                         label="ชื่อภาษาไทย"
+                        labelPlacement="outside"
+                        placeholder="กรอกชื่อภาษาไทย"
                         value={title_th}
                         onChange={(e) => setProgramTitleTh(e.target.value)}
                     />
+                    <Input
+                        type="text"
+                        radius='sm'
+                        variant="bordered"
+                        label="ชื่อภาษาอังกฤษ"
+                        labelPlacement="outside"
+                        placeholder="กรอกชื่อภาษาอังกฤษ"
+                        value={title_en}
+                        onChange={(e) => setProgramTitleEn(e.target.value)}
+                    />
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                         ยกเลิก
                     </Button>
-                    <Button color="primary" onPress={handleInsertProgram}>
+                    <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleInsertProgram}>
                         บันทึก
                     </Button>
                 </ModalFooter>

@@ -101,9 +101,25 @@ export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
     };
 
     return (
-        <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+        <Modal
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            size="md"
+            isOpen={isOpen}
+            onClose={onClose}
+            classNames={{
+                body: "py-6",
+                backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                base: "border-gray-300",
+                header: "border-b-[1.5px] border-gray-300",
+                footer: "border-t-[1.5px] border-gray-300",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">แก้ไขกลุ่มรายวิชา</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">
+                    <h2>แก้ไขกลุ่มวิชา</h2>
+                    <span className='text-base font-normal'>แบบฟอร์มแก้ไขกลุ่มวิชา</span>
+                </ModalHeader>
                 <ModalBody>
                     <label htmlFor="category">เลือกหมวดหมู๋รายวิชา</label>
                     <Select
@@ -116,19 +132,23 @@ export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
                         isClearable
                     />
                     <Input
+                        className='col-span-4 my-1'
                         type="text"
-                        id="newTitle"
-                        label="กลุ่มรายวิชา"
+                        radius='sm'
+                        variant="bordered"
+                        label="กลุ่มวิชา"
+                        labelPlacement="outside"
+                        placeholder="กรอกกลุ่มวิชา"
                         value={newTitle}
                         onChange={(e) => setNewTitle(e.target.value)}
                     />
 
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                         ยกเลิก
                     </Button>
-                    <Button color="primary" onPress={handleUpdateGroup}>
+                    <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleUpdateGroup}>
                         บันทึก
                     </Button>
                 </ModalFooter>

@@ -73,7 +73,7 @@ export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
 
             onDataInserted();
 
-            // Close the modal after inserting
+            showToastMessage(true, `เพิ่มกลุ่มวิชา ${groupTitle} สำเร็จ`);
             onClose();
         } catch (error) {
             showToastMessage(false, 'กลุ่มวิชาต้องห้ามซ้ำ');
@@ -89,11 +89,27 @@ export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
     }, [isOpen]);
 
     return (
-        <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+        <Modal
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            size="md"
+            isOpen={isOpen}
+            onClose={onClose}
+            classNames={{
+                body: "py-6",
+                backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                base: "border-gray-300",
+                header: "border-b-[1.5px] border-gray-300",
+                footer: "border-t-[1.5px] border-gray-300",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}>
             <ModalContent>
                 {(onClose) => (
                     <>
-                        <ModalHeader className="flex flex-col gap-1">เพิ่มกลุ่มรายวิชา</ModalHeader>
+                        <ModalHeader className="flex flex-col gap-1">
+                            <h2>เพิ่มกลุ่มวิชา</h2>
+                            <span className='text-base font-normal'>แบบฟอร์มเพิ่มกลุ่มวิชา</span>
+                        </ModalHeader>
                         <ModalBody>
                             <label htmlFor="category">เลือกหมวดหมู๋รายวิชา</label>
                             <Select
@@ -106,18 +122,22 @@ export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
                                 isClearable
                             />
                             <Input
+                                className='col-span-4 mt-1'
                                 type="text"
-                                id="groupTitle"
-                                label="กลุ่มรายวิชา"
+                                radius='sm'
+                                variant="bordered"
+                                label="กลุ่มวิชา"
+                                labelPlacement="outside"
+                                placeholder="กรอกกลุ่มวิชา"
                                 value={groupTitle}
                                 onChange={(e) => setGroupTitle(e.target.value)}
                             />
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="danger" variant="light" onPress={onClose}>
+                            <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                                 ยกเลิก
                             </Button>
-                            <Button color="primary" onPress={handleInsertGroup}>
+                            <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleInsertGroup}>
                                 บันทึก
                             </Button>
                         </ModalFooter>

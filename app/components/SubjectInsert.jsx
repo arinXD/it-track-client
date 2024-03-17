@@ -151,15 +151,32 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
     };
 
     return (
-        <Modal size="2xl" isOpen={isOpen} onClose={onClose}>
+        <Modal
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            size="2xl"
+            isOpen={isOpen}
+            onClose={onClose}
+            classNames={{
+                body: "py-6",
+                backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                base: "border-gray-300",
+                header: "border-b-[1.5px] border-gray-300",
+                footer: "border-t-[1.5px] border-gray-300",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">เพิ่มวิชา</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">
+                    <h2>เพิ่มวิชา</h2>
+                    <span className='text-base font-normal'>แบบฟอร์มเพิ่มวิชา</span>
+                </ModalHeader>
                 <ModalBody className='grid grid-cols-9 gap-4'>
                     <div className='col-span-3'>
-                        <label htmlFor="group">กลุ่มรายวิชา</label>
+                        <label htmlFor="group">กลุ่มวิชา</label>
                         <Select
                             className='z-50'
                             id="group"
+                            placeholder="เลือกกลุ่มยวิชา"
                             value={selectedGroup}
                             options={groups}
                             onChange={(selectedOption) => setSelectedGroup(selectedOption)}
@@ -172,6 +189,7 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                         <Select
                             className='z-50'
                             id="subgroup"
+                            placeholder="เลือกกลุ่มย่อยวิชา"
                             value={selectedSubGroup}
                             options={subgroups}
                             onChange={(selectedOption) => setSelectedSubGroup(selectedOption)}
@@ -184,6 +202,7 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                         <Select
                             className='z-40'
                             id="acadyear"
+                            placeholder="เลือกปีการศึกษา"
                             value={selectedAcadYear}
                             options={acadyears}
                             onChange={(selectedOption) => setSelectedAcadYear(selectedOption)}
@@ -195,32 +214,46 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                     <Input
                         className='col-span-3'
                         type="text"
-                        id="subject_code"
+                        radius='sm'
+                        variant="bordered"
                         label="รหัสวิชา"
+                        labelPlacement="outside"
+                        placeholder="รหัสวิชา"
                         value={subject_code}
                         onChange={(e) => setSubjectCode(e.target.value)}
                     />
+                    
                     <Input
                         className='col-span-3'
                         type="number"
-                        id="semester"
+                        radius='sm'
+                        variant="bordered"
+                        label="หน่วยกิต"
+                        labelPlacement="outside"
+                        placeholder="กรอกหน่วยกิต"
+                        value={credit}
+                        onChange={(e) => setCredit(e.target.value)}
+                    />
+
+                    <Input
+                        className='col-span-3'
+                        type="number"
+                        radius='sm'
+                        variant="bordered"
                         label="เทอม"
+                        labelPlacement="outside"
+                        placeholder="กรอกเทอม"
                         value={semester}
                         onChange={(e) => setSemester(e.target.value)}
                     />
                     <Input
-                        className='col-span-3'
-                        type="number"
-                        id="credit"
-                        label="หน่วยกิต"
-                        value={credit}
-                        onChange={(e) => setCredit(e.target.value)}
-                    />
-                    <Input
                         className='col-span-9'
                         type="text"
-                        id="title_th"
+                        radius='sm'
+                        variant="bordered"
                         label="ชื่อภาษาไทย"
+                        labelPlacement="outside"
+                        placeholder="กรอกชื่อภาษาไทย"
                         value={title_th}
                         onChange={(e) => setTitleTh(e.target.value)}
                     />
@@ -228,12 +261,14 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                     <Input
                         className='col-span-9'
                         type="text"
-                        id="title_en"
+                        radius='sm'
+                        variant="bordered"
                         label="ชื่อภาษาอังกฤษ"
+                        labelPlacement="outside"
+                        placeholder="กรอกชื่อภาษาอังกฤษ"
                         value={title_en}
                         onChange={(e) => setTitleEn(e.target.value)}
                     />
-
 
                     <Textarea
                         className='col-span-9'
@@ -241,6 +276,7 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                         label="รายละเอียด"
                         variant="bordered"
                         placeholder="เพิ่มรายละเอียด"
+                        labelPlacement='outside'
                         value={information}
                         disableAnimation
                         disableAutosize
@@ -254,10 +290,10 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
 
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                         ยกเลิก
                     </Button>
-                    <Button color="primary" onPress={handleInsertSubject}>
+                    <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleInsertSubject}>
                         บันทึก
                     </Button>
                 </ModalFooter>

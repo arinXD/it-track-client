@@ -17,6 +17,7 @@ const Page = async () => {
     const tracks = [
         { href: "/admin/track", lable: "ข้อมูลแทรค" },
         { href: "/admin/track-selection", lable: "คัดเลือกแทรค" },
+        { href: "/admin/trackstudent", lable: "รายชื่อนักศึกษาภายในแทรค" },
     ]
     return (
         <>

@@ -123,14 +123,22 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
     }
   };
   const handleInsertSubject = async () => {
-    const { value } = await Swal.fire({
+    const swal = Swal.mixin({
+      customClass: {
+          confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+          cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+      },
+      buttonsStyling: false
+  });
+    const { value } = await swal.fire({
       text: `ตรวจสอบวิชาเรียบร้อยแล้วหรือไม่ ?`,
-      icon: "warning",
+      icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "ตกลง",
-      cancelButtonText: "ยกเลิก"
+      cancelButtonText: "ยกเลิก",
+      reverseButtons: true
     });
 
     if (value) {
@@ -184,7 +192,6 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
           showToastMessage(false, 'หัวตารางไม่ตรงกับ Database');
         }
       } catch (error) {
-        console.error('Error inserting subjects:', error);
         showToastMessage(false, 'รหัสวิชาซ้ำ');
       }
     }

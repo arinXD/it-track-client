@@ -101,9 +101,25 @@ export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }
     };
 
     return (
-        <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+        <Modal
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            size="md"
+            isOpen={isOpen}
+            onClose={onClose}
+            classNames={{
+                body: "py-6",
+                backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                base: "border-gray-300",
+                header: "border-b-[1.5px] border-gray-300",
+                footer: "border-t-[1.5px] border-gray-300",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">แก้ไขกลุ่มย่อย</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">
+                    <h2>แก้ไขกลุ่มย่อยวิชา</h2>
+                    <span className='text-base font-normal'>แบบฟอร์มแก้ไขกลุ่มย่อยวิชา</span>
+                </ModalHeader>
                 <ModalBody>
                     <label htmlFor="group">เลือกกลุ่มวิชา</label>
                     <Select
@@ -111,25 +127,30 @@ export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }
                         className='z-50'
                         value={selectedGroup}
                         options={groups}
+                        placeholder='เลือกกลุ่มวิชา'
                         onChange={(selectedOption) => setSelectedGroup(selectedOption)}
                         isSearchable
                         isClearable
                     />
 
                     <Input
+                        className='col-span-4 mt-1'
                         type="text"
-                        id="newTitle"
+                        radius='sm'
+                        variant="bordered"
                         label="กลุ่มย่อยวิชา"
+                        labelPlacement="outside"
+                        placeholder="กรอกกลุ่มย่อยวิชา"
                         value={newTitle}
                         onChange={(e) => setNewTitle(e.target.value)}
                     />
 
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                         ยกเลิก
                     </Button>
-                    <Button color="primary" onPress={handleUpdateSubGroup}>
+                    <Button className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid' onPress={handleUpdateSubGroup}>
                         บันทึก
                     </Button>
                 </ModalFooter>

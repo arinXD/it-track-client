@@ -8,7 +8,7 @@ import { Skeleton } from "@nextui-org/react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { tableClass } from "@/src/util/tableClass";
-import { capitalize } from "../utils";
+import { capitalize } from "../../../../src/util/utils";
 import { TbRestore } from "react-icons/tb";
 import { getToken } from "@/app/components/serverAction/TokenAction";
 import { hostname } from "@/app/api/hostname";
