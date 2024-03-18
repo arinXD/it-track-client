@@ -1,16 +1,18 @@
 "use client"
 import React, { useEffect, useMemo, useState } from 'react'
 import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '../components';
-import PieChart from './PieChart';
 import { getAcadyears } from '@/src/util/academicYear';
-import Select from 'react-select';
 import { SearchIcon } from '../components/icons';
 import { Button } from '@nextui-org/react';
-import ReatChart from './ReatChart';
 import { fetchDataObj } from '../admin/action';
 
-export default function Page() {
+import dynamic from 'next/dynamic';
+const Select = dynamic(() => import('react-select'), { ssr: false });
+const DounutChart = dynamic(() => import('./DounutChart'), { ssr: false });
+const BarChart = dynamic(() => import('./BarChart'), { ssr: false });
+const MultipleBarChart = dynamic(() => import('./MultipleBarChart'), { ssr: false });
 
+export default function Page() {
     async function getGpaOption(selections) {
         if (!selections.length) return {}
         const all = {
@@ -213,14 +215,11 @@ export default function Page() {
     }
 
     useEffect(() => {
-        // Only execute client-side code
-        if (typeof window !== 'undefined') {
-            setSearching(true);
-            getTrackSelect();
-            getPopularTracks();
-            setSearching(false);
-        }
-    }, [window]);
+        setSearching(true);
+        getTrackSelect();
+        getPopularTracks();
+        setSearching(false);
+    }, []);
 
     const [searching, setSearching] = useState(false)
     const acadyears = getAcadyears().map(acadyear => ({
@@ -406,30 +405,6 @@ export default function Page() {
                                     ตัวชี้วัดแสดงผลรวมการคัดเลือกแทรคประจำปีการศึกษา {acadyear.value}
                                 </p>
                             </div>
-
-                            {/* <div className='my-[30px] flex flex-wrap gap-4'>
-                                <PieChart
-                                    title={"Property for BIS"}
-                                    value={64}
-                                    series={[64, 25]}
-                                    colors={['#475be8', '#e4e8ef']} />
-                                <PieChart
-                                    title={"Property for WEB"}
-                                    value={52}
-                                    series={[60, 40]}
-                                    colors={['#475ae8', '#e4b8ef']} />
-                                <PieChart
-                                    title={"Property for Network"}
-                                    value={56}
-                                    series={[75, 25]}
-                                    colors={['#275be8', '#c4e8ef']} />
-                                <PieChart
-                                    title={"Total Student"}
-                                    value={172}
-                                    series={[75, 25]}
-                                    colors={['#475be8', '#e4e8ef']} />
-                            </div> */}
-
                             <div className="w-full gap-4 grid place-items-center grid-cols-12 grid-rows-1">
                                 <div className="flex gap-3 flex-col items-center p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
                                     <div className='w-full text-start'>
@@ -440,13 +415,7 @@ export default function Page() {
                                             {trackSelect?.Selections?.length} คน
                                         </p>
                                     </div>
-                                    {(typeof window !== 'undefined') &&
-                                        <ReatChart
-                                            className={"w-full"}
-                                            options={sumTrackOption.options}
-                                            series={sumTrackOption.series}
-                                            type="donut" />
-                                    }
+                                    <DounutChart sumTrackOption={sumTrackOption} />
                                 </div>
                                 <div className="flex gap-3 flex-col items-center p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
                                     <div className='w-full text-start'>
@@ -454,15 +423,7 @@ export default function Page() {
                                             เกรดเฉลี่ยรวมของนักศึกษาภายในแทรค ปีการศึกษา {acadyear.value}
                                         </p>
                                     </div>
-                                    {(typeof window !== 'undefined') &&
-                                        <ReatChart
-                                            className={"w-full"}
-                                            options={gpaOptionBar.options}
-                                            series={gpaOptionBar.series}
-                                            type="bar"
-                                            height={320}
-                                        />
-                                    }
+                                    <BarChart gpaOptionBar={gpaOptionBar} />
                                 </div>
                                 <div className="flex gap-3 flex-col items-start p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
                                     {/* <div className='p-4 border-1 rounded-lg bg-white'>BIT {allGpa["BIT"]}</div>
@@ -494,14 +455,7 @@ export default function Page() {
                                         <p className='text-lg font-semi-bold text-[#11142d]'>
                                             แทรคที่ถูกเลือกในแต่ละปี (5 ปีย้อนหลัง)
                                         </p>
-                                        {(typeof window !== 'undefined') &&
-                                            <ReatChart
-                                                series={totalPopular}
-                                                type="bar"
-                                                height={310}
-                                                options={totalPopularOptions}
-                                            />
-                                        }
+                                        <MultipleBarChart totalPopular={totalPopular} totalPopularOptions={totalPopularOptions} />
                                     </div>
                                 </div>
                             </div>
