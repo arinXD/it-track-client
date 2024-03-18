@@ -5,9 +5,9 @@ import { getAcadyears } from '@/src/util/academicYear';
 import { SearchIcon } from '../components/icons';
 import { Button } from '@nextui-org/react';
 import { fetchDataObj } from '../admin/action';
-
+import Select from 'react-select'
 import dynamic from 'next/dynamic';
-const Select = dynamic(() => import('react-select'), { ssr: false });
+// const Select = dynamic(() => import('react-select'), { ssr: false });
 const DounutChart = dynamic(() => import('./DounutChart'), { ssr: false });
 const BarChart = dynamic(() => import('./BarChart'), { ssr: false });
 const MultipleBarChart = dynamic(() => import('./MultipleBarChart'), { ssr: false });
