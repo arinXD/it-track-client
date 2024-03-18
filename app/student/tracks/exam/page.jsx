@@ -2,15 +2,22 @@
 import React, { useEffect, useState } from 'react'
 import '../../../style/exam.css';
 import { Navbar, Sidebar, ContentWrap } from '@/app/components';
+import Link from 'next/link';
 const Page = () => {
     const data = [
         {
             question: 'คุณชอบที่จะทำงานกับข้อมูลที่มีขนาดเยอะ',
         },
         {
-            question: 'คุณชอบออกแบบ',
+            question: 'คุณคิดว่าการปกป้องข้อมูลสำคัญในองค์กรเป็นสิ่งสำคัญ'
         },
-    ]
+        {
+            question: 'คุณชอบทำงานเกี่ยวกับซอฟต์แวร์หรือบริการที่เกี่ยวข้องกับคลาวด์คอมพิวติ้ง'
+        },
+        {
+            question: 'คุณมีความรู้เกี่ยวกับการพัฒนาระบบเว็บแอปพลิเคชัน'
+        },
+    ];
     return (
         <>
             <header>
@@ -44,41 +51,51 @@ const Page = () => {
             </div>
             <div className='mt-8 px-8 sm:ml-[240px]'>
                 {data.map((question, index) => (
-                    <div key={index} className='mx-auto max-w-7xl my-12'>
+                    <div key={index} id={`question${index}`} className='mx-auto max-w-7xl my-12'>
                         <p className='text-center text-4xl text-gray-600'>{question.question}</p>
                         <div className='flex justify-center items-center gap-16 text-2xl'>
                             <h2 className='text-green-800'>ฉันเห็นด้วย</h2>
                             <div className='flex justify-center items-center gap-12 my-20'>
-                                <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
-                                    <span className="w-20 h-20 flex items-center justify-center border border-gray-300 rounded-full">
-                                        <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-                                        <span className="block rounded-full transition duration-400 hover:bg-green-800 w-20 h-20"></span>
-                                    </span>
-                                </label>
-                                <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
-                                    <span className="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-full">
-                                        <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-                                        <span className="block rounded-full transition duration-400 hover:bg-green-800 w-14 h-14"></span>
-                                    </span>
-                                </label>
-                                <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
-                                    <span className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full">
-                                        <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-                                        <span className="block rounded-full transition duration-400 hover:bg-gray-600 w-10 h-10"></span>
-                                    </span>
-                                </label>
-                                <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
-                                    <span className="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-full">
-                                        <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-                                        <span className="block rounded-full transition duration-400 hover:bg-purple-900 w-14 h-14"></span>
-                                    </span>
-                                </label>
-                                <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
-                                    <span className="w-20 h-20 flex items-center justify-center border border-gray-300 rounded-full">
-                                        <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-                                        <span className="block rounded-full transition duration-400 hover:bg-purple-900 w-20 h-20"></span>
-                                    </span>
-                                </label>
+                                <Link href={`#question${index + 1}`}>
+                                    <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
+                                        <span className="w-20 h-20 flex items-center justify-center border border-gray-300 rounded-full">
+                                            <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
+                                            <span className="block rounded-full transition duration-400 hover:bg-green-800 w-20 h-20"></span>
+                                        </span>
+                                    </label>
+                                </Link>
+                                <Link href={`#question${index + 1}`}>
+                                    <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
+                                        <span className="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-full">
+                                            <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
+                                            <span className="block rounded-full transition duration-400 hover:bg-green-800 w-14 h-14"></span>
+                                        </span>
+                                    </label>
+                                </Link>
+                                <Link href={`#question${index + 1}`}>
+                                    <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
+                                        <span className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full">
+                                            <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
+                                            <span className="block rounded-full transition duration-400 hover:bg-gray-600 w-10 h-10"></span>
+                                        </span>
+                                    </label>
+                                </Link>
+                                <Link href={`#question${index + 1}`}>
+                                    <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
+                                        <span className="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-full">
+                                            <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
+                                            <span className="block rounded-full transition duration-400 hover:bg-purple-900 w-14 h-14"></span>
+                                        </span>
+                                    </label>
+                                </Link>
+                                <Link href={`#question${index + 1}`}>
+                                    <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
+                                        <span className="w-20 h-20 flex items-center justify-center border border-gray-300 rounded-full">
+                                            <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
+                                            <span className="block rounded-full transition duration-400 hover:bg-purple-900 w-20 h-20"></span>
+                                        </span>
+                                    </label>
+                                </Link>
                             </div>
                             <h2 className='text-purple-800'>ฉันไม่เห็นด้วย</h2>
                         </div>
