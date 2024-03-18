@@ -90,7 +90,6 @@ export default function Page() {
         } else {
             ts = await fetchDataObj(`/api/tracks/selects/${acadyear}/students`)
         }
-        console.log(ts);
         setTrackSelect(ts)
         if (ts?.Selections && Object.keys(ts.Selections).length) {
             getGpaOption(ts?.Selections || [])
@@ -142,7 +141,7 @@ export default function Page() {
         }
         if (popular?.length) {
             const totalPop = [];
-
+            if(!popular[0]?.Selections) return
             Object.keys(popular[0].Selections).forEach(category => {
                 let categoryData = {
                     name: category,
