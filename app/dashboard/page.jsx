@@ -399,8 +399,8 @@ export default function Page() {
                         :
                         <>
                             <div className='mt-[30px]'>
-                                <p className='text-lg mt-4 font-bold color-[#11142D] mb-4]'>
-                                    ตัวชี้วัดแสดงผลรวมการคัดเลือกแทรคประจำปีการศึกษา {acadyear.value} {String(trackSelect?.Selections?.length)}
+                                <p className='text-lg mt-4 font-bold color-[#11142D] mb-4'>
+                                    ตัวชี้วัดแสดงผลรวมการคัดเลือกแทรคประจำปีการศึกษา {acadyear.value}
                                 </p>
                             </div>
 
