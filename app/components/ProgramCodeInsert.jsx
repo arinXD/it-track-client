@@ -169,9 +169,9 @@ export default function ProgramCodeInsert({ isOpen, onClose, onDataInserted }) {
                                 type="text"
                                 radius='sm'
                                 variant="bordered"
-                                label="หลักสูตร"
+                                label="รหัสหลักสูตร"
                                 labelPlacement="outside"
-                                placeholder="กรอกหลักสูตร"
+                                placeholder="กรอกรหัสหลักสูตร"
                                 value={program_code}
                                 onChange={(e) => setProgramTitle(e.target.value)}
                             />
