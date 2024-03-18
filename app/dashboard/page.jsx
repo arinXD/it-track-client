@@ -5,7 +5,6 @@ import { getAcadyears } from '@/src/util/academicYear';
 import { SearchIcon } from '../components/icons';
 import { Button } from '@nextui-org/react';
 import { fetchDataObj } from '../admin/action';
-import Select from 'react-select'
 import dynamic from 'next/dynamic';
 // const Select = dynamic(() => import('react-select'), { ssr: false });
 // const DounutChart = dynamic(() => import('./DounutChart'), { ssr: false });
@@ -370,7 +369,7 @@ export default function Page() {
             <ContentWrap>
                 <BreadCrumb />
                 <div className='flex flex-row gap-4 my-4'>
-                    <Select
+                    {/* <Select
                         className='w-[100%]'
                         id="acadyear"
                         value={acadyear}
@@ -379,7 +378,7 @@ export default function Page() {
                         isSearchable
                         placeholder='เลือกปีการศึกษา'
                         isClearable
-                    />
+                    /> */}
                     <Button
                         onClick={handleSearch}
                         radius="sm"
