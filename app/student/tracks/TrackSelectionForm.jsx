@@ -76,7 +76,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         if (result.ok) {
             // จุดพลุฉลอง
             handleConfetti()
-            console.log(data.updatedAt);
+
             Swal.fire({
                 title: "บันทึกข้อมูลการคัดเลือก",
                 text: `บันทึกข้อมูลการคัดเลือกของคุณ ณ วันที่ ${dmyt(data.updatedAt)}`,
@@ -166,9 +166,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                     return !(trackArr.includes(t.track))
                 }
             );
-            console.log(trackArr);
-            console.log(c + 1);
-            console.log(result);
+
             const type = `SET_ORDER_${c + 1}`
             const payload = result[0].track
             dispatch({

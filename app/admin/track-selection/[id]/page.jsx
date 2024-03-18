@@ -580,7 +580,9 @@ const Page = ({ params }) => {
                                                 {
                                                     allTrack?.students?.length === 0 ? null :
                                                         <StudentTrackTable
-                                                            trackSubj={trackSubj} studentData={allTrack} track={"ทุกแทรค"} />
+                                                            trackSubj={trackSubj} 
+                                                            studentData={allTrack} 
+                                                            track={"ทุกแทรค"} />
                                                 }
                                             </Tab>
                                             {studentsBit?.students?.length == 0 ? null :
