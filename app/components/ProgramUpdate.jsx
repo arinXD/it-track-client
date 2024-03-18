@@ -120,6 +120,7 @@ export default function ProgramUpdate({ isOpen, onClose, onUpdate, programId }) 
                         label="ชื่อภาษาอังกฤษ"
                         labelPlacement="outside"
                         placeholder="กรอกชื่อภาษาอังกฤษ"
+                        value={title_en}
                         onChange={(e) => setProgramTitleEn(e.target.value)}
                     />
                 </ModalBody>
