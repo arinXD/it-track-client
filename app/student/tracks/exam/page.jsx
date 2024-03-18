@@ -52,31 +52,31 @@ const Page = () => {
                                 <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
                                     <span className="w-20 h-20 flex items-center justify-center border border-gray-300 rounded-full">
                                         <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-                                        <span className="bloc rounded-full transition duration-400 hover:bg-green-800 w-20 h-20"></span>
+                                        <span className="block rounded-full transition duration-400 hover:bg-green-800 w-20 h-20"></span>
                                     </span>
                                 </label>
                                 <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
                                     <span className="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-full">
                                         <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-                                        <span className="bloc rounded-full transition duration-400 hover:bg-green-800 w-14 h-14"></span>
+                                        <span className="block rounded-full transition duration-400 hover:bg-green-800 w-14 h-14"></span>
                                     </span>
                                 </label>
                                 <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
                                     <span className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full">
                                         <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-                                        <span className="bloc rounded-full transition duration-400 hover:bg-gray-600 w-10 h-10"></span>
+                                        <span className="block rounded-full transition duration-400 hover:bg-gray-600 w-10 h-10"></span>
                                     </span>
                                 </label>
                                 <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
                                     <span className="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-full">
                                         <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-                                        <span className="bloc rounded-full transition duration-400 hover:bg-purple-900 w-14 h-14"></span>
+                                        <span className="block rounded-full transition duration-400 hover:bg-purple-900 w-14 h-14"></span>
                                     </span>
                                 </label>
                                 <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
                                     <span className="w-20 h-20 flex items-center justify-center border border-gray-300 rounded-full">
                                         <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-                                        <span className="bloc rounded-full transition duration-400 hover:bg-purple-900 w-20 h-20"></span>
+                                        <span className="block rounded-full transition duration-400 hover:bg-purple-900 w-20 h-20"></span>
                                     </span>
                                 </label>
                             </div>
