@@ -89,25 +89,37 @@ const Page = () => {
     // Fetching data
     async function getStudentStatuses() {
         const filterStatus = [10, 50, 62]
-        let statuses = await fetchData("/api/statuses")
-        statuses = statuses.filter(e => filterStatus.includes(e.id))
-        setStatusOptions(statuses)
+        try{
+            let statuses = await fetchData("/api/statuses")
+            statuses = statuses.filter(e => filterStatus.includes(e.id))
+            setStatusOptions(statuses)
+        }catch(err){
+            setStatusOptions([])
+        }
     }
     async function getStudents(program = "IT", acadyear = 2564) {
-        let students = await fetchData(`/api/students/programs/${program}/acadyear/${acadyear}`)
-        students.sort((a, b) => {
-            const order = {
-                "โครงการปกติ": 1,
-                "โครงการพิเศษ": 2
-            };
-            return order[a.courses_type] - order[b.courses_type];
-        });
-
-        setStudents(students);
+        try{
+            let students = await fetchData(`/api/students/programs/${program}/acadyear/${acadyear}`)
+            students.sort((a, b) => {
+                const order = {
+                    "โครงการปกติ": 1,
+                    "โครงการพิเศษ": 2
+                };
+                return order[a.courses_type] - order[b.courses_type];
+            });
+    
+            setStudents(students);
+        }catch(error){
+            setStudents([]);
+        }
     }
     async function getPrograms() {
-        const programs = await fetchData(`/api/programs`)
-        setPrograms(programs)
+        try {
+            const programs = await fetchData(`/api/programs`)
+            setPrograms(programs)
+        } catch (error) {
+            setPrograms([])
+        }
     }
 
     useEffect(() => {

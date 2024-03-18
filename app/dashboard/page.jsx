@@ -6,10 +6,10 @@ import { SearchIcon } from '../components/icons';
 import { Button } from '@nextui-org/react';
 import { fetchDataObj } from '../admin/action';
 import dynamic from 'next/dynamic';
-// const Select = dynamic(() => import('react-select'), { ssr: false });
-// const DounutChart = dynamic(() => import('./DounutChart'), { ssr: false });
-// const BarChart = dynamic(() => import('./BarChart'), { ssr: false });
-// const MultipleBarChart = dynamic(() => import('./MultipleBarChart'), { ssr: false });
+const Select = dynamic(() => import('react-select'), { ssr: false });
+const DounutChart = dynamic(() => import('./DounutChart'), { ssr: false });
+const BarChart = dynamic(() => import('./BarChart'), { ssr: false });
+const MultipleBarChart = dynamic(() => import('./MultipleBarChart'), { ssr: false });
 
 export default function Page() {
     async function getGpaOption(selections) {
@@ -369,7 +369,7 @@ export default function Page() {
             <ContentWrap>
                 <BreadCrumb />
                 <div className='flex flex-row gap-4 my-4'>
-                    {/* <Select
+                    <Select
                         className='w-[100%]'
                         id="acadyear"
                         value={acadyear}
@@ -378,7 +378,7 @@ export default function Page() {
                         isSearchable
                         placeholder='เลือกปีการศึกษา'
                         isClearable
-                    /> */}
+                    />
                     <Button
                         onClick={handleSearch}
                         radius="sm"
@@ -414,7 +414,7 @@ export default function Page() {
                                             {trackSelect?.Selections?.length} คน
                                         </p>
                                     </div>
-                                    {/* <DounutChart sumTrackOption={sumTrackOption} /> */}
+                                    <DounutChart sumTrackOption={sumTrackOption} />
                                 </div>
                                 <div className="flex gap-3 flex-col items-center p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
                                     <div className='w-full text-start'>
@@ -422,12 +422,9 @@ export default function Page() {
                                             เกรดเฉลี่ยรวมของนักศึกษาภายในแทรค ปีการศึกษา {acadyear.value}
                                         </p>
                                     </div>
-                                    {/* <BarChart gpaOptionBar={gpaOptionBar} /> */}
+                                    <BarChart gpaOptionBar={gpaOptionBar} />
                                 </div>
                                 <div className="flex gap-3 flex-col items-start p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
-                                    {/* <div className='p-4 border-1 rounded-lg bg-white'>BIT {allGpa["BIT"]}</div>
-                                    <div className='p-4 border-1 rounded-lg bg-white'>Network {allGpa["Network"]}</div>
-                                    <div className='p-4 border-1 rounded-lg bg-white'>Web {allGpa["Web and Mobile"]}</div> */}
                                     <div className=' w-full h-full max-w-lg'>
                                         <h1 className='text-start text-lg mb-5'>เกรดเฉลี่ยรวมของนักศึกษาภายในแทรค ปีการศึกษา <span className='font-semi-bold'>{acadyear.value}</span></h1>
                                         <div className='flex flex-wrap gap-y-4'>
@@ -454,7 +451,7 @@ export default function Page() {
                                         <p className='text-lg font-semi-bold text-[#11142d]'>
                                             แทรคที่ถูกเลือกในแต่ละปี (5 ปีย้อนหลัง)
                                         </p>
-                                        {/* <MultipleBarChart totalPopular={totalPopular} totalPopularOptions={totalPopularOptions} /> */}
+                                        <MultipleBarChart totalPopular={totalPopular} totalPopularOptions={totalPopularOptions} />
                                     </div>
                                 </div>
                             </div>

@@ -98,7 +98,6 @@ const StudentTable = () => {
           } else {
                tracks = []
           }
-          console.log(tracks);
           setTracks(tracks)
      }
 
