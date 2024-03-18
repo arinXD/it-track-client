@@ -5,10 +5,10 @@ import { Navbar, Sidebar, ContentWrap } from '@/app/components';
 const Page = () => {
     const data = [
         {
-            question: 'คุณทำความรู้จักเพื่อนใหม่เป็นประจำ',
+            question: 'คุณชอบที่จะทำงานกับข้อมูลที่มีขนาดเยอะ',
         },
         {
-            question: 'คุณทำความรู้จักเพื่อนใหม่เป็นประจำ',
+            question: 'คุณชอบออกแบบ',
         },
     ]
     return (
