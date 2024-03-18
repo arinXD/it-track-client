@@ -11,15 +11,89 @@ import { fetchDataObj } from '../admin/action';
 
 export default function Page() {
 
+    async function getGpaOption(selections) {
+        if (!selections.length) return {}
+        const all = {
+            "BIT": {
+                gpa: 0,
+                c: 0
+            },
+            "Network": {
+                gpa: 0,
+                c: 0
+            },
+            "Web and Mobile": {
+                gpa: 0,
+                c: 0
+            },
+        }
+        for (const select of selections) {
+            const result = select.result
+            if (!result) continue
+            all[result].gpa += select.gpa
+            all[result].c += 1
+        }
+        const gpa = {
+            "BIT": parseFloat(all.BIT.gpa / all.BIT.c || 1).toFixed(2),
+            "Network": parseFloat(all.Network.gpa / all.Network.c || 1).toFixed(2),
+            "Web and Mobile": parseFloat(all["Web and Mobile"].gpa / all["Web and Mobile"].c || 1).toFixed(2)
+        }
+        setAllGpa(gpa)
+        const option = {
+            series: [{
+                data: Object.values(gpa)
+            }],
+            options: {
+                chart: {
+                    height: 350,
+                    type: 'bar',
+                    events: {
+                        click: function (chart, w, e) {
+                            // console.log(chart, w, e)
+                        }
+                    }
+                },
+                // colors: colors,
+                plotOptions: {
+                    bar: {
+                        columnWidth: '45%',
+                        distributed: true,
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                legend: {
+                    show: false
+                },
+                xaxis: {
+                    categories: [
+                        ['BIT'],
+                        ['Network'],
+                        ['Web and Mobile'],
+                    ],
+                    labels: {
+                        style: {
+                            fontSize: '12px'
+                        }
+                    }
+                }
+            },
+        }
+        setGpaOptionBar(option)
+    }
+
     async function getTrackSelect(acadyear = null) {
         let ts
         if (acadyear == null) {
             ts = await fetchDataObj("/api/tracks/selects/get/last")
         } else {
-            ts = await fetchDataObj(`/api/tracks/selects/${acadyear.value}/students`)
+            ts = await fetchDataObj(`/api/tracks/selects/${acadyear}/students`)
         }
+        console.log(ts);
         setTrackSelect(ts)
         if (ts?.Selections && Object.keys(ts.Selections).length) {
+            getGpaOption(ts?.Selections || [])
             const sumOfTrack = getSumOfTrack(ts?.Selections || [])
             setSumTrackOption({
                 series: Object?.values(sumOfTrack),
@@ -141,8 +215,8 @@ export default function Page() {
 
     useEffect(() => {
         setSearching(true)
-        // getTrackSelect()
-        // getPopularTracks()
+        getTrackSelect()
+        getPopularTracks()
         setSearching(false)
     }, [])
 
@@ -153,6 +227,7 @@ export default function Page() {
     }));
     const [acadyear, setAcadyear] = useState(acadyears[0])
     const [trackSelect, setTrackSelect] = useState({})
+    const [gpaAll, setGpaAll] = useState({})
 
     const [sumTrackOption, setSumTrackOption] = useState({
         series: [1, 1, 1],
@@ -239,14 +314,13 @@ export default function Page() {
     })
 
     async function handleSearch() {
-
-        getTrackSelect(acadyear)
+        getTrackSelect(acadyear.value)
         getPopularTracks()
-
     }
-    const options = {
+    const [allGpa, setAllGpa] = useState({})
+    const [gpaOptionBar, setGpaOptionBar] = useState({
         series: [{
-            data: [2.68, 3.0, 2.95,]
+            data: [0, 0, 0,]
         }],
         options: {
             chart: {
@@ -279,13 +353,13 @@ export default function Page() {
                 ],
                 labels: {
                     style: {
-                        // colors: colors,
                         fontSize: '12px'
                     }
                 }
             }
         },
-    };
+    })
+
     return (
         <>
             <header>
@@ -378,16 +452,16 @@ export default function Page() {
                                     </div>
                                     <ReatChart
                                         className={"w-full"}
-                                        options={options.options}
-                                        series={options.series}
+                                        options={gpaOptionBar.options}
+                                        series={gpaOptionBar.series}
                                         type="bar"
                                         height={320}
                                     />
                                 </div>
                                 <div className="flex gap-3 flex-col items-start p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
-                                    <div className='p-4 border-1 rounded-lg bg-white'>BIT 2.65</div>
-                                    <div className='p-4 border-1 rounded-lg bg-white'>Network 2.65</div>
-                                    <div className='p-4 border-1 rounded-lg bg-white'>Web 2.65</div>
+                                    <div className='p-4 border-1 rounded-lg bg-white'>BIT {allGpa["BIT"]}</div>
+                                    <div className='p-4 border-1 rounded-lg bg-white'>Network {allGpa["Network"]}</div>
+                                    <div className='p-4 border-1 rounded-lg bg-white'>Web {allGpa["Web and Mobile"]}</div>
                                 </div>
                             </div>
 
