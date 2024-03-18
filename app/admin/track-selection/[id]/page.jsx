@@ -416,8 +416,8 @@ const Page = ({ params }) => {
                                             <div className='grid grid-cols-3 gap-8 max-xl:grid-cols-2 max-lg:grid-cols-1'>
                                                 <Link href={"#bit-students"} className="flex flex-row text-center rounded-l-full">
                                                     <div className={`bg-purple-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div class="rounded-full flex relative justify-center items-center">
-                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
+                                                        <div className="rounded-full flex relative justify-center items-center">
+                                                            <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
                                                                 <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
                                                             </div>
                                                         </div>
@@ -444,8 +444,8 @@ const Page = ({ params }) => {
                                                 </Link>
                                                 <Link href={"#network-students"} className="flex flex-row text-center rounded-l-full">
                                                     <div className={`bg-emerald-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div class="rounded-full flex relative justify-center items-center">
-                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
+                                                        <div className="rounded-full flex relative justify-center items-center">
+                                                            <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
                                                                 <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
                                                             </div>
                                                         </div>
@@ -472,8 +472,8 @@ const Page = ({ params }) => {
                                                 </Link>
                                                 <Link href={"#web-students"} className="flex flex-row text-center rounded-l-full">
                                                     <div className={`bg-indigo-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div class="rounded-full flex relative justify-center items-center">
-                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
+                                                        <div className="rounded-full flex relative justify-center items-center">
+                                                            <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
                                                                 <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
                                                             </div>
                                                         </div>
