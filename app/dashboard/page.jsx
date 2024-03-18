@@ -141,7 +141,7 @@ export default function Page() {
         }
         if (popular?.length) {
             const totalPop = [];
-            if(!popular[0]?.Selections) return
+            if (!popular[0]?.Selections) return
             Object.keys(popular[0].Selections).forEach(category => {
                 let categoryData = {
                     name: category,
@@ -458,9 +458,26 @@ export default function Page() {
                                     />
                                 </div>
                                 <div className="flex gap-3 flex-col items-start p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
-                                    <div className='p-4 border-1 rounded-lg bg-white'>BIT {allGpa["BIT"]}</div>
+                                    {/* <div className='p-4 border-1 rounded-lg bg-white'>BIT {allGpa["BIT"]}</div>
                                     <div className='p-4 border-1 rounded-lg bg-white'>Network {allGpa["Network"]}</div>
-                                    <div className='p-4 border-1 rounded-lg bg-white'>Web {allGpa["Web and Mobile"]}</div>
+                                    <div className='p-4 border-1 rounded-lg bg-white'>Web {allGpa["Web and Mobile"]}</div> */}
+                                    <div className=' w-full h-full max-w-lg'>
+                                        <h1 className='text-start text-lg mb-5'>เกรดเฉลี่ยรวมของนักศึกษาภายในแทรค ปีการศึกษา <span className='font-semi-bold'>{acadyear.value}</span></h1>
+                                        <div className='flex flex-wrap gap-y-4'>
+                                            <div className='rounded-lg border shadow-md grid grid-cols-2 items-center justify-items-center w-full py-8 bg-[#26A0FC]/75'>
+                                                <p className='text-xl text-black'>BIT</p>
+                                                <p className='text-5xl font-semibold text-black'>{allGpa["BIT"]}</p>
+                                            </div>
+                                            <div className='rounded-lg border shadow-md grid grid-cols-2 items-center justify-items-center w-full py-8 bg-[#26E7A6]/75'>
+                                                <p className='text-xl text-black'>Network</p>
+                                                <p className='text-5xl font-semibold text-black'>{allGpa["Network"]}</p>
+                                            </div>
+                                            <div className='rounded-lg border shadow-md grid grid-cols-2 items-center justify-items-center w-full py-8 bg-[#FEBC3B]/75'>
+                                                <p className='text-xl text-black'>Web and Mobile</p>
+                                                <p className='text-5xl font-semibold text-black'>{allGpa["Web and Mobile"]}</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
