@@ -107,7 +107,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 const data = response.data.data;
                 const trackData = trackResponse.data.data
                 if (selectedData) {
-                    setTrackResult(selectedData.result)
+                    setTrackResult(selectedData.Track)
                     for (let index = 1; index < 4; index++) {
                         const type = `SET_ORDER_${index}`
                         dispatch({
@@ -206,7 +206,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
                                                 {trackSelect.title}
                                             </h4>
-                                            <p>แทรคของคุณคือ {trackResult}</p>
+                                            <p>แทรคของคุณ คือ {trackResult.title_en}</p>
+                                            <p>{trackResult.title_th}</p>
                                         </div>
                                     )
                                     :

@@ -19,7 +19,7 @@ export default function Page() {
             ts = await fetchDataObj(`/api/tracks/selects/${acadyear.value}/students`)
         }
         setTrackSelect(ts)
-        if (Object.keys(ts?.Selections).length) {
+        if (ts?.Selections && Object.keys(ts.Selections).length) {
             const sumOfTrack = getSumOfTrack(ts?.Selections || [])
             setSumTrackOption({
                 series: Object?.values(sumOfTrack),
@@ -141,8 +141,8 @@ export default function Page() {
 
     useEffect(() => {
         setSearching(true)
-        getTrackSelect()
-        getPopularTracks()
+        // getTrackSelect()
+        // getPopularTracks()
         setSearching(false)
     }, [])
 
@@ -319,7 +319,7 @@ export default function Page() {
                     </Button>
                 </div>
                 {
-                    trackSelect?.Selections?.length == 0 ?
+                    !trackSelect?.Selections?.length ?
                         <p className='text-lg font-bold color-[#11142D] mb-4 text-center'>
                             ไม่มีข้อมูลการคัดเลือกแทรคของปีการศึกษา {acadyear.value}
                         </p>
@@ -327,7 +327,7 @@ export default function Page() {
                         <>
                             <div className='mt-[30px]'>
                                 <p className='text-lg mt-4 font-bold color-[#11142D] mb-4]'>
-                                    ตัวชี้วัดแสดงผลรวมการคัดเลือกแทรคประจำปีการศึกษา {acadyear.value}
+                                    ตัวชี้วัดแสดงผลรวมการคัดเลือกแทรคประจำปีการศึกษา {acadyear.value} {String(trackSelect?.Selections?.length)}
                                 </p>
                             </div>
 
