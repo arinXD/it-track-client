@@ -44,7 +44,7 @@ const Page = () => {
             </div>
             <div className='mt-8 px-8 sm:ml-[240px]'>
                 {data.map((question, index) => (
-                    <div className='mx-auto max-w-7xl my-12'>
+                    <div key={index} className='mx-auto max-w-7xl my-12'>
                         <p className='text-center text-4xl text-gray-600'>{question.question}</p>
                         <div className='flex justify-center items-center gap-16 text-2xl'>
                             <h2 className='text-green-800'>ฉันเห็นด้วย</h2>
