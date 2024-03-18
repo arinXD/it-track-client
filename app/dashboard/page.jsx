@@ -213,11 +213,14 @@ export default function Page() {
     }
 
     useEffect(() => {
-        setSearching(true)
-        getTrackSelect()
-        getPopularTracks()
-        setSearching(false)
-    }, [])
+        // Only execute client-side code
+        if (typeof window !== 'undefined') {
+            setSearching(true);
+            getTrackSelect();
+            getPopularTracks();
+            setSearching(false);
+        }
+    }, [window]);
 
     const [searching, setSearching] = useState(false)
     const acadyears = getAcadyears().map(acadyear => ({
@@ -437,11 +440,13 @@ export default function Page() {
                                             {trackSelect?.Selections?.length} คน
                                         </p>
                                     </div>
-                                    <ReatChart
-                                        className={"w-full"}
-                                        options={sumTrackOption.options}
-                                        series={sumTrackOption.series}
-                                        type="donut" />
+                                    {(typeof window !== 'undefined') &&
+                                        <ReatChart
+                                            className={"w-full"}
+                                            options={sumTrackOption.options}
+                                            series={sumTrackOption.series}
+                                            type="donut" />
+                                    }
                                 </div>
                                 <div className="flex gap-3 flex-col items-center p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
                                     <div className='w-full text-start'>
@@ -449,13 +454,15 @@ export default function Page() {
                                             เกรดเฉลี่ยรวมของนักศึกษาภายในแทรค ปีการศึกษา {acadyear.value}
                                         </p>
                                     </div>
-                                    <ReatChart
-                                        className={"w-full"}
-                                        options={gpaOptionBar.options}
-                                        series={gpaOptionBar.series}
-                                        type="bar"
-                                        height={320}
-                                    />
+                                    {(typeof window !== 'undefined') &&
+                                        <ReatChart
+                                            className={"w-full"}
+                                            options={gpaOptionBar.options}
+                                            series={gpaOptionBar.series}
+                                            type="bar"
+                                            height={320}
+                                        />
+                                    }
                                 </div>
                                 <div className="flex gap-3 flex-col items-start p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
                                     {/* <div className='p-4 border-1 rounded-lg bg-white'>BIT {allGpa["BIT"]}</div>
@@ -487,13 +494,14 @@ export default function Page() {
                                         <p className='text-lg font-semi-bold text-[#11142d]'>
                                             แทรคที่ถูกเลือกในแต่ละปี (5 ปีย้อนหลัง)
                                         </p>
-
-                                        <ReatChart
-                                            series={totalPopular}
-                                            type="bar"
-                                            height={310}
-                                            options={totalPopularOptions}
-                                        />
+                                        {(typeof window !== 'undefined') &&
+                                            <ReatChart
+                                                series={totalPopular}
+                                                type="bar"
+                                                height={310}
+                                                options={totalPopularOptions}
+                                            />
+                                        }
                                     </div>
                                 </div>
                             </div>
