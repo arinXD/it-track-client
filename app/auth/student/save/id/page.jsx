@@ -9,8 +9,6 @@ const Page = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(event.target.studentId.value);
-        console.log("Form submitted!");
     }
 
     return (

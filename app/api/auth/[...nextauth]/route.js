@@ -69,7 +69,6 @@ const handler = NextAuth({
                         ...userData
                     }
                 }
-                // console.log(response);
                 const { message } = response
                 throw new Error(message)
             }
@@ -92,7 +91,6 @@ const handler = NextAuth({
     ],
     callbacks: {
         async signIn({ user, account }) {
-            console.log(user);
             if (account.provider === "google") {
                 const token = await signToken({ email: user.email, image: user.image })
                 const options = {
@@ -133,7 +131,6 @@ const handler = NextAuth({
         async jwt({ token, user, trigger, session }) {
             if (trigger === "update") {
                 if (session.action == "verify signin") {
-                    console.log("session in update trigger: ", session);
                     token = session.user
                 }
                 token.test = session.user.test
