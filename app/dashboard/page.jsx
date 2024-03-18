@@ -89,7 +89,7 @@ export default function Page() {
         if (acadyear == null) {
             ts = await fetchDataObj("/api/tracks/selects/get/last")
         } else {
-            ts = await fetchDataObj(`/api/tracks/selects/${acadyear}/students`)
+            ts = await fetchDataObj(`/api/tracks/selects/${acadyear}/students/dashboard`)
         }
         setTrackSelect(ts)
         if (ts?.Selections && Object.keys(ts.Selections).length) {
