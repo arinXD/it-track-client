@@ -80,14 +80,14 @@ const Navbar = () => {
                         <div className="relative ml-3 flex flex-row gap-3">
                             {status == "authenticated" ?
                                 <div className='relative hidden sm:flex justify-center items-center gap-5'>
-                                    {
+                                    {/* {
                                         session?.user?.role === "admin" &&
                                         <Link href="/admin">
                                             <Button className='rounded-[5px] bg-blue-500 text-white font-medium text-sm h-9'>
                                                 Admin panel
                                             </Button>
                                         </Link>
-                                    }
+                                    } */}
                                     <Dropdown
                                         radius="sm"
                                         classNames={{

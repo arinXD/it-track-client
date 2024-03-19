@@ -215,7 +215,7 @@ export default function Page() {
 
     useEffect(() => {
         setSearching(true);
-        getTrackSelect();
+        getTrackSelect(acadyear.value);
         getPopularTracks();
         setSearching(false);
     }, []);
