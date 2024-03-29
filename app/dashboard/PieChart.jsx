@@ -3,6 +3,28 @@ import { Typography } from '@mui/material'
 import { Box, Stack } from '@mui/system'
 import React from 'react'
 import ReactApexChart from 'react-apexcharts'
+{/* <div className='my-[30px] flex flex-wrap gap-4'>
+<PieChart
+    title={"Property for BIS"}
+    value={64}
+    series={[64, 25]}
+    colors={['#475be8', '#e4e8ef']} />
+<PieChart
+    title={"Property for WEB"}
+    value={52}
+    series={[60, 40]}
+    colors={['#475ae8', '#e4b8ef']} />
+<PieChart
+    title={"Property for Network"}
+    value={56}
+    series={[75, 25]}
+    colors={['#275be8', '#c4e8ef']} />
+<PieChart
+    title={"Total Student"}
+    value={172}
+    series={[75, 25]}
+    colors={['#475be8', '#e4e8ef']} />
+</div> */}
 
 const PieChart = ({ title, value, series, colors }) => {
     return (

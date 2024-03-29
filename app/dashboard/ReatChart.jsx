@@ -1,3 +1,5 @@
-"use client"
 import dynamic from 'next/dynamic';
-export default dynamic(() => import('react-apexcharts'), { ssr: false });
+
+const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
+
+export default ApexCharts;

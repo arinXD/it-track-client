@@ -146,7 +146,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
         if (filteredItems?.length) {
             const start = (page - 1) * rowsPerPage;
             const end = start + rowsPerPage;
-
+            
             return filteredItems.slice(start, end);
         } else {
             return []
@@ -304,6 +304,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                             </TableColumn>
                         )}
                     </TableHeader>
+                    {/* sortedItems */}
                     <TableBody emptyContent={"ไม่มีรายชื่อนักศึกษา"} items={sortedItems}>
                         {(item) => (
                             <TableRow key={item.stuId}>

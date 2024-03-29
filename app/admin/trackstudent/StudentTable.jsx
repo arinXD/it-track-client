@@ -98,7 +98,6 @@ const StudentTable = () => {
           } else {
                tracks = []
           }
-          console.log(tracks);
           setTracks(tracks)
      }
 
@@ -152,7 +151,6 @@ const StudentTable = () => {
                     return selectData
                })
                if (selectedTrack !== "all") {
-                    console.log(selectedTrack);
                     filterSelect = filterSelect.filter(select => select?.result == selectedTrack)
                }
           }

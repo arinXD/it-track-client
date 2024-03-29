@@ -111,7 +111,7 @@ const Page = () => {
             redirect: false,
             callbackUrl: callbackUrl,
         })
-        console.log(result);
+        
         if (!result.ok) {
             setIsProcress(false)
             setError(result.error)

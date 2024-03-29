@@ -283,6 +283,51 @@ const Page = ({ params }) => {
         });
     }
 
+    async function handleDelete() {
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+            },
+            buttonsStyling: false
+        });
+        swal.fire({
+            text: `ต้องการลบการคัดแทรคปีการศึกษา ${trackSelect.acadyear} หรือไม่ ?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const token = await getToken()
+                const options = {
+                    url: `${hostname}/api/tracks/selects/${trackSelect.acadyear}`,
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        "authorization": `${token}`,
+                    },
+                };
+                axios(options)
+                    .then(async result => {
+                        const { ok, message } = result.data
+                        showToastMessage(ok, message)
+                        setTimeout(()=>{
+                            window.location.href="/admin/track-selection"
+                        },1500)
+                    })
+                    .catch(error => {
+                        const message = error.response.data.message
+                        showToastMessage(false, message)
+                    })
+            }
+        });
+    }
+
     return (
         <>
             <header>
@@ -387,7 +432,7 @@ const Page = ({ params }) => {
                                             </div>
                                             <Button startContent={""}
                                                 size='md'
-                                                onPress={""}
+                                                onPress={handleDelete}
                                                 color="danger" variant="solid"
                                                 className='w-full bg-red-600 max-lg:my-3'>
                                                 ลบ
@@ -416,8 +461,8 @@ const Page = ({ params }) => {
                                             <div className='grid grid-cols-3 gap-8 max-xl:grid-cols-2 max-lg:grid-cols-1'>
                                                 <Link href={"#bit-students"} className="flex flex-row text-center rounded-l-full">
                                                     <div className={`bg-purple-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div class="rounded-full flex relative justify-center items-center">
-                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
+                                                        <div className="rounded-full flex relative justify-center items-center">
+                                                            <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
                                                                 <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
                                                             </div>
                                                         </div>
@@ -444,8 +489,8 @@ const Page = ({ params }) => {
                                                 </Link>
                                                 <Link href={"#network-students"} className="flex flex-row text-center rounded-l-full">
                                                     <div className={`bg-emerald-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div class="rounded-full flex relative justify-center items-center">
-                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
+                                                        <div className="rounded-full flex relative justify-center items-center">
+                                                            <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
                                                                 <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
                                                             </div>
                                                         </div>
@@ -472,8 +517,8 @@ const Page = ({ params }) => {
                                                 </Link>
                                                 <Link href={"#web-students"} className="flex flex-row text-center rounded-l-full">
                                                     <div className={`bg-indigo-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div class="rounded-full flex relative justify-center items-center">
-                                                            <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
+                                                        <div className="rounded-full flex relative justify-center items-center">
+                                                            <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
                                                                 <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
                                                             </div>
                                                         </div>
@@ -503,25 +548,25 @@ const Page = ({ params }) => {
                                     <div>
                                         <div className='flex justify-between items-start mb-3'>
                                             <h2 className='mb-3 text-small text-default-900'>วิชาที่ใช้ในการคัดเลือก</h2>
-                                            <Button
+                                            {/* <Button
                                                 onClick={onOpen}
                                                 startContent={<PlusIcon />}
                                                 radius='sm'
                                                 color='primary'
                                                 size='sm'>
                                                 เพิ่มวิขา
-                                            </Button>
+                                            </Button> */}
                                         </div>
                                         {trackSubj &&
                                             <Table
                                                 classNames={tableClass}
                                                 removeWrapper
-                                                selectionMode="multiple"
+                                                // selectionMode="multiple"
                                                 // onSelectionChange={setSelectedKeys}
                                                 onRowAction={() => { }}
                                                 aria-label="track selection subjects table">
                                                 <TableHeader>
-                                                    <TableColumn></TableColumn>
+                                                    {/* <TableColumn></TableColumn> */}
                                                     <TableColumn>รหัสวิชา</TableColumn>
                                                     <TableColumn>ชื่อวิชา EN</TableColumn>
                                                     <TableColumn>ชื่อวิชา TH</TableColumn>
@@ -531,17 +576,17 @@ const Page = ({ params }) => {
                                                     <TableBody>
                                                         {trackSubj.map(subj => (
                                                             <TableRow key={subj.subject_code}>
-                                                                <TableCell className=''>
+                                                                {/* <TableCell className=''>
                                                                     <Tooltip color="danger" content="ลบ">
                                                                         <span onClick={() => { }} className="text-lg text-danger cursor-pointer active:opacity-50">
                                                                             <DeleteIcon2 />
                                                                         </span>
                                                                     </Tooltip>
-                                                                </TableCell>
-                                                                <TableCell>{subj.subject_code}</TableCell>
+                                                                </TableCell> */}
+                                                                <TableCell className=''>{subj.subject_code}</TableCell>
                                                                 <TableCell className="w-1/3">{subj.title_en}</TableCell>
                                                                 <TableCell className="w-1/3">{subj.title_th}</TableCell>
-                                                                <TableCell className='text-center'>{subj.credit}</TableCell>
+                                                                <TableCell>{subj.credit}</TableCell>
                                                             </TableRow>
                                                         ))}
                                                     </TableBody> :

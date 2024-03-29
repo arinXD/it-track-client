@@ -7,8 +7,8 @@ const TrackCard = ({ target, color, title, studentArr }) => {
         return (
             <Link href={target} className="flex flex-row text-center rounded-l-full">
                 <div className={`bg-${color}-500 p-4 rounded-l-full grid place-content-center`}>
-                    <div class="rounded-full flex relative justify-center items-center">
-                        <div class="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
+                    <div className="rounded-full flex relative justify-center items-center">
+                        <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
                             <p className='text-3xl text-black'>{studentArr?.students?.length}</p>
                         </div>
                     </div>

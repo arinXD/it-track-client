@@ -1,9 +1,22 @@
-import React from 'react'
+"use client"
+import React, { useEffect, useState } from 'react'
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from '../action'
 
-const page = async () => {
-    const tracks = await fetchData("/api/tracks")
+const Page = () => {
+    const [tracks, setTracks] = useState([])
+
+    useEffect(()=>{
+        async function init() {
+            try {
+                const tracks = await fetchData("/api/tracks")
+                setTracks(tracks)
+            } catch (error) {
+                setTracks([])
+            }
+        }
+        init()
+    },[])
     return (
         <>
             <header>
@@ -26,4 +39,4 @@ const page = async () => {
     )
 }
 
-export default page
+export default Page

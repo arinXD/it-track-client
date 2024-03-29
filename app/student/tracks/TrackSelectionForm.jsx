@@ -76,7 +76,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         if (result.ok) {
             // จุดพลุฉลอง
             handleConfetti()
-            console.log(data.updatedAt);
+
             Swal.fire({
                 title: "บันทึกข้อมูลการคัดเลือก",
                 text: `บันทึกข้อมูลการคัดเลือกของคุณ ณ วันที่ ${dmyt(data.updatedAt)}`,
@@ -107,7 +107,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 const data = response.data.data;
                 const trackData = trackResponse.data.data
                 if (selectedData) {
-                    setTrackResult(selectedData.result)
+                    setTrackResult(selectedData.Track)
                     for (let index = 1; index < 4; index++) {
                         const type = `SET_ORDER_${index}`
                         dispatch({
@@ -166,9 +166,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                     return !(trackArr.includes(t.track))
                 }
             );
-            console.log(trackArr);
-            console.log(c + 1);
-            console.log(result);
+
             const type = `SET_ORDER_${c + 1}`
             const payload = result[0].track
             dispatch({
@@ -208,7 +206,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
                                                 {trackSelect.title}
                                             </h4>
-                                            <p>แทรคของคุณคือ {trackResult}</p>
+                                            <p>แทรคของคุณ คือ {trackResult.title_en}</p>
+                                            <p>{trackResult.title_th}</p>
                                         </div>
                                     )
                                     :

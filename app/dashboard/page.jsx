@@ -1,25 +1,99 @@
 "use client"
 import React, { useEffect, useMemo, useState } from 'react'
 import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '../components';
-import PieChart from './PieChart';
 import { getAcadyears } from '@/src/util/academicYear';
-import Select from 'react-select';
 import { SearchIcon } from '../components/icons';
 import { Button } from '@nextui-org/react';
-import ReatChart from './ReatChart';
 import { fetchDataObj } from '../admin/action';
+import dynamic from 'next/dynamic';
 
 export default function Page() {
+    const Select = dynamic(() => import('react-select'), { ssr: false });
+    const DounutChart = dynamic(() => import('./DounutChart'), { ssr: false });
+    const BarChart = dynamic(() => import('./BarChart'), { ssr: false });
+    const MultipleBarChart = dynamic(() => import('./MultipleBarChart'), { ssr: false });
+    async function getGpaOption(selections) {
+        if (!selections.length) return {}
+        const all = {
+            "BIT": {
+                gpa: 0,
+                c: 0
+            },
+            "Network": {
+                gpa: 0,
+                c: 0
+            },
+            "Web and Mobile": {
+                gpa: 0,
+                c: 0
+            },
+        }
+        for (const select of selections) {
+            const result = select.result
+            if (!result) continue
+            all[result].gpa += select.gpa
+            all[result].c += 1
+        }
+        const gpa = {
+            "BIT": parseFloat(all.BIT.gpa / all.BIT.c || 1).toFixed(2),
+            "Network": parseFloat(all.Network.gpa / all.Network.c || 1).toFixed(2),
+            "Web and Mobile": parseFloat(all["Web and Mobile"].gpa / all["Web and Mobile"].c || 1).toFixed(2)
+        }
+        setAllGpa(gpa)
+        const option = {
+            series: [{
+                data: Object.values(gpa)
+            }],
+            options: {
+                chart: {
+                    height: 350,
+                    type: 'bar',
+                    events: {
+                        click: function (chart, w, e) {
+                            // console.log(chart, w, e)
+                        }
+                    }
+                },
+                // colors: colors,
+                plotOptions: {
+                    bar: {
+                        columnWidth: '45%',
+                        distributed: true,
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                legend: {
+                    show: false
+                },
+                xaxis: {
+                    categories: [
+                        ['BIT'],
+                        ['Network'],
+                        ['Web and Mobile'],
+                    ],
+                    labels: {
+                        style: {
+                            fontSize: '12px'
+                        }
+                    }
+                }
+            },
+        }
+        setGpaOptionBar(option)
+    }
 
     async function getTrackSelect(acadyear = null) {
         let ts
         if (acadyear == null) {
             ts = await fetchDataObj("/api/tracks/selects/get/last")
         } else {
-            ts = await fetchDataObj(`/api/tracks/selects/${acadyear.value}/students`)
+            ts = await fetchDataObj(`/api/tracks/selects/${acadyear}/students/dashboard`)
         }
         setTrackSelect(ts)
-        if (Object.keys(ts?.Selections).length) {
+        if (ts?.Selections && Object.keys(ts.Selections).length) {
+            getGpaOption(ts?.Selections || [])
             const sumOfTrack = getSumOfTrack(ts?.Selections || [])
             setSumTrackOption({
                 series: Object?.values(sumOfTrack),
@@ -68,7 +142,7 @@ export default function Page() {
         }
         if (popular?.length) {
             const totalPop = [];
-
+            if (!popular[0]?.Selections) return
             Object.keys(popular[0].Selections).forEach(category => {
                 let categoryData = {
                     name: category,
@@ -140,11 +214,11 @@ export default function Page() {
     }
 
     useEffect(() => {
-        setSearching(true)
-        getTrackSelect()
-        getPopularTracks()
-        setSearching(false)
-    }, [])
+        setSearching(true);
+        getTrackSelect(acadyear.value);
+        getPopularTracks();
+        setSearching(false);
+    }, []);
 
     const [searching, setSearching] = useState(false)
     const acadyears = getAcadyears().map(acadyear => ({
@@ -153,6 +227,7 @@ export default function Page() {
     }));
     const [acadyear, setAcadyear] = useState(acadyears[0])
     const [trackSelect, setTrackSelect] = useState({})
+    const [gpaAll, setGpaAll] = useState({})
 
     const [sumTrackOption, setSumTrackOption] = useState({
         series: [1, 1, 1],
@@ -239,14 +314,13 @@ export default function Page() {
     })
 
     async function handleSearch() {
-
-        getTrackSelect(acadyear)
+        getTrackSelect(acadyear.value)
         getPopularTracks()
-
     }
-    const options = {
+    const [allGpa, setAllGpa] = useState({})
+    const [gpaOptionBar, setGpaOptionBar] = useState({
         series: [{
-            data: [2.68, 3.0, 2.95,]
+            data: [0, 0, 0,]
         }],
         options: {
             chart: {
@@ -279,13 +353,13 @@ export default function Page() {
                 ],
                 labels: {
                     style: {
-                        // colors: colors,
                         fontSize: '12px'
                     }
                 }
             }
         },
-    };
+    })
+
     return (
         <>
             <header>
@@ -319,41 +393,17 @@ export default function Page() {
                     </Button>
                 </div>
                 {
-                    trackSelect?.Selections?.length == 0 ?
+                    !trackSelect?.Selections?.length ?
                         <p className='text-lg font-bold color-[#11142D] mb-4 text-center'>
                             ไม่มีข้อมูลการคัดเลือกแทรคของปีการศึกษา {acadyear.value}
                         </p>
                         :
                         <>
                             <div className='mt-[30px]'>
-                                <p className='text-lg mt-4 font-bold color-[#11142D] mb-4]'>
+                                <p className='text-lg mt-4 font-bold color-[#11142D] mb-4'>
                                     ตัวชี้วัดแสดงผลรวมการคัดเลือกแทรคประจำปีการศึกษา {acadyear.value}
                                 </p>
                             </div>
-
-                            {/* <div className='my-[30px] flex flex-wrap gap-4'>
-                                <PieChart
-                                    title={"Property for BIS"}
-                                    value={64}
-                                    series={[64, 25]}
-                                    colors={['#475be8', '#e4e8ef']} />
-                                <PieChart
-                                    title={"Property for WEB"}
-                                    value={52}
-                                    series={[60, 40]}
-                                    colors={['#475ae8', '#e4b8ef']} />
-                                <PieChart
-                                    title={"Property for Network"}
-                                    value={56}
-                                    series={[75, 25]}
-                                    colors={['#275be8', '#c4e8ef']} />
-                                <PieChart
-                                    title={"Total Student"}
-                                    value={172}
-                                    series={[75, 25]}
-                                    colors={['#475be8', '#e4e8ef']} />
-                            </div> */}
-
                             <div className="w-full gap-4 grid place-items-center grid-cols-12 grid-rows-1">
                                 <div className="flex gap-3 flex-col items-center p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
                                     <div className='w-full text-start'>
@@ -364,11 +414,7 @@ export default function Page() {
                                             {trackSelect?.Selections?.length} คน
                                         </p>
                                     </div>
-                                    <ReatChart
-                                        className={"w-full"}
-                                        options={sumTrackOption.options}
-                                        series={sumTrackOption.series}
-                                        type="donut" />
+                                    <DounutChart sumTrackOption={sumTrackOption} />
                                 </div>
                                 <div className="flex gap-3 flex-col items-center p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
                                     <div className='w-full text-start'>
@@ -376,18 +422,26 @@ export default function Page() {
                                             เกรดเฉลี่ยรวมของนักศึกษาภายในแทรค ปีการศึกษา {acadyear.value}
                                         </p>
                                     </div>
-                                    <ReatChart
-                                        className={"w-full"}
-                                        options={options.options}
-                                        series={options.series}
-                                        type="bar"
-                                        height={320}
-                                    />
+                                    <BarChart gpaOptionBar={gpaOptionBar} />
                                 </div>
                                 <div className="flex gap-3 flex-col items-start p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
-                                    <div className='p-4 border-1 rounded-lg bg-white'>BIT 2.65</div>
-                                    <div className='p-4 border-1 rounded-lg bg-white'>Network 2.65</div>
-                                    <div className='p-4 border-1 rounded-lg bg-white'>Web 2.65</div>
+                                    <div className=' w-full h-full max-w-lg'>
+                                        <h1 className='text-start text-lg mb-5'>เกรดเฉลี่ยรวมของนักศึกษาภายในแทรค ปีการศึกษา <span className='font-semi-bold'>{acadyear.value}</span></h1>
+                                        <div className='flex flex-wrap gap-y-4'>
+                                            <div className='rounded-lg border shadow-md grid grid-cols-2 items-center justify-items-center w-full py-8 bg-[#26A0FC]/75'>
+                                                <p className='text-xl text-black'>BIT</p>
+                                                <p className='text-5xl font-semibold text-black'>{allGpa["BIT"]}</p>
+                                            </div>
+                                            <div className='rounded-lg border shadow-md grid grid-cols-2 items-center justify-items-center w-full py-8 bg-[#26E7A6]/75'>
+                                                <p className='text-xl text-black'>Network</p>
+                                                <p className='text-5xl font-semibold text-black'>{allGpa["Network"]}</p>
+                                            </div>
+                                            <div className='rounded-lg border shadow-md grid grid-cols-2 items-center justify-items-center w-full py-8 bg-[#FEBC3B]/75'>
+                                                <p className='text-xl text-black'>Web and Mobile</p>
+                                                <p className='text-5xl font-semibold text-black'>{allGpa["Web and Mobile"]}</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -397,13 +451,7 @@ export default function Page() {
                                         <p className='text-lg font-semi-bold text-[#11142d]'>
                                             แทรคที่ถูกเลือกในแต่ละปี (5 ปีย้อนหลัง)
                                         </p>
-
-                                        <ReatChart
-                                            series={totalPopular}
-                                            type="bar"
-                                            height={310}
-                                            options={totalPopularOptions}
-                                        />
+                                        <MultipleBarChart totalPopular={totalPopular} totalPopularOptions={totalPopularOptions} />
                                     </div>
                                 </div>
                             </div>
