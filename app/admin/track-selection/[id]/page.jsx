@@ -563,67 +563,71 @@ const Page = ({ params }) => {
                                                 null
                                     }
                                     <div className="flex w-full flex-col mb-4">
-                                        <Tabs
-                                            aria-label="Options"
-                                            selectedKey={selectedTrack}
-                                            onSelectionChange={setSelectedTrack}
-                                            color="primary"
-                                            variant="bordered">
-                                            <Tab
-                                                key="all"
-                                                title={
-                                                    <div className="flex items-center space-x-2">
-                                                        <span>ทั้งหมด</span>
-                                                    </div>
-                                                }
-                                            >
-                                                {
-                                                    allTrack?.students?.length === 0 ? null :
+                                        {studentsBit?.students?.length == 0 &&
+                                            studentsNetwork?.students?.length == 0 &&
+                                            studentsWeb?.students?.length == 0 ? null :
+                                            <Tabs
+                                                aria-label="Options"
+                                                selectedKey={selectedTrack}
+                                                onSelectionChange={setSelectedTrack}
+                                                color="primary"
+                                                variant="bordered">
+                                                <Tab
+                                                    key="all"
+                                                    title={
+                                                        <div className="flex items-center space-x-2">
+                                                            <span>ทั้งหมด</span>
+                                                        </div>
+                                                    }
+                                                >
+                                                    {
+                                                        allTrack?.students?.length === 0 ? null :
+                                                            <StudentTrackTable
+                                                                trackSubj={trackSubj} studentData={allTrack} track={"ทุกแทรค"} />
+                                                    }
+                                                </Tab>
+                                                {studentsBit?.students?.length == 0 ? null :
+                                                    <Tab
+                                                        key={"BIT"}
+                                                        title={
+                                                            <div className="flex items-center space-x-2">
+                                                                <span>BIT</span>
+                                                            </div>
+                                                        }
+                                                    >
+
                                                         <StudentTrackTable
-                                                            trackSubj={trackSubj} studentData={allTrack} track={"ทุกแทรค"} />
+                                                            trackSubj={trackSubj} studentData={studentsBit} track={"BIT"} />
+                                                    </Tab>
                                                 }
-                                            </Tab>
-                                            {studentsBit?.students?.length == 0 ? null :
-                                                <Tab
-                                                    key={"BIT"}
-                                                    title={
-                                                        <div className="flex items-center space-x-2">
-                                                            <span>BIT</span>
-                                                        </div>
-                                                    }
-                                                >
 
-                                                    <StudentTrackTable
-                                                        trackSubj={trackSubj} studentData={studentsBit} track={"BIT"} />
-                                                </Tab>
-                                            }
+                                                {studentsNetwork?.students?.length == 0 ? null :
+                                                    <Tab
+                                                        key={"Network"}
+                                                        title={
+                                                            <div className="flex items-center space-x-2">
+                                                                <span>Network</span>
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <StudentTrackTable trackSubj={trackSubj} studentData={studentsNetwork} track={"Network"} />
+                                                    </Tab>
+                                                }
 
-                                            {studentsNetwork?.students?.length == 0 ? null :
-                                                <Tab
-                                                    key={"Network"}
-                                                    title={
-                                                        <div className="flex items-center space-x-2">
-                                                            <span>Network</span>
-                                                        </div>
-                                                    }
-                                                >
-                                                    <StudentTrackTable trackSubj={trackSubj} studentData={studentsNetwork} track={"Network"} />
-                                                </Tab>
-                                            }
-
-                                            {studentsWeb?.students?.length == 0 ? null :
-                                                <Tab
-                                                    key={"Web and Mobile"}
-                                                    title={
-                                                        <div className="flex items-center space-x-2">
-                                                            <span>Web and Mobile</span>
-                                                        </div>
-                                                    }
-                                                >
-                                                    <StudentTrackTable trackSubj={trackSubj} studentData={studentsWeb} track={"Web and Mobile"} />
-                                                </Tab>
-                                            }
-                                        </Tabs>
+                                                {studentsWeb?.students?.length == 0 ? null :
+                                                    <Tab
+                                                        key={"Web and Mobile"}
+                                                        title={
+                                                            <div className="flex items-center space-x-2">
+                                                                <span>Web and Mobile</span>
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <StudentTrackTable trackSubj={trackSubj} studentData={studentsWeb} track={"Web and Mobile"} />
+                                                    </Tab>
+                                                }
+                                            </Tabs>
+                                        }
                                     </div>
 
                                 </div>
