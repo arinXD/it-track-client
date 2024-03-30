@@ -23,7 +23,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { TbRestore } from "react-icons/tb";
 
 import Link from 'next/link';
-import { tableClass } from '@/src/util/tableClass';
+import { tableClass } from '@/src/util/ComponentClass';
 async function fetchData() {
     try {
         const programResult = await axios.get(`${hostname}/api/programs`);

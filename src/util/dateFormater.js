@@ -83,9 +83,14 @@ function dMyt(dateString) {
     return result
 }
 
+function getCurrentDate() {
+    return new Date().toISOString().split("T")[0]
+}
+
 module.exports = {
     dmy,
     dmyt,
     dMy,
     dMyt,
+    getCurrentDate,
 }

@@ -56,9 +56,9 @@ const BreadCrumb = () => {
                             <RightArrow />
                             {
                                 isLastIndex ?
-                                    <span className="ms-1 text-sm font-medium text-gray-500 md:ms-2">{links[currentUrl] || String(currentUrl)}</span>
+                                    <span className="text-sm font-medium text-gray-500">{links[currentUrl] || String(currentUrl)}</span>
                                     :
-                                    // ต่อ link 
+                                    // แสดง link 
                                     <Link href={nextIndex} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                                         {links[currentUrl] || String(currentUrl)}
                                     </Link>

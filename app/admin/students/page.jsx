@@ -1,6 +1,6 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, DropdownSection, } from "@nextui-org/react";
 import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } from "@/app/components/icons";
 import { capitalize } from "@/src/util/utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
@@ -13,7 +13,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TbRestore } from "react-icons/tb";
 import DeleteSelectModal from "./DeleteSelectModal";
-import { tableClass } from "@/src/util/tableClass";
+import { inputClass, tableClass } from "@/src/util/ComponentClass";
+import { RiFileExcel2Fill } from "react-icons/ri";
+import { SiGoogleforms } from "react-icons/si";
 
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"];
 const columns = [{
@@ -89,16 +91,16 @@ const Page = () => {
     // Fetching data
     async function getStudentStatuses() {
         const filterStatus = [10, 50, 62]
-        try{
+        try {
             let statuses = await fetchData("/api/statuses")
             statuses = statuses.filter(e => filterStatus.includes(e.id))
             setStatusOptions(statuses)
-        }catch(err){
+        } catch (err) {
             setStatusOptions([])
         }
     }
     async function getStudents(program = "IT", acadyear = 2564) {
-        try{
+        try {
             let students = await fetchData(`/api/students/programs/${program}/acadyear/${acadyear}`)
             students.sort((a, b) => {
                 const order = {
@@ -107,9 +109,9 @@ const Page = () => {
                 };
                 return order[a.courses_type] - order[b.courses_type];
             });
-    
+
             setStudents(students);
-        }catch(error){
+        } catch (error) {
             setStudents([]);
         }
     }
@@ -308,21 +310,11 @@ const Page = () => {
         return (
             <div className="flex flex-col gap-4">
                 <div className="flex justify-between gap-3 items-end">
-                    <Input
-                        isClearable
-                        className="w-full sm:max-w-[44%] h-fit"
-                        placeholder="Search by name..."
-                        size="sm"
-                        startContent={<SearchIcon />}
-                        value={filterValue}
-                        onClear={() => onClear()}
-                        onValueChange={onSearchChange}
-                    />
                     <div className="flex gap-3">
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button radius="sm" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
-                                    Status
+                                    สถานะภาพ
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -343,7 +335,7 @@ const Page = () => {
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button radius="sm" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
-                                    Columns
+                                    คอลัมน์
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -361,13 +353,48 @@ const Page = () => {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Button
-                            radius="sm"
-                            onPress={() => onOpen()}
-                            color="primary"
-                            endContent={<PlusIcon width={16} height={16} />}>
-                            เพิ่มรายชื่อนักศึกษา
-                        </Button>
+                    </div>
+                    <div className="flex gap-3">
+                        <Dropdown>
+                            <DropdownTrigger>
+                                <Button
+                                    radius="sm"
+                                    color="primary"
+                                    endContent={<PlusIcon width={16} height={16} />}>
+                                    เพิ่มข้อมูล
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu
+                                variant="faded"
+                                aria-label="Dropdown menu"
+                                onAction={(key) => {
+                                    if(key=="add-student") onOpen()
+                                    else alert(key)
+                                }}
+                            >
+                                <DropdownItem
+                                    key="add-student"
+                                    description="เพิ่มรายชื่อนักศึกษาผ่านแบบฟอร์ม"
+                                    startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
+                                >
+                                    เพิ่มรายชื่อนักศึกษา
+                                </DropdownItem>
+                                <DropdownItem
+                                    key="add-students-excel"
+                                    description="เพิ่มรายชื่อนักศึกษาผ่านไฟล์ excel, csv"
+                                    startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
+                                >
+                                    เพิ่มรายชื่อนักศึกษา
+                                </DropdownItem>
+                                <DropdownItem
+                                    key="add-enrollment-excel"
+                                    description="เพิ่มการลงทะเบียนเรียนผ่านไฟล์ excel, csv"
+                                    startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
+                                >
+                                    เพิ่มการลงทะเบียนเรียน
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
                         <Button
                             radius="sm"
                             isDisabled={disableSelectDelete}
@@ -401,6 +428,17 @@ const Page = () => {
                         </select>
                     </label>
                 </div>
+                <Input
+                    isClearable
+                    className="w-full h-fit"
+                    placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, อีเมล, ชื่อ)"
+                    size="sm"
+                    classNames={inputClass}
+                    startContent={<SearchIcon />}
+                    value={filterValue}
+                    onClear={() => onClear()}
+                    onValueChange={onSearchChange}
+                />
             </div>
         );
     }, [
@@ -498,9 +536,15 @@ const Page = () => {
                         </div>
                         :
                         <>
-
                             <div className="flex gap-3 items-center mb-4">
-                                <select onInput={() => setSelectProgram(event.target.value)} defaultValue="" id="" className="px-2 pe-3 py-1 border-1 rounded-lg">
+                                <select
+                                    onInput={() => setSelectProgram(event.target.value)}
+                                    defaultValue=""
+                                    style={{
+                                        lineHeight: "40px",
+                                        height: "40px",
+                                    }}
+                                    className="px-2 pe-3 py-1 border-1 rounded-lg">
                                     <option value="" disabled hidden>หลักสูตร</option>
                                     {programs?.length && programs.map((program) => (
                                         <option key={program.program} value={program.program}>
@@ -508,7 +552,14 @@ const Page = () => {
                                         </option>
                                     ))}
                                 </select>
-                                <select onInput={() => setSelectAcadYear(event.target.value)} defaultValue="" id="" className="px-2 pe-3 py-1 border-1 rounded-lg">
+                                <select
+                                    onInput={() => setSelectAcadYear(event.target.value)}
+                                    defaultValue=""
+                                    style={{
+                                        lineHeight: "40px",
+                                        height: "40px",
+                                    }}
+                                    className="px-2 pe-3 py-1 border-1 rounded-lg">
                                     <option value="" disabled hidden>ปีการศึกษา</option>
                                     {acadyears.map((acadyear) => (
                                         <option key={acadyear} value={acadyear}>

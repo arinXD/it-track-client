@@ -5,7 +5,7 @@ import { Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, Tabl
 import { PlusIcon, CheckIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon, ConfirmIcon, ClockIcon } from "@/app/components/icons";
 import { Icon } from '@iconify/react';
 import { Loading } from '@/app/components';
-import { tableClass } from '@/src/util/tableClass';
+import { tableClass } from '@/src/util/ComponentClass';
 
 const TrackSelectTable = ({ loading, trackSelection, handleOpen, handleDelete, handleSelectedDel, handleStartSelect }) => {
     const [searchQuery, setSearchQuery] = useState("");

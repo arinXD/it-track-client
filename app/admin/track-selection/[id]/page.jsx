@@ -2,7 +2,7 @@
 import { Navbar, Sidebar, ContentWrap, BreadCrumb, Loading } from '@/app/components'
 import { fetchData, fetchDataObj } from '../../action'
 import React, { useState, useEffect } from 'react'
-import { Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tab, Tabs, useDisclosure } from "@nextui-org/react";
+import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tab, Tabs, useDisclosure, Input, RadioGroup, Radio } from "@nextui-org/react";
 import { DeleteIcon2, PlusIcon } from "@/app/components/icons";
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -13,9 +13,9 @@ import { hostname } from '@/app/api/hostname';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StudentTrackTable from './StudentTrackTable';
-import TrackCard from './TrackCard';
-import { tableClass } from '@/src/util/tableClass';
+import { inputClass, tableClass } from '@/src/util/ComponentClass';
 import InsertSubjectModal from './InsertSubjectModal';
+import { getCurrentDate } from '@/src/util/dateFormater';
 
 const showToastMessage = (ok, message) => {
     if (ok) {
@@ -91,7 +91,6 @@ const Page = ({ params }) => {
         } else {
             tracks = []
         }
-        console.log(tracks);
         setTracks(tracks)
     }
 
@@ -316,9 +315,9 @@ const Page = ({ params }) => {
                     .then(async result => {
                         const { ok, message } = result.data
                         showToastMessage(ok, message)
-                        setTimeout(()=>{
-                            window.location.href="/admin/track-selection"
-                        },1500)
+                        setTimeout(() => {
+                            window.location.href = "/admin/track-selection"
+                        }, 1500)
                     })
                     .catch(error => {
                         const message = error.response.data.message
@@ -327,6 +326,18 @@ const Page = ({ params }) => {
             }
         });
     }
+
+    const [startType, setStartType] = useState('text');
+    const [endType, setEndType] = useState('text');
+
+    const handleFocus = (setter) => {
+        setter("date")
+    };
+
+    const handleBlur = (setter) => {
+        setter("text")
+    };
+
 
     return (
         <>
@@ -356,104 +367,104 @@ const Page = ({ params }) => {
                                     <div className='my-4 grid grid-cols-3 justify-stretch justify-items-stretch gap-4 w-full'>
                                         <div className='space-y-3 border-1 rounded-md p-3 w-full col-span-2 max-lg:col-span-3'>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[12%] text-end'>ปีการศึกษา: </span>
-                                                <input
-                                                    type='number'
-                                                    readOnly
+                                                <Input
+                                                    type="text"
+                                                    variant="bordered"
+                                                    radius='sm'
+                                                    label="ปีการศึกษา"
+                                                    placeholder="กรอกปีการศึกษา"
+                                                    labelPlacement="outside"
                                                     value={trackSelect.acadyear}
-                                                    className='select-none w-[88%] border-1 px-2 py-1.5 rounded-md border-gray-300' />
+                                                    isReadOnly
+                                                    classNames={inputClass}
+                                                />
                                             </div>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[12%] text-end'>เริ่มต้น: </span>
-                                                <input
+                                                <Input
                                                     type='datetime-local'
-                                                    required
-                                                    className='w-[88%] border-1 px-2 py-1.5 rounded-md border-gray-300'
+                                                    label="เริ่มต้น (ปี/เดือน/วัน)"
+                                                    variant="bordered"
+                                                    radius='sm'
+                                                    placeholder="เดือน/วัน/ปี"
+                                                    labelPlacement="outside"
                                                     value={startAt}
+                                                    classNames={inputClass}
                                                     onChange={(e) => {
                                                         setStartAt(e.target.value)
                                                         handleValueChange({ startAt: e.target.value })
-                                                    }} />
+                                                    }}
+                                                    min={getCurrentDate()}
+                                                />
                                             </div>
                                             <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[12%] text-end'>สิ้นสุด: </span>
-                                                <input
+                                                <Input
                                                     type='datetime-local'
-                                                    required
-                                                    className='w-[88%] border-1 px-2 py-1.5 rounded-md border-gray-300'
+                                                    label="สิ้นสุด (เดือน/วัน/ปี)"
+                                                    variant="bordered"
+                                                    radius='sm'
+                                                    placeholder="เดือน/วัน/ปี"
+                                                    labelPlacement="outside"
                                                     value={expiredAt}
+                                                    classNames={inputClass}
                                                     onChange={(e) => {
                                                         setExpiredAt(e.target.value)
                                                         handleValueChange({ expiredAt: e.target.value })
-                                                    }} />
+                                                    }}
+                                                    min={startAt}
+                                                />
                                             </div>
-                                            <div className='w-full flex justify-start items-center gap-4'>
-                                                <span className='inline-block w-[12%] text-end'>สถานะ: </span>
-                                                <input
-                                                    type="radio"
-                                                    name='hasFinished'
-                                                    value={false}
-                                                    className='cursor-pointer'
-                                                    checked={(!hasFinished)}
-                                                    onChange={() => {
-                                                        setHasFinished(false)
-                                                        handleValueChange({ has_finished: false })
-                                                    }} />
-                                                <span>กำลังดำเนินการ</span>
-                                                <input
-                                                    type="radio"
-                                                    name='hasFinished'
-                                                    value={true}
-                                                    className='cursor-pointer'
-                                                    checked={hasFinished}
-                                                    onChange={() => {
-                                                        setHasFinished(true)
-                                                        handleValueChange({ has_finished: true })
-                                                    }} />
-                                                <span>สิ้นสุด</span>
+                                            <div className='w-full flex justify-start items-center gap-2'>
+                                                <span className='block text-sm'>สถานะ: </span>
+                                                <RadioGroup
+                                                    size='sm'
+                                                    orientation='horizontal'
+                                                    value={hasFinished}
+                                                    onValueChange={(value) => {
+                                                        setHasFinished(value)
+                                                        handleValueChange({ has_finished: value })
+                                                    }}
+                                                >
+                                                    <Radio value={false}>กำลังดำเนินการ</Radio>
+                                                    <Radio value={true}>สิ้นสุด</Radio>
+                                                </RadioGroup>
                                             </div>
                                         </div>
-                                        <div className='w-full flex flex-col justify-between max-lg:col-span-3'>
-                                            <div>
-                                                {!(trackSelect.has_finished) ?
-                                                    <Button size='md'
-                                                        isLoading={starting}
-                                                        onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
-                                                        color="primary" variant="solid" className='bg-blue-500 w-full'>
-                                                        {starting ? "ปิดการคัดเลือก..." : "ปิดการคัดเลือก"}
-                                                    </Button>
-                                                    :
-                                                    <Button size='md'
-                                                        isLoading={starting}
-                                                        onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
-                                                        color="primary" variant="solid" className='bg-blue-500 w-full'>
-                                                        {starting ? "เปิดการคัดเลือก..." : "เปิดการคัดเลือก"}
-                                                    </Button>}
-                                            </div>
+                                        <div className='w-full flex flex-col justify-start max-lg:col-span-3 gap-3'>
+                                            {!(trackSelect.has_finished) ?
+                                                <Button size='md'
+                                                    isLoading={starting}
+                                                    onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
+                                                    color="primary" variant="solid" className='bg-blue-500 w-full'>
+                                                    {starting ? "ปิดการคัดเลือก..." : "ปิดการคัดเลือก"}
+                                                </Button>
+                                                :
+                                                <Button size='md'
+                                                    isLoading={starting}
+                                                    onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
+                                                    color="primary" variant="solid" className='bg-blue-500 w-full'>
+                                                    {starting ? "เปิดการคัดเลือก..." : "เปิดการคัดเลือก"}
+                                                </Button>}
                                             <Button startContent={""}
                                                 size='md'
                                                 onPress={handleDelete}
                                                 color="danger" variant="solid"
-                                                className='w-full bg-red-600 max-lg:my-3'>
+                                                className='w-full bg-red-600'>
                                                 ลบ
                                             </Button>
-                                            <div className="block">
-                                                <div className='flex flex-col gap-3'>
-                                                    <Button
-                                                        isLoading={updating}
-                                                        disabled={!valueChange}
-                                                        onClick={handleUpdate}
-                                                        className={`w-full h-[40px] px-[16px] rounded-[12px] text-white ${!valueChange ? "bg-indigo-200" : "bg-indigo-500 hover:bg-indigo-600"}`}>
-                                                        {updating ? "ยืนยันการแก้ไข..." : "ยืนยันการแก้ไข"}
-                                                    </Button>
-                                                    <Button
-                                                        disabled={!valueChange}
-                                                        onClick={handleUnsave}
-                                                        className={`w-full h-[40px] px-[16px] rounded-[12px] ${!valueChange ? "bg-gray-200 text-gray-400" : "bg-gray-400 hover:bg-gray-500"}`}>
-                                                        ยกเลิกการแก้ไข
-                                                    </Button>
-                                                </div>
-                                            </div>
+
+                                            <Button
+                                                isLoading={updating}
+                                                disabled={!valueChange}
+                                                onClick={handleUpdate}
+                                                className={`w-full h-[40px] px-[16px] rounded-[12px] text-white ${!valueChange ? "bg-indigo-200" : "bg-indigo-500 hover:bg-indigo-600"}`}>
+                                                {updating ? "ยืนยันการแก้ไข..." : "ยืนยันการแก้ไข"}
+                                            </Button>
+                                            <Button
+                                                disabled={!valueChange}
+                                                onClick={handleUnsave}
+                                                className={`w-full h-[40px] px-[16px] rounded-[12px] ${!valueChange ? "bg-gray-200 text-gray-400" : "bg-gray-400 hover:bg-gray-500"}`}>
+                                                ยกเลิกการแก้ไข
+                                            </Button>
                                         </div>
                                     </div>
                                     {

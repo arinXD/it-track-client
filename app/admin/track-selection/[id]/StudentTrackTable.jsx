@@ -4,7 +4,7 @@ import { Input, Tooltip, Button, Table, TableHeader, TableColumn, TableBody, Tab
 import { EyeIcon, SearchIcon } from "@/app/components/icons";
 import Link from 'next/link';
 import { dMy } from '@/src/util/dateFormater'
-import { tableClass } from '@/src/util/tableClass';
+import { tableClass } from '@/src/util/ComponentClass';
 
 function displayNull(string) {
     if (string) return string

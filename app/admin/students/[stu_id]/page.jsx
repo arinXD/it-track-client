@@ -7,7 +7,7 @@ import { dmy } from '@/src/util/dateFormater'
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useDisclosure } from '@nextui-org/react'
 import { DeleteIcon, DeleteIcon2, EditIcon2, VerticalDotsIcon } from '@/app/components/icons'
 import { Spinner } from "@nextui-org/react";
-import { tableClass } from '@/src/util/tableClass'
+import { tableClass } from '@/src/util/ComponentClass'
 import Link from 'next/link'
 import EditModal from './EditModal'
 import { useSearchParams } from 'next/navigation'

@@ -14,8 +14,26 @@ const tableClass = {
         "mb-4",
     ],
 }
-
+const inputClass = {
+    label: "text-black/50",
+    input: [
+        "bg-transparent",
+        "text-black/90",
+        "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+    ],
+    innerWrapper: [
+        "bg-transparent",
+    ],
+    inputWrapper: [
+        "hover:bg-white",
+        "border-1",
+        "bg-white",
+        "group-data-[focused=true]:bg-default-200/50",
+        "!cursor-text",
+    ],
+}
 
 module.exports = {
-    tableClass
+    tableClass,
+    inputClass
 }

@@ -3,14 +3,17 @@ import { format } from 'date-fns';
 import { Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import { Textarea, Select, SelectItem } from "@nextui-org/react";
 import { Icon } from '@iconify/react';
+import { getCurrentDate } from '@/src/util/dateFormater';
+import { inputClass } from '@/src/util/ComponentClass';
 
 const defaultSubj = ["SC361002", "SC361003", "SC361004", "SC361005"]
+const currentDateTime = new Date()
 
 export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, onClose }) {
     const [title, setTitle] = useState("")
     const [acadValue, setAcadValue] = useState("")
-    const [startValue, setStartValue] = useState("");
-    const [expiredValue, setExpiredValue] = useState("")
+    const [startValue, setStartValue] = useState(format(currentDateTime, 'yyyy-MM-dd HH:mm'));
+    const [expiredValue, setExpiredValue] = useState(format(currentDateTime, 'yyyy-MM-dd HH:mm'))
     const [trackSubj, setTrackSubj] = useState([])
 
     const [searchSubj, setSearchSubj] = useState("")
@@ -25,13 +28,6 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
             setAcadValue(acadyear[0].toString())
         }
     }, [acadyear])
-
-    useEffect(() => {
-        const currentDateTime = new Date();
-        const formattedDateTime = format(currentDateTime, 'yyyy-MM-dd HH:mm');
-        setStartValue(formattedDateTime)
-        setExpiredValue(formattedDateTime)
-    }, [])
 
     useEffect(() => {
         let data = []
@@ -110,7 +106,6 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
         }
         handleSubmit(formData)
     }
-
     return (
         <Modal
             size={"3xl"}
@@ -163,28 +158,30 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                     </div>
                                     <div className='flex flex-col gap-3'>
                                         <Input
+                                            type='datetime-local'
+                                            label="เริ่มต้น (เดือน/วัน/ปี)"
                                             isRequired
                                             radius={"sm"}
-                                            label="เริ่มต้น (เดือน/วัน/ปี)"
                                             value={startValue}
                                             labelPlacement="outside"
-                                            type="datetime-local"
                                             name="startAt"
                                             onChange={(e) => {
                                                 setStartValue(e.target.value)
                                             }}
+                                            min={getCurrentDate()}
                                         />
                                         <Input
+                                            type='datetime-local'
                                             isRequired
                                             radius={"sm"}
                                             label="สิ้นสุด (เดือน/วัน/ปี)"
                                             value={expiredValue}
                                             labelPlacement="outside"
-                                            type="datetime-local"
                                             name="expiredAt"
                                             onChange={(e) => {
                                                 setExpiredValue(e.target.value)
                                             }}
+                                            min={startValue}
                                         />
                                     </div>
                                 </div>

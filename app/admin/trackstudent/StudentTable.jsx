@@ -8,7 +8,7 @@ import { getAcadyears } from "@/src/util/academicYear";
 import { Skeleton } from "@nextui-org/react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { tableClass } from "@/src/util/tableClass";
+import { tableClass } from "@/src/util/ComponentClass";
 import { FaFileExcel } from "react-icons/fa6";
 
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "score", "gpa", "result"];
