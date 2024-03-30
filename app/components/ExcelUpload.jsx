@@ -125,11 +125,11 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
   const handleInsertSubject = async () => {
     const swal = Swal.mixin({
       customClass: {
-          confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
-          cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+        confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+        cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
       },
       buttonsStyling: false
-  });
+    });
     const { value } = await swal.fire({
       text: `ตรวจสอบวิชาเรียบร้อยแล้วหรือไม่ ?`,
       icon: "question",
@@ -196,9 +196,6 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
       }
     }
   };
-
-
-
 
   const handleClearFile = () => {
     setData([]);

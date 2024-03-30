@@ -5,7 +5,6 @@ import { Navbar, Sidebar, SubjectInsert, SubjectUpdate, ExcelUpload, ContentWrap
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import Swal from 'sweetalert2';
-import { CSVLink } from 'react-csv';
 import * as XLSX from "xlsx";
 import { dmy } from "@/src/util/dateFormater";
 import {
@@ -29,7 +28,6 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextu
 
 import { getAcadyears } from "@/src/util/academicYear";
 
-import { margin } from '@mui/system';
 
 async function fetchDatas() {
     try {

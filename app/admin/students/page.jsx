@@ -1,6 +1,6 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, DropdownSection, } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, } from "@nextui-org/react";
 import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } from "@/app/components/icons";
 import { capitalize } from "@/src/util/utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
@@ -16,6 +16,7 @@ import DeleteSelectModal from "./DeleteSelectModal";
 import { inputClass, tableClass } from "@/src/util/ComponentClass";
 import { RiFileExcel2Fill } from "react-icons/ri";
 import { SiGoogleforms } from "react-icons/si";
+import InsertStudentExcel from "./InsertStudentExcel";
 
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"];
 const columns = [{
@@ -87,6 +88,8 @@ const Page = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: delIsOpen, onOpen: delOnOpen, onClose: delOnClose } = useDisclosure();
     const { isOpen: delsIsOpen, onOpen: delsOnOpen, onClose: delsOnClose } = useDisclosure();
+    const { isOpen: studentExcelIsOpen, onOpen: studentExcelOnOpen, onClose: studentExcelOnClose } = useDisclosure();
+    const { isOpen: enrollExcelIsOpen, onOpen: enrollExcelOnOpen, onClose: enrollExcelOnClose } = useDisclosure();
 
     // Fetching data
     async function getStudentStatuses() {
@@ -368,7 +371,8 @@ const Page = () => {
                                 variant="faded"
                                 aria-label="Dropdown menu"
                                 onAction={(key) => {
-                                    if(key=="add-student") onOpen()
+                                    if (key == "add-student") onOpen()
+                                    else if (key == "add-students-excel") studentExcelOnOpen()
                                     else alert(key)
                                 }}
                             >
@@ -381,14 +385,14 @@ const Page = () => {
                                 </DropdownItem>
                                 <DropdownItem
                                     key="add-students-excel"
-                                    description="เพิ่มรายชื่อนักศึกษาผ่านไฟล์ excel, csv"
+                                    description="เพิ่มรายชื่อนักศึกษาผ่านไฟล์ excel"
                                     startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
                                 >
                                     เพิ่มรายชื่อนักศึกษา
                                 </DropdownItem>
                                 <DropdownItem
                                     key="add-enrollment-excel"
-                                    description="เพิ่มการลงทะเบียนเรียนผ่านไฟล์ excel, csv"
+                                    description="เพิ่มการลงทะเบียนเรียนผ่านไฟล์ excel"
                                     startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
                                 >
                                     เพิ่มการลงทะเบียนเรียน
@@ -515,6 +519,59 @@ const Page = () => {
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
+
+                <InsertModal
+                    showToastMessage={showToastMessage}
+                    getStudents={getStudents}
+                    programs={programs}
+                    isOpen={isOpen}
+                    onClose={onClose} />
+                <DeleteModal
+                    showToastMessage={showToastMessage}
+                    callData={getStudents}
+                    delIsOpen={delIsOpen}
+                    delOnClose={delOnClose}
+                    stuId={delStdId} />
+                <DeleteSelectModal
+                    setDisableSelectDelete={setDisableSelectDelete}
+                    setSelectedStudents={setSelectedStudents}
+                    showToastMessage={showToastMessage}
+                    getStudents={getStudents}
+                    delIsOpen={delsIsOpen}
+                    delOnClose={delsOnClose}
+                    stuIdList={selectedStudents} />
+
+                <Modal
+                    isDismissable={false}
+                    isKeyboardDismissDisabled={true}
+                    isOpen={studentExcelIsOpen}
+                    onClose={studentExcelOnClose}
+                    size="4xl"
+                    placement="top"
+                    scrollBehavior="inside"
+                    classNames={{
+                        body: "py-6",
+                        backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
+                        base: "border-gray-300",
+                        header: "border-b-[1.5px] border-gray-300",
+                        footer: "border-t-[1.5px] border-gray-300",
+                        closeButton: "hover:bg-white/5 active:bg-white/10",
+                    }}
+                >
+                    <ModalContent>
+                        <ModalHeader>เพิ่มรายชื่อนักศึกษาผ่านไฟล์ Exel</ModalHeader>
+                        <ModalBody>
+                            <InsertStudentExcel />
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button onClick={studentExcelOnClose} color="error">
+                                Close
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+
+
                 <div>
                     <ToastContainer />
                     {fetching ?
@@ -624,27 +681,6 @@ const Page = () => {
                     }
                 </div>
             </ContentWrap>
-
-            <InsertModal
-                showToastMessage={showToastMessage}
-                getStudents={getStudents}
-                programs={programs}
-                isOpen={isOpen}
-                onClose={onClose} />
-            <DeleteModal
-                showToastMessage={showToastMessage}
-                callData={getStudents}
-                delIsOpen={delIsOpen}
-                delOnClose={delOnClose}
-                stuId={delStdId} />
-            <DeleteSelectModal
-                setDisableSelectDelete={setDisableSelectDelete}
-                setSelectedStudents={setSelectedStudents}
-                showToastMessage={showToastMessage}
-                getStudents={getStudents}
-                delIsOpen={delsIsOpen}
-                delOnClose={delsOnClose}
-                stuIdList={selectedStudents} />
         </>
     )
 }
