@@ -127,15 +127,15 @@ const Page = () => {
         }
     }
 
+    async function initData() {
+        setFetching(true)
+        await getStudentStatuses()
+        await getStudents()
+        await getPrograms()
+        setFetching(false)
+    }
     useEffect(() => {
-        async function init() {
-            setFetching(true)
-            await getStudentStatuses()
-            await getStudents()
-            await getPrograms()
-            setFetching(false)
-        }
-        init()
+        initData()
     }, [])
 
     // State
@@ -405,7 +405,7 @@ const Page = () => {
                             onPress={handleSelectDelete}
                             color="danger"
                             endContent={<DeleteIcon2 width={16} height={16} />}>
-                            ลบรายการที่เลือก
+                            ลบรายการที่เลือก {String(disableSelectDelete)}
                         </Button>
                         <Link href="/admin/students/restore">
                             <Button
@@ -422,6 +422,7 @@ const Page = () => {
                     <label className="flex items-center text-default-400 text-small">
                         Rows per page:
                         <select
+                            id="rowPerPage"
                             className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
                             onChange={onRowsPerPageChange}
                         >
@@ -454,7 +455,7 @@ const Page = () => {
         onSearchChange,
         hasSearchFilter,
         fetching,
-        selectedStudents
+        selectedStudents,
     ]);
 
     const bottomContent = useMemo(() => {
@@ -491,6 +492,7 @@ const Page = () => {
         let students
         if (selectedKeys == "all") {
             students = sortedItems.map(e => parseInt(e.stu_id))
+            setDisableSelectDelete(false)
         } else {
             students = [...selectedKeys.values()].map(id => parseInt(id))
             if (students.length === 0) {
@@ -500,6 +502,7 @@ const Page = () => {
             }
         }
         setSelectedStudents(students)
+        console.log(students);
     }, [selectedKeys])
 
     function handleSelectDelete() {
@@ -561,11 +564,14 @@ const Page = () => {
                     <ModalContent>
                         <ModalHeader>เพิ่มรายชื่อนักศึกษาผ่านไฟล์ Exel</ModalHeader>
                         <ModalBody>
-                            <InsertStudentExcel />
+                            <InsertStudentExcel callData={initData} closeModal={studentExcelOnClose} />
                         </ModalBody>
                         <ModalFooter>
-                            <Button onClick={studentExcelOnClose} color="error">
-                                Close
+                            <Button
+                                variant="bordered"
+                                onClick={studentExcelOnClose}
+                                color="error">
+                                ยกเลิก
                             </Button>
                         </ModalFooter>
                     </ModalContent>
@@ -595,6 +601,7 @@ const Page = () => {
                         <>
                             <div className="flex gap-3 items-center mb-4">
                                 <select
+                                    name="select-program"
                                     onInput={() => setSelectProgram(event.target.value)}
                                     defaultValue=""
                                     style={{
@@ -610,6 +617,7 @@ const Page = () => {
                                     ))}
                                 </select>
                                 <select
+                                    name="select-acadyear"
                                     onInput={() => setSelectAcadYear(event.target.value)}
                                     defaultValue=""
                                     style={{
