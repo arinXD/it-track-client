@@ -7,13 +7,14 @@ import { fetchData } from "../../action";
 import { Skeleton } from "@nextui-org/react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { tableClass } from "@/src/util/ComponentClass";
+import { inputClass, tableClass } from "@/src/util/ComponentClass";
 import { capitalize } from "../../../../src/util/utils";
 import { TbRestore } from "react-icons/tb";
 import { getToken } from "@/app/components/serverAction/TokenAction";
 import { hostname } from "@/app/api/hostname";
 import axios from "axios";
 import DeleteModal from "./DeleteModal";
+import DeleteSelectModal from "./DeleteSelectModal";
 
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"];
 const columns = [{
@@ -82,7 +83,6 @@ function showToastMessage(ok, message) {
 const Page = () => {
 
     // Modal state
-    const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: delIsOpen, onOpen: delOnOpen, onClose: delOnClose } = useDisclosure();
     const { isOpen: delsIsOpen, onOpen: delsOnOpen, onClose: delsOnClose } = useDisclosure();
 
@@ -114,6 +114,7 @@ const Page = () => {
     const [disableSelectDelete, setDisableSelectDelete] = useState(false)
     const [selectedStudents, setSelectedStudents] = useState([])
     const [delStdId, setDelStdId] = useState(null)
+    const [restoring, setRestoring] = useState(false)
 
     const [statusOptions, setStatusOptions] = useState([])
     const [filterValue, setFilterValue] = useState("");
@@ -283,21 +284,11 @@ const Page = () => {
         return (
             <div className="flex flex-col gap-4">
                 <div className="flex justify-between gap-3 items-end">
-                    <Input
-                        isClearable
-                        className="w-full sm:max-w-[44%] h-fit"
-                        placeholder="Search by name..."
-                        size="sm"
-                        startContent={<SearchIcon />}
-                        value={filterValue}
-                        onClear={() => onClear()}
-                        onValueChange={onSearchChange}
-                    />
                     <div className="flex gap-3">
-                        <Dropdown aria-label="select status">
+                        <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button radius="sm" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
-                                    Status
+                                    สถานะภาพ
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -315,10 +306,10 @@ const Page = () => {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Dropdown aria-label="select column">
+                        <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button radius="sm" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
-                                    Columns
+                                    คอลัมน์
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -336,40 +327,65 @@ const Page = () => {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-
+                    </div>
+                    <div className="flex gap-3">
                         <Button
                             radius="sm"
                             isDisabled={disableSelectDelete}
-                            onPress={() => { }}
+                            onPress={handleSelectDelete}
                             color="danger"
                             endContent={<DeleteIcon2 width={16} height={16} />}>
                             ลบรายการที่เลือก
                         </Button>
                         <Button
                             radius="sm"
-                            isDisabled={disableSelectDelete}
-                            onPress={() => { }}
+                            isLoading={restoring}
+                            isDisabled={disableSelectDelete || restoring}
+                            onPress={handleSelectRestore}
                             color="default"
                             endContent={<TbRestore className="w-[18px] h-[18px]" />}>
                             กู้คืนรายการที่เลือก
                         </Button>
                     </div>
                 </div>
-                <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small">ข้อมูลทั้งหมด {students.length} แถว</span>
-                    <label className="flex items-center text-default-400 text-small">
-                        Rows per page:
-                        <select
-                            className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
-                            onChange={onRowsPerPageChange}
-                        >
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value="150">150</option>
-                            <option value={students?.length}>ทั้งหมด</option>
-                        </select>
-                    </label>
+                <div className="flex flex-col text-small">
+                    <div className="flex flex-col text-small mb-2 text-default-400">
+                        <div>สถานะ: {statusFilter == "all" ?
+                            statusOptions.map(s => `${s.id} ${s.description}`).join(", ") :
+                            statusOptions
+                                .filter(s => Array.from(statusFilter).includes(String(s.id)))
+                                .map(s => `${s.id} ${s.description}`).join(", ")
+                        }</div>
+                        <div>คอลัมน์: {headerColumns.map(column => column.name).join(", ")}</div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
+                        <label className="flex items-center text-default-400 text-small">
+                            Rows per page:
+                            <select
+                                id="rowPerPage"
+                                className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
+                                onChange={onRowsPerPageChange}
+                            >
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="150">150</option>
+                                <option value={students?.length}>ทั้งหมด</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
+                <Input
+                    isClearable
+                    className="w-full h-fit"
+                    placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, อีเมล, ชื่อ)"
+                    size="sm"
+                    classNames={inputClass}
+                    startContent={<SearchIcon />}
+                    value={filterValue}
+                    onClear={() => onClear()}
+                    onValueChange={onSearchChange}
+                />
             </div>
         );
     }, [
@@ -381,7 +397,7 @@ const Page = () => {
         onSearchChange,
         hasSearchFilter,
         fetching,
-        selectedStudents
+        selectedStudents,
     ]);
 
     const bottomContent = useMemo(() => {
@@ -417,7 +433,8 @@ const Page = () => {
     useEffect(() => {
         let students
         if (selectedKeys == "all") {
-            students = sortedItems.map(e => parseInt(e.stu_id))
+            students = sortedItems.map(e => parseInt(e.id))
+            setDisableSelectDelete(false)
         } else {
             students = [...selectedKeys.values()].map(id => parseInt(id))
             if (students.length === 0) {
@@ -453,6 +470,36 @@ const Page = () => {
         }
     }
 
+    async function handleSelectRestore() {
+        try {
+            const token = await getToken()
+            const options = {
+                url: `${hostname}/api/students/restore/select`,
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'authorization': `${token}`,
+                    'Content-Type': 'application/json;charset=UTF-8',
+                },
+                data: {
+                    students: selectedStudents
+                }
+            };
+
+            const res = await axios(options)
+            const { ok, message } = res.data
+            await getStudents()
+            showToastMessage(ok, message)
+        } catch (error) {
+            console.log(error);
+            const { ok, message } = error.response.data
+            showToastMessage(ok, message)
+        } finally {
+            setSelectedKeys([])
+        }
+    }
+
+
     function handleSelectDelete() {
         delsOnOpen()
     }
@@ -476,6 +523,15 @@ const Page = () => {
                     delIsOpen={delIsOpen}
                     delOnClose={delOnClose}
                     stuId={delStdId} />
+                <DeleteSelectModal
+                    setDisableSelectDelete={setDisableSelectDelete}
+                    setSelectedStudents={setSelectedStudents}
+                    showToastMessage={showToastMessage}
+                    getStudents={getStudents}
+                    delIsOpen={delsIsOpen}
+                    delOnClose={delsOnClose}
+                    stuIdList={selectedStudents}
+                    setSelectedKeys={setSelectedKeys} />
                 <div>
                     <ToastContainer />
                     {fetching ?

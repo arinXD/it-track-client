@@ -102,7 +102,7 @@ const Page = () => {
             setStatusOptions([])
         }
     }
-    async function getStudents(program = "IT", acadyear = 2564) {
+    async function getStudents(program = selectProgram, acadyear = selectAcadYear) {
         try {
             let students = await fetchData(`/api/students/programs/${program}/acadyear/${acadyear}`)
             students.sort((a, b) => {
@@ -405,7 +405,7 @@ const Page = () => {
                             onPress={handleSelectDelete}
                             color="danger"
                             endContent={<DeleteIcon2 width={16} height={16} />}>
-                            ลบรายการที่เลือก {String(disableSelectDelete)}
+                            ลบรายการที่เลือก
                         </Button>
                         <Link href="/admin/students/restore">
                             <Button
@@ -417,21 +417,32 @@ const Page = () => {
                         </Link>
                     </div>
                 </div>
-                <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
-                    <label className="flex items-center text-default-400 text-small">
-                        Rows per page:
-                        <select
-                            id="rowPerPage"
-                            className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
-                            onChange={onRowsPerPageChange}
-                        >
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value="150">150</option>
-                            <option value={students?.length}>ทั้งหมด</option>
-                        </select>
-                    </label>
+                <div className="flex flex-col text-small">
+                    <div className="flex flex-col text-small mb-2 text-default-400">
+                        <div>สถานะ: {statusFilter == "all" ?
+                            statusOptions.map(s => `${s.id} ${s.description}`).join(", ") :
+                            statusOptions
+                                .filter(s => Array.from(statusFilter).includes(String(s.id)))
+                                .map(s => `${s.id} ${s.description}`).join(", ")
+                        }</div>
+                        <div>คอลัมน์: {headerColumns.map(column => column.name).join(", ")}</div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
+                        <label className="flex items-center text-default-400 text-small">
+                            Rows per page:
+                            <select
+                                id="rowPerPage"
+                                className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
+                                onChange={onRowsPerPageChange}
+                            >
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="150">150</option>
+                                <option value={students?.length}>ทั้งหมด</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
                 <Input
                     isClearable
@@ -491,7 +502,7 @@ const Page = () => {
     useEffect(() => {
         let students
         if (selectedKeys == "all") {
-            students = sortedItems.map(e => parseInt(e.stu_id))
+            students = sortedItems.map(e => parseInt(e.id))
             setDisableSelectDelete(false)
         } else {
             students = [...selectedKeys.values()].map(id => parseInt(id))
@@ -502,7 +513,6 @@ const Page = () => {
             }
         }
         setSelectedStudents(students)
-        console.log(students);
     }, [selectedKeys])
 
     function handleSelectDelete() {
