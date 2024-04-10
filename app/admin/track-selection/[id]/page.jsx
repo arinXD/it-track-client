@@ -651,9 +651,7 @@ const Page = ({ params }) => {
                                                             </div>
                                                         }
                                                     >
-
-                                                        <StudentTrackTable
-                                                            trackSubj={trackSubj} studentData={studentsBit} track={"BIT"} />
+                                                        <StudentTrackTable trackSubj={trackSubj} studentData={studentsBit} track={"BIT"} />
                                                     </Tab>
                                                 }
 

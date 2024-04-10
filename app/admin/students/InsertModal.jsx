@@ -125,7 +125,6 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
         setProgram(null)
         setCourseType(null)
         onClose()
-
     }
 
     return (

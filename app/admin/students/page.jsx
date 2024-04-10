@@ -1,13 +1,12 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Spinner, } from "@nextui-org/react";
 import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } from "@/app/components/icons";
 import { capitalize } from "@/src/util/utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from '../action'
 import { getAcadyears } from "@/src/util/academicYear";
 import InsertModal from "./InsertModal";
-import { Skeleton } from "@nextui-org/react";
 import DeleteModal from "./DeleteModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,7 +15,10 @@ import DeleteSelectModal from "./DeleteSelectModal";
 import { inputClass, tableClass } from "@/src/util/ComponentClass";
 import { RiFileExcel2Fill } from "react-icons/ri";
 import { SiGoogleforms } from "react-icons/si";
-import InsertStudentExcel from "./InsertStudentExcel";
+import InsertExcelModal from "../../components/InsertExcelModal";
+import { getToken } from "@/app/components/serverAction/TokenAction";
+import { hostname } from "@/app/api/hostname";
+import InsertEnrollmentForm from "./InsertEnrollmentForm";
 
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"];
 const columns = [{
@@ -87,6 +89,7 @@ const Page = () => {
     // Modal state
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: delIsOpen, onOpen: delOnOpen, onClose: delOnClose } = useDisclosure();
+    const { isOpen: isOpenEnroll, onOpen: onOpenEnroll, onClose: onCloseEnroll } = useDisclosure();
     const { isOpen: delsIsOpen, onOpen: delsOnOpen, onClose: delsOnClose } = useDisclosure();
     const { isOpen: studentExcelIsOpen, onOpen: studentExcelOnOpen, onClose: studentExcelOnClose } = useDisclosure();
     const { isOpen: enrollExcelIsOpen, onOpen: enrollExcelOnOpen, onClose: enrollExcelOnClose } = useDisclosure();
@@ -373,7 +376,8 @@ const Page = () => {
                                 onAction={(key) => {
                                     if (key == "add-student") onOpen()
                                     else if (key == "add-students-excel") studentExcelOnOpen()
-                                    else alert(key)
+                                    else if (key == "add-enrollment-excel") enrollExcelOnOpen()
+                                    else if (key == "add-enrollment") onOpenEnroll()
                                 }}
                             >
                                 <DropdownItem
@@ -382,6 +386,13 @@ const Page = () => {
                                     startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
                                 >
                                     เพิ่มรายชื่อนักศึกษา
+                                </DropdownItem>
+                                <DropdownItem
+                                    key="add-enrollment"
+                                    description="เพิ่มการลงทะเบียนเรียนผ่านแบบฟอร์ม"
+                                    startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
+                                >
+                                    เพิ่มการลงทะเบียนเรียน
                                 </DropdownItem>
                                 <DropdownItem
                                     key="add-students-excel"
@@ -417,6 +428,7 @@ const Page = () => {
                         </Link>
                     </div>
                 </div>
+
                 <div className="flex flex-col text-small">
                     <div className="flex flex-col text-small mb-2 text-default-400">
                         <div>สถานะ: {statusFilter == "all" ?
@@ -427,22 +439,25 @@ const Page = () => {
                         }</div>
                         <div>คอลัมน์: {headerColumns.map(column => column.name).join(", ")}</div>
                     </div>
-                    <div className="flex justify-between items-center">
-                        <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
-                        <label className="flex items-center text-default-400 text-small">
-                            Rows per page:
-                            <select
-                                id="rowPerPage"
-                                className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
-                                onChange={onRowsPerPageChange}
-                            >
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                                <option value="150">150</option>
-                                <option value={students?.length}>ทั้งหมด</option>
-                            </select>
-                        </label>
-                    </div>
+                    {
+                        students.length > 0 &&
+                        <div className="flex justify-between items-center">
+                            <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
+                            <label className="flex items-center text-default-400 text-small">
+                                Rows per page:
+                                <select
+                                    id="rowPerPage"
+                                    className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
+                                    onChange={onRowsPerPageChange}
+                                >
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="150">150</option>
+                                    <option value={students?.length}>ทั้งหมด</option>
+                                </select>
+                            </label>
+                        </div>
+                    }
                 </div>
                 <Input
                     isClearable
@@ -524,6 +539,58 @@ const Page = () => {
         delOnOpen()
     }
 
+    async function insertStudentExcel(formattedData) {
+        // add required column
+        if (formattedData.every(row =>
+            row.stu_id != null &&
+            row.email != null &&
+            row.first_name != null &&
+            row.last_name != null &&
+            row.program != null
+        )) {
+
+            const token = await getToken()
+            const options = {
+                url: `${hostname}/api/students/excel`,
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    "authorization": `${token}`,
+                },
+            };
+
+            return { status: true, options }
+        } else {
+            return { status: false, options: {} }
+        }
+    }
+
+    async function insertEnrollmentExcel(formattedData) {
+        // add required column
+        if (formattedData.every(row =>
+            row.stu_id != null &&
+            row.subject_code != null &&
+            row.enroll_year != null
+        )) {
+
+            const token = await getToken()
+            const options = {
+                url: `${hostname}/api/students/enrollments/excel`,
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    "authorization": `${token}`,
+                },
+            };
+
+            return { status: true, options }
+        } else {
+            return { status: false, options: {} }
+        }
+    }
+
     return (
         <>
             <header>
@@ -539,6 +606,12 @@ const Page = () => {
                     programs={programs}
                     isOpen={isOpen}
                     onClose={onClose} />
+
+                <InsertEnrollmentForm
+                    showToastMessage={showToastMessage}
+                    isOpen={isOpenEnroll}
+                    onClose={onCloseEnroll} />
+
                 <DeleteModal
                     showToastMessage={showToastMessage}
                     callData={getStudents}
@@ -554,58 +627,47 @@ const Page = () => {
                     delOnClose={delsOnClose}
                     stuIdList={selectedStudents} />
 
-                <Modal
-                    isDismissable={false}
-                    isKeyboardDismissDisabled={true}
-                    isOpen={studentExcelIsOpen}
-                    onClose={studentExcelOnClose}
-                    size="4xl"
-                    placement="top"
-                    scrollBehavior="inside"
-                    classNames={{
-                        body: "py-6",
-                        backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
-                        base: "border-gray-300",
-                        header: "border-b-[1.5px] border-gray-300",
-                        footer: "border-t-[1.5px] border-gray-300",
-                        closeButton: "hover:bg-white/5 active:bg-white/10",
-                    }}
-                >
-                    <ModalContent>
-                        <ModalHeader>เพิ่มรายชื่อนักศึกษาผ่านไฟล์ Exel</ModalHeader>
-                        <ModalBody>
-                            <InsertStudentExcel callData={initData} closeModal={studentExcelOnClose} />
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button
-                                variant="bordered"
-                                onClick={studentExcelOnClose}
-                                color="error">
-                                ยกเลิก
-                            </Button>
-                        </ModalFooter>
-                    </ModalContent>
-                </Modal>
+                {/* students data */}
+                <InsertExcelModal
+                    title={"เพิ่มรายชื่อนักศึกษาผ่านไฟล์ Exel"}
+                    templateFileName={"students_template"}
+                    headers={[
+                        { required: true, label: "stu_id" },
+                        { required: true, label: "email" },
+                        { required: true, label: "first_name" },
+                        { required: true, label: "last_name" },
+                        { required: true, label: "program" },
+                        { label: "acadyear" },
+                        { label: "courses_type" },
+                        { label: "status_code" },
+                    ]}
+                    hook={insertStudentExcel}
+                    callData={initData}
+                    studentExcelIsOpen={studentExcelIsOpen}
+                    studentExcelOnClose={studentExcelOnClose}
+                />
 
+                {/* enrollments data */}
+                <InsertExcelModal
+                    title={"เพิ่มการลงทะเบียนของนักศึกษาผ่านไฟล์ Exel"}
+                    templateFileName={"enrollments_template"}
+                    headers={[
+                        { required: true, label: "stu_id" },
+                        { required: true, label: "subject_code" },
+                        { required: true, label: "enroll_year" },
+                        { label: "grade" },
+                    ]}
+                    hook={insertEnrollmentExcel}
+                    callData={() => { }}
+                    studentExcelIsOpen={enrollExcelIsOpen}
+                    studentExcelOnClose={enrollExcelOnClose}
+                />
 
                 <div>
                     <ToastContainer />
                     {fetching ?
-                        <div className="space-y-3">
-                            <Skeleton className="h-10 w-[40%] rounded-lg" />
-                            <div className="flex gap-5">
-                                <Skeleton className="h-10 w-[50%] rounded-lg" />
-                                <Skeleton className="h-10 w-[50%] rounded-lg" />
-                            </div>
-                            <div className="pt-5 space-y-3">
-                                <Skeleton className="h-4 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                            </div>
+                        <div className='w-full flex justify-center h-[70vh]'>
+                            <Spinner label="กำลังโหลด..." color="primary" />
                         </div>
                         :
                         <>

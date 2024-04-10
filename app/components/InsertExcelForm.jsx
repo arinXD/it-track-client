@@ -2,14 +2,12 @@
 import { useState, useEffect } from "react";
 import { read, utils, writeFile } from "xlsx";
 import axios from 'axios';
-import { hostname } from '@/app/api/hostname';
 import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell, Button, Pagination, } from '@nextui-org/react';
 import { PlusIcon, DeleteIcon, SearchIcon } from "@/app/components/icons";
-import '../../style/excel.css';
+import '../style/excel.css';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { FiDownload } from "react-icons/fi";
-import { getToken } from "@/app/components/serverAction/TokenAction";
 
 const swal = Swal.mixin({
     customClass: {
@@ -19,7 +17,7 @@ const swal = Swal.mixin({
     buttonsStyling: false
 });
 
-const InsertStudentExcel = ({ callData, closeModal }) => {
+const InsertExcelForm = ({ headers, hook, closeModal, callData, templateFileName }) => {
     const [data, setData] = useState([]);
     const [editingCell, setEditingCell] = useState(null);
     const [editingTbody, setEditingTbody] = useState(null);
@@ -27,8 +25,8 @@ const InsertStudentExcel = ({ callData, closeModal }) => {
     const [originalHeaders, setOriginalHeaders] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredData, setFilteredData] = useState([]);
-    const [fileName, setFileName] = useState('')
     const [inserting, setInserting] = useState(false)
+    const [uploadingFile, setUploadingFile] = useState(false)
 
     const showToastMessage = (ok, message) => {
         if (ok) {
@@ -91,8 +89,8 @@ const InsertStudentExcel = ({ callData, closeModal }) => {
         }
 
         if (file) {
+            setUploadingFile(true)
             reader.readAsBinaryString(file);
-            setFileName(file.name);
             reader.onload = (e) => {
                 const data = e.target.result;
                 const workbook = read(data, { type: "binary" });
@@ -110,6 +108,7 @@ const InsertStudentExcel = ({ callData, closeModal }) => {
                     showToastMessage(false, `ไม่มีข้อมูลในไฟล์ ${file.name}`);
                 }
             };
+            setUploadingFile(true)
         }
     };
 
@@ -136,7 +135,7 @@ const InsertStudentExcel = ({ callData, closeModal }) => {
     };
 
 
-    const handleInsertSubject = async () => {
+    const handleInsertData = async () => {
         const { value } = await swal.fire({
             text: `ตรวจสอบข้อมูลเรียบร้อยแล้วหรือไม่ ?`,
             icon: "question",
@@ -165,58 +164,40 @@ const InsertStudentExcel = ({ callData, closeModal }) => {
                     Object.entries(row).map(([key, value]) => [key.toLowerCase(), value])
                 );
             });
-
-            // add required column
-            if (formattedData.every(row =>
-                row.stu_id != null &&
-                row.email != null &&
-                row.first_name != null &&
-                row.last_name != null &&
-                row.program != null
-            )) {
-                // example 1st data
-                console.table(formattedData[0]);
-
-                const token = await getToken()
-                const options = {
-                    url: `${hostname}/api/students/excel`,
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json;charset=UTF-8',
-                        "authorization": `${token}`,
-                    },
-                };
-
-                if (formattedData.length <= 250) {
-                    options.data = formattedData
+            try {
+                const { status, options } = await hook(formattedData)
+                if (status) {
                     setInserting(true)
-                    try {
-                        const result = await axios(options)
-                        const { message } = result.data
-                        showToastMessage(true, message);
-                    } catch (error) {
-                        console.log(error);
-                        showToastMessage(false, "ไฟล์ใหย่โพด");
-                    } finally {
-                        setInserting(false)
-                    }
-                } else {
-                    setInserting(true)
-                    const batchStatus = await sendDataInBatches(formattedData, options)
-                    if (batchStatus) {
-                        showToastMessage(true, "เพิ่มข้อมูลสำเร็จ");
+                    if (formattedData.length <= 250) {
+                        options.data = formattedData
+                        try {
+                            const result = await axios(options)
+                            const { message } = result.data
+                            showToastMessage(true, message);
+                        } catch (error) {
+                            console.log(error);
+                            showToastMessage(false, "ไฟล์ใหย่โพด");
+                        }
                     } else {
-                        showToastMessage(false, "ไฟล์ใหย่โพด");
+                        const batchStatus = await sendDataInBatches(formattedData, options)
+                        if (batchStatus) {
+                            showToastMessage(true, "เพิ่มข้อมูลสำเร็จ");
+                        } else {
+                            showToastMessage(false, "ไฟล์ใหย่โพด");
+                        }
                     }
                     setInserting(false)
+                } else {
+                    showToastMessage(false, 'โปรดแก้ไขหัวตาราง');
                 }
+            } catch (error) {
+                console.log(error);
+            } finally {
                 callData()
                 handleClearFile();
                 closeModal()
-            } else {
-                showToastMessage(false, 'โปรดแก้ไขหัวตาราง');
             }
+
         }
     };
 
@@ -308,11 +289,11 @@ const InsertStudentExcel = ({ callData, closeModal }) => {
     const downloadTemplate = () => {
         try {
             const wb = utils.book_new();
-            const headers = ['stu_id', 'email', 'first_name', 'last_name', 'courses_type', 'program', 'acadyear', 'status_code'];
+            const headersCol = headers.map(header => header.label);
             const data = [{}];
-            const ws = utils.json_to_sheet(data, { header: headers });
+            const ws = utils.json_to_sheet(data, { header: headersCol });
             utils.book_append_sheet(wb, ws, 'students');
-            writeFile(wb, 'students_template.xlsx');
+            writeFile(wb, `${templateFileName}.xlsx`);
         } catch (error) {
             console.error('Error exporting Excel:', error);
         }
@@ -337,13 +318,19 @@ const InsertStudentExcel = ({ callData, closeModal }) => {
             {data.length == 0 && (
                 <div className="mt-5 mx-auto w-fit">
                     <Button
+                        isLoading={uploadingFile}
+                        isDisabled={uploadingFile}
                         radius="sm"
                         className=""
                         onClick={downloadTemplate}
                         color="primary"
                         endContent={<FiDownload className="w-4 h-4 text-white" />}
                     >
-                        ดาวน์โหลด Template
+                        {uploadingFile ?
+                            <>กำลังอัพโหลดไฟล์</>
+                            :
+                            <>ดาวน์โหลด Template</>
+                        }
                     </Button>
                 </div>
             )}
@@ -370,7 +357,7 @@ const InsertStudentExcel = ({ callData, closeModal }) => {
                                     isLoading={inserting}
                                     isDisabled={inserting}
                                     className=""
-                                    onClick={handleInsertSubject}
+                                    onClick={handleInsertData}
                                     color="primary"
                                 >
                                     เพิ่มข้อมูล
@@ -391,30 +378,16 @@ const InsertStudentExcel = ({ callData, closeModal }) => {
                         <table className="w-full text-sm text-left rtl:text-right text-gray-500">
                             <thead className="text-xs text-black font-bold bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="px-4 py-3">
-                                        <p className="flex gap-1">stu_id <span className="text-red-500">*</span></p>
-                                    </th>
-                                    <th scope="col" className="px-4 py-3">
-                                        <p className="flex gap-1">email <span className="text-red-500">*</span></p>
-                                    </th>
-                                    <th scope="col" className="px-4 py-3">
-                                        <p className="flex gap-1">first_name <span className="text-red-500">*</span></p>
-                                    </th>
-                                    <th scope="col" className="px-4 py-3">
-                                        <p className="flex gap-1">last_name <span className="text-red-500">*</span></p>
-                                    </th>
-                                    <th scope="col" className="px-4 py-3">
-                                        <p className="flex gap-1">program <span className="text-red-500">*</span></p>
-                                    </th>
-                                    <th scope="col" className="px-4 py-3">
-                                        acadyear
-                                    </th>
-                                    <th scope="col" className="px-4 py-3">
-                                        courses_type
-                                    </th>
-                                    <th scope="col" className="px-4 py-3">
-                                        status_code
-                                    </th>
+                                    {headers.map(header => (
+                                        header?.required == true ?
+                                            <th scope="col" className="px-4 py-3">
+                                                <p className="flex gap-1">{header.label} <span className="text-red-500">*</span></p>
+                                            </th>
+                                            :
+                                            <th scope="col" className="px-4 py-3">
+                                                {header.label}
+                                            </th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody>
@@ -490,4 +463,4 @@ const InsertStudentExcel = ({ callData, closeModal }) => {
     );
 }
 
-export default InsertStudentExcel
+export default InsertExcelForm

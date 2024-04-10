@@ -1,6 +1,6 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, Spinner, } from "@nextui-org/react";
 import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } from "@/app/components/icons";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from "../../action";
@@ -535,20 +535,8 @@ const Page = () => {
                 <div>
                     <ToastContainer />
                     {fetching ?
-                        <div className="space-y-3">
-                            <div className="flex gap-5">
-                                <Skeleton className="h-10 w-[50%] rounded-lg" />
-                                <Skeleton className="h-10 w-[50%] rounded-lg" />
-                            </div>
-                            <div className="pt-5 space-y-3">
-                                <Skeleton className="h-4 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                                <Skeleton className="h-2 w-full rounded-lg" />
-                            </div>
+                        <div className='w-full flex justify-center h-[70vh]'>
+                            <Spinner label="กำลังโหลด..." color="primary" />
                         </div>
                         :
                         <>

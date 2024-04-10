@@ -1,7 +1,7 @@
 const tableClass = {
     table: ["border"],
     tr: ["border-t", "border-divider"],
-    th: ["bg-transparent", "text-default-500"],
+    th: ["bg-white", "text-default-500"],
     td: [
         // first
         "group-data-[first=true]:first:before:rounded-none",

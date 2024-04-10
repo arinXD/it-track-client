@@ -55,7 +55,9 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
 
     const getEnrollmentGrade = (subjectCode) => {
         // ต้องการหา subjectCode ใน enrollments
-        const enrollment = enrollments.find(e => e.subject_code === subjectCode);
+        console.log(enrollments);
+        console.log(trackSubjects);
+        const enrollment = enrollments.find(e => e?.Subject?.subject_code === subjectCode);
         if (enrollment) {
             return enrollment.grade;
         }
@@ -179,7 +181,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
     if (userData?.program !== "IT") {
         <div className='text-center'>
             <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
-                {trackSelect.title}
+                {trackSelect?.title}
             </h4>
             <p>
                 คุณไม่มีสิทธิ์เข้ารับการคัดเลือกแทรคในหลักสูตรเทคโนโลยีสารสนเทศ ติดต่อ <TMonlicaEmail />
@@ -199,15 +201,15 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                         </>
                         :
                         <>
-                            {(trackSelect.has_finished || (new Date(trackSelect.expiredAt) < new Date())) ?
+                            {(trackSelect?.has_finished || (new Date(trackSelect?.expiredAt) < new Date())) ?
                                 trackResult ?
                                     (
                                         <div className='text-center'>
                                             <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
                                                 {trackSelect.title}
                                             </h4>
-                                            <p>แทรคของคุณ คือ {trackResult.title_en}</p>
-                                            <p>{trackResult.title_th}</p>
+                                            <p>แทรคของคุณ คือ {trackResult?.title_en}</p>
+                                            <p>{trackResult?.title_th}</p>
                                         </div>
                                     )
                                     :
@@ -221,8 +223,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                 :
                                 <>
                                     <h4 className="block font-sans font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-xl mb-3">
-                                        {/* การคัดเลือกความเชี่ยวชาญ วิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ */}
-                                        {trackSelect.title}
+                                        {trackSelect?.title}
                                     </h4>
                                     <p className='text-center my-3 text-sm'>
                                         ตั้งแต่วันที่ {dmy(trackSelect.startAt)} - {dmy(trackSelect.expiredAt)}

@@ -61,7 +61,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
         }
     })
     // const columns = [...initColumns, ...subjects]
-    const columns = [...initColumns.slice(0, 4), ...subjects, ...initColumns.slice(4, initColumns.length)];
+    const columns = [...initColumns.slice(0, 3), ...subjects, ...initColumns.slice(3, initColumns.length)];
     const students = studentData?.students
     const [filterValue, setFilterValue] = useState("");
     const [selectedKeys, setSelectedKeys] = useState(new Set([]));
@@ -98,13 +98,12 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
     const filteredItems = useMemo(() => {
         let filteredUsers
         if (studentData?.students?.length) {
-            let counter = 0;
             filteredUsers = students.map(student => {
                 const grade = []
                 let totalScore = 0
                 student?.SelectionDetails?.forEach(element => {
                     const g = {}
-                    g[element.subject_code] = element.grade
+                    g[element?.Subject?.subject_code] = element.grade
                     grade.push(g)
                     totalScore += convertGrade(element.grade)
                 });
@@ -146,7 +145,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
         if (filteredItems?.length) {
             const start = (page - 1) * rowsPerPage;
             const end = start + rowsPerPage;
-            
+
             return filteredItems.slice(start, end);
         } else {
             return []
@@ -289,7 +288,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     bottomContentPlacement="outside"
 
                     // selectionMode="multiple"
-                    classNames={{ ...tableClass, wrapper: "w-full", }}
+                    classNames={{ ...tableClass, wrapper: "w-full"}}
                     // onSelectionChange={setSelectedKeys}
                     onSortChange={setSortDescriptor}
                     sortDescriptor={sortDescriptor}
@@ -314,7 +313,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                                 {
                                     item.grade.map((g, index) => (
                                         <TableCell key={index}>
-                                            {g[subjects[index].uid]}
+                                            {g[subjects[index].uid] || "-"}
                                         </TableCell>
                                     ))
                                 }
