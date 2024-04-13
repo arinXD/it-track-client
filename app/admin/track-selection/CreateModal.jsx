@@ -1,15 +1,20 @@
-import React, { useEffect, useState } from 'react'
+"use client"
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { format } from 'date-fns';
-import { Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import { Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
 import { Textarea, Select, SelectItem } from "@nextui-org/react";
 import { Icon } from '@iconify/react';
 import { getCurrentDate } from '@/src/util/dateFormater';
-import { inputClass } from '@/src/util/ComponentClass';
-
-const defaultSubj = ["SC361002", "SC361003", "SC361004", "SC361005"]
-const currentDateTime = new Date()
 
 export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, onClose }) {
+    const defaultSubj = useMemo(() => ["SC361002", "SC361003", "SC361004", "SC361005"], [])
+    const currentDateTime = useMemo(() => {
+        const date = new Date();
+        date.setHours(12);
+        date.setMinutes(0);
+        return date;
+    }, []);
+
     const [title, setTitle] = useState("")
     const [acadValue, setAcadValue] = useState("")
     const [startValue, setStartValue] = useState(format(currentDateTime, 'yyyy-MM-dd HH:mm'));
@@ -55,7 +60,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
         setFilterSubj(subjects)
     }, [searchSubj])
 
-    function handleSelectionChange(e) {
+    const handleSelectionChange = useCallback(function (e) {
         const newAcad = e.target.value.toString()
         setAcadValue((prevVale) => {
             setTitle(prvTitle => {
@@ -67,9 +72,9 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
             })
             return newAcad
         });
-    }
+    }, [])
 
-    function addSubj(subj) {
+    const addSubj = useCallback(function (subj) {
         setTrackSubj((prevState) => {
             const data = [...prevState];
             let status = false
@@ -89,13 +94,14 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
             }
             return data
         })
-    }
+    }, [])
 
-    function delSubj(subject_code) {
+    const delSubj = useCallback(function (subject_code) {
         const data = trackSubj.filter(element => element.subject_code !== subject_code)
         setTrackSubj(data)
-    }
-    function createAcad(e) {
+    }, [trackSubj])
+
+    const createAcad = useCallback(function (e) {
         e.preventDefault();
         const formData = {
             acadyear: acadValue,
@@ -105,7 +111,14 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
             trackSubj: trackSubj.map((sbj) => sbj.subject_code),
         }
         handleSubmit(formData)
-    }
+    }, [
+        acadValue,
+        title,
+        startValue,
+        expiredValue,
+        trackSubj,
+    ])
+
     return (
         <Modal
             size={"3xl"}
@@ -250,7 +263,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                     color="primary"
                                     variant='solid'
                                     type="submit"
-                                    onPress={onClose}>
+                                >
                                     เพิ่ม
                                 </Button>
                             </ModalFooter>

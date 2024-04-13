@@ -1,3 +1,28 @@
+function calGrade(grade) {
+    const grades = {
+        "A": 4,
+        "B+": 3.5,
+        "B": 3,
+        "C+": 2.5,
+        "C": 2,
+        "D+": 1.5,
+        "D": 1,
+        "F": 0,
+        "I": "ยังไม่สมบูรณ์",
+        "P":"กำลังดำเนินอยู่",
+        "R":"ซ้ำชั้น",
+        "S": "พอใจ",
+        "T": "รับโอน",
+        "U": "ไม่พอใจ",
+        "W": "ถอนรายวิชา",
+    }
+    return grades[grade] !== undefined ? grades[grade] : null
+}
+
+function isNumber(number) {
+    return typeof number == "number"
+}
+
 function getGrades() {
     const grades = {
         hasScore: {
@@ -39,7 +64,7 @@ function getGrades() {
         noScore: {
             lable: "ไม่มีค่าคะแนน",
             grades: [{
-                    grade: "I ",
+                    grade: "I",
                     meaning: "ยังไม่สมบูรณ์"
                 },
                 {
@@ -70,7 +95,9 @@ function getGrades() {
         }
     }
     return grades
-    }
+}
 module.exports = {
-    getGrades
+    getGrades,
+    calGrade,
+    isNumber
 }

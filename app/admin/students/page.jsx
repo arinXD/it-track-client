@@ -315,11 +315,17 @@ const Page = () => {
     const topContent = useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
-                <div className="flex justify-between gap-3 items-end">
-                    <div className="flex gap-3">
+                <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-end rounded-md'>
+                    <div className="flex gap-2">
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
-                                <Button radius="sm" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                                <Button
+                                    size="sm"
+                                    radius="sm"
+                                    className="bg-gray-300"
+                                    color="default"
+                                    endContent={<ChevronDownIcon className="text-small" />}
+                                    variant="flat">
                                     สถานะภาพ
                                 </Button>
                             </DropdownTrigger>
@@ -340,7 +346,13 @@ const Page = () => {
                         </Dropdown>
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
-                                <Button radius="sm" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                                <Button
+                                    size="sm"
+                                    className="bg-gray-300"
+                                    radius="sm"
+                                    color="default"
+                                    endContent={<ChevronDownIcon className="text-small" />}
+                                    variant="flat">
                                     คอลัมน์
                                 </Button>
                             </DropdownTrigger>
@@ -360,13 +372,15 @@ const Page = () => {
                             </DropdownMenu>
                         </Dropdown>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                         <Dropdown>
                             <DropdownTrigger>
                                 <Button
+                                    size="sm"
+                                    className="bg-gray-300"
                                     radius="sm"
-                                    color="primary"
-                                    endContent={<PlusIcon width={16} height={16} />}>
+                                    color="default"
+                                    startContent={<PlusIcon className="w-5 h-5" />}>
                                     เพิ่มข้อมูล
                                 </Button>
                             </DropdownTrigger>
@@ -389,10 +403,10 @@ const Page = () => {
                                 </DropdownItem>
                                 <DropdownItem
                                     key="add-enrollment"
-                                    description="เพิ่มการลงทะเบียนเรียนผ่านแบบฟอร์ม"
+                                    description="เพิ่มรายวิชาที่ลงทะเบียนผ่านแบบฟอร์ม"
                                     startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
                                 >
-                                    เพิ่มการลงทะเบียนเรียน
+                                    เพิ่มรายวิชาที่ลงทะเบียน
                                 </DropdownItem>
                                 <DropdownItem
                                     key="add-students-excel"
@@ -403,44 +417,50 @@ const Page = () => {
                                 </DropdownItem>
                                 <DropdownItem
                                     key="add-enrollment-excel"
-                                    description="เพิ่มการลงทะเบียนเรียนผ่านไฟล์ excel"
+                                    description="เพิ่มรายวิชาที่ลงทะเบียนผ่านไฟล์ excel"
                                     startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
                                 >
-                                    เพิ่มการลงทะเบียนเรียน
+                                    เพิ่มรายวิชาที่ลงทะเบียน
                                 </DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
-                        <Button
-                            radius="sm"
-                            isDisabled={disableSelectDelete}
-                            onPress={handleSelectDelete}
-                            color="danger"
-                            endContent={<DeleteIcon2 width={16} height={16} />}>
-                            ลบรายการที่เลือก
-                        </Button>
                         <Link href="/admin/students/restore">
                             <Button
+                                size="sm"
                                 radius="sm"
                                 color="default"
-                                endContent={<TbRestore className="w-[18px] h-[18px]" />}>
+                                className="bg-gray-300"
+                                startContent={<TbRestore className="w-4 h-4" />}>
                                 รายการที่ถูกลบ
                             </Button>
                         </Link>
+                        <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
+                            <Button
+                                radius="sm"
+                                size="sm"
+                                isDisabled={disableSelectDelete}
+                                onPress={handleSelectDelete}
+                                color="default"
+                                className="bg-gray-300"
+                                startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                                ลบรายการที่เลือก
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col text-small">
-                    <div className="flex flex-col text-small mb-2 text-default-400">
-                        <div>สถานะ: {statusFilter == "all" ?
-                            statusOptions.map(s => `${s.id} ${s.description}`).join(", ") :
-                            statusOptions
-                                .filter(s => Array.from(statusFilter).includes(String(s.id)))
-                                .map(s => `${s.id} ${s.description}`).join(", ")
-                        }</div>
-                        <div>คอลัมน์: {headerColumns.map(column => column.name).join(", ")}</div>
-                    </div>
-                    {
-                        students.length > 0 &&
+                {
+                    students.length > 0 &&
+                    <div className="flex flex-col text-small">
+                        <div className="flex flex-col text-small mb-2 text-default-400">
+                            <div>สถานะ: {statusFilter == "all" ?
+                                statusOptions.map(s => `${s.id} ${s.description}`).join(", ") :
+                                statusOptions
+                                    .filter(s => Array.from(statusFilter).includes(String(s.id)))
+                                    .map(s => `${s.id} ${s.description}`).join(", ")
+                            }</div>
+                            <div>คอลัมน์: {headerColumns.map(column => column.name).join(", ")}</div>
+                        </div>
                         <div className="flex justify-between items-center">
                             <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
                             <label className="flex items-center text-default-400 text-small">
@@ -457,8 +477,8 @@ const Page = () => {
                                 </select>
                             </label>
                         </div>
-                    }
-                </div>
+                    </div>
+                }
                 <Input
                     isClearable
                     className="w-full h-fit"
@@ -671,45 +691,48 @@ const Page = () => {
                         </div>
                         :
                         <>
-                            <div className="flex gap-3 items-center mb-4">
-                                <select
-                                    name="select-program"
-                                    onInput={() => setSelectProgram(event.target.value)}
-                                    defaultValue=""
-                                    style={{
-                                        lineHeight: "40px",
-                                        height: "40px",
-                                    }}
-                                    className="px-2 pe-3 py-1 border-1 rounded-lg">
-                                    <option value="" disabled hidden>หลักสูตร</option>
-                                    {programs?.length && programs.map((program) => (
-                                        <option key={program.program} value={program.program}>
-                                            {program.title_th} {program.program}
-                                        </option>
-                                    ))}
-                                </select>
-                                <select
-                                    name="select-acadyear"
-                                    onInput={() => setSelectAcadYear(event.target.value)}
-                                    defaultValue=""
-                                    style={{
-                                        lineHeight: "40px",
-                                        height: "40px",
-                                    }}
-                                    className="px-2 pe-3 py-1 border-1 rounded-lg">
-                                    <option value="" disabled hidden>ปีการศึกษา</option>
-                                    {acadyears.map((acadyear) => (
-                                        <option key={acadyear} value={acadyear}>
-                                            {acadyear}
-                                        </option>
-                                    ))}
-                                </select>
+                            <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-start items-center gap-2 rounded-md mb-4'>
+                                <div className="flex gap-2 items-center w-1/2">
+                                    <select
+                                        name="select-program"
+                                        onInput={() => setSelectProgram(event.target.value)}
+                                        defaultValue=""
+                                        style={{
+                                            lineHeight: "32px",
+                                            height: "32px",
+                                        }}
+                                        className="px-2 pe-3 py-1 border-1 rounded-lg w-1/2 text-sm ">
+                                        <option value="" disabled hidden>หลักสูตร</option>
+                                        {programs?.length && programs.map((program) => (
+                                            <option key={program.program} value={program.program}>
+                                                {program.title_th} {program.program}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <select
+                                        name="select-acadyear"
+                                        onInput={() => setSelectAcadYear(event.target.value)}
+                                        defaultValue=""
+                                        style={{
+                                            lineHeight: "32px",
+                                            height: "32px",
+                                        }}
+                                        className="px-2 pe-3 py-1 border-1 rounded-lg w-1/2 text-sm">
+                                        <option value="" disabled hidden>ปีการศึกษา</option>
+                                        {acadyears.map((acadyear) => (
+                                            <option key={acadyear} value={acadyear}>
+                                                {acadyear}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <Button
                                     onClick={() => getStudents(selectProgram, selectAcadYear)}
                                     radius="sm"
-                                    size="md"
+                                    size="sm"
                                     variant="solid"
-                                    className="bg-gray-200"
+                                    className="bg-gray-300"
+                                    color="default"
                                     startContent={<SearchIcon />}
                                 >
                                     ค้นหา

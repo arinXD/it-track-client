@@ -37,18 +37,15 @@ const inputClass = {
     ],
 }
 
-const InsertModal = ({ showToastMessage, isOpen, onClose }) => {
+const InsertEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, callBack }) => {
     const [studentData, setStudentData] = useState([]);
     const [subjectData, setSubjectData] = useState([]);
     const acadyears = getAcadyears().map(acad => String(acad))
     const grades = getGrades()
 
     const [inserting, setInserting] = useState(false);
-    const [searchingStudent, setSearchingStudent] = useState(false);
     const [searchingSubject, setSearchingSubject] = useState(false);
-    const [searchStudent, setSearchStudent] = useState("");
     const [searchSubject, setSearchSubject] = useState("");
-    const [student, setStudent] = useState({});
     const [subject, setSubject] = useState({});
 
     const findEnroll = useCallback(async (formData) => {
@@ -69,7 +66,8 @@ const InsertModal = ({ showToastMessage, isOpen, onClose }) => {
             const res = await axios(options)
             const { ok, message } = res.data
             showToastMessage(ok, message)
-            // closeForm()
+            callBack()
+            closeForm()
         } catch (error) {
             const { ok, message } = error.response.data
             showToastMessage(ok, message)
@@ -115,24 +113,6 @@ const InsertModal = ({ showToastMessage, isOpen, onClose }) => {
         }
     }, [])
 
-    const fetchStudents = useCallback(async (student) => {
-        if (searchingStudent) return
-        if (!student) {
-            setStudentData([])
-            return
-        }
-        const url = `/api/students/find/${student}`
-        const options = await getOptions(url)
-        try {
-            setSearchingStudent(true)
-            const res = await axios(options)
-            setStudentData(res.data.data)
-        } catch (error) {
-            setStudentData([])
-        } finally {
-            setSearchingStudent(false)
-        }
-    }, [])
 
     const fetchSubjects = useCallback(async (subject) => {
         if (searchingSubject) return
@@ -156,17 +136,11 @@ const InsertModal = ({ showToastMessage, isOpen, onClose }) => {
     function closeForm() {
         setStudentData([])
         setSubjectData([])
-        setStudent({})
         setSubject({})
-        setSearchStudent("")
         setSearchSubject("")
         onClose()
     }
 
-    function selectStudent(student) {
-        setStudent(student)
-        setStudentData([])
-    }
     function selectSubject(subject) {
         setSubject(subject)
         setSubjectData([])
@@ -202,30 +176,6 @@ const InsertModal = ({ showToastMessage, isOpen, onClose }) => {
                                         boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px"
                                     }}
                                     className='mb-3 space-y-2 rounded-md p-2'>
-                                    <div className='flex flex-row gap-3 justify-start items-end'>
-                                        <Input
-                                            isClearable
-                                            className="w-full"
-                                            placeholder="รหัสนักศึกษา, ชื่อนักศึกษา"
-                                            size="sm" label="ค้นหานักศึกษา"
-                                            labelPlacement='outside'
-                                            classNames={inputClass}
-                                            startContent={<SearchIcon />}
-                                            value={searchStudent}
-                                            onValueChange={setSearchStudent}
-                                            onClear={() => fetchStudents("")}
-                                            onKeyDown={e => (e.code === 'Enter' || e.code === 'NumpadEnter') && fetchStudents(searchStudent)}
-                                        />
-                                        <Button
-                                            onClick={() => fetchStudents(searchStudent)}
-                                            radius="sm"
-                                            size="md"
-                                            variant="solid"
-                                            className="bg-gray-200 h-[32px]"
-                                            startContent={<SearchIcon className="w-5 h-5" />}>
-                                            ค้นหา
-                                        </Button>
-                                    </div>
                                     <div>
                                         {
                                             Object.keys(student) == 0 || studentData?.length != 0 ? undefined :
@@ -234,39 +184,6 @@ const InsertModal = ({ showToastMessage, isOpen, onClose }) => {
                                                     <p>
                                                         {student?.stu_id} {student?.first_name} {student?.last_name} {student?.Program?.title_th} ({student?.courses_type})
                                                     </p>
-                                                </div>
-                                        }
-                                        {studentData?.length == 0 ? undefined :
-                                            searchingStudent ?
-                                                <div className='w-full flex justify-center'>
-                                                    <Spinner label="กำลังโหลด..." color="primary" />
-                                                    {searchingStudent}
-                                                </div>
-                                                :
-                                                <div className='h-[150px] overflow-y-auto border-1'>
-                                                    <table className='w-[100%]'>
-                                                        <thead>
-                                                            <tr className='border-b-1 w-full'>
-                                                                <th className='px-2 py-1 text-start'>รหัสนักศึกษา</th>
-                                                                <th className='px-2 py-1 text-start'>ชื่อ-สกุล</th>
-                                                                <th className='px-2 py-1 text-start'>หลักสูตร</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className=''>
-                                                            {studentData.map(student => (
-                                                                <tr
-                                                                    onClick={() => selectStudent(student)}
-                                                                    key={student.id}
-                                                                    className='cursor-pointer border-b-1 w-full hover:bg-gray-200'
-                                                                >
-                                                                    <td className='px-2 py-1 text-start'>{student?.stu_id}</td>
-                                                                    <td className='px-2 py-1 text-start'>{student?.first_name} {student?.last_name}</td>
-                                                                    <td className='px-2 py-1 text-start'>{student?.Program?.title_th} ({student?.courses_type})</td>
-                                                                </tr>
-                                                            ))
-                                                            }
-                                                        </tbody>
-                                                    </table>
                                                 </div>
                                         }
                                     </div>
@@ -433,4 +350,4 @@ const InsertModal = ({ showToastMessage, isOpen, onClose }) => {
     )
 }
 
-export default InsertModal
+export default InsertEnrollmentForm

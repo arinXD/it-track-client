@@ -1,10 +1,10 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Input, Tooltip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from "@nextui-org/react";
-import { EyeIcon, SearchIcon } from "@/app/components/icons";
-import Link from 'next/link';
-import { dMy } from '@/src/util/dateFormater'
+import { Input, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from "@nextui-org/react";
+import { SearchIcon } from "@/app/components/icons";
 import { tableClass } from '@/src/util/ComponentClass';
+import { calGrade } from '@/src/util/grade';
+import { isNumber } from '../../../../src/util/grade';
 
 function displayNull(string) {
     if (string) return string
@@ -47,7 +47,7 @@ const initColumns = [
         sortable: true
     },
     {
-        name: "result",
+        name: "ผลลัพธ์",
         uid: "result",
         sortable: true
     },
@@ -60,7 +60,6 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
             uid: subj.subject_code,
         }
     })
-    // const columns = [...initColumns, ...subjects]
     const columns = [...initColumns.slice(0, 3), ...subjects, ...initColumns.slice(3, initColumns.length)];
     const students = studentData?.students
     const [filterValue, setFilterValue] = useState("");
@@ -81,20 +80,6 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
         return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
-    function convertGrade(grade) {
-        const grades = {
-            "A": 4,
-            "B+": 3.5,
-            "B": 3,
-            "C+": 2.5,
-            "C": 2,
-            "D+": 1.5,
-            "D": 1,
-            "F": 0,
-        }
-        return grades[grade] || 0
-    }
-
     const filteredItems = useMemo(() => {
         let filteredUsers
         if (studentData?.students?.length) {
@@ -105,7 +90,8 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     const g = {}
                     g[element?.Subject?.subject_code] = element.grade
                     grade.push(g)
-                    totalScore += convertGrade(element.grade)
+                    const gradeValue = calGrade(element.grade)
+                    if(isNumber(gradeValue)) totalScore += gradeValue
                 });
                 const score = (totalScore / (grade.length || 1)).toFixed(2)
                 return {
@@ -207,7 +193,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     <Input
                         isClearable
                         className="w-full sm:max-w-[44%] h-fit"
-                        placeholder="Search by name..."
+                        placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, ชื่อ, โครงการ, ผลลัพธ์)"
                         size="sm"
                         startContent={<SearchIcon />}
                         value={filterValue}
@@ -224,7 +210,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                             <option value="30">30</option>
                             <option value="50">50</option>
                             <option value="100">100</option>
-                            <option value="150">150</option>
+                            <option value={studentData?.students?.length || 150}>ทั้งหมด</option>
                         </select>
                     </label>
                 </div>

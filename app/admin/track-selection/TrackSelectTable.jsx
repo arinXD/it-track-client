@@ -1,46 +1,51 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { dMyt } from '@/src/util/dateFormater'
 import { Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
-import { PlusIcon, CheckIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon, ConfirmIcon, ClockIcon } from "@/app/components/icons";
+import { PlusIcon, CheckIcon, DeleteIcon2, SearchIcon } from "@/app/components/icons";
 import { Icon } from '@iconify/react';
 import { Loading } from '@/app/components';
-import { tableClass } from '@/src/util/ComponentClass';
+import axios from 'axios';
+import { getOptions } from '@/app/components/serverAction/TokenAction';
 
-const TrackSelectTable = ({ loading, trackSelection, handleOpen, handleDelete, handleSelectedDel, handleStartSelect }) => {
+const TrackSelectTable = ({ loading, trackSelection, handleOpen, 
+    handleDelete, handleStartSelect, swal, callTrackSelection, showToastMessage}) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState(trackSelection);
-    const [itemsPerPage, setItemPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
     const [selectedKey, setSelectedKey] = useState([])
+    const [disableDeleteBtn, setDisableDeleteBtn] = useState(true);
+    const [selectedTrackSelect, setSelectedTrackSelect] = useState([]);
 
     useEffect(() => {
         setFilteredData(trackSelection)
     }, [trackSelection])
 
-    function handleSetSelectedKey(selectedKey) {
+    useEffect(() => {
         let allId
         if (selectedKey === "all") {
-            allId = trackSelection.map(e => e.acadyear)
-            setSelectedKey(allId)
+            allId = filteredData.map(e => e.acadyear)
+            setSelectedTrackSelect(allId)
+            setDisableDeleteBtn(false)
         } else {
             let values = [...selectedKey.values()]
             if (values.length > 0) {
                 allId = []
                 values.map(e => {
-                    allId.push(trackSelection[parseInt(e)].acadyear)
+                    allId.push(filteredData[parseInt(e)]?.acadyear)
                 })
-                setSelectedKey(allId)
+                setSelectedTrackSelect(allId)
+                setDisableDeleteBtn(false)
             } else {
-                setSelectedKey([])
+                setSelectedTrackSelect([])
+                setDisableDeleteBtn(true)
             }
         }
-    }
+    }, [selectedKey, filteredData])
 
-    function handleSearch(query) {
+    const handleSearch = useCallback(function (query) {
         setSearchQuery(query);
         if (query) {
-            const filtered = trackSelection.filter((item) =>
+            const filtered = filteredData.filter((item) =>
                 Object.values(item)
                     .join(" ")
                     .toLowerCase()
@@ -48,50 +53,82 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen, handleDelete, h
             );
             setFilteredData(filtered);
         } else {
-            setFilteredData(trackSelection);
+            setFilteredData(filteredData);
         }
-    }
-    const totalItems = filteredData.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    }, [])
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-    const currentData = filteredData.slice(startIndex, endIndex);
+    const handleSelectedDel = useCallback(async function () {
+        if (selectedTrackSelect.length == 0) return
+        swal.fire({
+            text: `ต้องการลบการคัดแทรคปีการศึกษา ${selectedTrackSelect.join(", ")} หรือไม่ ?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const url = "/api/tracks/selects/del/selected"
+                const data = {
+                    acadArr: selectedTrackSelect
+                }
+                const options = await getOptions(url, "DELETE", data)
+                axios(options)
+                    .then(async result => {
+                        const { ok, message } = result.data
+                        showToastMessage(ok, message)
+                        callTrackSelection()
+                        setSelectedKey([])
+                    })
+                    .catch(error => {
+                        const message = error.response.data.message
+                        showToastMessage(false, message)
+                    })
+            }
+        });
+    }, [selectedTrackSelect])
+
     return (
         <div className='my-[30px]'>
-            <div className="flex flex-col md:flex-row justify-end gap-3 mb-3">
-                <div className="flex justify-end">
-                    <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
+            <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-center rounded-md mb-4'>
+                <div className="flex justify-end w-[50%]">
+                    <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-black rounded-lg bg-white">
                         <SearchIcon width={16} height={16} />
                     </div>
                     <input
                         type="search"
                         id="search"
-                        className="rounded-s-none pl-0 py-2 px-4 text-sm text-gray-900 rounded-lg bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Search..."
+                        className="rounded-s-none pl-0 py-2 px-4 text-sm text-black rounded-lg bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="ค้นหาจาก ชื่อ, ปีการศึกษา"
                         value={searchQuery}
                         style={{ width: '100%' }}
                         onChange={(e) => handleSearch(e.target.value)}
                     />
                 </div>
-                <div className="flex md:flex-row gap-3">
+                <div className="flex md:flex-row gap-2">
                     <Button
                         radius="sm"
+                        size='sm'
+                        className='bg-gray-300'
                         onPress={handleOpen}
-                        color="primary"
-                        endContent={<PlusIcon width={16} height={16} />}>
+                        color="default"
+                        startContent={<PlusIcon className="w-5 h-5" />}>
                         เพิ่มการคัดเลือกแทรค
                     </Button>
-                    <Button
-                        radius="sm"
-                        onPress={async () => {
-                            await handleSelectedDel(selectedKey)
-                            setSelectedKey([])
-                        }}
-                        color="danger"
-                        endContent={<DeleteIcon2 width={16} height={16} />}>
-                        ลบรายการที่เลือก
-                    </Button>
+                    <div className={`${disableDeleteBtn ? "cursor-not-allowed" : ""}`}>
+                        <Button
+                            radius="sm"
+                            className='bg-gray-300'
+                            size='sm'
+                            isDisabled={disableDeleteBtn}
+                            onPress={handleSelectedDel}
+                            color="default"
+                            startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                            ลบรายการที่เลือก
+                        </Button>
+                    </div>
                 </div>
             </div>
             {
@@ -103,7 +140,8 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen, handleDelete, h
                     <Table
                         removeWrapper
                         selectionMode="multiple"
-                        onSelectionChange={handleSetSelectedKey}
+                        selectedKeys={selectedKey}
+                        onSelectionChange={setSelectedKey}
                         onRowAction={() => { }}
                         aria-label="track selection table">
                         <TableHeader>

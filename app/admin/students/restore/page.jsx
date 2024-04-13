@@ -1,16 +1,15 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Autocomplete, AutocompleteItem, Link, useDisclosure, Spinner, } from "@nextui-org/react";
-import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } from "@/app/components/icons";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, User, Pagination, Link, useDisclosure, Spinner, } from "@nextui-org/react";
+import { VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } from "@/app/components/icons";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from "../../action";
-import { Skeleton } from "@nextui-org/react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { inputClass, tableClass } from "@/src/util/ComponentClass";
 import { capitalize } from "../../../../src/util/utils";
 import { TbRestore } from "react-icons/tb";
-import { getToken } from "@/app/components/serverAction/TokenAction";
+import { getOptions, getToken } from "@/app/components/serverAction/TokenAction";
 import { hostname } from "@/app/api/hostname";
 import axios from "axios";
 import DeleteModal from "./DeleteModal";
@@ -55,48 +54,50 @@ const columns = [{
     uid: "actions"
 },
 ];
-function showToastMessage(ok, message) {
-    if (ok) {
-        toast.success(message, {
-            position: toast.POSITION.TOP_RIGHT,
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    } else {
-        toast.warning(message, {
-            position: toast.POSITION.TOP_RIGHT,
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    }
-};
+
 const Page = () => {
+
+    const showToastMessage = useCallback((ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    }, [])
 
     // Modal state
     const { isOpen: delIsOpen, onOpen: delOnOpen, onClose: delOnClose } = useDisclosure();
     const { isOpen: delsIsOpen, onOpen: delsOnOpen, onClose: delsOnClose } = useDisclosure();
 
     // Fetching data
-    async function getStudentStatuses() {
+    const getStudentStatuses = useCallback(async function () {
         const filterStatus = [10, 50, 62]
         let statuses = await fetchData("/api/statuses")
         statuses = statuses.filter(e => filterStatus.includes(e.id))
         setStatusOptions(statuses)
-    }
-    async function getStudents() {
+    }, [])
+    const getStudents = useCallback(async function () {
         let students = await fetchData(`/api/students/get/restores`)
         setStudents(students);
-    }
+    }, [])
 
     useEffect(() => {
         async function init() {
@@ -280,14 +281,62 @@ const Page = () => {
         setPage(1)
     }, [])
 
+    const restoreStudent = useCallback(async function (id) {
+        try {
+            const url = `/api/students/${id}/restore`
+            const options = await getOptions(url, "PUT")
+            const res = await axios(options)
+            const { ok, message } = res.data
+            await getStudents()
+            showToastMessage(ok, message)
+        } catch (error) {
+            console.log(error);
+            const { ok, message } = error.response.data
+            showToastMessage(ok, message)
+        }
+    }, [])
+
+    const handleSelectRestore = useCallback(async function () {
+        try {
+            const data = { students: selectedStudents }
+            const url = "/api/students/restore/select"
+            const options = await getOptions(url, "PUT", data)
+
+            const res = await axios(options)
+            const { ok, message } = res.data
+            await getStudents()
+            showToastMessage(ok, message)
+        } catch (error) {
+            console.log(error);
+            const { ok, message } = error.response.data
+            showToastMessage(ok, message)
+        } finally {
+            setSelectedKeys([])
+        }
+    }, [selectedStudents])
+
+    const handleSelectDelete = useCallback(function () {
+        delsOnOpen()
+    }, [])
+
+    const openDeleteModal = useCallback(function (stuId) {
+        setDelStdId(stuId)
+        delOnOpen()
+    }, [])
+
     const topContent = useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
-                <div className="flex justify-between gap-3 items-end">
-                    <div className="flex gap-3">
+                <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-center gap-2 rounded-md'>
+                    <div className="flex gap-2">
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
-                                <Button radius="sm" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                                <Button
+                                    size="sm"
+                                    className="bg-gray-300"
+                                    radius="sm"
+                                    endContent={<ChevronDownIcon className="text-small" />}
+                                    variant="flat">
                                     สถานะภาพ
                                 </Button>
                             </DropdownTrigger>
@@ -308,7 +357,12 @@ const Page = () => {
                         </Dropdown>
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
-                                <Button radius="sm" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                                <Button
+                                    radius="sm"
+                                    size="sm"
+                                    className="bg-gray-300"
+                                    endContent={<ChevronDownIcon className="text-small" />}
+                                    variant="flat">
                                     คอลัมน์
                                 </Button>
                             </DropdownTrigger>
@@ -328,53 +382,64 @@ const Page = () => {
                             </DropdownMenu>
                         </Dropdown>
                     </div>
-                    <div className="flex gap-3">
-                        <Button
-                            radius="sm"
-                            isDisabled={disableSelectDelete}
-                            onPress={handleSelectDelete}
-                            color="danger"
-                            endContent={<DeleteIcon2 width={16} height={16} />}>
-                            ลบรายการที่เลือก
-                        </Button>
-                        <Button
-                            radius="sm"
-                            isLoading={restoring}
-                            isDisabled={disableSelectDelete || restoring}
-                            onPress={handleSelectRestore}
-                            color="default"
-                            endContent={<TbRestore className="w-[18px] h-[18px]" />}>
-                            กู้คืนรายการที่เลือก
-                        </Button>
+                    <div className="flex gap-2">
+                        <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
+                            <Button
+                                radius="sm"
+                                size="sm"
+                                className="bg-gray-300"
+                                isLoading={restoring}
+                                isDisabled={disableSelectDelete || restoring}
+                                onPress={handleSelectRestore}
+                                color="default"
+                                startContent={<TbRestore className="w-[18px] h-[18px]" />}>
+                                กู้คืนรายการที่เลือก
+                            </Button>
+                        </div>
+                        <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
+                            <Button
+                                radius="sm"
+                                size="sm"
+                                isDisabled={disableSelectDelete}
+                                onPress={handleSelectDelete}
+                                color="default"
+                                className="bg-gray-300"
+                                startContent={<DeleteIcon2 width={16} height={16} />}>
+                                ลบรายการที่เลือก
+                            </Button>
+                        </div>
                     </div>
                 </div>
-                <div className="flex flex-col text-small">
-                    <div className="flex flex-col text-small mb-2 text-default-400">
-                        <div>สถานะ: {statusFilter == "all" ?
-                            statusOptions.map(s => `${s.id} ${s.description}`).join(", ") :
-                            statusOptions
-                                .filter(s => Array.from(statusFilter).includes(String(s.id)))
-                                .map(s => `${s.id} ${s.description}`).join(", ")
-                        }</div>
-                        <div>คอลัมน์: {headerColumns.map(column => column.name).join(", ")}</div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                        <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
-                        <label className="flex items-center text-default-400 text-small">
-                            Rows per page:
-                            <select
-                                id="rowPerPage"
-                                className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
-                                onChange={onRowsPerPageChange}
-                            >
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                                <option value="150">150</option>
-                                <option value={students?.length}>ทั้งหมด</option>
-                            </select>
-                        </label>
-                    </div>
-                </div>
+                {
+                    !students?.length ? undefined :
+                        <div className="flex flex-col text-small">
+                            <div className="flex flex-col text-small mb-2 text-default-400">
+                                <div>สถานะ: {statusFilter == "all" ?
+                                    statusOptions.map(s => `${s.id} ${s.description}`).join(", ") :
+                                    statusOptions
+                                        .filter(s => Array.from(statusFilter).includes(String(s.id)))
+                                        .map(s => `${s.id} ${s.description}`).join(", ")
+                                }</div>
+                                <div>คอลัมน์: {headerColumns.map(column => column.name).join(", ")}</div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
+                                <label className="flex items-center text-default-400 text-small">
+                                    Rows per page:
+                                    <select
+                                        id="rowPerPage"
+                                        className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
+                                        onChange={onRowsPerPageChange}
+                                    >
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                        <option value="150">150</option>
+                                        <option value={students?.length}>ทั้งหมด</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                }
                 <Input
                     isClearable
                     className="w-full h-fit"
@@ -445,69 +510,6 @@ const Page = () => {
         }
         setSelectedStudents(students)
     }, [selectedKeys])
-
-    async function restoreStudent(id) {
-        try {
-            const token = await getToken()
-            const options = {
-                url: `${hostname}/api/students/${id}/restore`,
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/json',
-                    'authorization': `${token}`,
-                    'Content-Type': 'application/json;charset=UTF-8',
-                },
-            };
-
-            const res = await axios(options)
-            const { ok, message } = res.data
-            await getStudents()
-            showToastMessage(ok, message)
-        } catch (error) {
-            console.log(error);
-            const { ok, message } = error.response.data
-            showToastMessage(ok, message)
-        }
-    }
-
-    async function handleSelectRestore() {
-        try {
-            const token = await getToken()
-            const options = {
-                url: `${hostname}/api/students/restore/select`,
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/json',
-                    'authorization': `${token}`,
-                    'Content-Type': 'application/json;charset=UTF-8',
-                },
-                data: {
-                    students: selectedStudents
-                }
-            };
-
-            const res = await axios(options)
-            const { ok, message } = res.data
-            await getStudents()
-            showToastMessage(ok, message)
-        } catch (error) {
-            console.log(error);
-            const { ok, message } = error.response.data
-            showToastMessage(ok, message)
-        } finally {
-            setSelectedKeys([])
-        }
-    }
-
-
-    function handleSelectDelete() {
-        delsOnOpen()
-    }
-
-    function openDeleteModal(stuId) {
-        setDelStdId(stuId)
-        delOnOpen()
-    }
 
     return (
         <>

@@ -5,7 +5,6 @@ import { getToken } from '@/app/components/serverAction/TokenAction'
 export async function fetchData(url) {
     try {
         const token = await getToken()
-        // console.log("admin token:", token);
         const res = await axios.get(`${hostname}${url}`, {
             method: 'GET',
             headers: {

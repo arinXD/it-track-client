@@ -1,5 +1,5 @@
 const tableClass = {
-    table: ["border"],
+    table: ["border", "table-auto", "w-full"],
     tr: ["border-t", "border-divider"],
     th: ["bg-white", "text-default-500"],
     td: [

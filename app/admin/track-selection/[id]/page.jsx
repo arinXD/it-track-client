@@ -1,57 +1,65 @@
 "use client"
-import { Navbar, Sidebar, ContentWrap, BreadCrumb, Loading } from '@/app/components'
+import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData, fetchDataObj } from '../../action'
-import React, { useState, useEffect } from 'react'
-import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tab, Tabs, useDisclosure, Input, RadioGroup, Radio } from "@nextui-org/react";
-import { DeleteIcon2, PlusIcon } from "@/app/components/icons";
-import Link from 'next/link';
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { Button, Tab, Tabs, useDisclosure, Input, Spinner, Chip } from "@nextui-org/react";
 import { format } from 'date-fns';
 import Swal from 'sweetalert2'
 import axios from 'axios';
-import { getToken } from '@/app/components/serverAction/TokenAction';
-import { hostname } from '@/app/api/hostname';
+import { getOptions } from '@/app/components/serverAction/TokenAction';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StudentTrackTable from './StudentTrackTable';
-import { inputClass, tableClass } from '@/src/util/ComponentClass';
+import { inputClass } from '@/src/util/ComponentClass';
 import InsertSubjectModal from './InsertSubjectModal';
 import { getCurrentDate } from '@/src/util/dateFormater';
+import { DeleteIcon2, PlusIcon } from '@/app/components/icons';
+import { FaPlay } from "react-icons/fa";
+import { FaRegCircleStop } from "react-icons/fa6";
+import { FaSave } from "react-icons/fa";
+import { CiUndo } from "react-icons/ci";
+import TrackSubjectTable from './TrackSubjectTable';
 
-const showToastMessage = (ok, message) => {
-    if (ok) {
-        toast.success(message, {
-            position: toast.POSITION.TOP_RIGHT,
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    } else {
-        toast.warning(message, {
-            position: toast.POSITION.TOP_RIGHT,
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    }
-};
-const swal = Swal.mixin({
-    customClass: {
-        confirmButton: "btn bg-blue-500 text-white ms-3 hover:bg-blue-600",
-        cancelButton: "btn bg-white border-1 border-blue-500 text-blue-500 hover:bg-gray-100 hover:border-blue-500"
-    },
-    buttonsStyling: false
-});
 const Page = ({ params }) => {
+
+    const swal = useCallback(Swal.mixin({
+        customClass: {
+            confirmButton: "btn bg-blue-500 text-white ms-3 hover:bg-blue-600",
+            cancelButton: "btn bg-white border-1 border-blue-500 text-blue-500 hover:bg-gray-100 hover:border-blue-500"
+        },
+        buttonsStyling: false
+    }), [])
+
+    const showToastMessage = useCallback((ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    }, [])
+
+    const { id } = params
+    const [loading, setLoading] = useState(true)
+
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [fetching, setFetching] = useState(false)
     const [trackSubj, setTrackSubj] = useState([])
     const [trackSelect, setTrackSelect] = useState({})
     const [studentsBit, setStudentsBit] = useState({})
@@ -73,7 +81,7 @@ const Page = ({ params }) => {
 
     const [valueChange, setValueChange] = useState(false)
 
-    async function initTrackSelect(id) {
+    const initTrackSelect = useCallback(async function (id) {
         try {
             const result = await fetchDataObj(`/api/tracks/selects/${id}/subjects/students`)
             result.startAt = format(new Date(result?.startAt), 'yyyy-MM-dd HH:mm')
@@ -83,8 +91,9 @@ const Page = ({ params }) => {
         } catch (err) {
             console.error("Error on init func:", err);
         }
-    }
-    async function getTracks() {
+    }, [])
+
+    const getTracks = useCallback(async function () {
         let tracks = await fetchData(`/api/tracks`)
         if (tracks?.length) {
             tracks = tracks.map(track => track.track)
@@ -92,10 +101,7 @@ const Page = ({ params }) => {
             tracks = []
         }
         setTracks(tracks)
-    }
-
-    const { id } = params
-    const [loading, setLoading] = useState(true)
+    }, [])
 
     useEffect(() => {
         setLoading(true)
@@ -104,15 +110,16 @@ const Page = ({ params }) => {
         setLoading(false)
     }, []);
 
-    useEffect(() => {
-        function getStudentCount(studentData) {
-            const studentCount = {
-                students: studentData,
-                normal: studentData.filter(stu => stu?.Student?.courses_type === "โครงการปกติ").length,
-                vip: studentData.filter(stu => stu?.Student?.courses_type === "โครงการพิเศษ").length
-            }
-            return studentCount
+    const getStudentCount = useCallback(function (studentData) {
+        const studentCount = {
+            students: studentData,
+            normal: studentData.filter(stu => stu?.Student?.courses_type === "โครงการปกติ").length,
+            vip: studentData.filter(stu => stu?.Student?.courses_type === "โครงการพิเศษ").length
         }
+        return studentCount
+    }, [])
+
+    useEffect(() => {
         if (Object.keys(trackSelect).length > 0) {
             setTitle(trackSelect.title)
             setStartAt(format(new Date(trackSelect?.startAt), 'yyyy-MM-dd HH:mm'))
@@ -133,7 +140,7 @@ const Page = ({ params }) => {
         }
     }, [trackSelect]);
 
-    async function handleUpdate() {
+    const handleUpdate = useCallback(async function () {
         swal.fire({
             text: `ต้องการแก้ไขข้อมูลการคัดแทรคปีการศึกษา ${trackSelect.acadyear} หรือไม่`,
             icon: "warning",
@@ -144,22 +151,14 @@ const Page = ({ params }) => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 setUpdating(true)
-                const token = await getToken()
-                const options = {
-                    url: `${hostname}/api/tracks/selects/${id}`,
-                    method: 'PUT',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json;charset=UTF-8',
-                        "authorization": `${token}`,
-                    },
-                    data: {
-                        title,
-                        startAt,
-                        expiredAt,
-                        has_finished: hasFinished,
-                    }
-                };
+                const url = `/api/tracks/selects/${id}`
+                const data = {
+                    title,
+                    startAt,
+                    expiredAt,
+                    has_finished: hasFinished,
+                }
+                const options = await getOptions(url, "PUT", data)
                 try {
                     const result = await axios(options)
                     const { ok, message } = result.data
@@ -173,12 +172,19 @@ const Page = ({ params }) => {
                 }
             }
         });
-    }
+    }, [
+        trackSelect,
+        id,
+        title,
+        startAt,
+        expiredAt,
+        hasFinished,
+    ])
 
-    async function handleStartSelect({ id, hasFinished }) {
+    const handleStartSelect = useCallback(async function ({ id, hasFinished }) {
         swal.fire({
             text: `ต้องการ${hasFinished ? "เปิดการคัดเลือก" : "ปิดการคัดเลือก"}หรือไม่?`,
-            icon: "warning",
+            icon: "question",
             showCancelButton: true,
             confirmButtonText: "ตกลง",
             cancelButtonText: "ยกเลิก",
@@ -186,16 +192,8 @@ const Page = ({ params }) => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 setStarting(true)
-                const token = await getToken()
-                const options = {
-                    url: `${hostname}/api/tracks/selects/selected/${id}`,
-                    method: 'PUT',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json;charset=UTF-8',
-                        "authorization": `${token}`,
-                    },
-                };
+                const url = `/api/tracks/selects/selected/${id}`
+                const options = await getOptions(url, 'PUT')
                 try {
                     const result = await axios(options)
                     const { ok, message } = result.data
@@ -210,16 +208,16 @@ const Page = ({ params }) => {
                 }
             }
         });
-    }
+    }, [trackSelect])
 
-    function isDefaultValueChange(newValue) {
+    const isDefaultValueChange = useCallback(function (newValue) {
         const changeCount = Object.keys(newValue).filter(stateKey => {
             return newValue[stateKey] !== trackSelect[stateKey];
         });
         return changeCount.length > 0;
-    }
+    }, [trackSelect])
 
-    async function handleValueChange(newValue) {
+    const handleValueChange = useCallback(function (newValue) {
         const state = {
             title,
             startAt,
@@ -235,61 +233,22 @@ const Page = ({ params }) => {
         } else {
             setValueChange(false)
         }
-    }
+    }, [
+        title,
+        startAt,
+        expiredAt,
+        hasFinished,
+    ])
 
-    async function handleUnsave() {
+    const handleUnsave = useCallback(function handleUnsave() {
         setTitle(trackSelect.title)
         setStartAt(trackSelect.startAt)
         setExpiredAt(trackSelect.expiredAt)
         setHasFinished(trackSelect.has_finished)
         setValueChange(false)
-    }
+    }, [trackSelect])
 
-    async function handleDelete() {
-        swal.fire({
-            text: `ต้องการลบข้อมูลการคัดแทรคปีการศึกษา ${trackSelect.acadyear} หรือไม่`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "ตกลง",
-            cancelButtonText: "ยกเลิก",
-            reverseButtons: true
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                setDeleting(true)
-                const token = await getToken()
-                const options = {
-                    url: `${hostname}/api/tracks/selects/${id}`,
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json;charset=UTF-8',
-                        "authorization": `${token}`,
-                    },
-                };
-                try {
-                    const result = await axios(options)
-                    const { ok, message } = result.data
-                    showToastMessage(ok, message)
-
-                } catch (error) {
-                    showToastMessage(false, "message")
-                } finally {
-                    setDeleting(false)
-                }
-            }
-        });
-    }
-
-    async function handleDelete() {
-        const swal = Swal.mixin({
-            customClass: {
-                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
-                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
-            },
-            buttonsStyling: false
-        });
+    const handleDelete = useCallback(async function () {
         swal.fire({
             text: `ต้องการลบการคัดแทรคปีการศึกษา ${trackSelect.acadyear} หรือไม่ ?`,
             icon: "warning",
@@ -301,16 +260,8 @@ const Page = ({ params }) => {
             reverseButtons: true
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const token = await getToken()
-                const options = {
-                    url: `${hostname}/api/tracks/selects/${trackSelect.acadyear}`,
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json;charset=UTF-8',
-                        "authorization": `${token}`,
-                    },
-                };
+                const url = `/api/tracks/selects/${trackSelect.acadyear}`
+                const options = await getOptions(url, 'DELETE')
                 axios(options)
                     .then(async result => {
                         const { ok, message } = result.data
@@ -325,19 +276,39 @@ const Page = ({ params }) => {
                     })
             }
         });
-    }
+    }, [trackSelect])
 
-    const [startType, setStartType] = useState('text');
-    const [endType, setEndType] = useState('text');
-
-    const handleFocus = (setter) => {
-        setter("date")
-    };
-
-    const handleBlur = (setter) => {
-        setter("text")
-    };
-
+    const displayResult = useMemo(() => {
+        const selecteData = {
+            "all": {
+                studentData: allTrack,
+                track: "ทุกแทรค"
+            },
+            "BIT": {
+                studentData: studentsBit,
+                track: "BIT"
+            },
+            "Network": {
+                studentData: studentsNetwork,
+                track: "Network"
+            },
+            "Web and Mobile": {
+                studentData: studentsWeb,
+                track: "Web and Mobile"
+            },
+        }
+        const data = selecteData[selectedTrack]
+        return (
+            <StudentTrackTable trackSubj={trackSubj} studentData={data.studentData} track={data.track} />
+        )
+    }, [
+        selectedTrack,
+        allTrack,
+        studentsBit,
+        studentsNetwork,
+        studentsWeb,
+        trackSubj,
+    ])
 
     return (
         <>
@@ -347,25 +318,33 @@ const Page = ({ params }) => {
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
-                <InsertSubjectModal isOpen={isOpen} onClose={onClose} />
+                {/* <InsertSubjectModal
+                    callBack={initTrackSelect}
+                    showToastMessage={showToastMessage}
+                    trackId={trackSelect?.id}
+                    defaultTrackSubj={trackSubj}
+                    isOpen={isOpen}
+                    onClose={onClose} /> */}
                 {!trackSelect ?
                     <p>No data</p>
                     :
                     <div>
                         <ToastContainer />
                         {loading ?
-                            <div className='w-fit mx-auto mt-14'>
-                                <Loading />
+                            <div className='w-full flex justify-center h-[70vh]'>
+                                <Spinner label="กำลังโหลด..." color="primary" />
                             </div>
                             :
                             Object.keys(trackSelect).length > 0 ?
-                                <div className='space-y-8 mt-6'>
+                                <div className='space-y-6 mt-6'>
                                     {/* <Button className='fixed bottom-1 right-1 z-50'>UP</Button> */}
-                                    <h1 className='font-bold text-2xl'>
-                                        {title}
-                                    </h1>
+                                    <div className='bg-gray-100 border-gray-200 border-1 p-4 flex flex-col justify-start items-center gap-2 rounded-md'>
+                                        <h1 className='w-[100%] font-bold text-base'>
+                                            {title}
+                                        </h1>
+                                    </div>
                                     <div className='my-4 grid grid-cols-3 justify-stretch justify-items-stretch gap-4 w-full'>
-                                        <div className='space-y-3 border-1 rounded-md p-3 w-full col-span-2 max-lg:col-span-3'>
+                                        <div className='bg-gray-100 border-gray-200 border-1 space-y-3 rounded-md p-3 w-full col-span-3 max-lg:col-span-3'>
                                             <div className='w-full flex justify-start items-center gap-4'>
                                                 <Input
                                                     type="text"
@@ -415,62 +394,85 @@ const Page = ({ params }) => {
                                             </div>
                                             <div className='w-full flex justify-start items-center gap-2'>
                                                 <span className='block text-sm'>สถานะ: </span>
-                                                <RadioGroup
-                                                    size='sm'
-                                                    orientation='horizontal'
-                                                    value={hasFinished}
-                                                    onValueChange={(value) => {
-                                                        setHasFinished(value)
-                                                        handleValueChange({ has_finished: value })
-                                                    }}
-                                                >
-                                                    <Radio value={false}>กำลังดำเนินการ</Radio>
-                                                    <Radio value={true}>สิ้นสุด</Radio>
-                                                </RadioGroup>
+                                                <span className='text-sm'>
+                                                    <Chip color={`${hasFinished ? "danger" : "warning"}`} variant="solid">
+                                                        {hasFinished ?
+                                                            <>สิ้นสุดการคัดเลือก</>
+                                                            :
+                                                            <>กำลังดำเนินการ</>
+                                                        }
+                                                    </Chip>
+                                                </span>
                                             </div>
-                                        </div>
-                                        <div className='w-full flex flex-col justify-start max-lg:col-span-3 gap-3'>
-                                            {!(trackSelect.has_finished) ?
-                                                <Button size='md'
-                                                    isLoading={starting}
-                                                    onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
-                                                    color="primary" variant="solid" className='bg-blue-500 w-full'>
-                                                    {starting ? "ปิดการคัดเลือก..." : "ปิดการคัดเลือก"}
+                                            <div className='flex flex-row justify-start items-center gap-3 border-t-1 border-gray-300 pt-3'>
+                                                <div className={!valueChange ? "cursor-not-allowed" : ""}>
+                                                    <Button
+                                                        size='sm'
+                                                        radius='sm'
+                                                        color="default"
+                                                        isLoading={updating}
+                                                        isDisabled={!valueChange}
+                                                        onClick={handleUpdate}
+                                                        startContent={<FaSave className='w-3 h-3' />}
+                                                        className='bg-gray-300'>
+                                                        {updating ? "ยืนยันการแก้ไข..." : "ยืนยันการแก้ไข"}
+                                                    </Button>
+                                                </div>
+                                                <div className={!valueChange ? "cursor-not-allowed" : ""}>
+                                                    <Button
+                                                        size='sm'
+                                                        radius='sm'
+                                                        color="default"
+                                                        isDisabled={!valueChange}
+                                                        onClick={handleUnsave}
+                                                        startContent={<CiUndo className='w-4 h-4' />}
+                                                        className='bg-gray-300'>
+                                                        ยกเลิกการแก้ไข
+                                                    </Button>
+                                                </div>
+                                                {!(trackSelect.has_finished) ?
+                                                    <Button
+                                                        size='sm'
+                                                        radius='sm'
+                                                        color="default"
+                                                        isLoading={starting}
+                                                        onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
+                                                        variant="solid"
+                                                        startContent={<FaRegCircleStop />}
+                                                        className='bg-gray-300'>
+                                                        {starting ? "ปิดการคัดเลือก..." : "ปิดการคัดเลือก"}
+                                                    </Button>
+                                                    :
+                                                    <Button
+                                                        size='sm'
+                                                        radius='sm'
+                                                        color="default"
+                                                        isLoading={starting}
+                                                        onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
+                                                        variant="solid"
+                                                        startContent={<FaPlay className='' />}
+                                                        className='bg-gray-300'>
+                                                        {starting ? "เปิดการคัดเลือก..." : "เปิดการคัดเลือก"}
+                                                    </Button>}
+                                                <Button
+                                                    size='sm'
+                                                    radius='sm'
+                                                    color="default"
+                                                    isDisabled={deleting}
+                                                    isLoading={deleting}
+                                                    onPress={handleDelete}
+                                                    variant="solid"
+                                                    startContent={<DeleteIcon2 className="w-5 h-5" />}
+                                                    className='bg-gray-300'>
+                                                    ลบ
                                                 </Button>
-                                                :
-                                                <Button size='md'
-                                                    isLoading={starting}
-                                                    onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
-                                                    color="primary" variant="solid" className='bg-blue-500 w-full'>
-                                                    {starting ? "เปิดการคัดเลือก..." : "เปิดการคัดเลือก"}
-                                                </Button>}
-                                            <Button startContent={""}
-                                                size='md'
-                                                onPress={handleDelete}
-                                                color="danger" variant="solid"
-                                                className='w-full bg-red-600'>
-                                                ลบ
-                                            </Button>
-
-                                            <Button
-                                                isLoading={updating}
-                                                disabled={!valueChange}
-                                                onClick={handleUpdate}
-                                                className={`w-full h-[40px] px-[16px] rounded-[12px] text-white ${!valueChange ? "bg-indigo-200" : "bg-indigo-500 hover:bg-indigo-600"}`}>
-                                                {updating ? "ยืนยันการแก้ไข..." : "ยืนยันการแก้ไข"}
-                                            </Button>
-                                            <Button
-                                                disabled={!valueChange}
-                                                onClick={handleUnsave}
-                                                className={`w-full h-[40px] px-[16px] rounded-[12px] ${!valueChange ? "bg-gray-200 text-gray-400" : "bg-gray-400 hover:bg-gray-500"}`}>
-                                                ยกเลิกการแก้ไข
-                                            </Button>
+                                            </div>
                                         </div>
                                     </div>
                                     {
                                         !parseInt(studentsBit?.normal + studentsNetwork?.normal + studentsWeb?.normal) ? null :
                                             <div className='grid grid-cols-3 gap-8 max-xl:grid-cols-2 max-lg:grid-cols-1'>
-                                                <Link href={"#bit-students"} className="flex flex-row text-center rounded-l-full">
+                                                <div className="flex flex-row text-center rounded-l-full">
                                                     <div className={`bg-purple-500 p-4 rounded-l-full grid place-content-center`}>
                                                         <div className="rounded-full flex relative justify-center items-center">
                                                             <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
@@ -497,8 +499,8 @@ const Page = ({ params }) => {
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                                </Link>
-                                                <Link href={"#network-students"} className="flex flex-row text-center rounded-l-full">
+                                                </div>
+                                                <div className="flex flex-row text-center rounded-l-full">
                                                     <div className={`bg-emerald-500 p-4 rounded-l-full grid place-content-center`}>
                                                         <div className="rounded-full flex relative justify-center items-center">
                                                             <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
@@ -525,8 +527,8 @@ const Page = ({ params }) => {
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                                </Link>
-                                                <Link href={"#web-students"} className="flex flex-row text-center rounded-l-full">
+                                                </div>
+                                                <div className="flex flex-row text-center rounded-l-full">
                                                     <div className={`bg-indigo-500 p-4 rounded-l-full grid place-content-center`}>
                                                         <div className="rounded-full flex relative justify-center items-center">
                                                             <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
@@ -553,58 +555,17 @@ const Page = ({ params }) => {
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                                </Link>
+                                                </div>
                                             </div>
                                     }
-                                    <div>
-                                        <div className='flex justify-between items-start mb-3'>
-                                            <h2 className='mb-3 text-small text-default-900'>วิชาที่ใช้ในการคัดเลือก</h2>
-                                            {/* <Button
-                                                onClick={onOpen}
-                                                startContent={<PlusIcon />}
-                                                radius='sm'
-                                                color='primary'
-                                                size='sm'>
-                                                เพิ่มวิขา
-                                            </Button> */}
-                                        </div>
-                                        {trackSubj &&
-                                            <Table
-                                                classNames={tableClass}
-                                                removeWrapper
-                                                // selectionMode="multiple"
-                                                // onSelectionChange={setSelectedKeys}
-                                                onRowAction={() => { }}
-                                                aria-label="track selection subjects table">
-                                                <TableHeader>
-                                                    {/* <TableColumn></TableColumn> */}
-                                                    <TableColumn>รหัสวิชา</TableColumn>
-                                                    <TableColumn>ชื่อวิชา EN</TableColumn>
-                                                    <TableColumn>ชื่อวิชา TH</TableColumn>
-                                                    <TableColumn>หน่วยกิต</TableColumn>
-                                                </TableHeader>
-                                                {trackSubj.length > 0 ?
-                                                    <TableBody>
-                                                        {trackSubj.map(subj => (
-                                                            <TableRow key={subj.subject_code}>
-                                                                {/* <TableCell className=''>
-                                                                    <Tooltip color="danger" content="ลบ">
-                                                                        <span onClick={() => { }} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                                            <DeleteIcon2 />
-                                                                        </span>
-                                                                    </Tooltip>
-                                                                </TableCell> */}
-                                                                <TableCell className=''>{subj.subject_code}</TableCell>
-                                                                <TableCell className="w-1/3">{subj.title_en}</TableCell>
-                                                                <TableCell className="w-1/3">{subj.title_th}</TableCell>
-                                                                <TableCell>{subj.credit}</TableCell>
-                                                            </TableRow>
-                                                        ))}
-                                                    </TableBody> :
-                                                    <TableBody emptyContent={"ไม่มีวิชาที่ใช้ในการคัดเลือก"}>{[]}</TableBody>}
-                                            </Table>
-                                        }
-                                    </div>
+                                    <TrackSubjectTable
+                                        callBack={initTrackSelect}
+                                        swal={swal}
+                                        showToastMessage={showToastMessage}
+                                        trackSubj={trackSubj}
+                                        onOpen={onOpen}
+                                        trackId={trackSelect?.id}
+                                    />
                                     {
                                         studentsSelect?.students?.length > 0 ?
                                             <div>
@@ -636,13 +597,9 @@ const Page = ({ params }) => {
                                                         </div>
                                                     }
                                                 >
-                                                    {
-                                                        allTrack?.students?.length === 0 ? null :
-                                                            <StudentTrackTable
-                                                                trackSubj={trackSubj} studentData={allTrack} track={"ทุกแทรค"} />
-                                                    }
+                                                    {allTrack?.students?.length === 0 ? null : displayResult}
                                                 </Tab>
-                                                {studentsBit?.students?.length == 0 ? null :
+                                                {studentsBit?.students?.length === 0 ? null :
                                                     <Tab
                                                         key={"BIT"}
                                                         title={
@@ -651,11 +608,11 @@ const Page = ({ params }) => {
                                                             </div>
                                                         }
                                                     >
-                                                        <StudentTrackTable trackSubj={trackSubj} studentData={studentsBit} track={"BIT"} />
+                                                        {displayResult}
                                                     </Tab>
                                                 }
 
-                                                {studentsNetwork?.students?.length == 0 ? null :
+                                                {studentsNetwork?.students?.length === 0 ? null :
                                                     <Tab
                                                         key={"Network"}
                                                         title={
@@ -664,11 +621,11 @@ const Page = ({ params }) => {
                                                             </div>
                                                         }
                                                     >
-                                                        <StudentTrackTable trackSubj={trackSubj} studentData={studentsNetwork} track={"Network"} />
+                                                        {displayResult}
                                                     </Tab>
                                                 }
 
-                                                {studentsWeb?.students?.length == 0 ? null :
+                                                {studentsWeb?.students?.length === 0 ? null :
                                                     <Tab
                                                         key={"Web and Mobile"}
                                                         title={
@@ -677,7 +634,7 @@ const Page = ({ params }) => {
                                                             </div>
                                                         }
                                                     >
-                                                        <StudentTrackTable trackSubj={trackSubj} studentData={studentsWeb} track={"Web and Mobile"} />
+                                                        {displayResult}
                                                     </Tab>
                                                 }
                                             </Tabs>

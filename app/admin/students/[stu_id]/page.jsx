@@ -1,35 +1,71 @@
 "use client"
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { fetchData, fetchDataObj } from '../../action'
 import { BreadCrumb, ContentWrap, Navbar, Sidebar } from '@/app/components'
 import Image from 'next/image'
 import { dmy } from '@/src/util/dateFormater'
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useDisclosure } from '@nextui-org/react'
-import { DeleteIcon, DeleteIcon2, EditIcon2, VerticalDotsIcon } from '@/app/components/icons'
+import { Button, useDisclosure } from '@nextui-org/react'
+import { DeleteIcon2, EditIcon2, PlusIcon } from '@/app/components/icons'
 import { Spinner } from "@nextui-org/react";
-import { tableClass } from '@/src/util/ComponentClass'
 import Link from 'next/link'
 import EditModal from './EditModal'
 import { useSearchParams } from 'next/navigation'
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import EnrollmentsTable from './EnrollmentsTable'
+import { calGrade, isNumber } from '@/src/util/grade'
+import InsertEnrollmentForm from './InsertEnrollmentForm'
+import EditEnrollmentForm from './EditEnrollmentForm'
+import DeleteEnrollModal from './DeleteEnrollModal'
 import DeleteModal from '../DeleteModal'
 
 export default function Page({ params }) {
+
+    const showToastMessage = useCallback((ok, message) => {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    }, [])
+
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: delIsOpen, onOpen: delOnOpen, onClose: delOnClose } = useDisclosure();
+    const { isOpen: isOpenEnroll, onOpen: onOpenEnroll, onClose: onCloseEnroll } = useDisclosure();
+    const { isOpen: isOpenEditEnroll, onOpen: onOpenEditEnroll, onClose: onCloseEditEnroll } = useDisclosure();
+    const { isOpen: isOpenDeleteEnroll, onOpen: onOpenDeleteEnroll, onClose: onCloseDeleteEnroll } = useDisclosure();
+    
     const searchParams = useSearchParams()
     const editMode = searchParams.get('edit') || "0"
     const [student, setStudent] = useState({})
 
     const { stu_id } = params
-    const [selectedKeys, setSelectedKeys] = useState([])
     const [gpa, setGpa] = useState(0)
     const [enrollmentsByYear, setEnrollmentsByYear] = useState([])
     const [fetching, setFetching] = useState(true)
     const [programs, setPrograms] = useState([])
     const [status, setStatus] = useState([])
     const [updateData, setUpdateData] = useState({})
+
+    const [editEnroll, setEditEnroll] = useState({});
 
     useEffect(() => {
         if (fetching == false && Object.keys(student).length == 0) {
@@ -52,8 +88,7 @@ export default function Page({ params }) {
                 const gradeA = calGrade(a.grade);
                 const gradeB = calGrade(b.grade);
 
-                const isSpecialGrade = (grade) => ["W", "S", "U", "I"].includes(grade);
-
+                const isSpecialGrade = (grade) => ["I", "P", "R", "S", "T", "U", "W",].includes(grade);
                 if (gradeA == null && gradeB == null) {
                     return 0;
                 } else if (gradeA == null) {
@@ -91,23 +126,6 @@ export default function Page({ params }) {
         setStatus(statuses)
     }
 
-    function calGrade(grade) {
-        const grades = {
-            "A": 4,
-            "B+": 3.5,
-            "B": 3,
-            "C+": 2.5,
-            "C": 2,
-            "D+": 1.5,
-            "D": 1,
-            "F": 0,
-            "W": "ถอน",
-            "S": "ผ่าน",
-            "U": "ไม่ผ่าน",
-            "I": "ไม่สามารถเข้ารับการวัดผล",
-        }
-        return grades[grade] !== undefined ? grades[grade] : null
-    }
     function calGpa(enrollments) {
         if (enrollments.length == 0) return 0
         let sumGrade = 0
@@ -122,10 +140,6 @@ export default function Page({ params }) {
         return parseFloat(sumGrade / sumCredit).toFixed(2)
     }
 
-    function isNumber(number) {
-        return typeof number == "number"
-    }
-
     async function initData() {
         setFetching(true)
         await getStudentData()
@@ -137,33 +151,6 @@ export default function Page({ params }) {
     useEffect(() => {
         initData()
     }, [])
-
-    function showToastMessage(ok, message) {
-        if (ok) {
-            toast.success(message, {
-                position: toast.POSITION.TOP_RIGHT,
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        } else {
-            toast.warning(message, {
-                position: toast.POSITION.TOP_RIGHT,
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        }
-    };
-
 
     useEffect(() => {
         if (editMode == "1" && Object.keys(student).length && Object.keys(programs).length && Object.keys(status).length) {
@@ -203,6 +190,28 @@ export default function Page({ params }) {
                     delIsOpen={delIsOpen}
                     delOnClose={delOnClose}
                     stuId={stu_id} />
+                <InsertEnrollmentForm
+                    showToastMessage={showToastMessage}
+                    isOpen={isOpenEnroll}
+                    student={student}
+                    callBack={initData}
+                    onClose={onCloseEnroll} />
+                <EditEnrollmentForm
+                    showToastMessage={showToastMessage}
+                    isOpen={isOpenEditEnroll}
+                    student={student}
+                    callBack={initData}
+
+                    enroll={editEnroll}
+                    onClose={onCloseEditEnroll} />
+
+                <DeleteEnrollModal
+                    showToastMessage={showToastMessage}
+                    callData={initData}
+                    delIsOpen={isOpenDeleteEnroll}
+                    delOnClose={onCloseDeleteEnroll}
+                    enroll={editEnroll} />
+
                 <div>
                     {
                         fetching ?
@@ -212,39 +221,45 @@ export default function Page({ params }) {
                             :
                             Object.keys(student).length ?
                                 <>
+                                    <div className='bg-gray-100 border-gray-200 border-1 p-3 flex flex-row justify-between items-center rounded-md'>
+                                        <h1>ข้อมูลของนักศึกษา</h1>
+                                        <div className='flex flex-2 gap-3'>
+                                            <Button
+                                                type='button'
+                                                className=''
+                                                radius='sm'
+                                                size='sm'
+                                                color="default"
+                                                variant='solid'
+                                                startContent={<EditIcon2 className={"w-5 h-5"} />}
+                                                onPress={handleEdit}>
+                                                แก้ไขรายชื่อนักศึกษา
+                                            </Button>
+                                            <Button
+                                                type='button'
+                                                className=''
+                                                radius='sm'
+                                                size='sm'
+                                                color="default"
+                                                startContent={<DeleteIcon2 className={"w-5 h-5"} />}
+                                                variant='solid'
+                                                onPress={delOnOpen}>
+                                                ลบรายชื่อนักศึกษา
+                                            </Button>
+                                        </div>
+                                    </div>
                                     <div className='flex gap-8 py-6'>
                                         <div className="w-[30%] flex flex-col justify-center items-center">
                                             <Image
+                                                className='rounded-lg'
                                                 priority={true}
                                                 alt='student image'
-                                                width={100}
-                                                height={100}
+                                                width={150}
+                                                height={150}
                                                 src={student?.User?.image || "/image/user.png"}
                                             />
                                         </div>
                                         <div className='w-[70%] flex flex-col space-y-2'>
-                                            <div className='flex flex-2 gap-3 mb-2'>
-                                                <Button
-                                                    type='button'
-                                                    className=''
-                                                    radius='sm'
-                                                    color="primary"
-                                                    variant='solid'
-                                                    startContent={<EditIcon2 />}
-                                                    onPress={handleEdit}>
-                                                    แก้ไขรายชื่อนักศึกษา
-                                                </Button>
-                                                <Button
-                                                    type='button'
-                                                    className=''
-                                                    radius='sm'
-                                                    color="primary"
-                                                    startContent={<DeleteIcon2 />}
-                                                    variant='solid'
-                                                    onPress={delOnOpen}>
-                                                    ลบรายชื่อนักศึกษา
-                                                </Button>
-                                            </div>
                                             <h1 className='text-lg'>{student.first_name} {student.last_name}</h1>
                                             <div className='space-y-1'>
                                                 <p>
@@ -263,67 +278,37 @@ export default function Page({ params }) {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className='my-5 space-y-3'>
-                                        <p>รายวิชาที่ลงทะเบียน</p>
+                                    <div className='my-3 space-y-3'>
+                                        <div className='flex gap-3 items-center'>
+                                            <p>รายวิชาที่ลงทะเบียน</p>
+                                            <Button
+                                                type='button'
+                                                className=''
+                                                radius='sm'
+                                                size='sm'
+                                                color="default"
+                                                variant='solid'
+                                                startContent={<PlusIcon width={4} height={4} />}
+                                                onPress={onOpenEnroll}>
+                                                เพิ่มรายวิชาที่ลงทะเบียน
+                                            </Button>
+                                        </div>
                                         {
                                             Object.keys(enrollmentsByYear).length == 0 ?
                                                 <>ไม่มีรายวิชาที่ลงทะเบียน</>
                                                 :
                                                 Object.keys(enrollmentsByYear).map((year) => (
-                                                    <div key={year}>
-                                                        <p className='mb-2'>ปีการศึกษา {year}</p>
-                                                        <Table
-                                                            isCompact
-                                                            removeWrapper
-                                                            aria-label="รายวิชาที่ลงทะเบียน"
-                                                            checkboxesProps={{
-                                                                classNames: {
-                                                                    wrapper: "after:bg-blue-500 after:text-background text-background",
-                                                                },
-                                                            }}
-                                                            classNames={tableClass}
-                                                            // selectedKeys={selectedKeys}
-                                                            selectionMode="multiple"
-                                                            onSelectionChange={setSelectedKeys}
-                                                        >
-                                                            <TableHeader>
-                                                                <TableColumn>รหัสวิชา</TableColumn>
-                                                                <TableColumn>ชื่อวิชา</TableColumn>
-                                                                <TableColumn>หน่วยกิต</TableColumn>
-                                                                <TableColumn>เกรด</TableColumn>
-                                                                <TableColumn>เกรด</TableColumn>
-                                                                <TableColumn align="center">Action</TableColumn>
-                                                            </TableHeader>
-                                                            <TableBody emptyContent={"ไม่มีรายวิชาที่ลงทะเบียน"} items={enrollmentsByYear[year] || []}>
-                                                                {(item) => (
-                                                                    <TableRow key={item.id}>
-                                                                        <TableCell>{item?.subject_code}</TableCell>
-                                                                        <TableCell>{item?.Subject?.title_en} <br /> {item?.Subject?.title_th}</TableCell>
-                                                                        <TableCell>{item?.Subject?.credit}</TableCell>
-                                                                        <TableCell>{item?.grade || "-"}</TableCell>
-                                                                        <TableCell>{calGrade(item?.grade) == null ? "-" : isNumber(calGrade(item?.grade)) ? String(calGrade(item?.grade)) : calGrade(item?.grade)}</TableCell>
-                                                                        <TableCell>
-                                                                            <div className="relative flex justify-center items-center gap-2">
-                                                                                <Dropdown>
-                                                                                    <DropdownTrigger>
-                                                                                        <Button isIconOnly size="sm" variant="light">
-                                                                                            <VerticalDotsIcon className="text-default-300" />
-                                                                                        </Button>
-                                                                                    </DropdownTrigger>
-                                                                                    <DropdownMenu>
-                                                                                        <DropdownItem>Edit</DropdownItem>
-                                                                                        <DropdownItem key="delete" className="text-danger" color="danger">
-                                                                                            Delete
-                                                                                        </DropdownItem>
-                                                                                    </DropdownMenu>
-                                                                                </Dropdown>
-                                                                            </div>
-                                                                        </TableCell>
-                                                                    </TableRow>
-                                                                )}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </div>
+                                                    <EnrollmentsTable
+                                                        key={year}
+                                                        year={year}
+                                                        callBack={initData}
+                                                        enrollments={enrollmentsByYear[year]}
+                                                        showToastMessage={showToastMessage}
+
+                                                        onOpenEditEnroll={onOpenEditEnroll}
+                                                        onOpenDeleteEnroll={onOpenDeleteEnroll}
+                                                        setEditEnroll={setEditEnroll}
+                                                    />
                                                 ))
                                         }
                                     </div>
