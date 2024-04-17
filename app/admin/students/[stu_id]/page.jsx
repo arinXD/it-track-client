@@ -13,7 +13,7 @@ import { useSearchParams } from 'next/navigation'
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EnrollmentsTable from './EnrollmentsTable'
-import { calGrade, isNumber } from '@/src/util/grade'
+import { floorGpa, calGrade, isNumber } from '@/src/util/grade'
 import InsertEnrollmentForm from './InsertEnrollmentForm'
 import EditEnrollmentForm from './EditEnrollmentForm'
 import DeleteEnrollModal from './DeleteEnrollModal'
@@ -81,7 +81,7 @@ export default function Page({ params }) {
         if (student?.Enrollments?.length) {
             let enrollments = student?.Enrollments
             // หา GPA
-            setGpa(calGpa(enrollments))
+            setGpa(getGpa(enrollments))
 
             // เรียงลำดับใหม่ DESC 
             enrollments.sort((a, b) => {
@@ -126,7 +126,7 @@ export default function Page({ params }) {
         setStatus(statuses)
     }
 
-    function calGpa(enrollments) {
+    function getGpa(enrollments) {
         if (enrollments.length == 0) return 0
         let sumGrade = 0
         let sumCredit = 0
@@ -137,7 +137,7 @@ export default function Page({ params }) {
             sumGrade += grade * credit
             sumCredit += credit
         }
-        return parseFloat(sumGrade / sumCredit).toFixed(2)
+        return floorGpa(sumGrade/sumCredit)
     }
 
     async function initData() {

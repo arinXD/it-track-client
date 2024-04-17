@@ -112,28 +112,26 @@ const InsertExcelForm = ({ headers, hook, closeModal, callData, templateFileName
         }
     };
 
-    async function sendBatch(options) {
-        try {
-            await axios(options);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
     async function sendDataInBatches(formattedData, options) {
-        const chunkSize = 250;
-        for (let i = 0; i < formattedData.length; i += chunkSize) {
-            const chunk = formattedData.slice(i, i + chunkSize);
-            options.data = chunk;
-            try {
-                await sendBatch(options);
-            } catch (err) {
-                return false
-            }
+        const batchSize = 1000; 
+        const numBatches = Math.ceil(formattedData.length / batchSize);
+        const batchPromises = [];
+    
+        for (let i = 0; i < numBatches; i++) {
+            const start = i * batchSize;
+            const end = Math.min((i + 1) * batchSize, formattedData.length);
+            const chunk = formattedData.slice(start, end);
+            const requestOptions = { ...options, data: chunk };
+            batchPromises.push(axios(requestOptions));
         }
-        return true
-    };
-
+    
+        try {
+            await Promise.all(batchPromises);
+            return true
+        } catch (error) {
+            return false
+        }
+    }
 
     const handleInsertData = async () => {
         const { value } = await swal.fire({
@@ -175,11 +173,12 @@ const InsertExcelForm = ({ headers, hook, closeModal, callData, templateFileName
                             const { message } = result.data
                             showToastMessage(true, message);
                         } catch (error) {
-                            console.log(error);
                             showToastMessage(false, "ไฟล์ใหย่โพด");
                         }
                     } else {
+                        console.time('executionTime');
                         const batchStatus = await sendDataInBatches(formattedData, options)
+                        console.timeEnd('executionTime');
                         if (batchStatus) {
                             showToastMessage(true, "เพิ่มข้อมูลสำเร็จ");
                         } else {
@@ -380,11 +379,11 @@ const InsertExcelForm = ({ headers, hook, closeModal, callData, templateFileName
                                 <tr>
                                     {headers.map(header => (
                                         header?.required == true ?
-                                            <th scope="col" className="px-4 py-3">
+                                            <th key={`header-${header.label}`} scope="col" className="px-4 py-3">
                                                 <p className="flex gap-1">{header.label} <span className="text-red-500">*</span></p>
                                             </th>
                                             :
-                                            <th scope="col" className="px-4 py-3">
+                                            <th key={`header-${header.label}`} scope="col" className="px-4 py-3">
                                                 {header.label}
                                             </th>
                                     ))}

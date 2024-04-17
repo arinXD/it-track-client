@@ -11,17 +11,18 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StudentTrackTable from './StudentTrackTable';
 import { inputClass } from '@/src/util/ComponentClass';
-import InsertSubjectModal from './InsertSubjectModal';
 import { getCurrentDate } from '@/src/util/dateFormater';
-import { DeleteIcon2, PlusIcon } from '@/app/components/icons';
+import { DeleteIcon2 } from '@/app/components/icons';
 import { FaPlay } from "react-icons/fa";
 import { FaRegCircleStop } from "react-icons/fa6";
 import { FaSave } from "react-icons/fa";
 import { CiUndo } from "react-icons/ci";
 import TrackSubjectTable from './TrackSubjectTable';
+import { FiDownload } from "react-icons/fi";
+import { calGrade, floorGpa, isNumber } from '@/src/util/grade';
+import { utils, writeFile } from "xlsx";
 
 const Page = ({ params }) => {
-
     const swal = useCallback(Swal.mixin({
         customClass: {
             confirmButton: "btn bg-blue-500 text-white ms-3 hover:bg-blue-600",
@@ -297,7 +298,8 @@ const Page = ({ params }) => {
                 track: "Web and Mobile"
             },
         }
-        const data = selecteData[selectedTrack]
+        const data = selecteData[selectedTrack] || undefined
+        if (!data) return
         return (
             <StudentTrackTable trackSubj={trackSubj} studentData={data.studentData} track={data.track} />
         )
@@ -309,6 +311,253 @@ const Page = ({ params }) => {
         studentsWeb,
         trackSubj,
     ])
+
+    const downloadTrack = useCallback(async function (trackSelect) {
+
+        function getWorkSheet(data) {
+            return utils.json_to_sheet(data);
+        }
+
+        function sortByScore(data) {
+            data.sort((a, b) => {
+                const scoreA = parseFloat(a.Score);
+                const scoreB = parseFloat(b.Score);
+
+                if (scoreA < scoreB) {
+                    return 1;
+                }
+                if (scoreA > scoreB) {
+                    return -1;
+                }
+                return 0;
+            });
+            const result = data.map((row, index) => ({
+                ...row,
+                "No.": index + 1
+            }))
+            return result
+        }
+
+        function getResult(data) {
+            let output = []
+            for (const [index, select] of data.entries()) {
+                const student = {
+                    "No.": index + 1,
+                    stuid: select?.Student?.stu_id,
+                    email: select?.Student?.email,
+                    name: select?.Student?.first_name + " " + select?.Student?.last_name,
+                    program: select?.Student?.courses_type
+                }
+                const grade = allSubjects.map(subj => {
+                    const gradeValue = {}
+                    gradeValue[subj] = null
+                    return gradeValue
+                })
+                let score = 0
+                let credit = 0
+                for (const detail of select?.SelectionDetails) {
+                    const subjCode = detail?.Subject?.subject_code
+                    grade[subjCode] = detail?.grade
+                    const gradeValue = calGrade(detail?.grade)
+                    if (isNumber(gradeValue)) {
+                        score += gradeValue * detail?.Subject?.credit
+                        credit += detail?.Subject?.credit
+                    }
+                }
+                delete grade["0"]
+                delete grade["1"]
+                delete grade["2"]
+                delete grade["3"]
+                score = (score / credit || 1).toFixed(2)
+                const result = {
+                    OR01: select?.track_order_1 || "-",
+                    OR02: select?.track_order_2 || "-",
+                    OR03: select?.track_order_3 || "-",
+                    Result: select?.result
+                }
+                output.push({
+                    ...student,
+                    ...grade,
+                    Score: score,
+                    ...result
+                })
+            }
+            return sortByScore(output)
+        }
+
+        function sortByStuid(array) {
+            return array.sort((a, b) => {
+                const idA = parseFloat(a.stuid);
+                const idB = parseFloat(b.stuid);
+
+                if (idA > idB) {
+                    return 1;
+                }
+                if (idA < idB) {
+                    return -1;
+                }
+                return 0;
+            });
+        }
+        function getNo(array, type = "reg") {
+            return array.map((row, index) => {
+                const no = type === "reg" ? "No." : "No. ";
+                return {
+                    [no]: index + 1,
+                    ...row
+                };
+            });
+        }
+
+        const allSubjects = trackSubj?.map(subject => subject.subject_code)
+        let data
+        let ws
+        const wb = utils.book_new();
+        const selections = trackSelect?.Selections
+        const tracks = {
+            "BIT": 1,
+            "Web and Mobile": 2,
+            "Network": 3,
+            "1": "BIT",
+            "2": "Web and Mobile",
+            "3": "Network",
+        }
+
+        data = []
+        for (const select of selections) {
+            const selectData = {
+                stuid: select?.Student?.stu_id,
+                name: select?.Student?.first_name + " " + select?.Student?.last_name,
+                program: select?.Student?.courses_type == "โครงการปกติ" ? "ภาคปกติ" : "โครงการพิเศษ",
+                acadyear: select?.Student?.acadyear,
+            }
+            for (const detail of select?.SelectionDetails) {
+                const detailData = {
+                    subjectCode: detail?.Subject?.subject_code,
+                    subjectName: detail?.Subject?.title_th,
+                    grade: detail?.grade,
+                }
+                data.push({
+                    ...selectData,
+                    ...detailData
+                })
+            }
+        }
+        ws = getWorkSheet(data.filter(row => row.stuid))
+        utils.book_append_sheet(wb, ws, 'Grade');
+
+        data = selections.map(select => {
+            return {
+                email: select?.Student?.email,
+                stuid: select?.Student?.stu_id,
+                name: select?.Student?.first_name + " " + select?.Student?.last_name,
+                ORCode1: tracks[select?.track_order_1] || "-",
+                ORCode2: tracks[select?.track_order_2] || "-",
+                ORCode3: tracks[select?.track_order_3] || "-",
+                OR01: tracks[tracks[select?.track_order_1]] || "-",
+                OR02: tracks[tracks[select?.track_order_2]] || "-",
+                OR03: tracks[tracks[select?.track_order_3]] || "-",
+            }
+        }).filter(row => row.stuid)
+        ws = getWorkSheet(data)
+        utils.book_append_sheet(wb, ws, 'Selection');
+
+        const reg = selections?.filter(select => select?.Student?.courses_type == "โครงการปกติ")
+        const regData = getResult(reg)
+        let regDataFilterKey = regData.map(obj => {
+            const newObj = { ...obj };
+            delete newObj.program;
+            return newObj;
+        });
+        ws = getWorkSheet(regDataFilterKey)
+        utils.book_append_sheet(wb, ws, 'REG');
+
+        const spe = selections?.filter(select => select?.Student?.courses_type == "โครงการพิเศษ")
+        const speData = getResult(spe)
+        let speDataFilterKey = speData.map(obj => {
+            const newObj = { ...obj };
+            delete newObj.program;
+            return newObj;
+        });
+        ws = getWorkSheet(speDataFilterKey)
+        utils.book_append_sheet(wb, ws, 'SPE');
+
+        // all
+        const sorceKey = ["No.", "stuid", "email", "name", "program", "Score", "GPA", "Result"]
+        const studentGpa = await fetchData(`/api/students/enrollments/${trackSelect.acadyear}/gpa`)
+        const all = [...regData, ...speData].map(row => {
+            const targerData = {}
+            for (const key of Object.keys(row)) {
+                if (sorceKey.includes(key)) {
+                    if (key == "Result") {
+                        targerData.GPA = floorGpa(studentGpa.filter(stuGpa => stuGpa.stuid == row.stuid)[0].gpa)
+                        targerData[key] = row[key]
+                    } else if (key == "program") {
+                        targerData[key] = row[key] == "โครงการปกติ" ? "Regular" : "Special"
+                    } else {
+                        targerData[key] = row[key]
+                    }
+                }
+            }
+            return targerData
+        })
+        ws = getWorkSheet(all)
+        utils.book_append_sheet(wb, ws, 'All');
+
+        //  announce
+        regDataFilterKey = regData.map(obj => {
+            return {
+                "รหัสนักศึกษา": obj.stuid,
+                Track: obj.Result
+            };
+        });
+        speDataFilterKey = speData.map(obj => {
+            return {
+                "รหัสนักศึกษา ": obj.stuid,
+                "Track ": obj.Result
+            };
+        });
+        const regArr = getNo(sortByStuid(regDataFilterKey))
+        const speArr = getNo(sortByStuid(speDataFilterKey), "spe")
+        const minLength = Math.min(regArr?.length || 0, speArr?.length || 0);
+        const [maxArr, minArr] = speArr.length == minLength ? [regArr, speArr] : [speArr, regArr]
+        const announce = []
+
+        for (let index = 0; index < maxArr.length; index++) {
+            if (index >= minLength) {
+                announce.push(maxArr[index]);
+            } else {
+                announce.push({
+                    ...maxArr[index],
+                    " ": null,
+                    ...minArr[index]
+                });
+            }
+        }
+        const header = ["ภาคปกติ", "", "", "", "โครงการปกติ"];
+        const newHeader = Object.keys(announce[0]);
+        const merges = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // Merge cells from A1 to C1
+            { s: { r: 0, c: 4 }, e: { r: 0, c: 6 } }  // Merge cells from E1 to G1
+        ];
+
+        ws = utils.aoa_to_sheet([header, newHeader])
+        ws['!merges'] = merges;
+
+        // Add data to the worksheet
+        utils.sheet_add_json(ws, announce, {
+            skipHeader: true,
+            origin: -1 // Start adding data from the last row
+        });
+
+        utils.book_append_sheet(wb, ws, 'Announce');
+
+        try {
+            writeFile(wb, `Track_${trackSelect.acadyear}.xlsx`);
+        } catch (error) {
+            console.error('Error exporting Excel:', error);
+        }
+    }, [trackSubj])
 
     return (
         <>
@@ -583,61 +832,82 @@ const Page = ({ params }) => {
                                         {studentsBit?.students?.length == 0 &&
                                             studentsNetwork?.students?.length == 0 &&
                                             studentsWeb?.students?.length == 0 ? null :
-                                            <Tabs
-                                                aria-label="Options"
-                                                selectedKey={selectedTrack}
-                                                onSelectionChange={setSelectedTrack}
-                                                color="primary"
-                                                variant="bordered">
-                                                <Tab
-                                                    key="all"
-                                                    title={
-                                                        <div className="flex items-center space-x-2">
-                                                            <span>ทั้งหมด</span>
-                                                        </div>
-                                                    }
+                                            <>
+                                                <Tabs
+                                                    aria-label="Options"
+                                                    selectedKey={selectedTrack}
+                                                    onSelectionChange={setSelectedTrack}
+                                                    color="primary"
+                                                    variant="light"
+                                                    disabledKeys={["download"]}
+                                                    classNames={{
+                                                        tabList: "gap-6 w-full relative rounded-none p-0 pb-2 border-b border-divider",
+                                                        cursor: "w-full",
+                                                        tab: "max-w-fit h-10 last:p-0 last:absolute last:right-0 last:!cursor-default last:!opacity-100",
+                                                        tabContent: "group-data-[selected=true]:text-white group-data-[selected=true]:font-bold"
+                                                    }}
                                                 >
-                                                    {allTrack?.students?.length === 0 ? null : displayResult}
-                                                </Tab>
-                                                {studentsBit?.students?.length === 0 ? null :
                                                     <Tab
-                                                        key={"BIT"}
+                                                        key="all"
                                                         title={
                                                             <div className="flex items-center space-x-2">
-                                                                <span>BIT</span>
+                                                                <span>ทั้งหมด</span>
                                                             </div>
                                                         }
                                                     >
-                                                        {displayResult}
+                                                        {allTrack?.students?.length === 0 ? null : displayResult}
                                                     </Tab>
-                                                }
+                                                    {studentsBit?.students?.length === 0 ? null :
+                                                        <Tab
+                                                            key={"BIT"}
+                                                            title={
+                                                                <div className="flex items-center space-x-2">
+                                                                    <span>BIT</span>
+                                                                </div>
+                                                            }
+                                                        >
+                                                            {displayResult}
+                                                        </Tab>
+                                                    }
 
-                                                {studentsNetwork?.students?.length === 0 ? null :
-                                                    <Tab
-                                                        key={"Network"}
-                                                        title={
-                                                            <div className="flex items-center space-x-2">
-                                                                <span>Network</span>
-                                                            </div>
-                                                        }
-                                                    >
-                                                        {displayResult}
-                                                    </Tab>
-                                                }
+                                                    {studentsNetwork?.students?.length === 0 ? null :
+                                                        <Tab
+                                                            key={"Network"}
+                                                            title={
+                                                                <div className="flex items-center space-x-2">
+                                                                    <span>Network</span>
+                                                                </div>
+                                                            }
+                                                        >
+                                                            {displayResult}
+                                                        </Tab>
+                                                    }
 
-                                                {studentsWeb?.students?.length === 0 ? null :
+                                                    {studentsWeb?.students?.length === 0 ? null :
+                                                        <Tab
+                                                            key={"Web and Mobile"}
+                                                            title={
+                                                                <div className="flex items-center space-x-2">
+                                                                    <span>Web and Mobile</span>
+                                                                </div>
+                                                            }
+                                                        >
+                                                            {displayResult}
+                                                        </Tab>
+                                                    }
                                                     <Tab
-                                                        key={"Web and Mobile"}
+                                                        key="download"
                                                         title={
-                                                            <div className="flex items-center space-x-2">
-                                                                <span>Web and Mobile</span>
+                                                            <div
+                                                                onClick={() => downloadTrack(trackSelect)}
+                                                                className='flex gap-2 bg-gray-200 px-3 py-1.5 rounded-md cursor-pointer active:scale-95'>
+                                                                <FiDownload className="w-4 h-4" />
+                                                                ดาวน์โหลด
                                                             </div>
                                                         }
-                                                    >
-                                                        {displayResult}
-                                                    </Tab>
-                                                }
-                                            </Tabs>
+                                                    />
+                                                </Tabs>
+                                            </>
                                         }
                                     </div>
 

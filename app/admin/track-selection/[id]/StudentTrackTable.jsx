@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Input, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from "@nextui-org/react";
 import { SearchIcon } from "@/app/components/icons";
 import { tableClass } from '@/src/util/ComponentClass';
-import { calGrade } from '@/src/util/grade';
+import { calGrade, floorGpa } from '@/src/util/grade';
 import { isNumber } from '../../../../src/util/grade';
 
 function displayNull(string) {
@@ -93,7 +93,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     const gradeValue = calGrade(element.grade)
                     if(isNumber(gradeValue)) totalScore += gradeValue
                 });
-                const score = (totalScore / (grade.length || 1)).toFixed(2)
+                const score = floorGpa(totalScore / (grade.length || 1))
                 return {
                     action: student.stu_id,
                     stuId: student.stu_id,
@@ -189,12 +189,13 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
     const topContent = useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-end">
                     <Input
                         isClearable
                         className="w-full sm:max-w-[44%] h-fit"
                         placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, ชื่อ, โครงการ, ผลลัพธ์)"
                         size="sm"
+                        radius='sm'
                         startContent={<SearchIcon />}
                         value={filterValue}
                         onClear={() => onClear()}
@@ -230,7 +231,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
             return null
         }
         return (
-            <div className="py-2 px-2 flex justify-between items-center">
+            <div className="py-2 flex justify-between items-center">
                 <Pagination
                     isCompact
                     showControls

@@ -9,14 +9,14 @@ function calGrade(grade) {
         "D": 1,
         "F": 0,
         "I": "ยังไม่สมบูรณ์",
-        "P":"กำลังดำเนินอยู่",
-        "R":"ซ้ำชั้น",
+        "P": "กำลังดำเนินอยู่",
+        "R": "ซ้ำชั้น",
         "S": "พอใจ",
         "T": "รับโอน",
         "U": "ไม่พอใจ",
         "W": "ถอนรายวิชา",
     }
-    return grades[grade] !== undefined ? grades[grade] : null
+    return grades[grade] != undefined ? grades[grade] : null
 }
 
 function isNumber(number) {
@@ -96,8 +96,13 @@ function getGrades() {
     }
     return grades
 }
+
+function floorGpa(gpa) {
+    return Math.floor(gpa * 100) / 100;
+}
 module.exports = {
     getGrades,
     calGrade,
-    isNumber
+    isNumber,
+    floorGpa,
 }

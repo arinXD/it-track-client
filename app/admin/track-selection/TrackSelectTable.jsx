@@ -8,8 +8,8 @@ import { Loading } from '@/app/components';
 import axios from 'axios';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 
-const TrackSelectTable = ({ loading, trackSelection, handleOpen, 
-    handleDelete, handleStartSelect, swal, callTrackSelection, showToastMessage}) => {
+const TrackSelectTable = ({ loading, trackSelection, handleOpen,
+    handleDelete, handleStartSelect, swal, callTrackSelection, showToastMessage }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState(trackSelection);
     const [selectedKey, setSelectedKey] = useState([])
@@ -45,17 +45,17 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
     const handleSearch = useCallback(function (query) {
         setSearchQuery(query);
         if (query) {
-            const filtered = filteredData.filter((item) =>
-                Object.values(item)
+            const filtered = trackSelection.filter((item) => {
+                return Object.values(item)
                     .join(" ")
                     .toLowerCase()
                     .includes(query.toLowerCase())
-            );
+            });
             setFilteredData(filtered);
         } else {
-            setFilteredData(filteredData);
+            setFilteredData(trackSelection);
         }
-    }, [])
+    }, [trackSelection])
 
     const handleSelectedDel = useCallback(async function () {
         if (selectedTrackSelect.length == 0) return
@@ -94,13 +94,13 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
         <div className='my-[30px]'>
             <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-center rounded-md mb-4'>
                 <div className="flex justify-end w-[50%]">
-                    <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-black rounded-lg bg-white">
+                    <div className="border-1 border-e-0 flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-black rounded-lg bg-white">
                         <SearchIcon width={16} height={16} />
                     </div>
                     <input
                         type="search"
                         id="search"
-                        className="rounded-s-none pl-0 py-2 px-4 text-sm text-black rounded-lg bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="border-1 border-s-0 rounded-s-none pl-0 py-2 px-4 text-sm text-black rounded-lg bg-white focus:outline-none"
                         placeholder="ค้นหาจาก ชื่อ, ปีการศึกษา"
                         value={searchQuery}
                         style={{ width: '100%' }}
