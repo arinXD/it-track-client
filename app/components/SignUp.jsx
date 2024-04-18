@@ -1,5 +1,5 @@
 "use client";
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { AiOutlineCloseCircle, AiOutlineClose, AiFillQuestionCircle } from 'react-icons/ai';
 import { BsEyeFill, BsEyeSlashFill } from 'react-icons/bs';
 import { useEffect, useState } from 'react'
@@ -14,7 +14,7 @@ import { styled } from '@mui/material/styles';
 import { createUser } from './serverAction/signUpAction';
 
 export default function SignUp(props) {
-    const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+    const BorderLinearProgress = useCallback(styled(LinearProgress)(({ theme }) => ({
         height: 6,
         borderRadius: 5,
         [`&.${linearProgressClasses.colorPrimary}`]: {
@@ -24,7 +24,7 @@ export default function SignUp(props) {
             borderRadius: 5,
             backgroundColor: strength.color,
         },
-    }));
+    })), [])
 
     const router = useRouter()
     let timeoutError;
@@ -47,20 +47,28 @@ export default function SignUp(props) {
     const [passwordvalid, setPasswordValid] = useState(null);
     const [confirmPassvalid, setConfirmPassValid] = useState(null);
 
-    async function checkEmpty(value, setValue) {
+    const strengthColorList = useMemo(() => ({
+        red: "#ef4444",
+        yellow: "#facc15",
+        green: "#15803d",
+    }), []);
+
+    const [strength, setStrength] = useState({
+        text: 'Password strength',
+        color: "",
+        value: 0
+    });
+
+    const checkEmpty = useCallback(async function (value, setValue) {
         if (value === "") setValue(true)
         else setValue(false)
-    }
+    }, [])
 
     // ======================
     // Call sign up
     // ======================
-    async function onCreate(event) {
+    const onCreate = useCallback(async function (event) {
         event.preventDefault()
-        // // test
-        // router.push(`/email-verify/email/${email}`);
-        // router.refresh()
-        // return
         setIsSubmit(true)
         checkEmpty(fname, setFnameValid)
         checkEmpty(lname, setLnameValid)
@@ -106,7 +114,14 @@ export default function SignUp(props) {
             setError(result.message)
         }
 
-    }
+    }, [
+        fname,
+        lname,
+        email,
+        password,
+        confirmPass,
+        strength,
+    ])
 
     // ======================
     // Error timing
@@ -128,23 +143,18 @@ export default function SignUp(props) {
     // ======================
     // Cleat error
     // ======================
-    async function clearError() {
+    const clearError = useCallback(async function () {
         setFnameValid(false)
         setLnameValid(false)
         setemailValid(false)
         setPasswordValid(false)
         setConfirmPassValid(false)
-    }
+    }, [])
 
     // ======================
     // Password strength
     // ======================
-    const strengthColorList = {
-        red: "#ef4444",
-        yellow: "#facc15",
-        green: "#15803d",
-    }
-    const getPasswordStrength = (password) => {
+    const getPasswordStrength = useCallback((password) => {
         let strength = 0;
 
         if (password.length >= 8) {
@@ -161,12 +171,7 @@ export default function SignUp(props) {
         }
 
         return strength;
-    };
-    const [strength, setStrength] = useState({
-        text: 'Password strength',
-        color: "",
-        value: 0
-    });
+    }, [])
 
     useEffect(() => {
         const strengthValue = getPasswordStrength(password);
@@ -323,11 +328,10 @@ export default function SignUp(props) {
                                 } />
                         </div>
                         <div>
-                            <p className='text-xs'>By clicking Create account, you agree to our
-                                <Link href={"#"} className='text-blue-700'> Terms </Link> ,
-                                <Link href={"#"} className='text-blue-700'> Privacy Policy </Link> and
-                                <Link href={"#"} className='text-blue-700'> Cookies Policy </Link>
-                                You may receive SMS notifications from us and can opt out at any time.</p>
+                            <p className='text-xs'>
+                                เมื่อสมัครสมาชิก ท่านยินยอมให้เราเก็บข้อมูลส่วนตัวเพื่อมอบประสบการณ์การใช้งานที่ดีที่สุด นำเสนอข้อมูล ข่าวสาร
+                                ข้อมูลจะไม่ถูกเปิดเผย ท่านมีสิทธิ์เข้าถึง แก้ไข ลบข้อมูลบัญชีผู้ใช้
+                            </p>
                         </div>
                         <div>
                             <button

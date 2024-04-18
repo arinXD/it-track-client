@@ -1,22 +1,28 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from '../action'
+import TrackTable from './TrackTable'
+import { Spinner } from '@nextui-org/react'
 
 const Page = () => {
+    const [fetching, setFetching] = useState(false);
     const [tracks, setTracks] = useState([])
 
-    useEffect(()=>{
-        async function init() {
-            try {
-                const tracks = await fetchData("/api/tracks")
-                setTracks(tracks)
-            } catch (error) {
-                setTracks([])
-            }
+    const init = useCallback(async function () {
+        try {
+            setFetching(true)
+            const tracks = await fetchData("/api/tracks")
+            setFetching(false)
+            setTracks(tracks)
+        } catch (error) {
+            setTracks([])
         }
+    }, [])
+
+    useEffect(() => {
         init()
-    },[])
+    }, [])
     return (
         <>
             <header>
@@ -25,15 +31,16 @@ const Page = () => {
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
-                <div>
-                    <h1>Track</h1>
-                    <ul>
-                        {tracks.length > 0 ? tracks.map((track, index) => (
-                            <li key={index}>{`${index + 1})`} {track.title_en}</li>
-                        )) :
-                            <li>ไม่มีข้อมูลแทรค</li>}
-                    </ul>
-                </div>
+                {
+                    fetching ?
+                        <div className='w-full flex justify-center h-[70vh]'>
+                            <Spinner label="กำลังโหลด..." color="primary" />
+                        </div>
+                        :
+                        <TrackTable
+                            tracks={tracks}
+                        />
+                }
             </ContentWrap>
         </>
     )

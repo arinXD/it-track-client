@@ -46,6 +46,7 @@ const VerifiedEmailProvider = (options) => {
 const handler = NextAuth({
     session: {
         strategy: "jwt",
+        maxAge: 3600 * 6,
     },
     providers: [
         VerifiedEmailProvider(),

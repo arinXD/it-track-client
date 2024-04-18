@@ -1,5 +1,5 @@
 "use client"
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { useSession, signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AiOutlineCloseCircle } from 'react-icons/ai';
@@ -8,17 +8,33 @@ import Link from 'next/link';
 import { SignUp } from '@/app/components';
 import { Progress } from "@nextui-org/react";
 import { signToken, decodeToken } from '@/app/components/serverAction/TokenAction';
+import toast, { Toaster } from 'react-hot-toast';
 
 const Page = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get('callbackUrl') ?? "/"
+    const { data: session } = useSession();
+
+    // ======================
+    // Redirect if has session
+    // ======================
+    useEffect(() => {
+        if (session) {
+            toast.custom(() => (
+                <div className='px-3 py-2 rounded-md bg-blue-400 text-white text-xs shadow-md'>
+                    Authenticate as {session.user.email}
+                </div>
+            ));
+            router.push(callbackUrl);
+            router.refresh()
+        }
+    }, [session]);
 
     const email = useRef(null)
     const pass = useRef(null)
     const [isProcress, setIsProcress] = useState(false)
     const [displaySignUp, setDisplaySignUp] = useState(false)
-    const { data: session } = useSession();
     const [error, setError] = useState(false)
     const [emptyEmail, setEmptyEmail] = useState(false)
     const [emptyPass, setEmptyPass] = useState(false)
@@ -49,17 +65,14 @@ const Page = () => {
     // ===========================
     // Toast notify
     // ===========================
-    // toast
-    // const notify = (params) => toast.error(params, {
-    //     position: toast.POSITION.TOP_CENTER,
-    // });;
+
 
     // ===========================
     // Close modal sign up
     // ===========================
-    const closeModal = () => {
+    const closeModal = useCallback(() => {
         setDisplaySignUp(false);
-    }
+    }, [])
 
     // ===========================
     // Handler progress interval
@@ -76,7 +89,7 @@ const Page = () => {
     // ======================
     // Credentails sign in
     // ======================
-    const signInCredentials = async (event) => {
+    const signInCredentials = useCallback(async (event) => {
         setIsProcress(true)
         setEmptyEmail(false)
         setEmptyPass(false)
@@ -111,25 +124,29 @@ const Page = () => {
             redirect: false,
             callbackUrl: callbackUrl,
         })
-        
+
         if (!result.ok) {
             setIsProcress(false)
             setError(result.error)
         } else {
             localStorage.setItem("token", await signToken({ email: eValue }))
         }
-    }
+    }, [
+        email,
+        pass,
+        callbackUrl,
+    ])
 
     // ======================
     // Google sign in
     // ======================
-    const signInGoogle = async () => {
+    const signInGoogle = useCallback(async () => {
         await signIn("google", undefined, {
             redirect: true,
             callbackUrl: callbackUrl,
             prompt: 'select_account',
         })
-    }
+    }, [callbackUrl])
 
     // ======================
     // If error then Got cha!!
@@ -139,16 +156,6 @@ const Page = () => {
             setError(searchParams.get('error'))
         }
     }, [])
-
-    // ======================
-    // Redirect if has session
-    // ======================
-    useEffect(() => {
-        if (session) {
-            router.push(callbackUrl);
-            router.refresh()
-        }
-    }, [session, router]);
 
     // ======================
     // Handler error timing
@@ -171,20 +178,19 @@ const Page = () => {
     }, [error]);
 
     return (
-
         <section className="absolute w-full p-5 max-h-full max-w-full h-[calc(100%)]">
+            <Toaster />
             <div
                 style={{ transform: 'translate(-50%, -50%)' }}
                 className='absolute w-full max-h-full max-w-7xl h-[calc(100%)] top-[50%] left-[50%] flex flex-col items-center gap-5 p-4'>
                 <div className='pt-8 pb-3 w-full max-h-full flex flex-col items-center justify-center'>
                     <div className='w-fit'>
-                        <h1 className="font-bold text-4xl sm:text-5xl leading-tight tracking-tight text-blue-500">
-                            IT Tracks
+                        <h1 className="font-bold text-4xl sm:text-5xl leading-tight tracking-tight text-blue-500 text-center">
+                            KKU IT
                         </h1>
                         <h2 className='mt-2'>
-                            Welcome to IT Track by IT64
+                            Discover Your Experience with KKU IT
                         </h2>
-
                     </div>
                 </div>
                 <div className="max-h-full w-full sm:w-1/2 px-10 flex justify-start items-center">
