@@ -12,9 +12,11 @@ const Page = () => {
     const init = useCallback(async function () {
         try {
             setFetching(true)
-            const tracks = await fetchData("/api/tracks")
-            setFetching(false)
-            setTracks(tracks)
+            setTimeout(async () => {
+                const tracks = await fetchData("/api/tracks")
+                setFetching(false)
+                setTracks(tracks)
+            }, 1500);
         } catch (error) {
             setTracks([])
         }
@@ -31,16 +33,10 @@ const Page = () => {
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
-                {
-                    fetching ?
-                        <div className='w-full flex justify-center h-[70vh]'>
-                            <Spinner label="กำลังโหลด..." color="primary" />
-                        </div>
-                        :
-                        <TrackTable
-                            tracks={tracks}
-                        />
-                }
+                <TrackTable
+                    fetching={fetching}
+                    tracks={tracks}
+                />
             </ContentWrap>
         </>
     )
