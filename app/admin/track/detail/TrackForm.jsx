@@ -1,23 +1,22 @@
 "use client"
-import { getOptions } from '@/app/components/serverAction/TokenAction'
-import { Input, Spinner, Textarea } from '@nextui-org/react'
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+import { Button, Input, Spinner, Textarea } from '@nextui-org/react'
 import axios from 'axios'
 import { useState, useEffect, useCallback } from 'react'
-import { Empty } from 'antd';
+import { Empty, message } from 'antd';
 import { inputClass } from '@/src/util/ComponentClass'
 import UploadCover from './UploadCover'
+import { hostname } from '@/app/api/hostname'
 
 const TrackForm = ({ track }) => {
-    const [fetching, setFetching] = useState(false);
+    const [fetching, setFetching] = useState(true);
     const [trackData, settrackData] = useState({});
-    const [coverImageFile, setCoverImageFile] = useState({});
     const [titleTh, setTitleTh] = useState("");
     const [titleEn, setTitleEn] = useState("");
     const [desc, setDesc] = useState(" ");
-
-    useEffect(() => {
-        // console.log(coverImageFile);
-    }, [coverImageFile]);
+    const [information, setInformation] = useState("");
+    const [coverImageFile, setCoverImageFile] = useState({});
+    const [trackImageFile, setTrackImageFile] = useState({});
 
     const getTrackData = useCallback(async () => {
         const url = `/api/tracks/${track}`
@@ -41,89 +40,148 @@ const TrackForm = ({ track }) => {
     useEffect(() => {
         setTitleTh(trackData?.title_th)
         setTitleEn(trackData?.title_en)
+        setDesc(trackData?.desc)
+        setInformation(trackData?.information)
     }, [trackData]);
 
-    const handleSubmit = useCallback((e) => {
+    const handleSubmit = useCallback(async (e) => {
         e.preventDefault()
-        console.log(e);
-    }, [])
+        const formData = new FormData(e.target);
+        const formDataObject = Object.fromEntries(formData.entries());
+        const option = await getOptions(`/api/tracks/${formDataObject.track}`, "PUT", formDataObject)
+        const token = await getToken()
+        const headers = {
+            'Content-Type': 'multipart/form-data',
+            'authorization': `${token}`,
+        }
+
+        try {
+            await axios(option)
+
+            if (trackImageFile instanceof Blob || trackImageFile instanceof File) {
+                const formData = new FormData();
+                formData.append('image', trackImageFile)
+                await axios.post(`${hostname}/api/tracks/${formDataObject.track}/image/img`, formData, {
+                    headers
+                });
+            }
+
+            if (coverImageFile instanceof Blob || coverImageFile instanceof File) {
+                const formData = new FormData();
+                formData.append('image', coverImageFile);
+                await axios.post(`http://localhost:4000/api/tracks/${formDataObject.track}/image/coverImg`, formData, {
+                    headers
+                });
+            }
+
+            await getTrackData()
+            message.success("แก้ไขข้อมูลสำเร็จ")
+        } catch (error) {
+            console.log(error);
+            message.error("แก้ไขข้อมูลไม่สำเร็จ")
+        }
+
+    }, [coverImageFile,
+        trackImageFile])
 
     return (
         <div>
+            <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-end rounded-md mt-6'>
+                <p>ข้อมูลแทรค</p>
+            </div>
             {
                 fetching ?
-                    <div className='w-full flex justify-center'>
+                    <div className='w-full flex justify-center my-6'>
                         <Spinner label="กำลังโหลด..." color="primary" />
                     </div>
                     :
-                    <div>
+                    <div className='mt-4'>
                         {trackData && Object.keys(trackData).length !== 0 ?
                             <>
-                                <div className='flex flex-row gap-6 justify-between'>
-                                    <div className='w-1/2 flex flex-col space-y-3'>
+                                <div className='flex flex-col md:flex-row gap-16 justify-between'>
+                                    <div className='w-full md:w-1/2 flex flex-col'>
                                         <UploadCover
-                                            setCoverImageFile={setCoverImageFile}
+                                            src={trackData?.img}
+                                            label="ภาพแทรค"
+                                            width="w-[180px]"
+                                            setImageFile={setTrackImageFile}
                                         />
                                         <UploadCover
-                                            setCoverImageFile={setCoverImageFile}
+                                            src={trackData?.coverImg}
+                                            label="ภาพหน้าปก"
+                                            width="w-full"
+                                            setImageFile={setCoverImageFile}
                                         />
                                     </div>
-                                    <div className='w-1/2 flex flex-col space-y-10'>
-                                        <div className='flex flex-col'>
-                                            <Input
-                                                type="text"
-                                                variant="bordered"
-                                                radius='sm'
-                                                label="แทรค"
-                                                labelPlacement="outside"
-                                                value={trackData.track}
-                                                isReadOnly
-                                                classNames={inputClass}
-                                                className='mb-4'
-                                            />
-                                            <Input
-                                                type="text"
-                                                variant="bordered"
-                                                radius='sm'
-                                                label="ชื่อแทรคภาษาไทย"
-                                                labelPlacement="outside"
-                                                value={titleTh}
-                                                onValueChange={setTitleTh}
-                                                classNames={inputClass}
-                                                className='mb-4'
-                                            />
-                                            <Input
-                                                type="text"
-                                                variant="bordered"
-                                                radius='sm'
-                                                label="ชื่อแทรคภาษาอังกฤษ"
-                                                labelPlacement="outside"
-                                                value={titleEn}
-                                                onValueChange={setTitleEn}
-                                                classNames={inputClass}
-                                            />
-                                        </div>
-                                        <div className='flex flex-col'>
-                                            <Textarea
-                                                variant="bordered"
-                                                label="คำอธิบายแทรค"
-                                                labelPlacement="outside"
-                                                value={desc}
-                                                onValueChange={setDesc}
-                                                classNames={inputClass}
-                                                className='mb-2'
-                                            />
-                                            <Textarea
-                                                variant="bordered"
-                                                label="ข้อมูลแทรค"
-                                                labelPlacement="outside"
-                                                value={desc}
-                                                onValueChange={setDesc}
-                                                classNames={inputClass}
-                                                className='mb-2'
-                                            />
-                                        </div>
-                                    </div>
+                                    <form
+                                        onSubmit={handleSubmit}
+                                        className='w-full md:w-1/2 flex flex-col'>
+                                        <Input
+                                            name='track'
+                                            type="text"
+                                            variant="bordered"
+                                            radius='sm'
+                                            label="แทรค"
+                                            labelPlacement="outside"
+                                            value={trackData.track}
+                                            isReadOnly
+                                            classNames={inputClass}
+                                            className='mb-4'
+                                            isRequired
+                                        />
+                                        <Input
+                                            name='title_th'
+                                            type="text"
+                                            variant="bordered"
+                                            radius='sm'
+                                            label="ชื่อแทรคภาษาไทย"
+                                            labelPlacement="outside"
+                                            value={titleTh}
+                                            onValueChange={setTitleTh}
+                                            classNames={inputClass}
+                                            className='mb-4'
+                                            isRequired
+                                        />
+                                        <Input
+                                            name='title_en'
+                                            type="text"
+                                            variant="bordered"
+                                            radius='sm'
+                                            label="ชื่อแทรคภาษาอังกฤษ"
+                                            labelPlacement="outside"
+                                            value={titleEn}
+                                            onValueChange={setTitleEn}
+                                            classNames={inputClass}
+                                            className='mb-4'
+                                            isRequired
+                                        />
+                                        <Textarea
+                                            name='desc'
+                                            variant="bordered"
+                                            label="คำอธิบายแทรค"
+                                            labelPlacement="outside"
+                                            value={desc}
+                                            onValueChange={setDesc}
+                                            classNames={inputClass}
+                                            className='mb-4'
+                                        />
+                                        <Textarea
+                                            name='information'
+                                            variant="bordered"
+                                            label="ข้อมูลแทรค"
+                                            labelPlacement="outside"
+                                            value={information}
+                                            onValueChange={setInformation}
+                                            classNames={inputClass}
+                                            className='mb-4'
+                                        />
+                                        <Button
+                                            type='submit'
+                                            radius='sm'
+                                            color='primary'
+                                            className='bg-primary-500'
+                                        >บันทึก</Button>
+                                    </form>
                                 </div>
                             </>
                             :

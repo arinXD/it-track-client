@@ -2,13 +2,24 @@
 const nextConfig = {
     reactStrictMode: false,
     images: {
-        remotePatterns: [{
+        domains: ['localhost:4000'],
+        remotePatterns: [
+            {
                 protocol: "https",
                 hostname: "*.googleusercontent.com",
             },
             {
-                // http://localhost:3000/
+                protocol: "https",
+                hostname: "*it-track.arinchawut.com",
+            },
+            {
                 protocol: "http",
+                port:"4000",
+                hostname: "localhost",
+            },
+            {
+                protocol: "http",
+                port:"3000",
                 hostname: "*.localhost",
             },
         ],

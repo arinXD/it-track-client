@@ -12,6 +12,7 @@ const inter = Inter({ subsets: ['latin'] })
 //         icon: '/logo.png',
 //       },
 // }
+
 export default function RootLayout({ children }) {
     return (
         <html>
