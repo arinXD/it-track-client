@@ -23,14 +23,14 @@ const Page = () => {
                         track == undefined ?
                             <Empty className='my-16' />
                             :
-                            <>
+                            <div className='space-y-6'>
                                 <TrackForm
                                     track={track} />
                                 <TeacherTrack
                                     track={track} />
                                 <TrackSubject
                                     track={track} />
-                            </>
+                            </div>
                     }
                 </div>
             </ContentWrap>

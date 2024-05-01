@@ -4,9 +4,9 @@ import { DeleteIcon2, PlusIcon, SearchIcon } from '@/app/components/icons'
 import { Button, Input, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
 import Link from 'next/link'
 import { TbRestore } from 'react-icons/tb'
-import { inputClass, tableClass } from '@/src/util/ComponentClass'
+import { inputClass } from '@/src/util/ComponentClass'
 
-const TrackTable = ({ tracks, fetching }) => {
+const TrackTable = ({ tracks, fetching, openInsertModal }) => {
 
     const INITIAL_VISIBLE_COLUMNS = useMemo(() => (
         ["track", "title_en", "title_th", "actions"]
@@ -153,6 +153,27 @@ const TrackTable = ({ tracks, fetching }) => {
         setPage(1)
     }, [])
 
+    // Multiple deleted
+    useEffect(() => {
+        let students
+        if (selectedKeys == "all") {
+            students = sortedItems.map(e => e.track)
+            setDisableDeleteBtn(false)
+        } else {
+            students = [...selectedKeys.values()]
+            if (students.length === 0) {
+                setDisableDeleteBtn(true)
+            } else {
+                setDisableDeleteBtn(false)
+            }
+        }
+        setSelectedTracks(students)
+    }, [selectedKeys])
+
+    const handleDelete = useCallback((selectedTracks) => {
+        console.log("del", selectedTracks);
+    }, [selectedTracks])
+
     const topContent = useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
@@ -162,6 +183,7 @@ const TrackTable = ({ tracks, fetching }) => {
                         <Button
                             radius='sm'
                             size='sm'
+                            onPress={openInsertModal}
                             startContent={<PlusIcon className="w-5 h-5" />}>
                             เพิ่มแทรค
                         </Button>
@@ -180,6 +202,7 @@ const TrackTable = ({ tracks, fetching }) => {
                             isLoading={deleting}
                             radius='sm'
                             size='sm'
+                            onClick={() => handleDelete(selectedTracks)}
                             startContent={<DeleteIcon2 className="w-5 h-5" />}>
                             ลบ
                         </Button>
@@ -204,6 +227,8 @@ const TrackTable = ({ tracks, fetching }) => {
         onRowsPerPageChange,
         onSearchChange,
         hasSearchFilter,
+        disableDeleteBtn,
+        selectedTracks
     ]);
 
     const bottomContent = useMemo(() => {
@@ -235,24 +260,6 @@ const TrackTable = ({ tracks, fetching }) => {
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
-    // Multiple deleted
-    useEffect(() => {
-        let students
-        if (selectedKeys == "all") {
-            students = sortedItems.map(e => parseInt(e.id))
-            setDisableDeleteBtn(false)
-        } else {
-            students = [...selectedKeys.values()].map(id => parseInt(id))
-            if (students.length === 0) {
-                setDisableDeleteBtn(true)
-            } else {
-                setDisableDeleteBtn(false)
-            }
-        }
-        setSelectedTracks(students)
-    }, [selectedKeys])
-
-
     return (
         <div>
             <Table
@@ -263,7 +270,7 @@ const TrackTable = ({ tracks, fetching }) => {
                     },
                 }}
                 classNames={{
-                    table: "min-h-[300px]",
+                    table: "min-h-[250px]",
                 }}
 
                 bottomContent={bottomContent}
@@ -293,7 +300,7 @@ const TrackTable = ({ tracks, fetching }) => {
                 </TableHeader>
                 <TableBody
                     isLoading={fetching}
-                    loadingContent={<Spinner/>}
+                    loadingContent={<Spinner />}
                     // emptyContent={"ไม่มีข้อมูลแทรค"}
                     items={sortedItems}>
                     {(item) => (

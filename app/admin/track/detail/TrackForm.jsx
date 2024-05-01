@@ -17,6 +17,8 @@ const TrackForm = ({ track }) => {
     const [information, setInformation] = useState("");
     const [coverImageFile, setCoverImageFile] = useState({});
     const [trackImageFile, setTrackImageFile] = useState({});
+    const [uploadProgressImg, setuploadProgressImg] = useState(0);
+    const [uploadProgressCover, setuploadProgressCover] = useState(0);
 
     const getTrackData = useCallback(async () => {
         const url = `/api/tracks/${track}`
@@ -62,7 +64,10 @@ const TrackForm = ({ track }) => {
                 const formData = new FormData();
                 formData.append('image', trackImageFile)
                 await axios.post(`${hostname}/api/tracks/${formDataObject.track}/image/img`, formData, {
-                    headers
+                    headers,
+                    onUploadProgress: (progressObj) => {
+                        setuploadProgressImg(progressObj.progress * 100)
+                    }
                 });
             }
 
@@ -70,7 +75,10 @@ const TrackForm = ({ track }) => {
                 const formData = new FormData();
                 formData.append('image', coverImageFile);
                 await axios.post(`http://localhost:4000/api/tracks/${formDataObject.track}/image/coverImg`, formData, {
-                    headers
+                    headers,
+                    onUploadProgress: (progressObj) => {
+                        setuploadProgressCover(progressObj.progress * 100)
+                    }
                 });
             }
 
@@ -79,6 +87,11 @@ const TrackForm = ({ track }) => {
         } catch (error) {
             console.log(error);
             message.error("แก้ไขข้อมูลไม่สำเร็จ")
+        } finally {
+            setuploadProgressImg(0)
+            setuploadProgressCover(0)
+            setCoverImageFile({})
+            setTrackImageFile({})
         }
 
     }, [coverImageFile,
@@ -105,12 +118,14 @@ const TrackForm = ({ track }) => {
                                             label="ภาพแทรค"
                                             width="w-[180px]"
                                             setImageFile={setTrackImageFile}
+                                            uploadProgress={uploadProgressImg}
                                         />
                                         <UploadCover
                                             src={trackData?.coverImg}
                                             label="ภาพหน้าปก"
                                             width="w-full"
                                             setImageFile={setCoverImageFile}
+                                            uploadProgress={uploadProgressCover}
                                         />
                                     </div>
                                     <form
