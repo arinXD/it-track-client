@@ -67,6 +67,20 @@ const Sidebar = () => {
                             }
                         </li>
                         <li className="">
+                            <Link href={"/tracks"}
+                                className={`${url == "/tracks" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                            >
+                                {url == "/tracks" ?
+                                    <HiUserGroup
+                                        className="w-5 h-5" />
+                                    :
+                                    <HiOutlineUserGroup
+                                        className="w-5 h-5" />
+                                }
+                                <span className="ml-3 text-sm">แทรค</span>
+                            </Link>
+                        </li>
+                        <li className="">
                             <Link href={"/student/tracks"}
                                 className={`${url == "/student/tracks" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
@@ -77,7 +91,7 @@ const Sidebar = () => {
                                     <HiOutlineUserGroup
                                         className="w-5 h-5" />
                                 }
-                                <span className="ml-3 text-sm">คัดเลือกความเชี่ยวชาญ</span>
+                                <span className="ml-3 text-sm">คัดเลือกแทรค</span>
                             </Link>
                         </li>
                         <li className="">

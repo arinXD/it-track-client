@@ -1,17 +1,25 @@
-"use client"
-import { Inter } from 'next/font/google'
+import { Inter, Roboto, Rubik } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from './components'
 
 const inter = Inter({ subsets: ['latin'] })
+const roboto = Roboto({
+    weight: '400',
+    subsets: ['latin'],
+})
+const rubik = Rubik({
+    weight: '400',
+    subsets: ['latin'],
+})
 
-// export const metadata = {
-//     title: 'IT Track',
-//     description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
-//     icons: {
-//         icon: '/logo.png',
-//       },
-// }
+
+export const metadata = {
+    title: 'IT Track',
+    description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
+    icons: {
+        icon: '/logo.png',
+      },
+}
 
 export default function RootLayout({ children }) {
     return (

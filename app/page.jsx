@@ -1,6 +1,5 @@
 import { ContentWrap, Navbar, Sidebar } from '@/app/components'
 import dynamic from 'next/dynamic'
-
 import React from 'react';
 import axios from 'axios';
 import { getServerSession } from 'next-auth';
@@ -9,12 +8,13 @@ import { SearchIcon } from './components/icons';
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { BiBook } from "react-icons/bi";
 import { Input, Button } from "@nextui-org/react";
+import Link from 'next/link';
 
 const News = dynamic(() => import('./components/News'), { ssr: false })
 
 async function getData() {
     try {
-        const res = await axios.get(`${hostname}/api/test`,{
+        const res = await axios.get(`${hostname}/api/test`, {
             withCredentials: true
         })
         const data = res.data.data
@@ -46,11 +46,13 @@ const Page = async () => {
                                 className=''>
                                 ค้นหาวิชา
                             </Button>
-                            <Button
-                                startContent={<HiOutlineUserGroup className='h-5 w-5' />}
-                                className=''>
-                                ค้นหาแทรค
-                            </Button>
+                            <Link href={"/tracks"}>
+                                <Button
+                                    startContent={<HiOutlineUserGroup className='h-5 w-5' />}
+                                    className=''>
+                                    ค้นหาแทรค
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </div>
