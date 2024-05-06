@@ -15,7 +15,7 @@ const Page = () => {
         try {
             setFetching(true)
             setTimeout(async () => {
-                const tracks = await fetchData("/api/tracks")
+                const tracks = await fetchData("/api/tracks/all")
                 setFetching(false)
                 setTracks(tracks)
             }, 1500);

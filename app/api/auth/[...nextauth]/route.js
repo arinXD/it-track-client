@@ -5,51 +5,50 @@ import axios from "axios";
 import { hostname } from '@/app/api/hostname'
 import { signToken } from "@/app/components/serverAction/TokenAction";
 
-const VerifiedEmailProvider = (options) => {
-    return {
-        id: 'verifiedEmail',
-        name: 'Verified Email',
-        type: 'credentials',
-        credentials: {
-            email: { label: 'Email', type: 'email' },
-        },
-        async authorize(credentials, req) {
-            const options = {
-                url: `${hostname}/api/auth/signin/verified/email`,
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json;charset=UTF-8'
-                },
-                data: {
-                    email: credentials.email
-                }
-            };
-
-            try {
-                const result = await axios(options)
-                if (result.data.userData) {
-                    const userData = result.data.userData
-                    return {
-                        id: null,
-                        ...userData
-                    }
-                }
-            } catch (error) {
-                const message = error.response.data.message
-                throw new Error(message)
-            }
-        }
-    };
-};
-
 const handler = NextAuth({
     session: {
         strategy: "jwt",
         maxAge: 3600 * 6,
     },
     providers: [
-        VerifiedEmailProvider(),
+        function VerifiedEmailProvider(){
+            return {
+                id: 'verifiedEmail',
+                name: 'Verified Email',
+                type: 'credentials',
+                credentials: {
+                    email: { label: 'Email', type: 'email' },
+                },
+                async authorize(credentials, req) {
+                    const options = {
+                        url: `${hostname}/api/auth/signin/verified/email`,
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json;charset=UTF-8'
+                        },
+                        withCredentials: true,
+                        data: {
+                            email: credentials.email
+                        },
+                    };
+        
+                    try {
+                        const result = await axios(options)
+                        if (result.data.userData) {
+                            const userData = result.data.userData
+                            return {
+                                id: null,
+                                ...userData
+                            }
+                        }
+                    } catch (error) {
+                        const message = error.response.data.message
+                        throw new Error(message)
+                    }
+                }
+            };
+        },
         CredentialsProvider({
             name: "Credentials",
             credentials: {
@@ -57,14 +56,20 @@ const handler = NextAuth({
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials, req) {
-                const res = await fetch(`${hostname}/api/auth/signin`, {
+                const options = {
+                    url: `${hostname}/api/auth/signin`,
                     method: 'POST',
-                    body: JSON.stringify(credentials),
-                    headers: { "Content-Type": "application/json" }
-                })
-                const response = await res.json()
-                if (res.ok && response) {
-                    let userData = response.user
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                    },
+                    withCredentials: true,
+                    data: credentials
+                };
+                const res = await axios(options)
+                const data = res.data
+                if (data.ok && data) {
+                    let userData = data.user
                     return {
                         id: null,
                         ...userData
@@ -101,6 +106,7 @@ const handler = NextAuth({
                         'Accept': 'application/json',
                         'Content-Type': 'application/json;charset=UTF-8',
                     },
+                    withCredentials: true,
                     data: {
                         email: token
                     }

@@ -21,7 +21,7 @@ const TrackForm = ({ track }) => {
     const [uploadProgressCover, setuploadProgressCover] = useState(0);
 
     const getTrackData = useCallback(async () => {
-        const url = `/api/tracks/${track}`
+        const url = `/api/tracks/${track}/get-track`
         const option = await getOptions(url, "GET")
         setFetching(true)
         try {

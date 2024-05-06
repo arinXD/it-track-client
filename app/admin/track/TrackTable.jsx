@@ -192,7 +192,6 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
                                 size="sm"
                                 radius="sm"
                                 color="default"
-                                className="bg-gray-300"
                                 startContent={<TbRestore className="w-4 h-4" />}>
                                 รายการที่ถูกลบ
                             </Button>

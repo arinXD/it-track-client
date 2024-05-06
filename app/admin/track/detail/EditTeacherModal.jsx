@@ -11,7 +11,7 @@ import { message } from "antd";
 import { getToken } from "@/app/components/serverAction/TokenAction";
 import { hostname } from "@/app/api/hostname";
 
-const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName }) => {
+const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName, tid }) => {
     const [uploadImageFile, setUploadImageFile] = useState({});
     const [previewImage, setPreviewImage] = useState(src)
     const [teacherName, setTeacherName] = useState(editName);
@@ -48,7 +48,6 @@ const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName }) 
         document.querySelector("#image").value = ""
         setUploadImageFile({})
         setPreviewImage("")
-        setTeacherName("")
         setUploadProgress(0)
         onClose()
     }, [])
@@ -57,33 +56,38 @@ const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName }) 
         e.preventDefault()
         const formData = new FormData(e.target);
         const formDataObject = Object.fromEntries(formData.entries());
-        const URL = "/api/teachers/tracks"
+        let URL = `/api/teachers/tracks/${tid}`
         const token = await getToken()
-        const headers = {
-            'Content-Type': 'multipart/form-data',
+        let headers = {
             'authorization': `${token}`,
         }
 
         if (uploadImageFile instanceof Blob || uploadImageFile instanceof File) {
-            try {
-                await axios.post(`${hostname}${URL}`, formDataObject, {
-                    headers,
-                    onUploadProgress: (progressObj) => {
+            headers["Content-Type"] = 'multipart/form-data'
+            URL += "/form"
+        } else {
+            headers["Content-Type"] = 'application/json;charset=UTF-8'
+            URL += "/json"
+            delete formDataObject.image
+        }
+        try {
+            await axios.put(`${hostname}${URL}`, formDataObject, {
+                headers,
+                onUploadProgress: (progressObj) => {
+                    if (uploadImageFile instanceof Blob || uploadImageFile instanceof File) {
                         setUploadProgress(progressObj.progress * 100)
                     }
-                });
-                await getTeachers()
-                closeForm()
-                message.success("เพิ่มข้อมูลสำเร็จ")
-            } catch (error) {
-                console.log(error);
-                message.error("เพิ่มข้อมูลไม่สำเร็จ")
-            }
-        } else {
-            message.error("ต้องเพิ่มรูปอาจารย์ก่อน")
+                }
+            });
+            await getTeachers()
+            closeForm()
+            message.success("เพิ่มข้อมูลสำเร็จ")
+        } catch (error) {
+            console.log(error);
+            message.error("เพิ่มข้อมูลไม่สำเร็จ")
         }
 
-    }, [uploadImageFile])
+    }, [uploadImageFile, tid])
     return (
         <>
             <Modal
@@ -191,7 +195,7 @@ const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName }) 
                                     radius="sm"
                                     type="submit"
                                     color="primary">
-                                    เพิ่ม
+                                    แก้ไข
                                 </Button>
                             </ModalFooter>
                         </form>
