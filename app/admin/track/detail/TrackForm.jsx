@@ -74,7 +74,7 @@ const TrackForm = ({ track }) => {
             if (coverImageFile instanceof Blob || coverImageFile instanceof File) {
                 const formData = new FormData();
                 formData.append('image', coverImageFile);
-                await axios.post(`http://localhost:4000/api/tracks/${formDataObject.track}/image/coverImg`, formData, {
+                await axios.post(`${hostname}/api/tracks/${formDataObject.track}/image/coverImg`, formData, {
                     headers,
                     onUploadProgress: (progressObj) => {
                         setuploadProgressCover(progressObj.progress * 100)
