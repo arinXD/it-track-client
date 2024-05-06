@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React, { useCallback } from 'react'
 import { hostname } from '@/app/api/hostname'
 import axios from 'axios'
 import { useState, useEffect, useReducer } from 'react'
@@ -11,6 +11,7 @@ import { dmy, dmyt } from '@/src/util/dateFormater'
 import confetti from 'canvas-confetti';
 import { Loading } from '@/app/components'
 import TMonlicaEmail from '@/app/components/TMonlicaEmail'
+import { getOptions } from '@/app/components/serverAction/TokenAction'
 
 const TrackSelectionForm = ({ enrollments, userData }) => {
     const initOrder = {
@@ -55,8 +56,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
 
     const getEnrollmentGrade = (subjectCode) => {
         // ต้องการหา subjectCode ใน enrollments
-        console.log(enrollments);
-        console.log(trackSubjects);
         const enrollment = enrollments.find(e => e?.Subject?.subject_code === subjectCode);
         if (enrollment) {
             return enrollment.grade;
@@ -97,49 +96,59 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         }
         isProcessing(false)
     }
+    const fetchData = async function () {
+        try {
+            let URL = `/api/tracks/selects/${userData.acadyear}`
+            let option = await getOptions(URL, "GET")
+            const response = await axios(option)
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await axios.get(`${hostname}/api/tracks/selects/${userData.acadyear}`);
-                const trackResponse = await axios.get(`${hostname}/api/tracks`)
-                const selectDataResponse = await axios.get(`${hostname}/api/students/${userData.stu_id}/track/select`)
+            URL = `/api/tracks/all`
+            option = await getOptions(URL, "GET")
+            const trackResponse = await axios(option)
+            
+            URL = `/api/students/${userData.stu_id}/track/select`
+            option = await getOptions(URL, "GET")
+            const selectDataResponse = await axios(option)
 
-                const selectedData = selectDataResponse.data.data
-                const data = response.data.data;
-                const trackData = trackResponse.data.data
-                if (selectedData) {
-                    setTrackResult(selectedData.Track)
-                    for (let index = 1; index < 4; index++) {
-                        const type = `SET_ORDER_${index}`
-                        dispatch({
-                            type,
-                            payload: selectedData[`track_order_${index}`]
-                        });
-                    }
-                } else {
+            const selectedData = selectDataResponse.data.data
+            const data = response.data.data;
+            const trackData = trackResponse.data.data
+            if (selectedData) {
+                setTrackResult(selectedData.Track)
+                for (let index = 1; index < 4; index++) {
+                    const type = `SET_ORDER_${index}`
                     dispatch({
-                        type: "CLEAR_ORDER",
+                        type,
+                        payload: selectedData[`track_order_${index}`]
                     });
                 }
-
-                setTrackSelect(data);
-                if (data?.Subjects) {
-                    setTrackSubjects(data.Subjects)
-                } else {
-                    setTrackSubjects([])
-                }
-                setTracks(trackData)
-            } catch (error) {
-                console.error(error);
-                setTrackSelect({});
-                setTrackSubjects([])
-                setTracks([])
-            } finally {
-                setLoading(false)
+            } else {
+                dispatch({
+                    type: "CLEAR_ORDER",
+                });
             }
+
+            setTrackSelect(data);
+            if (data?.Subjects) {
+                setTrackSubjects(data.Subjects)
+            } else {
+                setTrackSubjects([])
+            }
+            setTracks(trackData)
+        } catch (error) {
+            console.log(error);
+            setTrackSelect({});
+            setTrackSubjects([])
+            setTracks([])
+        } finally {
+            setLoading(false)
         }
-        fetchData()
+    }
+    
+    useEffect(() => {
+        if (Object.keys(userData).length > 0) {
+            fetchData()
+        }
     }, [userData])
 
     const handleChange = async (value, index) => {

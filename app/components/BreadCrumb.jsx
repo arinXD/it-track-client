@@ -21,6 +21,7 @@ const links = {
     "restore": "รายการที่ถูกลบ",
     "trackstudent": "รายชื่อนักศึกษาภายในแทรค",
     "verify": "แบบฟอร์มตรวจสอบจบ",
+    "detail": "รายละเอียด"
 };
 
 const BreadCrumb = () => {

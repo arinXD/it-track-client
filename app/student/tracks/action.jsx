@@ -53,28 +53,4 @@ export async function createTrackSelection(formData) {
             message: "create track selection error.",
         })
     }
-    // const acadyear = formData.get("acadyear")
-    // try {
-    //     const options = {
-    //         url: `${hostname}/api/acadyear/`,
-    //         method: 'POST',
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             'Content-Type': 'application/json;charset=UTF-8',
-    //         },
-    //         data: {
-    //             acadyear
-    //         }
-    //     };
-    //     const result = await axios(options)
-    //     revalidatePath("/admin/acadyears");
-    //     return result.data;
-
-    // } catch (error) {
-    //     const message = error.response.data.message
-    //     return {
-    //         ok: false,
-    //         message: message
-    //     }
-    // }
 }

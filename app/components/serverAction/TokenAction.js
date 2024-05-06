@@ -1,14 +1,8 @@
 "use server"
-import {
-    jwtDecode
-} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import jwt from "jsonwebtoken";
-import {
-    getServerSession
-} from 'next-auth';
-import {
-    hostname
-} from "@/app/api/hostname";
+import { getServerSession } from 'next-auth';
+import { hostname } from "@/app/api/hostname";
 
 export const decodeToken = async (data) => {
     const decode = jwtDecode(data)

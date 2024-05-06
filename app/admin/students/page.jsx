@@ -20,71 +20,75 @@ import { getToken } from "@/app/components/serverAction/TokenAction";
 import { hostname } from "@/app/api/hostname";
 import InsertEnrollmentForm from "./InsertEnrollmentForm";
 
-const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"];
-const columns = [{
-    name: "ID",
-    uid: "id",
-    sortable: true
-},
-{
-    name: "รหัสนักศึกษา",
-    uid: "stu_id",
-    sortable: true
-},
-{
-    name: "ชื่อ-สกุล",
-    uid: "fullName",
-    sortable: true
-},
-{
-    name: "โครงการ",
-    uid: "courses_type",
-    sortable: true
-},
-{
-    name: "หลักสูตร",
-    uid: "program"
-},
-{
-    name: "ปีการศึกษา",
-    uid: "acadyear",
-},
-{
-    name: "สถานะภาพ",
-    uid: "status_code",
-    sortable: true
-},
-{
-    name: "ACTIONS",
-    uid: "actions"
-},
-];
-function showToastMessage(ok, message) {
-    if (ok) {
-        toast.success(message, {
-            position: toast.POSITION.TOP_RIGHT,
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    } else {
-        toast.warning(message, {
-            position: toast.POSITION.TOP_RIGHT,
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    }
-};
 const Page = () => {
+
+    const showToastMessage = useCallback(function (ok, message) {
+        if (ok) {
+            toast.success(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } else {
+            toast.warning(message, {
+                position: toast.POSITION.TOP_RIGHT,
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    }, [])
+
+    const INITIAL_VISIBLE_COLUMNS = useMemo(() => (
+        ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"]
+    ), [])
+    const columns = useMemo(() => ([{
+        name: "ID",
+        uid: "id",
+        sortable: true
+    },
+    {
+        name: "รหัสนักศึกษา",
+        uid: "stu_id",
+        sortable: true
+    },
+    {
+        name: "ชื่อ-สกุล",
+        uid: "fullName",
+        sortable: true
+    },
+    {
+        name: "โครงการ",
+        uid: "courses_type",
+        sortable: true
+    },
+    {
+        name: "หลักสูตร",
+        uid: "program"
+    },
+    {
+        name: "ปีการศึกษา",
+        uid: "acadyear",
+    },
+    {
+        name: "สถานะภาพ",
+        uid: "status_code",
+        sortable: true
+    },
+    {
+        name: "ACTIONS",
+        uid: "actions"
+    },
+    ]), [])
 
     // Modal state
     const { isOpen, onOpen, onClose } = useDisclosure();

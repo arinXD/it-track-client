@@ -4,7 +4,7 @@ import { NextResponse, NextRequest } from "next/server"
 const auth = withAuth(
     async function middleware(req) {
         const path = req.nextUrl.pathname
-        console.log("Middleware token: ", req?.nextauth?.token);
+        // console.log("Middleware token: ", req?.nextauth?.token);
 
         if (path === "/" && req.nextauth.token.role === "admin") {
             const url = req.nextUrl.clone()
@@ -65,27 +65,3 @@ export const config = {
         "/dashboard"
     ]
 }
-
-
-// if (req.nextauth.token) {
-//     const path = req.nextUrl.pathname
-//     const url = req.nextUrl.clone()
-
-//     const studentEmail = "kkumail.com"
-//     const teacherEmail = "kku.ac.th"
-//     var email
-//     // console.log(req.nextauth.token)
-//     if (req.nextauth.token?.email) {
-//         email = req.nextauth.token?.email.toString()
-//         email = email.split("@")[1]
-//     }
-//     if (path.startsWith("/student") && !email.includes(studentEmail)) {
-//         url.pathname = '/permission/kkumail.com'
-//         return NextResponse.redirect(url)
-//     }
-//     if (path.startsWith("/teacher") && !email.includes(teacherEmail)) {
-//         url.pathname = '/permission/kku.ac.th'
-//         return NextResponse.redirect(url)
-//     }
-// } else {
-// }

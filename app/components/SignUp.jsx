@@ -214,7 +214,9 @@ export default function SignUp(props) {
                     สร้างบัญชีผู้ใช้
                 </h1>
                 <div className="mt-5 space-y-4 md:space-y-6">
-                    <form className="space-y-3 md:space-y-4" onSubmit={onCreate}>
+                    <form
+                        className="space-y-3 md:space-y-4"
+                        onSubmit={onCreate}>
                         {(error) ?
                             <div className={'flex gap-3 items-center bg-red-500 text-white px-3 py-3'}>
                                 <AiOutlineCloseCircle onClick={() => {

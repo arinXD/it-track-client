@@ -5,8 +5,7 @@ import { Icon } from '@iconify/react';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import axios from 'axios';
 
-export default function InsertSubjectModal({ defaultTrackSubj, isOpen, onClose,
-     trackId, showToastMessage, callBack }) {
+export default function InsertSubjectModal({ defaultTrackSubj, isOpen, onClose, trackId, showToastMessage, callBack }) {
      const [subjects, setSubjects] = useState([]);
      const [trackSubj, setTrackSubj] = useState([])
      const [searchSubj, setSearchSubj] = useState("")
