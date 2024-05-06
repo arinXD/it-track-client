@@ -12,47 +12,37 @@ import { toast } from 'react-toastify';
 import { getAcadyears } from "@/src/util/academicYear";
 
 export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) {
-    const [semester, setSemester] = useState('');
+    // const [semester, setSemester] = useState('');
     const [subject_code, setSubjectCode] = useState('');
     const [title_th, setNewTitleTH] = useState('');
     const [title_en, setNewTitleEN] = useState('');
     const [information, setInformation] = useState('');
     const [credit, setCredit] = useState('');
 
-    const [selectedGroup, setSelectedGroup] = useState(null);
-    const [groups, setGroups] = useState([]);
+    const [selectedTrack, setSelectedTrack] = useState(null);
+    const [tracks, setTracks] = useState([]);
 
-    const [selectedSubGroup, setSelectedSubGroup] = useState(null);
-    const [subgroups, setSupGroups] = useState([]);
+    // const [selectedGroup, setSelectedGroup] = useState(null);
+    // const [groups, setGroups] = useState([]);
 
-    const [selectedAcadyears, setSelectedAcadyears] = useState(null);
-    const [acadyears, setAcadyears] = useState([]);
+    // const [selectedSubGroup, setSelectedSubGroup] = useState(null);
+    // const [subgroups, setSupGroups] = useState([]);
+
+    // const [selectedAcadyears, setSelectedAcadyears] = useState(null);
+    // const [acadyears, setAcadyears] = useState([]);
 
 
     const showToastMessage = (ok, message) => {
-        if (ok) {
-            toast.success(message, {
-                position: toast.POSITION.TOP_RIGHT,
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        } else {
-            toast.warning(message, {
-                position: toast.POSITION.TOP_RIGHT,
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        }
+        toast[ok ? 'success' : 'warning'](message, {
+            position: toast.POSITION.TOP_RIGHT,
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
     };
 
     useEffect(() => {
@@ -61,46 +51,57 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 // Fetch the subject details
                 const subjectResult = await axios.get(`${hostname}/api/subjects/${subjectId}`);
                 const subjectData = subjectResult.data.data;
-                console.log(subjectData);
 
-                setSemester(subjectData.semester ?? '');
+                // setSemester(subjectData.semester ?? '');
                 setSubjectCode(subjectData.subject_code ?? '');
                 setNewTitleTH(subjectData.title_th ?? '');
                 setNewTitleEN(subjectData.title_en ?? '');
                 setInformation(subjectData.information ?? '');
                 setCredit(subjectData.credit ?? '');
 
-                const acadyearOptions = getAcadyears().map(acadyear => ({
-                    value: acadyear,
-                    label: acadyear
+                const trackResult = await axios.get(`${hostname}/api/tracks`);
+                const tracks = trackResult.data.data;
+
+                const optionsTrack = tracks.map((track) => ({
+                    value: track.track,
+                    label: track.title_th
                 }));
-                setAcadyears(acadyearOptions);
+                setTracks(optionsTrack);
 
-                const selectedAcadyear = acadyearOptions.find(option => option.value === subjectData.acadyear);
-                setSelectedAcadyears(selectedAcadyear);
+                const selectedTrack = optionsTrack.find(option => option.value === subjectData.track);
+                setSelectedTrack(selectedTrack);
 
-                // Fetch the list of groups
-                const groupResult = await axios.get(`${hostname}/api/groups`);
-                const groups = groupResult.data.data;
+                // const acadyearOptions = getAcadyears().map(acadyear => ({
+                //     value: acadyear,
+                //     label: acadyear
+                // }));
+                // setAcadyears(acadyearOptions);
 
-                const subgroupResult = await axios.get(`${hostname}/api/subgroups`);
-                const subgroups = subgroupResult.data.data;
+                // const selectedAcadyear = acadyearOptions.find(option => option.value === subjectData.acadyear);
+                // setSelectedAcadyears(selectedAcadyear);
 
-                const optionsGroups = groups.map((group) => ({
-                    value: group.id,
-                    label: group.group_title
-                }));
-                setGroups(optionsGroups);
-                const selectedGroup = optionsGroups.find(option => option.value === subjectData.group_id);
-                setSelectedGroup(selectedGroup);
+                // // Fetch the list of groups
+                // const groupResult = await axios.get(`${hostname}/api/groups`);
+                // const groups = groupResult.data.data;
 
-                const optionsSubGroups = subgroups.map((subgroup) => ({
-                    value: subgroup.id,
-                    label: subgroup.sub_group_title
-                }));
-                setSupGroups(optionsSubGroups);
-                const selectedSupGroup = optionsSubGroups.find(option => option.value === subjectData.sub_group_id);
-                setSelectedSubGroup(selectedSupGroup);
+                // const subgroupResult = await axios.get(`${hostname}/api/subgroups`);
+                // const subgroups = subgroupResult.data.data;
+
+                // const optionsGroups = groups.map((group) => ({
+                //     value: group.id,
+                //     label: group.group_title
+                // }));
+                // setGroups(optionsGroups);
+                // const selectedGroup = optionsGroups.find(option => option.value === subjectData.group_id);
+                // setSelectedGroup(selectedGroup);
+
+                // const optionsSubGroups = subgroups.map((subgroup) => ({
+                //     value: subgroup.id,
+                //     label: subgroup.sub_group_title
+                // }));
+                // setSupGroups(optionsSubGroups);
+                // const selectedSupGroup = optionsSubGroups.find(option => option.value === subjectData.sub_group_id);
+                // setSelectedSubGroup(selectedSupGroup);
 
             } catch (error) {
                 console.error('Error fetching subject details:', error);
@@ -113,8 +114,8 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
     const handleUpdateSubject = async () => {
         try {
 
-            if (semester < 0 || credit < 0) {
-                showToastMessage(false, 'เทอมหรือหน่วยกิตต้องเป็นเลขบวกเท่านั้น');
+            if (credit < 0) {
+                showToastMessage(false, 'หน่วยกิตต้องเป็นเลขบวกเท่านั้น');
                 return;
             }
 
@@ -124,15 +125,16 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
             }
 
             await axios.post(`${hostname}/api/subjects/updateSubject/${subjectId}`, {
-                semester: semester ? semester : null,
+                // semester: semester ? semester : null,
                 subject_code: subject_code ? subject_code : null,
                 title_th: title_th ? title_th : null,
                 title_en: title_en ? title_en : null,
                 information: information ? information : null,
                 credit: credit ? credit : null,
-                sub_group_id: selectedSubGroup ? selectedSubGroup.value : null,
-                group_id: selectedGroup ? selectedGroup.value : null,
-                acadyear: selectedAcadyears ? selectedAcadyears.value : null,
+                track: selectedTrack ? selectedTrack.value : null,
+                // sub_group_id: selectedSubGroup ? selectedSubGroup.value : null,
+                // group_id: selectedGroup ? selectedGroup.value : null,
+                // acadyear: selectedAcadyears ? selectedAcadyears.value : null,
             });
 
             // Notify the parent component that data has been updated
@@ -167,7 +169,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                     <span className='text-base font-normal'>แบบฟอร์มแก้ไขวิชา</span>
                 </ModalHeader>
                 <ModalBody className='grid grid-cols-9 gap-4'>
-                    <div className='col-span-3'>
+                    {/* <div className='col-span-3'>
                         <label htmlFor="group">กลุ่มวิชา</label>
                         <Select
                             className='z-50'
@@ -206,7 +208,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                             isSearchable
                             isClearable
                         />
-                    </div>
+                    </div> */}
                     <Input
                         disabled
                         className='col-span-3'
@@ -221,7 +223,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                     />
 
                     <Input
-                        className='col-span-3'
+                        className='col-span-2'
                         type="number"
                         radius='sm'
                         variant="bordered"
@@ -231,7 +233,22 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                         value={credit}
                         onChange={(e) => setCredit(e.target.value)}
                     />
-                    <Input
+
+                    <div className='group flex flex-col w-full group relative justify-end data-[has-label=true]:mt-[calc(theme(fontSize.small)_+_10px)] col-span-4'>
+                        <label className='absolute pointer-events-none origin-top-left subpixel-antialiased block  will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-foreground group-data-[filled-within=true]:pointer-events-auto pb-0 z-20 
+                         group-data-[filled-within=true]:left-0 text-foreground-800 top-0 text-small group-data-[filled-within=true]:-translate-y-[calc(100%_+_theme(fontSize.small)/2_+_20px)] pe-2 max-w-full text-ellipsis overflow-hidden' htmlFor="track">กลุ่มความเชี่ยวชาญ</label>
+                        <Select
+                            className='w-full font-normal bg-transparent !outline-none placeholder:text-foreground-500 focus-visible:outline-none text-small z-40'
+                            id="track"
+                            placeholder="เลือกกลุ่มความเชี่ยวชาญ"
+                            value={selectedTrack}
+                            options={tracks}
+                            onChange={(selectedOption) => setSelectedTrack(selectedOption)}
+                            isSearchable
+                            isClearable
+                        />
+                    </div>
+                    {/* <Input
                         className='col-span-3'
                         type="number"
                         radius='sm'
@@ -241,7 +258,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                         placeholder="กรอกเทอม"
                         value={semester}
                         onChange={(e) => setSemester(e.target.value)}
-                    />
+                    /> */}
 
                     <Input
                         className='col-span-9'

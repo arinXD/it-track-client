@@ -16,111 +16,63 @@ import { getAcadyears } from "@/src/util/academicYear";
 import { toast } from 'react-toastify';
 
 export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
-    const [semester, setSemester] = useState('');
     const [subject_code, setSubjectCode] = useState('');
     const [title_th, setTitleTh] = useState('');
     const [title_en, setTitleEn] = useState('');
     const [information, setInformation] = useState('');
     const [credit, setCredit] = useState('');
 
-    const [selectedSubGroup, setSelectedSubGroup] = useState(null);
-    const [subgroups, setSubGroup] = useState([]);
-
-    const [selectedGroup, setSelectedGroup] = useState(null);
-    const [groups, setGroups] = useState([]);
-
-    const [selectedAcadYear, setSelectedAcadYear] = useState(null);
-    const [acadyears, setAcadYear] = useState([]);
+    const [selectedTrack, setSelectedTrack] = useState(null);
+    const [tracks, setTracks] = useState([]);
 
     const showToastMessage = (ok, message) => {
-        if (ok) {
-            toast.success(message, {
-                position: toast.POSITION.TOP_RIGHT,
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        } else {
-            toast.warning(message, {
-                position: toast.POSITION.TOP_RIGHT,
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        }
+        toast[ok ? 'success' : 'warning'](message, {
+            position: toast.POSITION.TOP_RIGHT,
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
     };
+
     useEffect(() => {
-        const fetchSubGroups = async () => {
+        const fetchTracks = async () => {
             try {
-                const result = await axios.get(`${hostname}/api/subgroups`);
-                const data = result.data.data;
+                const response = await axios.get(`${hostname}/api/tracks`);
+                const data = response.data.data;
 
-                const subgroupOptions = data.map(subgroup => ({
-                    value: subgroup.id,
-                    label: subgroup.sub_group_title
+                const trackOptions = data.map(track => ({
+                    value: track.track,
+                    label: track.title_th
                 }));
 
-                setSubGroup(subgroupOptions);
+                setTracks(trackOptions);
             } catch (error) {
-                console.error('Error fetching subgroup:', error);
-            }
-        };
-        const fetchGroups = async () => {
-            try {
-                const result = await axios.get(`${hostname}/api/groups`);
-                const data = result.data.data;
-
-                const groupOptions = data.map(group => ({
-                    value: group.id,
-                    label: group.group_title
-                }));
-
-                setGroups(groupOptions);
-            } catch (error) {
-                console.error('Error fetching groups:', error);
+                console.error('Error fetching track:', error);
             }
         };
 
-
-        const acadyearOptions = getAcadyears().map(acadyear => ({
-            value: acadyear,
-            label: acadyear
-        }));
-
-        setAcadYear(acadyearOptions);
-
-        fetchSubGroups();
-        fetchGroups();
+        fetchTracks();
     }, []);
 
     useEffect(() => {
         if (isOpen) {
-            // Clear all state values
-            setSemester('');
             setSubjectCode('');
             setTitleTh('');
             setTitleEn('');
             setInformation('');
             setCredit('');
-            setSelectedSubGroup(null);
-            setSelectedGroup(null);
-            setSelectedAcadYear(null);
+            setSelectedTrack(null);
         }
     }, [isOpen]);
 
     const handleInsertSubject = async () => {
         try {
-
-            if (semester < 0 || credit < 0) {
-                showToastMessage(false, 'เทอมหรือหน่วยกิตต้องเป็นเลขบวกเท่านั้น');
+            if (credit < 0) {
+                showToastMessage(false, 'หน่วยกิตต้องเป็นเลขบวกเท่านั้น');
                 return;
             }
 
@@ -129,24 +81,20 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                 return;
             }
 
-            const result = await axios.post(`${hostname}/api/subjects/insertSubject`, {
-                subject_code: subject_code ? subject_code : null,
-                title_th: title_th ? title_th : null,
-                title_en: title_en ? title_en : null,
-                information: information ? information : null,
-                semester: semester ? semester : null,
-                credit: credit ? credit : null,
-                sub_group_id: selectedSubGroup ? selectedSubGroup.value : null,
-                group_id: selectedGroup ? selectedGroup.value : null,
-                acadyear: selectedAcadYear ? selectedAcadYear.value : null,
+            const response = await axios.post(`${hostname}/api/subjects/insertSubject`, {
+                subject_code: subject_code || null,
+                title_th: title_th || null,
+                title_en: title_en || null,
+                information: information || null,
+                credit: credit || null,
+                track: selectedTrack ? selectedTrack.value : null,
             });
 
             onDataInserted();
-            showToastMessage(true, `เพิ่มวิชา ${result.data.data.subject_code} สำเร็จ`);
+            showToastMessage(true, `เพิ่มวิชา ${response.data.data.subject_code} สำเร็จ`);
         } catch (error) {
             console.error('Error inserting subjects:', error);
             showToastMessage(false, 'รหัสวิชาซ้ำ');
-
         }
     };
 
@@ -171,46 +119,6 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                     <span className='text-base font-normal'>แบบฟอร์มเพิ่มวิชา</span>
                 </ModalHeader>
                 <ModalBody className='grid grid-cols-9 gap-4'>
-                    <div className='col-span-3'>
-                        <label htmlFor="group">กลุ่มวิชา</label>
-                        <Select
-                            className='z-50'
-                            id="group"
-                            placeholder="เลือกกลุ่มยวิชา"
-                            value={selectedGroup}
-                            options={groups}
-                            onChange={(selectedOption) => setSelectedGroup(selectedOption)}
-                            isSearchable
-                            isClearable
-                        />
-                    </div>
-                    <div className='col-span-3'>
-                        <label htmlFor="subgroup">กลุ่มย่อย</label>
-                        <Select
-                            className='z-50'
-                            id="subgroup"
-                            placeholder="เลือกกลุ่มย่อยวิชา"
-                            value={selectedSubGroup}
-                            options={subgroups}
-                            onChange={(selectedOption) => setSelectedSubGroup(selectedOption)}
-                            isSearchable
-                            isClearable
-                        />
-                    </div >
-                    <div className='col-span-3'>
-                        <label htmlFor="acadyear">ปีการศึกษา</label>
-                        <Select
-                            className='z-40'
-                            id="acadyear"
-                            placeholder="เลือกปีการศึกษา"
-                            value={selectedAcadYear}
-                            options={acadyears}
-                            onChange={(selectedOption) => setSelectedAcadYear(selectedOption)}
-                            isSearchable
-                            isClearable
-                        />
-                    </div>
-
                     <Input
                         className='col-span-3'
                         type="text"
@@ -222,9 +130,9 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                         value={subject_code}
                         onChange={(e) => setSubjectCode(e.target.value)}
                     />
-                    
+
                     <Input
-                        className='col-span-3'
+                        className='col-span-2'
                         type="number"
                         radius='sm'
                         variant="bordered"
@@ -235,17 +143,21 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                         onChange={(e) => setCredit(e.target.value)}
                     />
 
-                    <Input
-                        className='col-span-3'
-                        type="number"
-                        radius='sm'
-                        variant="bordered"
-                        label="เทอม"
-                        labelPlacement="outside"
-                        placeholder="กรอกเทอม"
-                        value={semester}
-                        onChange={(e) => setSemester(e.target.value)}
-                    />
+                    <div className='group flex flex-col w-full group relative justify-end data-[has-label=true]:mt-[calc(theme(fontSize.small)_+_10px)] col-span-4'>
+                    <label className='absolute pointer-events-none origin-top-left subpixel-antialiased block  will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-foreground group-data-[filled-within=true]:pointer-events-auto pb-0 z-20 
+                         group-data-[filled-within=true]:left-0 text-foreground-800 top-0 text-small group-data-[filled-within=true]:-translate-y-[calc(100%_+_theme(fontSize.small)/2_+_20px)] pe-2 max-w-full text-ellipsis overflow-hidden' htmlFor="track">กลุ่มความเชี่ยวชาญ</label>
+                        <Select
+                            className='w-full font-normal bg-transparent !outline-none placeholder:text-foreground-500 focus-visible:outline-none text-small z-40'
+                            id="track"
+                            placeholder="เลือกกลุ่มความเชี่ยวชาญ"
+                            value={selectedTrack}
+                            options={tracks}
+                            onChange={(selectedOption) => setSelectedTrack(selectedOption)}
+                            isSearchable
+                            isClearable
+                        />
+                    </div>
+
                     <Input
                         className='col-span-9'
                         type="text"
@@ -286,8 +198,6 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                         }}
                         onChange={(e) => setInformation(e.target.value)}
                     />
-
-
                 </ModalBody>
                 <ModalFooter>
                     <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>

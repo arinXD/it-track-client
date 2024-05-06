@@ -26,29 +26,36 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
 
+import { fetchData } from '../action'
+
 import { getAcadyears } from "@/src/util/academicYear";
 
 
 async function fetchDatas() {
     try {
-        const groupResult = await axios.get(`${hostname}/api/groups`);
-        const groups = groupResult.data.data;
-
-        const acadyears = getAcadyears().map(acadyear => ({
-            value: acadyear,
-            label: acadyear
-        }));
-
-        const subgroupResult = await axios.get(`${hostname}/api/subgroups`);
-        const subgroups = subgroupResult.data.data;
-
-        const programResult = await axios.get(`${hostname}/api/programs`);
-        const programs = programResult.data.data;
-
         const result = await axios.get(`${hostname}/api/subjects`);
         const subjects = result.data.data;
 
-        return { subjects, groups, acadyears, subgroups, programs }
+        // const track = await fetchData("/api/tracks")
+        const track = await axios.get(`${hostname}/api/tracks`);
+        const tracks = track.data.data;
+        // const groupResult = await axios.get(`${hostname}/api/groups`);
+        // const groups = groupResult.data.data;
+
+        // const acadyears = getAcadyears().map(acadyear => ({
+        //     value: acadyear,
+        //     label: acadyear
+        // }));
+
+        // const subgroupResult = await axios.get(`${hostname}/api/subgroups`);
+        // const subgroups = subgroupResult.data.data;
+
+        // const programResult = await axios.get(`${hostname}/api/programs`);
+        // const programs = programResult.data.data;
+
+
+        return { subjects, tracks }
+        // return { subjects, groups, acadyears, subgroups, programs }
     } catch (error) {
         console.log("fetch error:", error);
     }
@@ -56,9 +63,10 @@ async function fetchDatas() {
 
 export default function Subject() {
     const [subjects, setSubjects] = useState([]);
-    const [groups, setGroups] = useState([]);
-    const [acadyears, setAcadyears] = useState([]);
-    const [subgroups, setSubgroups] = useState([]);
+    const [tracks, setTracks] = useState([])
+    // const [groups, setGroups] = useState([]);
+    // const [acadyears, setAcadyears] = useState([]);
+    // const [subgroups, setSubgroups] = useState([]);
     const [isInsertModalOpen, setInsertModalOpen] = useState(false);
     const [isImportModalOpen, setImportModalOpen] = useState(false);
     const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
@@ -95,9 +103,10 @@ export default function Subject() {
         fetchDatas().then(data => {
             console.log(data);
             setSubjects(data.subjects)
-            setGroups(data.groups)
-            setAcadyears(data.acadyears);
-            setSubgroups(data.subgroups)
+            setTracks(data.tracks)
+            // setGroups(data.groups)
+            // setAcadyears(data.acadyears);
+            // setSubgroups(data.subgroups)
 
         }).catch(err => {
             console.log("error on useeffect:", err);
@@ -136,9 +145,10 @@ export default function Subject() {
         try {
             const data = await fetchDatas();
             setSubjects(data.subjects)
-            setGroups(data.groups)
-            setAcadyears(data.acadyears)
-            setSubgroups(data.subgroups)
+            setTracks(data.tracks)
+            // setGroups(data.groups)
+            // setAcadyears(data.acadyears)
+            // setSubgroups(data.subgroups)
             // Close the modal after updating
             showToastMessage(true, `อัปเดตข้อมูลสำเร็จ`);
             handleUpdateModalClose();
@@ -154,9 +164,10 @@ export default function Subject() {
         try {
             const data = await fetchDatas();
             setSubjects(data.subjects)
-            setGroups(data.groups)
-            setAcadyears(data.acadyears)
-            setSubgroups(data.subgroups)
+            setTracks(data.tracks)
+            // setGroups(data.groups)
+            // setAcadyears(data.acadyears)
+            // setSubgroups(data.subgroups)
 
             handleInsertModalClose();
             handleImportModalClose()
@@ -201,39 +212,45 @@ export default function Subject() {
             }
         }
     };
+    const getTrackTitle = (trackId) => {
+        const track = tracks.find(e => e.track === trackId);
+        return track ? track.track : '-';
+    }
 
-    const getAcadyearTitle = (acadYearId) => {
-        const acadYear = acadyears.find(e => e.acadyear === acadYearId);
-        return acadYear ? acadYear.acadyear : '-';
-    };
+    // const getAcadyearTitle = (acadYearId) => {
+    //     const acadYear = acadyears.find(e => e.acadyear === acadYearId);
+    //     return acadYear ? acadYear.acadyear : '-';
+    // };
 
-    const getGroupTitle = (groupId) => {
-        const group = groups.find(e => e.id === groupId);
-        return group ? group.group_title : '-';
-    };
+    // const getGroupTitle = (groupId) => {
+    //     const group = groups.find(e => e.id === groupId);
+    //     return group ? group.group_title : '-';
+    // };
 
-    const getSubGroupTitle = (subGroupId) => {
-        const subGroup = subgroups.find(e => e.id === subGroupId);
-        return subGroup ? subGroup.sub_group_title : '-';
-    };
+    // const getSubGroupTitle = (subGroupId) => {
+    //     const subGroup = subgroups.find(e => e.id === subGroupId);
+    //     return subGroup ? subGroup.sub_group_title : '-';
+    // };
 
     const handleExportCSV = () => {
         try {
             const csvData = subjects.map(subject => [
-                getAcadyearTitle(subject.acadyear),
-                getGroupTitle(subject.group_id),
-                getSubGroupTitle(subject.sub_group_id),
-                subject.semester || "-",
+                // getAcadyearTitle(subject.acadyear),
+                // getGroupTitle(subject.group_id),
+                // getSubGroupTitle(subject.sub_group_id),
+                // subject.semester || "-",
                 subject.subject_code || "-",
                 subject.title_th || "-",
                 subject.title_en || "-",
-                subject.information || "-",
                 subject.credit || "-",
+                getTrackTitle(subject.track),
+                subject.information || "-",
             ]);
 
             const csvHeaders = [
-                'Acadyear', 'Group', 'SubGroup', 'Semester', 'Subject Code',
-                'Title (TH)', 'Title (EN)', 'Information', 'Credit'
+                // 'Acadyear', 'Group', 'SubGroup', 'Semester', 'Subject Code',
+                // 'Title (TH)', 'Title (EN)', 'Information', 'Credit'
+                'Subject Code', 'Title (TH)', 'Title (EN)', 'Credit', 'Track', 'Information'
             ];
 
             csvData.unshift(csvHeaders);
@@ -260,15 +277,16 @@ export default function Subject() {
             // Create a workbook with a worksheet
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.json_to_sheet(subjects.map(subject => ({
-                'Acadyear': getAcadyearTitle(subject.acadyear),
-                Group: getGroupTitle(subject.group_id),
-                SubGroup: getSubGroupTitle(subject.sub_group_id),
-                Semester: subject.semester || "-",
+                // 'Acadyear': getAcadyearTitle(subject.acadyear),
+                // Group: getGroupTitle(subject.group_id),
+                // SubGroup: getSubGroupTitle(subject.sub_group_id),
+                // Semester: subject.semester || "-",
                 'Subject Code': subject.subject_code || "-",
                 'Title (TH)': subject.title_th || "-",
                 'Title (EN)': subject.title_en || "-",
-                Information: subject.information || "-",
                 Credit: subject.credit || "-",
+                Track: getTrackTitle(subject.track) || "-",
+                Information: subject.information || "-",
             })));
 
             // Add the worksheet to the workbook
@@ -287,10 +305,10 @@ export default function Subject() {
         const queryLowerCase = searchQuery.toLowerCase();
 
         return (
-            (subject.acadyear && subject.acadyear.acadyear && subject.acadyear.acadyear.toLowerCase().includes(queryLowerCase)) ||
-            (subject.group_id && subject.group_id.group_title && subject.group_id.group_title.toLowerCase().includes(queryLowerCase)) ||
-            (subject.sub_group_id && subject.sub_group_id.sub_group_title && subject.sub_group_id.sub_group_title.toLowerCase().includes(queryLowerCase)) ||
-            (subject.semester && subject.semester.toLowerCase().includes(queryLowerCase)) ||
+            // (subject.acadyear && subject.acadyear.acadyear && subject.acadyear.acadyear.toLowerCase().includes(queryLowerCase)) ||
+            // (subject.group_id && subject.group_id.group_title && subject.group_id.group_title.toLowerCase().includes(queryLowerCase)) ||
+            // (subject.sub_group_id && subject.sub_group_id.sub_group_title && subject.sub_group_id.sub_group_title.toLowerCase().includes(queryLowerCase)) ||
+            // (subject.semester && subject.semester.toLowerCase().includes(queryLowerCase)) ||
             (subject.subject_code && subject.subject_code.toLowerCase().includes(queryLowerCase)) ||
             (subject.title_th && subject.title_th.toLowerCase().includes(queryLowerCase)) ||
             (subject.title_en && subject.title_en.toLowerCase().includes(queryLowerCase)) ||
@@ -394,11 +412,12 @@ export default function Subject() {
                             <TableColumn>รหัสวิชา</TableColumn>
                             <TableColumn>ชื่อไทย</TableColumn>
                             <TableColumn>ชื่ออังกฤษ</TableColumn>
-                            <TableColumn>ปีการศึกษา</TableColumn>
-                            <TableColumn>เทอม</TableColumn>
+                            {/* <TableColumn>ปีการศึกษา</TableColumn> */}
+                            {/* <TableColumn>เทอม</TableColumn> */}
                             <TableColumn>หน่วยกิต</TableColumn>
-                            <TableColumn>กลุ่มวิชา</TableColumn>
-                            <TableColumn>กลุ่มย่อยวิชา</TableColumn>
+                            {/* <TableColumn>กลุ่มวิชา</TableColumn>
+                            <TableColumn>กลุ่มย่อยวิชา</TableColumn> */}
+                            <TableColumn>กลุ่มความเชี่ยวชาญ</TableColumn>
                             <TableColumn>รายละเอียด</TableColumn>
                             <TableColumn>วันที่สร้าง</TableColumn>
                             <TableColumn>วันที่แก้ไข</TableColumn>
@@ -424,10 +443,11 @@ export default function Subject() {
                                         <TableCell>{subject.subject_code || "-"}</TableCell>
                                         <TableCell>{subject.title_th || "-"}</TableCell>
                                         <TableCell>{subject.title_en || "-"}</TableCell>
-                                        <TableCell>{subject.acadyear || "-"}</TableCell>
-                                        <TableCell>{subject.semester || "-"}</TableCell>
+                                        {/* <TableCell>{subject.acadyear || "-"}</TableCell> */}
+                                        {/* <TableCell>{subject.semester || "-"}</TableCell> */}
                                         <TableCell>{subject.credit || "-"}</TableCell>
-                                        <TableCell>
+                                        <TableCell>{subject.track || "-"}</TableCell>
+                                        {/* <TableCell>
                                             {subject.group_id ?
                                                 <>
                                                     {groups.map(e => (
@@ -446,7 +466,7 @@ export default function Subject() {
                                                     ))}
                                                 </>
                                                 : '-'}
-                                        </TableCell>
+                                        </TableCell> */}
                                         <TableCell>{subject.information || "-"}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>

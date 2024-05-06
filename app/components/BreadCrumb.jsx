@@ -20,6 +20,7 @@ const links = {
     "students": "รายชื่อนักศึกษา",
     "restore": "รายการที่ถูกลบ",
     "trackstudent": "รายชื่อนักศึกษาภายในแทรค",
+    "verify": "แบบฟอร์มตรวจสอบจบ",
 };
 
 const BreadCrumb = () => {

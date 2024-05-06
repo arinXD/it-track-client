@@ -340,9 +340,6 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
               <thead className="text-xs text-black font-bold bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="px-6 py-3">
-                    semester
-                  </th>
-                  <th scope="col" className="px-6 py-3">
                     subject_code
                   </th>
                   <th scope="col" className="px-6 py-3">
@@ -356,9 +353,6 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
                   </th>
                   <th scope="col" className="px-6 py-3">
                     credit
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    acadyear
                   </th>
                 </tr>
               </thead>

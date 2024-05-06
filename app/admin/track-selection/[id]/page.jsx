@@ -89,6 +89,7 @@ const Page = ({ params }) => {
             result.expiredAt = format(new Date(result?.expiredAt), 'yyyy-MM-dd HH:mm')
             setTrackSelect(result)
             setTrackSubj(result?.Subjects)
+            console.log(result?.Subjects);
         } catch (err) {
             console.error("Error on init func:", err);
         }
