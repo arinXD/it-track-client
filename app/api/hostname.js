@@ -1,6 +1,9 @@
-let hostname
-hostname = "http://localhost:4000"
-hostname = "https://it-track.arinchawut.com"
+const hostNameStage = {
+    "dev": "http://localhost:4000",
+    "prod": "https://it-track.arinchawut.com"
+}
+const hostname = hostNameStage[process.env.STAGE] || hostNameStage["dev"]
+
 module.exports = {
     hostname
 }

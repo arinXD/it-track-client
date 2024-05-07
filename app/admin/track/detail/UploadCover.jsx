@@ -5,6 +5,7 @@ import { BsFillImageFill } from "react-icons/bs";
 import { GoPaperclip } from "react-icons/go";
 import { AiOutlineDelete } from "react-icons/ai";
 import { message } from 'antd';
+import Image from 'next/image';
 
 const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress }) => {
     const [uploadImageFile, setUploadImageFile] = useState({});
@@ -42,7 +43,7 @@ const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress }) =
             <div className={`${previewImage ? "!border-solid border-1 !h-auto" : "border-2"} border-gray-400 mx-auto border-dashed ${width} h-[180px] mt-1 mb-3 grid grid-cols-1 place-items-center`}>
                 {
                     previewImage ?
-                        <img
+                        <Image
                             src={previewImage}
                             width={320}
                             height={180}
