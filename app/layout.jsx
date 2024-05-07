@@ -1,3 +1,5 @@
+"use client"
+
 import { Inter, Roboto, Rubik } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from './components'
@@ -13,13 +15,13 @@ const rubik = Rubik({
 })
 
 
-export const metadata = {
-    title: 'IT Track',
-    description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
-    icons: {
-        icon: '/logo.png',
-      },
-}
+// export const metadata = {
+//     title: 'IT Track',
+//     description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
+//     icons: {
+//         icon: '/logo.png',
+//       },
+// }
 
 export default function RootLayout({ children }) {
     return (
