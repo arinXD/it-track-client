@@ -19,6 +19,7 @@ const TrackForm = ({ track }) => {
     const [trackImageFile, setTrackImageFile] = useState({});
     const [uploadProgressImg, setuploadProgressImg] = useState(0);
     const [uploadProgressCover, setuploadProgressCover] = useState(0);
+    const [inserting, setInserting] = useState(false);
 
     const getTrackData = useCallback(async () => {
         const url = `/api/tracks/${track}/get-track`
@@ -58,6 +59,7 @@ const TrackForm = ({ track }) => {
         }
 
         try {
+            setInserting(true)
             await axios(option)
 
             if (trackImageFile instanceof Blob || trackImageFile instanceof File) {
@@ -92,6 +94,7 @@ const TrackForm = ({ track }) => {
             setuploadProgressCover(0)
             setCoverImageFile({})
             setTrackImageFile({})
+            setInserting(false)
         }
 
     }, [coverImageFile,
@@ -195,7 +198,17 @@ const TrackForm = ({ track }) => {
                                             radius='sm'
                                             color='primary'
                                             className='bg-primary-500'
-                                        >บันทึก</Button>
+                                            isDisabled={inserting}
+                                            isLoading={inserting}
+                                        >
+
+                                            {
+                                                inserting ?
+                                                    "กำลังบันทึก..."
+                                                    :
+                                                    "บันทึก"
+                                            }
+                                        </Button>
                                     </form>
                                 </div>
                             </>

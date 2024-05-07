@@ -29,15 +29,17 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextu
 import { fetchData } from '../action'
 
 import { getAcadyears } from "@/src/util/academicYear";
+import { getOptions } from '@/app/components/serverAction/TokenAction';
 
 
 async function fetchDatas() {
     try {
-        const result = await axios.get(`${hostname}/api/subjects`);
+        let option = await getOptions("/api/subjects", "GET")
+        const result = await axios(option)
         const subjects = result.data.data;
-
-        // const track = await fetchData("/api/tracks")
-        const track = await axios.get(`${hostname}/api/tracks`);
+        
+        option = await getOptions("/api/tracks/all", "GET")
+        const track = await axios(option)
         const tracks = track.data.data;
         // const groupResult = await axios.get(`${hostname}/api/groups`);
         // const groups = groupResult.data.data;
