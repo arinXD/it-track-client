@@ -85,6 +85,9 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 confirmButtonColor: "#3085d6",
                 confirmButtonText: "ตกลง"
             })
+            setTimeout(() => {
+                window.open("https://docs.google.com/forms/d/e/1FAIpQLSdJ2NQilMU1IGdekQIkiZZ3uvZ09Ef1XXA7MOuNHhDptqjnHg/viewform?usp=sf_link")
+            }, 1500)
         } else {
             Swal.fire({
                 title: "Warning!",
@@ -105,7 +108,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             URL = `/api/tracks/all`
             option = await getOptions(URL, "GET")
             const trackResponse = await axios(option)
-            
+
             URL = `/api/students/${userData.stu_id}/track/select`
             option = await getOptions(URL, "GET")
             const selectDataResponse = await axios(option)
@@ -144,7 +147,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             setLoading(false)
         }
     }
-    
+
     useEffect(() => {
         if (Object.keys(userData).length > 0) {
             fetchData()
