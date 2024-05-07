@@ -5,6 +5,7 @@ import 'aos/dist/aos.css';
 import { Button } from '@nextui-org/react';
 import Link from 'next/link';
 import { Empty } from 'antd';
+import Image from 'next/image';
 
 const Track = ({ tracks }) => {
     useEffect(() => {
@@ -28,8 +29,11 @@ const Track = ({ tracks }) => {
                                     className='flex justify-start items-start gap-6 mb-6 border-b-1 pb-4'>
                                     <div
                                         className='w-[250px] h-[180px] relative'>
-                                        <img
+                                        <Image
+                                            width={250}
+                                            height={180}
                                             className='w-full h-full object-cover rounded-md brightness-75'
+                                            alt={track.track}
                                             src={track.img} />
                                         <p
                                             style={{
