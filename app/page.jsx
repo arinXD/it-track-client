@@ -1,6 +1,5 @@
 import { ContentWrap, Navbar, Sidebar } from '@/app/components'
 import dynamic from 'next/dynamic'
-
 import React from 'react';
 import axios from 'axios';
 import { getServerSession } from 'next-auth';
@@ -9,12 +8,13 @@ import { SearchIcon } from './components/icons';
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { BiBook } from "react-icons/bi";
 import { Input, Button } from "@nextui-org/react";
+import Link from 'next/link';
 
 const News = dynamic(() => import('./components/News'), { ssr: false })
 
 async function getData() {
     try {
-        const res = await axios.get(`${hostname}/api/test`,{
+        const res = await axios.get(`${hostname}/api/test`, {
             withCredentials: true
         })
         const data = res.data.data
@@ -29,7 +29,7 @@ async function getData() {
 const Page = async () => {
     const session = await getServerSession()
     const rootData = await getData()
-    console.log("Home page session: ", session);
+    // console.log("Home page session: ", session);
     return (
         <>
             <header>
@@ -37,23 +37,7 @@ const Page = async () => {
             </header>
             <Sidebar />
             <ContentWrap>
-                <div className="flex flex-col gap-4 my-4">
-                    <div className="flex justify-between gap-3 items-start">
-                        <h1>ข่าวสารและประชาสัมพันธ์</h1>
-                        <div className="flex gap-6">
-                            <Button
-                                startContent={<BiBook className='w-5 h-5' />}
-                                className=''>
-                                ค้นหาวิชา
-                            </Button>
-                            <Button
-                                startContent={<HiOutlineUserGroup className='h-5 w-5' />}
-                                className=''>
-                                ค้นหาแทรค
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                <h1 className='mb-4'>ข่าวสารและประชาสัมพันธ์</h1>
                 <News />
             </ContentWrap>
         </>

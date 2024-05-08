@@ -68,22 +68,56 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
 
         });
     }
+    const handleConfetti = () => {
+        confetti({
+            particleCount: 200,
+            spread: 180,
+            origin: { y: 0.6 },
+            colors: ['#ef4444', '#fbbf24', '#f97316', '#a78bfa', '#60a5fa', '#84cc16'],
+        });
+    };
+
     const handleSubmit = async (event) => {
-        isProcessing(true)
         event.preventDefault();
+        isProcessing(true)
         const formData = new FormData(event.target)
         const result = await createTrackSelection(formData)
         const data = result.data
         if (result.ok) {
             // จุดพลุฉลอง
             handleConfetti()
+            const swal = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn rounded-md bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+                    cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+                },
+                buttonsStyling: false
+            });
 
-            Swal.fire({
+            swal.fire({
                 title: "บันทึกข้อมูลการคัดเลือก",
                 text: `บันทึกข้อมูลการคัดเลือกของคุณ ณ วันที่ ${dmyt(data.updatedAt)}`,
                 icon: "success",
                 confirmButtonColor: "#3085d6",
                 confirmButtonText: "ตกลง"
+            }).then(result => {
+                if (result.isConfirmed) {
+                    swal.fire({
+                        title: "ขออนุญาตผู้ใช้ทำแบบสอบถาม",
+                        text: `ขออนุญาตผู้ใช้ทำแบบสอบถามเพื่อนำ feed back มาปรับปรุงแก้ไขเว็บไซต์ให้มีประสิทธิภาพต่อไป`,
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "ยินยอม",
+                        cancelButtonText: "ไม่ยินยอม",
+                        reverseButtons: true
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            window.open("https://docs.google.com/forms/d/e/1FAIpQLSdJ2NQilMU1IGdekQIkiZZ3uvZ09Ef1XXA7MOuNHhDptqjnHg/viewform?usp=sf_link")
+                        }
+                    })
+                }
             })
         } else {
             Swal.fire({
@@ -105,7 +139,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             URL = `/api/tracks/all`
             option = await getOptions(URL, "GET")
             const trackResponse = await axios(option)
-            
+
             URL = `/api/students/${userData.stu_id}/track/select`
             option = await getOptions(URL, "GET")
             const selectDataResponse = await axios(option)
@@ -144,7 +178,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             setLoading(false)
         }
     }
-    
+
     useEffect(() => {
         if (Object.keys(userData).length > 0) {
             fetchData()
@@ -156,15 +190,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         dispatch({
             type,
             payload: value,
-        });
-    };
-
-    const handleConfetti = () => {
-        confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#ef4444', '#fbbf24', '#f97316', '#a78bfa', '#60a5fa', '#84cc16'],
         });
     };
 
@@ -189,12 +214,17 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
 
     if (userData?.program !== "IT") {
         <div className='text-center'>
-            <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
+            <h4
+                style={{
+                    fontSize: "clamp(16px, 5vw, 24px)",
+                    margin: "auto"
+                }}
+                className="md:!mt-4 max-w-screen-md block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
                 {trackSelect?.title}
             </h4>
-            <p>
+            <div>
                 คุณไม่มีสิทธิ์เข้ารับการคัดเลือกแทรคในหลักสูตรเทคโนโลยีสารสนเทศ ติดต่อ <TMonlicaEmail />
-            </p>
+            </div>
         </div>
     }
 
@@ -214,8 +244,13 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                 trackResult ?
                                     (
                                         <div className='text-center'>
-                                            <h4 className="block font-sans font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased text-center text-xl my-5">
-                                                {trackSelect.title}
+                                            <h4
+                                                style={{
+                                                    fontSize: "clamp(16px, 5vw, 24px)",
+                                                    margin: "auto"
+                                                }}
+                                                className="md:!mt-4 max-w-screen-md block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
+                                                {trackSelect?.title}
                                             </h4>
                                             <p>แทรคของคุณ คือ {trackResult?.title_en}</p>
                                             <p>{trackResult?.title_th}</p>
@@ -223,31 +258,44 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                     )
                                     :
                                     (
-                                        <p>
+                                        <div>
                                             การคัดเลือกความเชี่ยวชาญ หลักสูตรเทคโนโลยีสารสนเทศ
                                             <strong> จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
                                             ระบบจะทำการสุ่มให้ หากมีคำถามเพิ่มเติมติดต่อ <TMonlicaEmail />
-                                        </p>
+                                        </div>
                                     )
                                 :
                                 <>
-                                    <h4 className="block font-sans font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-xl mb-3">
+
+                                    <h4
+                                        style={{
+                                            fontSize: "clamp(16px, 5vw, 24px)",
+                                            margin: "auto"
+                                        }}
+                                        className="md:!mt-4 max-w-screen-md block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
                                         {trackSelect?.title}
                                     </h4>
-                                    <p className='text-center my-3 text-sm'>
+                                    <p
+                                        style={{
+                                            fontSize: "clamp(8px, 4vw, 16px)",
+                                            margin: "auto"
+                                        }}
+                                        className='text-center mb-3 text-lg font-semibold text-gray-900'>
                                         ตั้งแต่วันที่ {dmy(trackSelect.startAt)} - {dmy(trackSelect.expiredAt)}
                                     </p>
                                     <form
                                         onSubmit={handleSubmit}
-                                        className="mt-8 mb-2 w-83 max-w-screen-lg sm:w-63 "
+                                        className="mt-8 mb-2 max-w-screen-lg"
                                         style={{ margin: '0 auto' }}>
                                         <div className="flex flex-col">
                                             <input type="hidden" name='track_selection_id' defaultValue={trackSelect.id} readOnly />
                                             <input type="hidden" name='stu_id' defaultValue={userData.stu_id} readOnly />
 
-                                            <div className='mt-5'>
+                                            <div className='mt-5 text-center'>
                                                 <label className="block font-bold text-black text-base">รายละเอียดวิชาที่ใช้ในการคัดเลือกและเกรดที่ได้</label>
-                                                <label className="block text-sm font-medium text-black mt-2 mb-5">* โปรดตรวจสอบรายละเอียดเกรดของแต่ละวิชา</label>
+                                                <label className="block text-sm font-medium text-black mt-2 mb-5">
+                                                    <span className='text-red-500 font-bold'>*</span>  โปรดตรวจสอบรายละเอียดเกรดของแต่ละวิชา <span className='text-red-500 font-bold'>*</span>
+                                                </label>
                                             </div>
                                             <div id='TrackSubjects'>
                                                 {trackSubjects.map((subject, index) => (
@@ -326,6 +374,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         </div>
                                         <div className='text-end mb-2'>
                                             <Button
+                                                radius='sm'
                                                 className='mb-1 w-fit'
                                                 type='button'
                                                 onClick={clearForm}
@@ -369,13 +418,14 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                 className="mt-px cursor-pointer select-none font-light text-gray-700"
                                                 htmlFor="checkbox"
                                             >
-                                                <p className="flex items-center font-sans text-sm font-normal leading-normal text-gray-700 antialiased">
+                                                <p className="flex items-center text-sm font-normal leading-normal text-gray-700 antialiased">
                                                     ตรวจสอบข้อมูลเรียบร้อย (สามารถแก้ไขลำดับได้หลังจากยืนยัน จนถึงวันที่ {dmy(trackSelect.expiredAt)})
                                                 </p>
                                             </label>
                                         </div>
 
                                         <Button
+                                            radius='sm'
                                             className='bg-blue-500 mt-4 block w-full text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none'
                                             type="submit"
                                             disabled={!isConfirm || processing}

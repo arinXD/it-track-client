@@ -4,7 +4,7 @@ import '../../../style/exam.css';
 import { Navbar, Sidebar, ContentWrap } from '@/app/components';
 import Link from 'next/link';
 const Page = () => {
-    const data = [
+    let data = [
         {
             question: 'คุณชอบที่จะทำงานกับข้อมูลที่มีขนาดเยอะ',
         },
@@ -18,19 +18,20 @@ const Page = () => {
             question: 'คุณมีความรู้เกี่ยวกับการพัฒนาระบบเว็บแอปพลิเคชัน'
         },
     ];
+    data = []
     return (
         <>
             <header>
                 <Navbar />
             </header>
             <Sidebar />
-            <div className='bg-[#33A474] mt-16 px-8 sm:ml-[240px] bg-imgs'>
+            <div className='bg-[#33A474] mt-16 px-8 md:ml-[240px] bg-imgs'>
                 <div className=' mx-auto max-w-2xl text-center py-12 lg:py-20'>
                     <h1 className='text-4xl font-bold tracking-tight text-white sm:text-5xl'>แบบทดสอบกลุ่มความเชี่ยวชาญ</h1>
                     <h2 className='mt-6 text-2xl leading-8 tracking-tighter text-white dark:text-gray-300'>ค้นพบความเชี่ยวชาญหลักสูตรไอทีล่าสุด! ยกระดับทักษะของคุณด้วยความเชี่ยวชาญที่ล้ำสมัย นำทางไปสู่อนาคตของความสำเร็จทางเทคโนโลยี</h2>
                 </div>
-                <div className=' px-4 mx-auto max-w-screen-xl lg:px-6'>
-                    <div className='className="space-y-8 lg:grid lg:grid-cols-3 sm:gap-6 xl:gap-10 lg:space-y-0"'>
+                <div className='px-4 mx-auto max-w-screen-xl lg:px-6'>
+                    <div className='space-y-8 grid lg:grid-cols-3  sm:gap-6 xl:gap-10 lg:space-y-0'>
                         <div className='flex flex-col p-6 mx-auto max-w-lg text-gray-900 bg-white rounded-lg border border-gray-100 shadow xl:p-8 text-center'>
                             <img src="/network.png" alt="" className='p-4 mb-2 md:mb-4 max-h-60 w-full object-contain rounded-lg' width={512} height={512} />
                             <h3 className='mt-4 mb-4 text-2xl font-semibold'>Systems, Network, <br></br>Security and IoTs</h3>
@@ -49,7 +50,10 @@ const Page = () => {
                     </div>
                 </div>
             </div>
-            <div className='mt-8 px-8 sm:ml-[240px]'>
+            <div className='mt-8 px-8 md:ml-[240px]'>
+                <div className='text-center font-bold text-lg my-28'>
+                    Coming soon!
+                </div>
                 {data.map((question, index) => (
                     <div key={index} id={`question${index}`} className='mx-auto max-w-7xl my-12'>
                         <p className='text-center text-4xl text-gray-600'>{question.question}</p>

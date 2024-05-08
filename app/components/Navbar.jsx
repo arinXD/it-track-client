@@ -1,18 +1,18 @@
 'use client';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { signIn, signOut } from "next-auth/react"
 import Image from 'next/image'
 import Link from 'next/link';
 import { useSession } from "next-auth/react"
-import { RiSettings5Fill } from "react-icons/ri";
 import { MdOutlineLogout } from "react-icons/md";
-import { Button, Skeleton } from "@nextui-org/react";
+import { Skeleton } from "@nextui-org/react";
 import { usePathname } from 'next/navigation';
-import { HiOutlineBars3, HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
+import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoQuestion, GoHome, GoHomeFill } from "react-icons/go";
 import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem, User } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem } from "@nextui-org/react";
+import { AiFillEdit, AiOutlineEdit } from 'react-icons/ai';
 
 const Navbar = () => {
     const links = [
@@ -23,16 +23,22 @@ const Navbar = () => {
             label: "หน้าหลัก"
         },
         {
-            href: "/student/tracks",
+            href: "/tracks",
             activeIcon: <HiUserGroup className="w-5 h-5" />,
             icon: <HiOutlineUserGroup className="w-5 h-5" />,
-            label: "คัดเลือกความเชี่ยวชาญ"
+            label: "แทรค"
+        },
+        {
+            href: "/student/tracks",
+            activeIcon: <AiFillEdit className="w-5 h-5" />,
+            icon: <AiOutlineEdit className="w-5 h-5" />,
+            label: "คัดเลือกแทรค"
         },
         {
             href: "/student/tracks/exam",
             activeIcon: <MdQuiz className="w-5 h-5" />,
             icon: <MdOutlineQuiz className="w-5 h-5" />,
-            label: "หาแทรคที่เหมาะสม"
+            label: "แนะนำแทรค"
         },
         {
             href: "/student/verify",
@@ -47,9 +53,9 @@ const Navbar = () => {
 
     return (
         <nav className="bg-white fixed top-0 left-0 z-40 w-full border-b">
-            <div className="px-2 sm:px-6 lg:ps-5 lg:pe-8">
+            <div className="px-2 sm:px-6">
                 <div className="relative flex h-16 items-center justify-between">
-                    <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                    <div className="absolute inset-y-0 left-0 flex items-center md:hidden">
                         <button
                             onClick={() => setOpenToggle(!openToggle)}
                             type="button"
@@ -66,11 +72,11 @@ const Navbar = () => {
                             </svg>
                         </button>
                     </div>
-                    <div className="flex flex-1 items-center justify-center sm:justify-start gap-4">
+                    <div className="flex flex-1 items-center justify-center md:justify-start gap-4">
                         <div className="flex flex-shrink-0 gap-1 items-center">
-                            <button className='sm:block '>
+                            {/* <button className='hidden md:block'>
                                 <HiOutlineBars3 className='w-6 h-6 ms-2.5 max-sm:hidden' />
-                            </button>
+                            </button> */}
                             <Link href="/" className="flex items-center p-2 text-gray-900 rounded-lg ">
                                 <img className="h-6 mb-2 w-auto" src="/regular_logo.svg" alt="it kku" />
                             </Link>
@@ -80,14 +86,6 @@ const Navbar = () => {
                         <div className="relative ml-3 flex flex-row gap-3">
                             {status == "authenticated" ?
                                 <div className='relative hidden sm:flex justify-center items-center gap-5'>
-                                    {/* {
-                                        session?.user?.role === "admin" &&
-                                        <Link href="/admin">
-                                            <Button className='rounded-[5px] bg-blue-500 text-white font-medium text-sm h-9'>
-                                                Admin panel
-                                            </Button>
-                                        </Link>
-                                    } */}
                                     <Dropdown
                                         radius="sm"
                                         classNames={{
@@ -169,20 +167,20 @@ const Navbar = () => {
                                 </div>
 
                             }
-                            {
+                            {/* {
                                 status == "unauthenticated" &&
                                 <div>
                                     <button onClick={() => signIn()} className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded active:scale-90'>
                                         เข้าสู่ระบบ
                                     </button>
                                 </div>
-                            }
+                            } */}
                         </div >
                     </div >
                 </div >
             </div >
             {openToggle &&
-                <div className="sm:hidden" id="mobile-menu">
+                <div className="md:hidden" id="mobile-menu">
                     <div className="space-y-1 p-2 border-t-1 border-t-gray-200">
                         {session &&
                             <div className="flex gap-4 items-start mb-1 border-b-1 border-b-gray-200 py-3 p-2">
@@ -201,32 +199,18 @@ const Navbar = () => {
                             </div>
                         }
                         {links.map((link, index) => (
-                            index == 0 && session?.user?.role == "admin" ?
-                                <Link href={"/admin"}
-                                    className={`${url.includes("admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                                    onClick={() => setOpenToggle(false)}
-                                    key={index}
-                                >
-                                    {url.includes("admin") ?
-                                        <>{link.activeIcon}</>
-                                        :
-                                        <>{link.icon}</>
-                                    }
-                                    <span className="ml-3 text-sm">Admin Panel</span>
-                                </Link>
-                                :
-                                <Link href={link.href}
-                                    className={`${url == link.href ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                                    onClick={() => setOpenToggle(false)}
-                                    key={index}
-                                >
-                                    {url == link.href ?
-                                        <>{link.activeIcon}</>
-                                        :
-                                        <>{link.icon}</>
-                                    }
-                                    <span className="ml-3 text-sm">{link.label}</span>
-                                </Link>
+                            <Link href={link.href}
+                                className={`${url == link.href ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                onClick={() => setOpenToggle(false)}
+                                key={index}
+                            >
+                                {url == link.href ?
+                                    <>{link.activeIcon}</>
+                                    :
+                                    <>{link.icon}</>
+                                }
+                                <span className="ml-3 text-sm">{link.label}</span>
+                            </Link>
                         ))}
                         <div className='border-t-1 border-t-gray-200 cursor-pointer'
                             onClick={() => signOut()}>

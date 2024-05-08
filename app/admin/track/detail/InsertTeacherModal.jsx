@@ -16,6 +16,7 @@ const InsertTeacherModal = ({ isOpen, onClose, src = "", track, getTeachers }) =
     const [previewImage, setPreviewImage] = useState(src)
     const [teacherName, setTeacherName] = useState("");
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [inserting, setInserting] = useState(false);
 
     const handleUpload = useCallback(e => {
         const file = e.target.files?.[0]
@@ -63,6 +64,7 @@ const InsertTeacherModal = ({ isOpen, onClose, src = "", track, getTeachers }) =
 
         if (uploadImageFile instanceof Blob || uploadImageFile instanceof File) {
             try {
+                setInserting(true)
                 await axios.post(`${hostname}${URL}`, formDataObject, {
                     headers,
                     onUploadProgress: (progressObj) => {
@@ -75,6 +77,8 @@ const InsertTeacherModal = ({ isOpen, onClose, src = "", track, getTeachers }) =
             } catch (error) {
                 console.log(error);
                 message.error("เพิ่มข้อมูลไม่สำเร็จ")
+            }finally{
+                setInserting(false)
             }
         } else {
             message.error("ต้องเพิ่มรูปอาจารย์ก่อน")
@@ -191,8 +195,15 @@ const InsertTeacherModal = ({ isOpen, onClose, src = "", track, getTeachers }) =
                                 <Button
                                     radius="sm"
                                     type="submit"
+                                    isDisabled={inserting}
+                                    isLoading={inserting}
                                     color="primary">
-                                    เพิ่ม
+                                        {
+                                            inserting ? 
+                                            "กำลังเพิ่ม..."
+                                            :
+                                            "เพิ่ม"
+                                        }
                                 </Button>
                             </ModalFooter>
                         </form>
