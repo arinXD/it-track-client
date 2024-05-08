@@ -1,5 +1,6 @@
 import { Empty } from "antd"
 import TeacherItem from "./TeacherItem"
+import Image from "next/image"
 
 const TeacherList = ({ teachers }) => {
     return (
@@ -12,11 +13,20 @@ const TeacherList = ({ teachers }) => {
                     </div>
                     :
                     <>
-                        <ul className="flex gap-4 ">
+                        <div className="grid justify-items-center max-lg:justify-items-center grid-cols-4 gap-4 px-80 my-9 max-2xl:px-0">
                             {teachers.map((teacher, index) => (
-                                <TeacherItem key={index} teacher={teacher} />
+                                <div key={index} className="grid col-span-1 max-lg:col-span-2 ">
+                                <Image
+                                    width={800}
+                                    height={800}
+                                    src={teacher?.image}
+                                    alt={teacher?.teacherName}
+                                    className="rounded-md w-[200px] h-[200px]"
+                                />
+                                <p className="text-center">{teacher?.teacherName}</p>
+                            </div>
                             ))}
-                        </ul>
+                        </div>
                     </>
             }
         </section>
