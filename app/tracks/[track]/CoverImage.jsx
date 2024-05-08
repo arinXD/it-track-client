@@ -3,7 +3,7 @@ import Image from 'next/image'
 const CoverImage = ({ track }) => {
     return (
         <>
-            <section className='mt-16 sm:ml-[240px] h-[300px] relative'>
+            <section className='mt-16 md:ml-[240px] h-[300px] relative'>
                 <Image
                     width={1000}
                     height={500}
@@ -18,13 +18,28 @@ const CoverImage = ({ track }) => {
                     }}
                     className='w-full font-bold text-white absolute uppercase px-10 text-4xl text-center'
                 >
-                    <span className='block'>
+                    <span
+                        style={{
+                            fontSize: "clamp(16px, 5vw, 24px)",
+                            margin: "auto"
+                        }}
+                        className='block'>
                         {track?.title_en}
                     </span>
-                    <span className='block'>
+                    <span
+                        style={{
+                            fontSize: "clamp(16px, 5vw, 24px)",
+                            margin: "auto"
+                        }}
+                        className='block'>
                         {track?.title_th}
                     </span>
-                    <span className='block text-lg mt-3 text-default-200 font-normal'>
+                    <span
+                        style={{
+                            fontSize: "clamp(8px, 4vw, 16px)",
+                            margin: "auto"
+                        }}
+                        className='block text-lg mt-3 text-default-200 font-normal'>
                         {track?.desc}
                     </span>
                 </p>

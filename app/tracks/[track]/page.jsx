@@ -52,7 +52,7 @@ const Page = async ({ params }) => {
                 trackData && Object?.keys(trackData).length > 0 ?
                     <>
                         <CoverImage track={trackData} />
-                        <section className='py-8 px-16 sm:ml-[240px]'>
+                        <section className='p-4 md:p-6 md:ml-[240px]'>
                             <BreadCrumb />
                             <TeacherList teachers={teachers} />
                             <SubjectList
@@ -61,7 +61,7 @@ const Page = async ({ params }) => {
                         </section>
                     </>
                     :
-                    <div className='mt-16 sm:ml-[240px] pt-10 flex items-center justify-center'>
+                    <div className='mt-16 md:ml-[240px] pt-10 flex items-center justify-center'>
                         <Empty />
                     </div>
             }

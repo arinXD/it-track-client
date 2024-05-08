@@ -6,9 +6,6 @@ import localFont from 'next/font/local'
 // export const metadata = {
 //     title: 'IT Track',
 //     description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
-//     icons: {
-//         icon: '/logo.png',
-//       },
 // }
 
 const prompt = localFont({ src: '../public/fonts/Prompt-Regular.woff2' })

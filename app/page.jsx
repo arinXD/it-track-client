@@ -37,25 +37,7 @@ const Page = async () => {
             </header>
             <Sidebar />
             <ContentWrap>
-                <div className="flex flex-col gap-4 my-4">
-                    <div className="flex justify-between gap-3 items-start">
-                        <h1>ข่าวสารและประชาสัมพันธ์</h1>
-                        <div className="flex gap-6">
-                            <Button
-                                startContent={<BiBook className='w-5 h-5' />}
-                                className=''>
-                                ค้นหาวิชา
-                            </Button>
-                            <Link href={"/tracks"}>
-                                <Button
-                                    startContent={<HiOutlineUserGroup className='h-5 w-5' />}
-                                    className=''>
-                                    ค้นหาแทรค
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
+                <h1 className='mb-4'>ข่าวสารและประชาสัมพันธ์</h1>
                 <News />
             </ContentWrap>
         </>

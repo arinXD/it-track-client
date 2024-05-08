@@ -27,16 +27,17 @@ const Track = ({ tracks }) => {
                             className='text-center sm:text-start font-bold text-3xl mb-6'>
                             แทร็กความเชี่ยวชาญ
                         </h1>
-                        <ul>
+                        <ul className='space-y-6'>
                             {tracks.map((track, index) => (
                                 <li key={index}
-                                    className='flex flex-col sm:flex-row justify-start items-start gap-6 mb-6 border-b-1 pb-4'>
+                                    className='flex flex-col sm:flex-row justify-start items-start gap-6 border-b-1 pb-4'>
                                     <div
                                         className='w-full sm:w-[250px] h-[180px] relative'>
                                         <Image
+                                            priority={true}
                                             width={600}
                                             height={400}
-                                            className='w-full h-full object-cover rounded-md brightness-75'
+                                            className='w-full h-full object-cover brightness-75'
                                             alt={track.track}
                                             src={track.img} />
                                         <p
@@ -52,23 +53,24 @@ const Track = ({ tracks }) => {
                                     <div className='flex flex-col items-start justify-between w-full h-full'>
                                         <div className='flex flex-col gap-4'>
                                             <div className='flex flex-col gap-1'>
-                                                <p className='font-bold'>{track.title_en}</p>
+                                                <p className='font-bold text-lg'>{track.title_en}</p>
                                                 <p>{track.title_th}</p>
                                             </div>
-                                            <p>
+                                            <p className='text-default-500'>
                                                 {track.desc}
                                             </p>
                                         </div>
-                                        <div className='flex justify-end w-full sm:justify-start mt-4'>
-                                            <Link href={`/tracks/${track.track?.toLowerCase()}`}>
-                                                <Button
-                                                    radius='md'
-                                                    className='w-fit'
-                                                >
-                                                    รายละเอียด
-                                                </Button>
-                                            </Link>
-                                        </div>
+                                        <Link
+                                            href={`/tracks/${track.track?.toLowerCase()}`}
+                                            className='flex w-full sm:justify-start mt-4'>
+                                            <Button
+                                                radius='sm'
+                                                className='!w-full'
+                                                color={"primary"}
+                                            >
+                                                รายละเอียด
+                                            </Button>
+                                        </Link>
                                     </div>
                                 </li>
                             ))}
