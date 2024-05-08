@@ -201,32 +201,18 @@ const Navbar = () => {
                             </div>
                         }
                         {links.map((link, index) => (
-                            index == 0 && session?.user?.role == "admin" ?
-                                <Link href={"/admin"}
-                                    className={`${url.includes("admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                                    onClick={() => setOpenToggle(false)}
-                                    key={index}
-                                >
-                                    {url.includes("admin") ?
-                                        <>{link.activeIcon}</>
-                                        :
-                                        <>{link.icon}</>
-                                    }
-                                    <span className="ml-3 text-sm">Admin Panel</span>
-                                </Link>
-                                :
-                                <Link href={link.href}
-                                    className={`${url == link.href ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                                    onClick={() => setOpenToggle(false)}
-                                    key={index}
-                                >
-                                    {url == link.href ?
-                                        <>{link.activeIcon}</>
-                                        :
-                                        <>{link.icon}</>
-                                    }
-                                    <span className="ml-3 text-sm">{link.label}</span>
-                                </Link>
+                            <Link href={link.href}
+                                className={`${url == link.href ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                onClick={() => setOpenToggle(false)}
+                                key={index}
+                            >
+                                {url == link.href ?
+                                    <>{link.activeIcon}</>
+                                    :
+                                    <>{link.icon}</>
+                                }
+                                <span className="ml-3 text-sm">{link.label}</span>
+                            </Link>
                         ))}
                         <div className='border-t-1 border-t-gray-200 cursor-pointer'
                             onClick={() => signOut()}>

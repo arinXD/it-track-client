@@ -20,18 +20,22 @@ const Track = ({ tracks }) => {
                     </div>
                     :
                     <>
-                        <h1 className='font-bold text-3xl mb-6'>
+                        <h1
+                            style={{
+                                fontSize: "clamp(20px, 5vw, 24px)",
+                            }}
+                            className='text-center sm:text-start font-bold text-3xl mb-6'>
                             แทร็กความเชี่ยวชาญ
                         </h1>
                         <ul>
                             {tracks.map((track, index) => (
                                 <li key={index}
-                                    className='flex justify-start items-start gap-6 mb-6 border-b-1 pb-4'>
+                                    className='flex flex-col sm:flex-row justify-start items-start gap-6 mb-6 border-b-1 pb-4'>
                                     <div
-                                        className='w-[250px] h-[180px] relative'>
+                                        className='w-full sm:w-[250px] h-[180px] relative'>
                                         <Image
-                                            width={250}
-                                            height={180}
+                                            width={600}
+                                            height={400}
                                             className='w-full h-full object-cover rounded-md brightness-75'
                                             alt={track.track}
                                             src={track.img} />
@@ -45,7 +49,7 @@ const Track = ({ tracks }) => {
                                             {track.track}
                                         </p>
                                     </div>
-                                    <div className='flex flex-col items-start justify-between w-full h-[180px]'>
+                                    <div className='flex flex-col items-start justify-between w-full h-full'>
                                         <div className='flex flex-col gap-4'>
                                             <div className='flex flex-col gap-1'>
                                                 <p className='font-bold'>{track.title_en}</p>
@@ -55,7 +59,7 @@ const Track = ({ tracks }) => {
                                                 {track.desc}
                                             </p>
                                         </div>
-                                        <div>
+                                        <div className='flex justify-end w-full sm:justify-start mt-4'>
                                             <Link href={`/tracks/${track.track?.toLowerCase()}`}>
                                                 <Button
                                                     radius='md'

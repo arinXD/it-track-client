@@ -1,20 +1,8 @@
 "use client"
-
-import { Inter, Roboto, Rubik } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from './components'
-
-const inter = Inter({ subsets: ['latin'] })
-const roboto = Roboto({
-    weight: '400',
-    subsets: ['latin'],
-})
-const rubik = Rubik({
-    weight: '400',
-    subsets: ['latin'],
-})
-
-
+import localFont from 'next/font/local'
+ 
 // export const metadata = {
 //     title: 'IT Track',
 //     description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
@@ -23,6 +11,8 @@ const rubik = Rubik({
 //       },
 // }
 
+const prompt = localFont({ src: '../public/fonts/Prompt-Regular.woff2' })
+
 export default function RootLayout({ children }) {
     return (
         <html>
@@ -30,7 +20,7 @@ export default function RootLayout({ children }) {
                 <link rel="icon" href="/logo.png" sizes="any" />
             </head>
             <body
-                className={inter.className}
+                className={prompt.className}
                 suppressHydrationWarning={true}
             >
                 <main>

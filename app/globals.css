@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  font-family: "Kanit", sans-serif !important;
-}
-
 html {
   scroll-behavior: smooth !important;
 }

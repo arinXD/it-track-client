@@ -7,8 +7,10 @@ const SubjectList = ({ track, subjects }) => {
             <ul className="list-disc ps-4">
                 {subjects.map((subject, index) => (
                     <li
+                        className="flex gap-2"
                         key={index}>
                         <span>{subject?.title_en}</span>
+                        -
                         <span>{subject?.title_th}</span>
                     </li>
                 ))}
