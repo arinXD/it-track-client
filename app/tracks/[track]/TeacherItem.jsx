@@ -2,7 +2,7 @@ import Image from "next/image"
 
 const TeacherItem = ({ teacher }) => {
     return (
-        <div className="flex flex-col w-full md:w-1/2 lg:w-[200px]">
+        <div className="grid col-span-1 max-md:col-span-2">
             <Image
                 width={800}
                 height={800}
