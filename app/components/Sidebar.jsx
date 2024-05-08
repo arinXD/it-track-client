@@ -69,9 +69,9 @@ const Sidebar = () => {
                         </li>
                         <li className="">
                             <Link href={"/tracks"}
-                                className={`${url.includes("/tracks") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                className={`${url.includes("/tracks") && url.startsWith("/tracks") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                             >
-                                {url.includes("/tracks") ?
+                                {url.includes("/tracks") && url.startsWith("/tracks") ?
                                     <HiUserGroup
                                         className="w-5 h-5" />
                                     :
