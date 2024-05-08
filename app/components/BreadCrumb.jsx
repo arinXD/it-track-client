@@ -21,7 +21,12 @@ const links = {
     "restore": "รายการที่ถูกลบ",
     "trackstudent": "รายชื่อนักศึกษาภายในแทรค",
     "verify": "แบบฟอร์มตรวจสอบจบ",
-    "detail": "รายละเอียด"
+    "detail": "รายละเอียด",
+    "tracks": "แทรค",
+    "web%20and%20mobile": "Mobile and Web Application Development",
+    "network": "Network Systems, Information Technology Security, and Internet of Things (IoT)",
+    "bit": "Business Information Technology",
+
 };
 
 const BreadCrumb = () => {
