@@ -221,7 +221,9 @@ const Page = () => {
                     :
                     !(verifySelect?.id) ?
                         <>
-                            <p>รอการประกาศจากอาจารย์ครับ/ค่ะ</p>
+                            <p className='text-center font-bold text-lg my-28'>
+                                Coming soon!
+                            </p>
                         </>
                         :
                         <>
