@@ -145,7 +145,8 @@ const Page = () => {
                         showToastMessage(ok, message)
                     })
                     .catch(error => {
-                        const message = error.response.data.message
+                        console.log(error);
+                        const message = error?.response?.data?.message
                         showToastMessage(false, message)
                     })
             }

@@ -255,7 +255,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             </h4>
                                             <p>แทร็กของคุณ คือ {trackResult?.title_en}</p>
                                             <p>{trackResult?.title_th}</p>
-                                            <Link>รายละเอียดแทร็ก</Link>
+                                            <Link href={`/tracks/${trackResult.track}`} className='text-blue-500 mt-3 block'>รายละเอียดแทร็ก</Link>
                                         </div>
                                     )
                                     :
