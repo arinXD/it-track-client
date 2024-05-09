@@ -89,14 +89,13 @@ const Page = ({ params }) => {
             result.expiredAt = format(new Date(result?.expiredAt), 'yyyy-MM-dd HH:mm')
             setTrackSelect(result)
             setTrackSubj(result?.Subjects)
-            console.log(result?.Subjects);
         } catch (err) {
             console.error("Error on init func:", err);
         }
     }, [])
 
     const getTracks = useCallback(async function () {
-        let tracks = await fetchData(`/api/tracks`)
+        let tracks = await fetchData(`/api/tracks/all`)
         if (tracks?.length) {
             tracks = tracks.map(track => track.track)
         } else {
