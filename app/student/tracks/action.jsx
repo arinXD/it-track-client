@@ -15,7 +15,7 @@ export async function createTrackSelection(formData) {
         if (!unique) {
             return ({
                 ok: false,
-                message: "แทรคต้องไม่ซ้ำกัน",
+                message: "แทร็กต้องไม่ซ้ำกัน",
             })
         }
 

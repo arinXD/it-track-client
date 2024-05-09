@@ -12,6 +12,7 @@ import confetti from 'canvas-confetti';
 import { Loading } from '@/app/components'
 import TMonlicaEmail from '@/app/components/TMonlicaEmail'
 import { getOptions } from '@/app/components/serverAction/TokenAction'
+import Link from 'next/link'
 
 const TrackSelectionForm = ({ enrollments, userData }) => {
     const initOrder = {
@@ -223,7 +224,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 {trackSelect?.title}
             </h4>
             <div>
-                คุณไม่มีสิทธิ์เข้ารับการคัดเลือกแทรคในหลักสูตรเทคโนโลยีสารสนเทศ ติดต่อ <TMonlicaEmail />
+                คุณไม่มีสิทธิ์เข้ารับการคัดเลือกแทร็กในหลักสูตรเทคโนโลยีสารสนเทศ ติดต่อ <TMonlicaEmail />
             </div>
         </div>
     }
@@ -236,7 +237,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                     :
                     !(trackSelect?.id) ?
                         <>
-                            รอการประกาศการคัดเลือกแทรคจากอาจารย์ครับ/ค่ะ
+                            รอการประกาศการคัดเลือกแทร็กจากอาจารย์ครับ/ค่ะ
                         </>
                         :
                         <>
@@ -252,8 +253,9 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                 className="md:!mt-4 max-w-screen-md block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
                                                 {trackSelect?.title}
                                             </h4>
-                                            <p>แทรคของคุณ คือ {trackResult?.title_en}</p>
+                                            <p>แทร็กของคุณ คือ {trackResult?.title_en}</p>
                                             <p>{trackResult?.title_th}</p>
+                                            <Link>รายละเอียดแทร็ก</Link>
                                         </div>
                                     )
                                     :
@@ -334,7 +336,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         </div>
                                         <div className="mb-1 flex flex-col mt-5">
                                             <div>
-                                                <label className="block font-bold text-black text-base">เลือกอันดับความเชี่ยวชาญ (แทรค) ที่ต้องการ</label>
+                                                <label className="block font-bold text-black text-base">เลือกอันดับความเชี่ยวชาญ (แทร็ก) ที่ต้องการ</label>
                                                 <label className="block text-sm font-medium text-black mb-5 mt-2">* อันดับแรกคืออันดับที่ต้องการมากที่สุด จากนั้นเลือกอันดับที่ต้องการรองจากอับดับแรก ในกรณีที่อับดับแรกเต็ม</label>
                                             </div>
                                             <div>
@@ -356,7 +358,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                                     (orders[`order${index + 1}`]) ? orders[`order${index + 1}`] : ""
                                                                 }
                                                                 className="select-order bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-white dark:placeholder-black-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:border-blue-500 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50">
-                                                                <option value="" disabled hidden>เลือกแทรค</option>
+                                                                <option value="" disabled hidden>เลือกแทร็ก</option>
                                                                 {tracks.map((track, index) => (
                                                                     <option
                                                                         hidden={[orders.order1, orders.order2, orders.order3].includes(track.track)}
