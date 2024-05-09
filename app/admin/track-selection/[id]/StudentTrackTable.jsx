@@ -259,7 +259,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
     return (
         <div>
             <h2 id={`${track.toLowerCase()}-students`} className='mb-3 text-default-900 text-small'>
-                {title && <> รายชื่อนักศึกษาแทรค {track} จำนวน {studentData?.students?.length} คน</>}
+                {title && <> รายชื่อนักศึกษาแทร็ก {track} จำนวน {studentData?.students?.length} คน</>}
                 {studentData?.normal > 0 && <>โครงการปกติ {studentData?.normal} คน</>}
                 {studentData?.vip > 0 && <>โครงการพิเศษ {studentData?.vip} คน</>}
             </h2>

@@ -143,7 +143,7 @@ const Page = ({ params }) => {
 
     const handleUpdate = useCallback(async function () {
         swal.fire({
-            text: `ต้องการแก้ไขข้อมูลการคัดแทรคปีการศึกษา ${trackSelect.acadyear} หรือไม่`,
+            text: `ต้องการแก้ไขข้อมูลการคัดแทร็กปีการศึกษา ${trackSelect.acadyear} หรือไม่`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "ตกลง",
@@ -251,7 +251,7 @@ const Page = ({ params }) => {
 
     const handleDelete = useCallback(async function () {
         swal.fire({
-            text: `ต้องการลบการคัดแทรคปีการศึกษา ${trackSelect.acadyear} หรือไม่ ?`,
+            text: `ต้องการลบการคัดแทร็กปีการศึกษา ${trackSelect.acadyear} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -283,7 +283,7 @@ const Page = ({ params }) => {
         const selecteData = {
             "all": {
                 studentData: allTrack,
-                track: "ทุกแทรค"
+                track: "ทุกแทร็ก"
             },
             "BIT": {
                 studentData: studentsBit,
@@ -830,7 +830,7 @@ const Page = ({ params }) => {
                                             : (studentsBit?.students?.length == 0 &&
                                                 studentsNetwork?.students?.length == 0 &&
                                                 studentsWeb?.students?.length == 0) ?
-                                                <p>ยังไม่มีนักศึกษาเลือกแทรค</p>
+                                                <p>ยังไม่มีนักศึกษาเลือกแทร็ก</p>
                                                 :
                                                 null
                                     }
@@ -920,7 +920,7 @@ const Page = ({ params }) => {
                                 </div>
                                 :
                                 <>
-                                    <p className='text-center'>ไม่มีข้อมูลคัดเลือกแทรค</p>
+                                    <p className='text-center'>ไม่มีข้อมูลคัดเลือกแทร็ก</p>
                                 </>
                         }
 

@@ -98,7 +98,7 @@ const Page = () => {
 
     const handleDelete = useCallback(async function (acadyear) {
         swal.fire({
-            text: `ต้องการลบการคัดแทรคปีการศึกษา ${acadyear} หรือไม่ ?`,
+            text: `ต้องการลบการคัดแทร็กปีการศึกษา ${acadyear} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",

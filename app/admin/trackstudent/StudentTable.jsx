@@ -269,7 +269,7 @@ const StudentTable = () => {
                               variant="bordered"
                               label="ค้นหานักศึกษา"
                               className="w-full sm:max-w-[44%]"
-                              placeholder="ค้นหาจาก รหัส, ชื่อ-สกุล, แทรค"
+                              placeholder="ค้นหาจาก รหัส, ชื่อ-สกุล, แทร็ก"
                               size="sm"
                               labelPlacement="outside"
                               startContent={<SearchIcon />}

@@ -23,12 +23,12 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
             sortable: true
         },
         {
-            name: "ชื่อแทรค (EN)",
+            name: "ชื่อแทร็ก (EN)",
             uid: "title_en",
             sortable: true
         },
         {
-            name: "ชื่อแทรค (TH)",
+            name: "ชื่อแทร็ก (TH)",
             uid: "title_th",
             sortable: true
         },
@@ -178,14 +178,14 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
         return (
             <div className="flex flex-col gap-4">
                 <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-center gap-2 rounded-md'>
-                    <h1>ข้อมูลแทรค</h1>
+                    <h1>ข้อมูลแทร็ก</h1>
                     <div className="flex gap-2">
                         <Button
                             radius='sm'
                             size='sm'
                             onPress={openInsertModal}
                             startContent={<PlusIcon className="w-5 h-5" />}>
-                            เพิ่มแทรค
+                            เพิ่มแทร็ก
                         </Button>
                         <Link href="/admin/track/restore">
                             <Button
@@ -210,7 +210,7 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
                 <Input
                     isClearable
                     className="w-full h-fit"
-                    placeholder="ค้นหาแทรค"
+                    placeholder="ค้นหาแทร็ก"
                     size="sm"
                     classNames={inputClass}
                     startContent={<SearchIcon />}
@@ -300,7 +300,7 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
                 <TableBody
                     isLoading={fetching}
                     loadingContent={<Spinner />}
-                    // emptyContent={"ไม่มีข้อมูลแทรค"}
+                    // emptyContent={"ไม่มีข้อมูลแทร็ก"}
                     items={sortedItems}>
                     {(item) => (
                         <TableRow key={item.track}>

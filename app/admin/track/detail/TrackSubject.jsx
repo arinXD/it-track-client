@@ -43,7 +43,7 @@ const TrackSubject = ({ track }) => {
 
     const handleSelectDelete = useCallback(async (selectSubjects) => {
         const { value } = await swal.fire({
-            text: `ต้องการลบวิชาภายในแทรคหรือไม่ ?`,
+            text: `ต้องการลบวิชาภายในแทร็กหรือไม่ ?`,
             icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",

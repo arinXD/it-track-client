@@ -60,7 +60,7 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
     const handleSelectedDel = useCallback(async function () {
         if (selectedTrackSelect.length == 0) return
         swal.fire({
-            text: `ต้องการลบการคัดแทรคปีการศึกษา ${selectedTrackSelect.join(", ")} หรือไม่ ?`,
+            text: `ต้องการลบการคัดแทร็กปีการศึกษา ${selectedTrackSelect.join(", ")} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -115,7 +115,7 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
                         onPress={handleOpen}
                         color="default"
                         startContent={<PlusIcon className="w-5 h-5" />}>
-                        เพิ่มการคัดเลือกแทรค
+                        เพิ่มการคัดเลือกแทร็ก
                     </Button>
                     <div className={`${disableDeleteBtn ? "cursor-not-allowed" : ""}`}>
                         <Button
@@ -207,7 +207,7 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
                                     </TableRow>
                                 ))}
                             </TableBody> :
-                            <TableBody emptyContent={"ไม่มีข้อมูลคัดเลือกแทรค"}>{[]}</TableBody>}
+                            <TableBody emptyContent={"ไม่มีข้อมูลคัดเลือกแทร็ก"}>{[]}</TableBody>}
                     </Table>
             }
         </div >
