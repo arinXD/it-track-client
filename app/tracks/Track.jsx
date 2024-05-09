@@ -2,20 +2,18 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-// import { Button } from '@nextui-org/react';
-import Link from 'next/link';
 import { Empty } from 'antd';
-import { Card, CardHeader, CardBody, CardFooter, Button, Image } from "@nextui-org/react";
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Card, CardFooter, Image } from "@nextui-org/react";
+import { useRouter, } from 'next/navigation'
 
 const Track = ({ tracks }) => {
 
     const router = useMemo(() => useRouter(), [])
 
-    const linkTo = useCallback(function (url) {
+    const linkTo = function (url) {
         router.push(url);
         router.refresh()
-    }, [router])
+    }
 
     useEffect(() => {
         AOS.init();
