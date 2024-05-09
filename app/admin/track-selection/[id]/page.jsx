@@ -653,7 +653,7 @@ const Page = ({ params }) => {
                                                     </Chip>
                                                 </span>
                                             </div>
-                                            <div className='flex flex-row justify-start items-center gap-3 border-t-1 border-gray-300 pt-3'>
+                                            <div className='flex flex-row justify-start items-center gap-3 border-t-1 border-gray-300 pt-3 flex-wrap'>
                                                 <div className={!valueChange ? "cursor-not-allowed" : ""}>
                                                     <Button
                                                         size='sm'
@@ -760,8 +760,14 @@ const Page = ({ params }) => {
                                                     <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-emerald-400 text-white`}>
                                                         <table className='table-auto mx-auto'>
                                                             <thead>
-                                                                <tr className=''>
-                                                                    <th className='text-base'>IOT & Networking</th>
+                                                                <tr className='w-full'>
+                                                                    <th
+                                                                        style={{
+                                                                            whiteSpace: "nowrap",
+                                                                            overflow: "hidden",
+                                                                            textOverflow: "ellipsis",
+                                                                        }}
+                                                                        className='text-base'>Network</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
