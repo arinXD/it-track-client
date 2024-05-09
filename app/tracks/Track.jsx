@@ -7,8 +7,7 @@ import { Card, CardFooter, Image } from "@nextui-org/react";
 import { useRouter, } from 'next/navigation'
 
 const Track = ({ tracks }) => {
-
-    const router = useMemo(() => useRouter(), [])
+    const router = useRouter()
 
     const linkTo = function (url) {
         router.push(url);
