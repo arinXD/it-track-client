@@ -264,9 +264,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                 icon={<SmileOutlined />}
                                                 title={`แทร็กของคุณ คือ ${trackResult?.title_en}`}
                                                 subTitle={<p className='text-lg'>{trackResult?.title_th}</p>}
-                                            // extra={<Button type="primary">Next</Button>}
                                             />
-                                            <Link href={`/tracks/${trackResult.track}`} className='text-blue-500 block'>รายละเอียดแทร็ก</Link>
+                                            <Link href={`/tracks/${trackResult?.track?.toLowerCase()}`} className='text-blue-500 block'>รายละเอียดแทร็ก</Link>
                                         </div>
                                     )
                                     :
