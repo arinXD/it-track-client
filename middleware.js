@@ -61,6 +61,7 @@ export const config = {
         "/",
         "/student/:path*",
         "/teacher/:path*",
+        "/tracks/:path*",
         "/admin/:path*",
         "/dashboard"
     ]
