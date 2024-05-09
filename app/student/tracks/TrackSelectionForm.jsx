@@ -1,15 +1,12 @@
 "use client"
-import { useCallback } from 'react'
-import { hostname } from '@/app/api/hostname'
 import axios from 'axios'
 import { useState, useEffect, useReducer } from 'react'
 import { createTrackSelection } from './action'
 import Swal from 'sweetalert2'
-import { Button } from "@nextui-org/react";
+import { Button, Spinner } from "@nextui-org/react";
 import { DeleteIcon } from '@/app/components/icons'
 import { dmy, dmyt } from '@/src/util/dateFormater'
 import confetti from 'canvas-confetti';
-import { Loading } from '@/app/components'
 import TMonlicaEmail from '@/app/components/TMonlicaEmail'
 import { getOptions } from '@/app/components/serverAction/TokenAction'
 import Link from 'next/link'
@@ -240,7 +237,9 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         return (
             <div className="relative flex flex-col rounded-xl bg-transparent bg-clip-border text-gray-700 shadow-none">
                 {loading ?
-                    <Loading />
+                    <div className='w-full flex justify-center h-[70vh]'>
+                        <Spinner label="กำลังโหลด..." color="primary" />
+                    </div>
                     :
                     !(trackSelect?.id) ?
                         <>
