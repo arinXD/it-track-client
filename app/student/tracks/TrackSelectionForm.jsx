@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import { hostname } from '@/app/api/hostname'
 import axios from 'axios'
 import { useState, useEffect, useReducer } from 'react'
@@ -13,6 +13,9 @@ import { Loading } from '@/app/components'
 import TMonlicaEmail from '@/app/components/TMonlicaEmail'
 import { getOptions } from '@/app/components/serverAction/TokenAction'
 import Link from 'next/link'
+
+import { SmileOutlined } from '@ant-design/icons';
+import { Result } from 'antd';
 
 const TrackSelectionForm = ({ enrollments, userData }) => {
     const initOrder = {
@@ -213,6 +216,10 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         }
     }, [orders]);
 
+    useEffect(() => {
+        if ((trackSelect?.has_finished || (new Date(trackSelect?.expiredAt) < new Date())) && trackResult) handleConfetti();
+    }, [trackResult, trackSelect])
+
     if (userData?.program !== "IT") {
         <div className='text-center'>
             <h4
@@ -244,18 +251,22 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                             {(trackSelect?.has_finished || (new Date(trackSelect?.expiredAt) < new Date())) ?
                                 trackResult ?
                                     (
-                                        <div className='text-center'>
-                                            <h4
+                                        <div className='flex flex-col justify-center items-center h-[70vh]'>
+                                            {/* <h4
                                                 style={{
                                                     fontSize: "clamp(16px, 5vw, 24px)",
                                                     margin: "auto"
                                                 }}
                                                 className="md:!mt-4 max-w-screen-md block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
                                                 {trackSelect?.title}
-                                            </h4>
-                                            <p>แทร็กของคุณ คือ {trackResult?.title_en}</p>
-                                            <p>{trackResult?.title_th}</p>
-                                            <Link href={`/tracks/${trackResult.track}`} className='text-blue-500 mt-3 block'>รายละเอียดแทร็ก</Link>
+                                            </h4> */}
+                                            <Result
+                                                icon={<SmileOutlined />}
+                                                title={`แทร็กของคุณ คือ ${trackResult?.title_en}`}
+                                                subTitle={<p className='text-lg'>{trackResult?.title_th}</p>}
+                                            // extra={<Button type="primary">Next</Button>}
+                                            />
+                                            <Link href={`/tracks/${trackResult.track}`} className='text-blue-500 block'>รายละเอียดแทร็ก</Link>
                                         </div>
                                     )
                                     :

@@ -26,19 +26,19 @@ const Navbar = () => {
             href: "/tracks",
             activeIcon: <HiUserGroup className="w-5 h-5" />,
             icon: <HiOutlineUserGroup className="w-5 h-5" />,
-            label: "แทรค"
+            label: "แทร็ก"
         },
         {
             href: "/student/tracks",
             activeIcon: <AiFillEdit className="w-5 h-5" />,
             icon: <AiOutlineEdit className="w-5 h-5" />,
-            label: "คัดเลือกแทรค"
+            label: "คัดเลือกแทร็ก"
         },
         {
             href: "/student/tracks/exam",
             activeIcon: <MdQuiz className="w-5 h-5" />,
             icon: <MdOutlineQuiz className="w-5 h-5" />,
-            label: "แนะนำแทรค"
+            label: "แนะนำแทร็ก"
         },
         {
             href: "/student/verify",

@@ -78,7 +78,7 @@ const Sidebar = () => {
                                     <HiOutlineUserGroup
                                         className="w-5 h-5" />
                                 }
-                                <span className="ml-3 text-sm">แทรค</span>
+                                <span className="ml-3 text-sm">แทร็ก</span>
                             </Link>
                         </li>
                         <li className="">
@@ -92,7 +92,7 @@ const Sidebar = () => {
                                     <AiOutlineEdit
                                         className="w-5 h-5" />
                                 }
-                                <span className="ml-3 text-sm">คัดเลือกแทรค</span>
+                                <span className="ml-3 text-sm">คัดเลือกแทร็ก</span>
                             </Link>
                         </li>
                         <li className="">
@@ -106,7 +106,7 @@ const Sidebar = () => {
                                     <MdOutlineQuiz
                                         className="w-5 h-5" />
                                 }
-                                <span className="ml-3 text-sm">แนะนำแทรค</span>
+                                <span className="ml-3 text-sm">แนะนำแทร็ก</span>
                             </Link>
                         </li>
                         <li className="">

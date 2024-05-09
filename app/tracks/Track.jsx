@@ -1,13 +1,22 @@
 "use client"
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { Button } from '@nextui-org/react';
+// import { Button } from '@nextui-org/react';
 import Link from 'next/link';
 import { Empty } from 'antd';
-import Image from 'next/image';
+import { Card, CardHeader, CardBody, CardFooter, Button, Image } from "@nextui-org/react";
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const Track = ({ tracks }) => {
+
+    const router = useMemo(() => useRouter(), [])
+
+    const linkTo = useCallback(function (url) {
+        router.push(url);
+        router.refresh()
+    }, [router])
+
     useEffect(() => {
         AOS.init();
     }, [])
@@ -19,15 +28,59 @@ const Track = ({ tracks }) => {
                         <Empty />
                     </div>
                     :
-                    <>
+                    <div className='my-[30px] px-8 max-lg:px-4'>
                         <h1
-                            style={{
-                                fontSize: "clamp(20px, 5vw, 24px)",
+                            style={{             //min def max
+                                fontSize: "clamp(45px, 3vw, 30px)",
                             }}
-                            className='text-center sm:text-start font-bold text-3xl mb-6'>
+                            className='text-center sm:text-start font-bold text-3xl mb-8'>
                             แทร็กความเชี่ยวชาญ
                         </h1>
-                        <ul className='space-y-6'>
+                        <p className='text-center sm:text-start text-lg mb-8'>
+                            ค้นพบแทร็กหลักสูตรไอทีล่าสุด! ยกระดับทักษะของคุณด้วยความเชี่ยวชาญที่ล้ำสมัย นำทางไปสู่อนาคตของความสำเร็จทางเทคโนโลยี
+                        </p>
+                        <div className='grid grid-cols-12 gap-4'>
+                            {tracks.map((track, index) => {
+                                let colSpan;
+                                if (index === 0) {
+                                    colSpan = 'col-span-7';
+                                } else if (index === 1) {
+                                    colSpan = 'col-span-5';
+                                } else {
+                                    colSpan = 'col-span-12';
+                                }
+
+                                return (
+                                    <div key={index} className={`w-full grid max-lg:col-span-12 ${colSpan}`}>
+                                        <Card
+                                            key={index}
+                                            shadow="none"
+                                            isPressable
+                                            onClick={() => linkTo(`/tracks/${track.track?.toLowerCase()}`)}
+                                            radius='none'
+                                            isFooterBlurred
+                                            className="group relative w-full h-[400px] max-xl:h-[250px]">
+                                            <Image
+                                                radius='none'
+                                                removeWrapper
+                                                width={1000}
+                                                height={1000}
+                                                unoptimized="true"
+                                                className="z-0 w-full h-full object-cover"
+                                                quality={100}
+                                                alt={track.track}
+                                                src={track.img} />
+                                            <CardFooter className="flex-col justify-center h-full text-white bg-opacity-60 bg-black text-small absolute bottom-[-30em] group-hover:bottom-0 ease-in-out duration-400">
+                                                <span className='text-3xl font-extrabold'>{track.track}</span>
+                                                <hr className='w-10 mt-7 mb-5 border-2 border-gray-500'></hr>
+                                                <span className='text-2xl text-default-300'>{track.title_th}</span>
+                                            </CardFooter>
+                                        </Card>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        {/* <ul className='space-y-6'>
                             {tracks.map((track, index) => (
                                 <li key={index}
                                     className='flex flex-col sm:flex-row justify-start items-start gap-6 border-b-1 pb-4'>
@@ -74,8 +127,8 @@ const Track = ({ tracks }) => {
                                     </div>
                                 </li>
                             ))}
-                        </ul>
-                    </>
+                        </ul> */}
+                    </div >
             }
         </>
     )

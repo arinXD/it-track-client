@@ -395,13 +395,13 @@ export default function Page() {
                 {
                     !trackSelect?.Selections?.length ?
                         <p className='text-lg font-bold color-[#11142D] mb-4 text-center'>
-                            ไม่มีข้อมูลการคัดเลือกแทรคของปีการศึกษา {acadyear.value}
+                            ไม่มีข้อมูลการคัดเลือกแทร็กของปีการศึกษา {acadyear.value}
                         </p>
                         :
                         <>
                             <div className='mt-[30px]'>
                                 <p className='text-lg mt-4 font-bold color-[#11142D] mb-4'>
-                                    ตัวชี้วัดแสดงผลรวมการคัดเลือกแทรคประจำปีการศึกษา {acadyear.value}
+                                    ตัวชี้วัดแสดงผลรวมการคัดเลือกแทร็กประจำปีการศึกษา {acadyear.value}
                                 </p>
                             </div>
                             <div className="w-full gap-4 grid place-items-center grid-cols-12 grid-rows-1">
@@ -419,14 +419,14 @@ export default function Page() {
                                 <div className="flex gap-3 flex-col items-center p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
                                     <div className='w-full text-start'>
                                         <p className='text-lg font-semi-bold text-[#11142d]'>
-                                            เกรดเฉลี่ยรวมของนักศึกษาภายในแทรค ปีการศึกษา {acadyear.value}
+                                            เกรดเฉลี่ยรวมของนักศึกษาภายในแทร็ก ปีการศึกษา {acadyear.value}
                                         </p>
                                     </div>
                                     <BarChart gpaOptionBar={gpaOptionBar} />
                                 </div>
                                 <div className="flex gap-3 flex-col items-start p-4 group w-full h-full col-span-12 sm:col-span-4 bg-[#fcfcfc] rounded-lg border-1 border-[#e5e5e5]">
                                     <div className=' w-full h-full max-w-lg'>
-                                        <h1 className='text-start text-lg mb-5'>เกรดเฉลี่ยรวมของนักศึกษาภายในแทรค ปีการศึกษา <span className='font-semi-bold'>{acadyear.value}</span></h1>
+                                        <h1 className='text-start text-lg mb-5'>เกรดเฉลี่ยรวมของนักศึกษาภายในแทร็ก ปีการศึกษา <span className='font-semi-bold'>{acadyear.value}</span></h1>
                                         <div className='flex flex-wrap gap-y-4'>
                                             <div className='rounded-lg border shadow-md grid grid-cols-2 items-center justify-items-center w-full py-8 bg-[#26A0FC]/75'>
                                                 <p className='text-xl text-black'>BIT</p>
@@ -449,7 +449,7 @@ export default function Page() {
                                 <div className='w-full col-span-12'>
                                     <div className='w-full p-4 flex-1 bg-[#fcfcfc] flex flex-col rounded-lg border-1 border-[#e5e5e5]'>
                                         <p className='text-lg font-semi-bold text-[#11142d]'>
-                                            แทรคที่ถูกเลือกในแต่ละปี (5 ปีย้อนหลัง)
+                                            แทร็กที่ถูกเลือกในแต่ละปี (5 ปีย้อนหลัง)
                                         </p>
                                         <MultipleBarChart totalPopular={totalPopular} totalPopularOptions={totalPopularOptions} />
                                     </div>
