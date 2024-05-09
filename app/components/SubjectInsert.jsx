@@ -69,6 +69,16 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
         }
     }, [isOpen]);
 
+    const checkDuplicate = async (subject_code) => {
+        try {
+            const response = await axios.get(`${hostname}/api/subjects/getSubjectByCode/${subject_code}`);
+            return response.data.exists;
+        } catch (error) {
+            console.error('Error checking duplicate:', error);
+            throw error;
+        }
+    };
+
     const handleInsertSubject = async () => {
         try {
             if (credit < 0) {
@@ -78,6 +88,12 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
 
             if (!subject_code.trim()) {
                 showToastMessage(false, 'รหัสวิชาห้ามเป็นค่าว่าง');
+                return;
+            }
+
+            const isDuplicate = await checkDuplicate(subject_code);
+            if (isDuplicate) {
+                showToastMessage(false, 'วิชานี้มีอยู่แล้ว');
                 return;
             }
 
@@ -144,7 +160,7 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                     />
 
                     <div className='group flex flex-col w-full group relative justify-end data-[has-label=true]:mt-[calc(theme(fontSize.small)_+_10px)] col-span-4'>
-                    <label className='absolute pointer-events-none origin-top-left subpixel-antialiased block  will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-foreground group-data-[filled-within=true]:pointer-events-auto pb-0 z-20 
+                        <label className='absolute pointer-events-none origin-top-left subpixel-antialiased block  will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-foreground group-data-[filled-within=true]:pointer-events-auto pb-0 z-20 
                          group-data-[filled-within=true]:left-0 text-foreground-800 top-0 text-small group-data-[filled-within=true]:-translate-y-[calc(100%_+_theme(fontSize.small)/2_+_20px)] pe-2 max-w-full text-ellipsis overflow-hidden' htmlFor="track">กลุ่มความเชี่ยวชาญ</label>
                         <Select
                             className='w-full font-normal bg-transparent !outline-none placeholder:text-foreground-500 focus-visible:outline-none text-small z-40'

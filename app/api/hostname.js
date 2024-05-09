@@ -3,7 +3,7 @@ const hostNameStage = {
     "prod": "https://it-track.arinchawut.com"
 }
 let hostname = hostNameStage[process.env.STAGE]
-hostname = "https://it-track.arinchawut.com"
+hostname = "http://localhost:4000"
 module.exports = {
     hostname
 }

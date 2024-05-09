@@ -47,8 +47,8 @@ const Page = ({ params }) => {
                console.log(result);
                // console.log(result);
                setProgram(result?.Program)
-               const subjects = result.SubjectVerifies.map(subjectVerify => subjectVerify.Subject);
-               setSubjects(subjects);
+               // const subjects = result.SubjectVerifies.map(subjectVerify => subjectVerify.Subject);
+               // setSubjects(subjects);
 
                const subgroupData = result.SubjectVerifies.map(subjectVerify => {
                     const subject = subjectVerify.Subject;
