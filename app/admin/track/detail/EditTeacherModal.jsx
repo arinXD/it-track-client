@@ -99,7 +99,7 @@ const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName, ti
                     {(closeForm) => (
                         <form
                             onSubmit={handleSubmit}>
-                            <ModalHeader className="flex flex-col gap-1">แบบฟอร์มแก้ไขคณาจารย์ประจำแทรค</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">แบบฟอร์มแก้ไขคณาจารย์ประจำแทร็ก</ModalHeader>
                             <ModalBody>
                                 <div className="flex gap-6">
                                     <div className={`${previewImage ? "!border-solid border-1 !h-auto" : "border-2"} border-gray-400 border-dashed w-1/2 h-[180px] mt-1 mb-3 grid grid-cols-1 place-items-center`}>

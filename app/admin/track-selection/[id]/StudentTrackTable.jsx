@@ -91,7 +91,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     g[element?.Subject?.subject_code] = element.grade
                     grade.push(g)
                     const gradeValue = calGrade(element.grade)
-                    if(isNumber(gradeValue)) totalScore += gradeValue
+                    if (isNumber(gradeValue)) totalScore += gradeValue
                 });
                 const score = floorGpa(totalScore / (grade.length || 1))
                 return {
@@ -189,10 +189,10 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
     const topContent = useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-end">
+                <div className="flex flex-col gap-2 md:gap-0 md:flex-row justify-between items-end">
                     <Input
                         isClearable
-                        className="w-full sm:max-w-[44%] h-fit"
+                        className="w-full md:max-w-[44%] h-fit"
                         placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, ชื่อ, โครงการ, ผลลัพธ์)"
                         size="sm"
                         radius='sm'
@@ -259,11 +259,11 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
     return (
         <div>
             <h2 id={`${track.toLowerCase()}-students`} className='mb-3 text-default-900 text-small'>
-                {title && <> รายชื่อนักศึกษาแทรค {track} จำนวน {studentData?.students?.length} คน</>}
+                {title && <> รายชื่อนักศึกษาแทร็ก {track} จำนวน {studentData?.students?.length} คน</>}
                 {studentData?.normal > 0 && <>โครงการปกติ {studentData?.normal} คน</>}
                 {studentData?.vip > 0 && <>โครงการพิเศษ {studentData?.vip} คน</>}
             </h2>
-            {studentData &&
+            {studentData && sortedItems.length > 0 &&
                 <Table
                     aria-label={`Student Track Table`}
                     removeWrapper
@@ -275,7 +275,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     bottomContentPlacement="outside"
 
                     // selectionMode="multiple"
-                    classNames={{ ...tableClass, wrapper: "w-full"}}
+                    classNames={{ ...tableClass, wrapper: "w-full" }}
                     // onSelectionChange={setSelectedKeys}
                     onSortChange={setSortDescriptor}
                     sortDescriptor={sortDescriptor}
@@ -319,3 +319,42 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
 }
 
 export default StudentTrackTable
+
+// <>
+//     {JSON.stringify(headerColumns.map(e => e.name))} - {headerColumns.length} <br />
+//     <table>
+//         <thead>
+//             <tr>
+//                 {
+//                     headerColumns.map(head => (
+//                         <th className='border-1 bg-blue-300' key={head.name}>{head.name}</th>
+//                     ))
+//                 }
+//             </tr>
+//         </thead>
+//         <tbody>
+//             {
+//                 sortedItems.map((body, index) => (
+//                     <tr key={index}>
+//                         <td className='border-1'>{body?.stuId}</td>
+//                         <td className='border-1'>{body?.fullName}</td>
+//                         <td className='border-1'>{body?.coursesType}</td>
+//                         {
+//                             body.grade.map((g, index) => (
+//                                 <td className='border-1' key={index}>
+//                                     {g[subjects[index].uid] || "-"}
+//                                 </td>
+//                             ))
+//                         }
+//                         <td className='border-1'>{body?.score}</td>
+//                         <td className='border-1'>{body?.track_order_1}</td>
+//                         <td className='border-1'>{body?.track_order_2}</td>
+//                         <td className='border-1'>{body?.track_order_3}</td>
+//                         <td className='border-1'>{body?.result}</td>
+//                     </tr>
+//                 ))
+//             }
+//         </tbody>
+//     </table>
+//     {JSON.stringify(sortedItems[0])} - {Object?.keys(sortedItems[0]).length}
+// </>

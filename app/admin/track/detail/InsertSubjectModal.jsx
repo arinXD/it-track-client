@@ -114,7 +114,7 @@ const InsertSubjectModal = ({ isOpen, onClose, track, callBack }) => {
             <ModalContent>
                 {(onClose) => (
                     <>
-                        <ModalHeader className="flex flex-col gap-1">แบบฟอร์มเพิ่มวิชาภายแทรค</ModalHeader>
+                        <ModalHeader className="flex flex-col gap-1">แบบฟอร์มเพิ่มวิชาภายแทร็ก</ModalHeader>
                         <ModalBody>
                             <div className='flex flex-row gap-3'>
                                 <div className='w-1/2 flex flex-col'>

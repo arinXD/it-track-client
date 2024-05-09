@@ -173,7 +173,7 @@ const TeacherTrack = ({ track }) => {
                 onClose={onCloseEdit} />
 
             <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-end rounded-md mb-4'>
-                <p>คณาจารย์ประจำแทรค</p>
+                <p>คณาจารย์ประจำแทร็ก</p>
                 <div className="flex gap-2">
                     <Button
                         size="sm"

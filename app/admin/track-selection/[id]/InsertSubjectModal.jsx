@@ -113,7 +113,7 @@ export default function InsertSubjectModal({ defaultTrackSubj, isOpen, onClose, 
                <ModalContent>
                     {(onClose) => (
                          <>
-                              <ModalHeader className="flex flex-col gap-1">เพิ่มการคัดเลือกแทรค</ModalHeader>
+                              <ModalHeader className="flex flex-col gap-1">เพิ่มการคัดเลือกแทร็ก</ModalHeader>
                               <ModalBody>
                                    <div className='flex flex-row gap-3'>
                                         <div className='w-1/2 flex flex-col'>

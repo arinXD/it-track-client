@@ -89,14 +89,13 @@ const Page = ({ params }) => {
             result.expiredAt = format(new Date(result?.expiredAt), 'yyyy-MM-dd HH:mm')
             setTrackSelect(result)
             setTrackSubj(result?.Subjects)
-            console.log(result?.Subjects);
         } catch (err) {
             console.error("Error on init func:", err);
         }
     }, [])
 
     const getTracks = useCallback(async function () {
-        let tracks = await fetchData(`/api/tracks`)
+        let tracks = await fetchData(`/api/tracks/all`)
         if (tracks?.length) {
             tracks = tracks.map(track => track.track)
         } else {
@@ -144,7 +143,7 @@ const Page = ({ params }) => {
 
     const handleUpdate = useCallback(async function () {
         swal.fire({
-            text: `ต้องการแก้ไขข้อมูลการคัดแทรคปีการศึกษา ${trackSelect.acadyear} หรือไม่`,
+            text: `ต้องการแก้ไขข้อมูลการคัดแทร็กปีการศึกษา ${trackSelect.acadyear} หรือไม่`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "ตกลง",
@@ -252,7 +251,7 @@ const Page = ({ params }) => {
 
     const handleDelete = useCallback(async function () {
         swal.fire({
-            text: `ต้องการลบการคัดแทรคปีการศึกษา ${trackSelect.acadyear} หรือไม่ ?`,
+            text: `ต้องการลบการคัดแทร็กปีการศึกษา ${trackSelect.acadyear} หรือไม่ ?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -284,7 +283,7 @@ const Page = ({ params }) => {
         const selecteData = {
             "all": {
                 studentData: allTrack,
-                track: "ทุกแทรค"
+                track: "ทุกแทร็ก"
             },
             "BIT": {
                 studentData: studentsBit,
@@ -654,7 +653,7 @@ const Page = ({ params }) => {
                                                     </Chip>
                                                 </span>
                                             </div>
-                                            <div className='flex flex-row justify-start items-center gap-3 border-t-1 border-gray-300 pt-3'>
+                                            <div className='flex flex-row justify-start items-center gap-3 border-t-1 border-gray-300 pt-3 flex-wrap'>
                                                 <div className={!valueChange ? "cursor-not-allowed" : ""}>
                                                     <Button
                                                         size='sm'
@@ -761,8 +760,14 @@ const Page = ({ params }) => {
                                                     <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-emerald-400 text-white`}>
                                                         <table className='table-auto mx-auto'>
                                                             <thead>
-                                                                <tr className=''>
-                                                                    <th className='text-base'>IOT & Networking</th>
+                                                                <tr className='w-full'>
+                                                                    <th
+                                                                        style={{
+                                                                            whiteSpace: "nowrap",
+                                                                            overflow: "hidden",
+                                                                            textOverflow: "ellipsis",
+                                                                        }}
+                                                                        className='text-base'>Network</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -825,7 +830,7 @@ const Page = ({ params }) => {
                                             : (studentsBit?.students?.length == 0 &&
                                                 studentsNetwork?.students?.length == 0 &&
                                                 studentsWeb?.students?.length == 0) ?
-                                                <p>ยังไม่มีนักศึกษาเลือกแทรค</p>
+                                                <p>ยังไม่มีนักศึกษาเลือกแทร็ก</p>
                                                 :
                                                 null
                                     }
@@ -915,7 +920,7 @@ const Page = ({ params }) => {
                                 </div>
                                 :
                                 <>
-                                    <p className='text-center'>ไม่มีข้อมูลคัดเลือกแทรค</p>
+                                    <p className='text-center'>ไม่มีข้อมูลคัดเลือกแทร็ก</p>
                                 </>
                         }
 

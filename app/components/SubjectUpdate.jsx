@@ -236,11 +236,11 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
 
                     <div className='group flex flex-col w-full group relative justify-end data-[has-label=true]:mt-[calc(theme(fontSize.small)_+_10px)] col-span-4'>
                         <label className='absolute pointer-events-none origin-top-left subpixel-antialiased block  will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-foreground group-data-[filled-within=true]:pointer-events-auto pb-0 z-20 
-                         group-data-[filled-within=true]:left-0 text-foreground-800 top-0 text-small group-data-[filled-within=true]:-translate-y-[calc(100%_+_theme(fontSize.small)/2_+_20px)] pe-2 max-w-full text-ellipsis overflow-hidden' htmlFor="track">กลุ่มความเชี่ยวชาญ</label>
+                         group-data-[filled-within=true]:left-0 text-foreground-800 top-0 text-small group-data-[filled-within=true]:-translate-y-[calc(100%_+_theme(fontSize.small)/2_+_20px)] pe-2 max-w-full text-ellipsis overflow-hidden' htmlFor="track">แทร็ก</label>
                         <Select
                             className='w-full font-normal bg-transparent !outline-none placeholder:text-foreground-500 focus-visible:outline-none text-small z-40'
                             id="track"
-                            placeholder="เลือกกลุ่มความเชี่ยวชาญ"
+                            placeholder="เลือกแทร็ก"
                             value={selectedTrack}
                             options={tracks}
                             onChange={(selectedOption) => setSelectedTrack(selectedOption)}

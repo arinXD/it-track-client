@@ -103,7 +103,7 @@ const TrackForm = ({ track }) => {
     return (
         <div>
             <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-end rounded-md mt-6'>
-                <p>ข้อมูลแทรค</p>
+                <p>ข้อมูลแทร็ก</p>
             </div>
             {
                 fetching ?
@@ -118,7 +118,7 @@ const TrackForm = ({ track }) => {
                                     <div className='w-full md:w-1/2 flex flex-col'>
                                         <UploadCover
                                             src={trackData?.img}
-                                            label="ภาพแทรค"
+                                            label="ภาพแทร็ก"
                                             width="w-[180px]"
                                             setImageFile={setTrackImageFile}
                                             uploadProgress={uploadProgressImg}
@@ -139,7 +139,7 @@ const TrackForm = ({ track }) => {
                                             type="text"
                                             variant="bordered"
                                             radius='sm'
-                                            label="แทรค"
+                                            label="แทร็ก"
                                             labelPlacement="outside"
                                             value={trackData.track}
                                             isReadOnly
@@ -152,7 +152,7 @@ const TrackForm = ({ track }) => {
                                             type="text"
                                             variant="bordered"
                                             radius='sm'
-                                            label="ชื่อแทรคภาษาไทย"
+                                            label="ชื่อแทร็กภาษาไทย"
                                             labelPlacement="outside"
                                             value={titleTh}
                                             onValueChange={setTitleTh}
@@ -165,7 +165,7 @@ const TrackForm = ({ track }) => {
                                             type="text"
                                             variant="bordered"
                                             radius='sm'
-                                            label="ชื่อแทรคภาษาอังกฤษ"
+                                            label="ชื่อแทร็กภาษาอังกฤษ"
                                             labelPlacement="outside"
                                             value={titleEn}
                                             onValueChange={setTitleEn}
@@ -176,7 +176,7 @@ const TrackForm = ({ track }) => {
                                         <Textarea
                                             name='desc'
                                             variant="bordered"
-                                            label="คำอธิบายแทรค"
+                                            label="คำอธิบายแทร็ก"
                                             labelPlacement="outside"
                                             value={desc}
                                             onValueChange={setDesc}
@@ -186,7 +186,7 @@ const TrackForm = ({ track }) => {
                                         <Textarea
                                             name='information'
                                             variant="bordered"
-                                            label="ข้อมูลแทรค"
+                                            label="ข้อมูลแทร็ก"
                                             labelPlacement="outside"
                                             value={information}
                                             onValueChange={setInformation}

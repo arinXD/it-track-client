@@ -12,7 +12,7 @@ const InsertTrackModal = ({ isOpen, onClose }) => {
                 <ModalContent>
                     {(onClose) => (
                         <form>
-                            <ModalHeader className="flex flex-col gap-1">แบบฟอร์มเพิ่มแทรค</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">แบบฟอร์มเพิ่มแทร็ก</ModalHeader>
                             <ModalBody>
                                 <p>
                                     Lorem ipsum dolor sit amet, consectetur adipiscing elit.

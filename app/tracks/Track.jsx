@@ -62,7 +62,7 @@ const Track = ({ tracks }) => {
                                         </div>
                                         <Link
                                             href={`/tracks/${track.track?.toLowerCase()}`}
-                                            className='flex w-full sm:justify-start mt-4'>
+                                            className='flex w-full md:w-fit sm:justify-start mt-4'>
                                             <Button
                                                 radius='sm'
                                                 className='!w-full'

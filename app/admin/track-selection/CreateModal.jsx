@@ -131,7 +131,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                 {(onClose) => (
                     <>
                         <form onSubmit={createAcad}>
-                            <ModalHeader className="flex flex-col gap-1">เพิ่มการคัดเลือกแทรค</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">เพิ่มการคัดเลือกแทร็ก</ModalHeader>
                             <ModalBody>
                                 <div className='grid grid-cols-2 gap-3'>
                                     <div className='flex flex-col gap-3'>
