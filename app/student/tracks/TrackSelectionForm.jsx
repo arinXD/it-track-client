@@ -346,7 +346,9 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         <div className="mb-1 flex flex-col mt-5">
                                             <div>
                                                 <label className="block font-bold text-black text-base">เลือกลำดับความเชี่ยวชาญ (แทร็ก) ที่ต้องการ</label>
-                                                <label className="block text-sm font-medium text-black mb-5 mt-2">* ลำดับแรกคือลำดับที่ต้องการมากที่สุด จากนั้นเลือกลำดับที่ต้องการรองจากอับดับแรก ในกรณีที่อับดับแรกเต็ม</label>
+                                                <label className="block text-sm font-medium mb-5 mt-2 text-default-500">
+                                                    การคัดเลือกแทร็กจะเริ่มเลือกจากคนที่มีเกรดสูงที่สุดไปหาน้อยที่สุด หากแทร็กที่เลือกลำดับที่ 1 เต็ม จะได้แทร็กลำดับที่ 2 หรือลำดับที่ 3 ตามแทร็กที่ว่าง <br/> ลำดับแรกคือลำดับที่ต้องการมากที่สุด จากนั้นเลือกลำดับที่ต้องการรองจากลำดับแรก
+                                                </label>
                                             </div>
                                             <div>
                                                 {/* {JSON.stringify([orders.order1, orders.order2, orders.order3].filter(e => e))} <br /> */}
@@ -393,7 +395,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                     <DeleteIcon className={"w-5 h-5"} />
                                                 }
                                                 color="primary">
-                                                Clear
+                                                เคลียร์ฟอร์ม
                                             </Button>
                                         </div>
                                         <div className="inline-flex items-center">
@@ -441,7 +443,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             type="submit"
                                             disabled={!isConfirm || processing}
                                         >
-                                            {!processing ? "ตกลง" : "บันทึกข้อมูล..."}
+                                            {!processing ? "บันทึกข้อมูล" : "บันทึกข้อมูล..."}
                                         </Button>
                                     </form>
                                 </>
