@@ -345,8 +345,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         </div>
                                         <div className="mb-1 flex flex-col mt-5">
                                             <div>
-                                                <label className="block font-bold text-black text-base">เลือกอันดับความเชี่ยวชาญ (แทร็ก) ที่ต้องการ</label>
-                                                <label className="block text-sm font-medium text-black mb-5 mt-2">* อันดับแรกคืออันดับที่ต้องการมากที่สุด จากนั้นเลือกอันดับที่ต้องการรองจากอับดับแรก ในกรณีที่อับดับแรกเต็ม</label>
+                                                <label className="block font-bold text-black text-base">เลือกลำดับความเชี่ยวชาญ (แทร็ก) ที่ต้องการ</label>
+                                                <label className="block text-sm font-medium text-black mb-5 mt-2">* ลำดับแรกคือลำดับที่ต้องการมากที่สุด จากนั้นเลือกลำดับที่ต้องการรองจากอับดับแรก ในกรณีที่อับดับแรกเต็ม</label>
                                             </div>
                                             <div>
                                                 {/* {JSON.stringify([orders.order1, orders.order2, orders.order3].filter(e => e))} <br /> */}
@@ -356,7 +356,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             <div>
                                                 {tracks.map((e, index) => (
                                                     <div key={index}>
-                                                        <label className="block text-sm font-medium text-black mb-2">อันดับที่ {index + 1}</label>
+                                                        <label className="block text-sm font-medium text-black mb-2">ลำดับที่ {index + 1}</label>
                                                         <div className="relative h-11 w-full mb-4">
                                                             <select
                                                                 onChange={() => handleChange(event.target.value, index)}
