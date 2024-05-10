@@ -243,7 +243,23 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                     :
                     !(trackSelect?.id) ?
                         <>
-                            รอการประกาศการคัดเลือกแทร็กจากอาจารย์ครับ/ค่ะ
+                            <h4
+                                style={{
+                                    fontSize: "clamp(16px, 5vw, 24px)",
+                                    margin: "auto"
+                                }}
+                                className="md:!mt-4 block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
+                                การคัดเลือกความเชี่ยวชาญ วิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ ปีการศึกษา 2566
+                            </h4>
+                            <p
+                                style={{
+                                    fontSize: "clamp(8px, 4vw, 16px)",
+                                    margin: "auto"
+                                }}
+                                className='text-center mb-3 text-lg text-default-600'>
+                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ 13 พฤษภาคม 2567 - 20 พฤษภาคม 2567 <br />
+                                ประกาศผลวันที่ 23 พฤษภาคม 2567
+                            </p>
                         </>
                         :
                         <>
@@ -251,14 +267,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                 trackResult ?
                                     (
                                         <div className='flex flex-col justify-center items-center h-[70vh]'>
-                                            {/* <h4
-                                                style={{
-                                                    fontSize: "clamp(16px, 5vw, 24px)",
-                                                    margin: "auto"
-                                                }}
-                                                className="md:!mt-4 max-w-screen-md block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
-                                                {trackSelect?.title}
-                                            </h4> */}
                                             <Result
                                                 icon={<SmileOutlined />}
                                                 title={`แทร็กของคุณ คือ ${trackResult?.title_en}`}
