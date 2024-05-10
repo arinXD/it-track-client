@@ -105,7 +105,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 if (result.isConfirmed) {
                     swal.fire({
                         title: "ขออนุญาตผู้ใช้ทำแบบสอบถาม",
-                        text: `ขออนุญาตผู้ใช้ทำแบบสอบถามเพื่อนำ feed back มาปรับปรุงแก้ไขเว็บไซต์ให้มีประสิทธิภาพต่อไป`,
+                        text: `ขออนุญาตผู้ใช้ทำแบบสอบถามเพื่อนำ feedback มาปรับปรุงแก้ไขเว็บไซต์ให้มีประสิทธิภาพต่อไป`,
                         icon: "question",
                         showCancelButton: true,
                         confirmButtonColor: "#3085d6",
