@@ -305,7 +305,24 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             <div className='mt-5 text-center'>
                                                 <label className="block font-bold text-black text-base">รายละเอียดวิชาที่ใช้ในการคัดเลือกและเกรดที่ได้</label>
                                                 <label className="block text-sm font-medium text-black mt-2 mb-5">
-                                                    <span className='text-red-500 font-bold'>*</span>  โปรดตรวจสอบรายละเอียดเกรดของแต่ละวิชา <span className='text-red-500 font-bold'>*</span>
+                                                    <span className='text-red-500 font-bold'>*</span>
+                                                    <span> โปรดตรวจสอบรายละเอียดเกรดของแต่ละวิชา หากตรวจสอบแล้วเกรดไม่ถูกต้องสามารถติดต่อ: </span>
+                                                    <span className='text-red-500 font-bold'> *</span>
+                                                    <br />
+                                                    [ <Link
+                                                        className="text-blue-500"
+                                                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${"arinchawut.k@kkumail.com"}&authuser=1`}
+                                                        size="sm"
+                                                        isexternal="true">
+                                                        arinchawut.k@kkumail.com
+                                                    </Link> , &nbsp;
+                                                    <Link
+                                                        className="text-blue-500"
+                                                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${"pubes.k@kkumail.com"}&authuser=1`}
+                                                        size="sm"
+                                                        isexternal="true">
+                                                        pubes.k@kkumail.com
+                                                    </Link> ]
                                                 </label>
                                             </div>
                                             <div id='TrackSubjects'>
@@ -347,7 +364,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             <div>
                                                 <label className="block font-bold text-black text-base">เลือกลำดับความเชี่ยวชาญ (แทร็ก) ที่ต้องการ</label>
                                                 <label className="block text-sm font-medium mb-5 mt-2 text-default-500">
-                                                    การคัดเลือกแทร็กจะเริ่มเลือกจากคนที่มีเกรดสูงที่สุดไปหาน้อยที่สุด หากแทร็กที่เลือกลำดับที่ 1 เต็ม จะได้แทร็กลำดับที่ 2 หรือลำดับที่ 3 ตามแทร็กที่ว่าง <br/> ลำดับแรกคือลำดับที่ต้องการมากที่สุด จากนั้นเลือกลำดับที่ต้องการรองจากลำดับแรก
+                                                    การคัดเลือกแทร็กจะเริ่มเลือกจากคนที่มีเกรดสูงที่สุดไปหาน้อยที่สุด หากแทร็กที่เลือกลำดับที่ 1 เต็ม จะได้แทร็กลำดับที่ 2 หรือลำดับที่ 3 ตามแทร็กที่ว่าง <br /> ลำดับแรกคือลำดับที่ต้องการมากที่สุด จากนั้นเลือกลำดับที่ต้องการรองจากลำดับแรก
                                                 </label>
                                             </div>
                                             <div>
