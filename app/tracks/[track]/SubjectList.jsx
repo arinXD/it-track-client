@@ -1,5 +1,3 @@
-import { FaCircle } from "react-icons/fa6"
-
 const SubjectList = ({ track, subjects }) => {
     return (
         <section className="grid grid-cols-2 gap-10 mt-14 mb-5 max-lg:mt-0">

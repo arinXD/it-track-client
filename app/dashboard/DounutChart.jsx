@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import ReactApexChart from 'react-apexcharts'
 const DounutChart = ({ sumTrackOption }) => {
      return (

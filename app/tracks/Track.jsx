@@ -1,19 +1,17 @@
 "use client"
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Empty } from 'antd';
 import { Card, CardFooter, Image } from "@nextui-org/react";
 
 const Track = ({ tracks }) => {
-
+    useEffect(() => {
+        AOS.init();
+    }, []);
     const linkTo = function (url) {
         window.location.href = url
     }
-
-    useEffect(() => {
-        AOS.init();
-    }, [])
     return (
         <>
             {
@@ -40,16 +38,24 @@ const Track = ({ tracks }) => {
                         <div className='grid grid-cols-12 gap-4'>
                             {tracks.map((track, index) => {
                                 let colSpan;
+                                let duration
                                 if (index === 0) {
                                     colSpan = 'col-span-7';
+                                    duration = "500"
                                 } else if (index === 1) {
                                     colSpan = 'col-span-5';
+                                    duration = "800"
                                 } else {
                                     colSpan = 'col-span-12';
+                                    duration = "1000"
                                 }
 
                                 return (
-                                    <div key={index} className={`w-full grid max-lg:col-span-12 ${colSpan}`}>
+                                    <div
+                                        data-aos="fade-up"
+                                        data-aos-duration={duration}
+                                        key={index}
+                                        className={`w-full grid max-lg:col-span-12 ${colSpan}`}>
                                         <Card
                                             key={index}
                                             shadow="none"

@@ -10,7 +10,6 @@ import confetti from 'canvas-confetti';
 import TMonlicaEmail from '@/app/components/TMonlicaEmail'
 import { getOptions } from '@/app/components/serverAction/TokenAction'
 import Link from 'next/link'
-
 import { SmileOutlined } from '@ant-design/icons';
 import { Result } from 'antd';
 

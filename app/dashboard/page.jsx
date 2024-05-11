@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '../components';
 import { getAcadyears } from '@/src/util/academicYear';
 import { SearchIcon } from '../components/icons';

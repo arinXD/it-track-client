@@ -1,8 +1,15 @@
+"use client"
 import { Empty } from "antd"
-import TeacherItem from "./TeacherItem"
 import Image from "next/image"
+import { useEffect, useMemo } from "react";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const TeacherList = ({ teachers }) => {
+    const duration = useMemo(() => 500, [])
+    useEffect(() => {
+        AOS.init();
+    }, []);
     return (
         <section className="my-10">
             <h2 className="text-center font-bold text-3xl text-[#1C75BC] mb-3">คณาจารย์ประจำแทร็ก</h2>
@@ -18,7 +25,10 @@ const TeacherList = ({ teachers }) => {
                     <>
                         <div className="flex flex-wrap justify-center items-center gap-4 w-full my-9 max-2xl:px-0">
                             {teachers.map((teacher, index) => (
-                                <div key={index} className="">
+                                <div
+                                    data-aos="fade-up"
+                                    data-aos-duration={duration + (index * 200)}
+                                    key={index}>
                                     <Image
                                         width={800}
                                         height={800}

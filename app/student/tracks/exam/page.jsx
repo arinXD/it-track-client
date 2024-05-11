@@ -1,7 +1,7 @@
 'use client';
-import React, { useEffect, useState } from 'react'
+// import { useEffect, useState } from 'react'
 import '../../../style/exam.css';
-import { Navbar, Sidebar, ContentWrap } from '@/app/components';
+import { Navbar, Sidebar } from '@/app/components';
 import Link from 'next/link';
 const Page = () => {
     let data = [

@@ -1,5 +1,4 @@
 "use server"
-import React from 'react'
 import axios from 'axios'
 import { VerifyLogin } from '@/app/components'
 import { hostname } from '@/app/api/hostname'

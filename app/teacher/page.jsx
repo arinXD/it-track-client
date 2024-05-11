@@ -11,9 +11,6 @@ const Page = () => {
         }
     })
 
-    // if(session?.user.role !== "teacher"){
-    //     return <h1 className='text-5xl'>Access Denied</h1>
-    // }
     return (
         <>
             <header>
