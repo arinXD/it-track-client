@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Navbar, Sidebar, ContentWrap } from '@/app/components';
 import { useSession } from "next-auth/react"
 import { getOptions } from '@/app/components/serverAction/TokenAction';
@@ -9,6 +9,8 @@ import { Loading } from '@/app/components'
 import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useKbd, Spinner } from '@nextui-org/react'
 import { ToastContainer, toast } from "react-toastify";
 import { tableClass } from '@/src/util/ComponentClass'
+import { Checkbox } from "@nextui-org/checkbox";
+import { calGrade, isNumber } from '@/src/util/grade';
 
 const Page = () => {
     const [loading, setLoading] = useState(true)
@@ -44,6 +46,15 @@ const Page = () => {
             fetchEnrollment(session?.user?.stu_id)
         }
     }, [session])
+
+    const getEnrollmentGrade = (subjectCode) => {
+        // ต้องการหา subjectCode ใน enrollments
+        const enrollment = enrollments.find(e => e?.Subject?.subject_code === subjectCode);
+        if (enrollment) {
+            return enrollment.grade;
+        }
+        return "ไม่มีเกรด";
+    }
 
     const fetchData = async function () {
         try {
@@ -128,7 +139,6 @@ const Page = () => {
                 </header>
                 <Sidebar />
                 <ContentWrap>
-
                     <div>
                         ไม่สามารถเข้าถึงข้อมูลของคุณได้ กรุณาติดต่อ <TMonlicaEmail />
                     </div>
@@ -142,7 +152,96 @@ const Page = () => {
     // console.log(verifySubjects);
     // console.log(subgroupData);
     // console.log(groupData);
-    console.log(groupedSubjectsByCategory);
+    // console.log(groupedSubjectsByCategory);
+
+    const getSubTrack = (subgroup, subgroupIndex) => {
+        console.log(subgroup);
+        if (subgroup?.subjects.every(subject => subject?.Track)) {
+            const subjects = subgroup?.subjects
+            const trackSubjects = {}
+            for (let index = 0; index < subjects?.length; index++) {
+                const track = subjects[index]?.Track.title_th
+                if (!trackSubjects.hasOwnProperty(track)) {
+                    trackSubjects[track] = []
+                }
+                trackSubjects[track].push(subjects[index])
+            }
+            return (
+                <div key={subgroupIndex}>
+                    <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
+                        <h3 className='text-md text-default-800 px-10'><li>{subgroup?.sub_group_title}</li></h3>
+                    </div>
+                    {trackSubjects && Object.keys(trackSubjects).map((track, trackIndex) => (
+                        <div key={trackIndex}>
+                            <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
+                                <h3 className='text-md text-default-800 px-16'><li>กลุ่มย่อยที่ {trackIndex + 1} {track}</li></h3>
+                            </div>
+                            <Table
+                                classNames={tableClass}
+                                removeWrapper
+                                onRowAction={() => { }}
+                                aria-label="subjects table">
+                                <TableHeader>
+                                    <TableColumn>รหัสวิชา</TableColumn>
+                                    <TableColumn>ชื่อวิชา EN</TableColumn>
+                                    <TableColumn>ชื่อวิชา TH</TableColumn>
+                                    <TableColumn>หน่วยกิต</TableColumn>
+                                    <TableColumn>เกรด</TableColumn>
+                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                </TableHeader>
+                                <TableBody>
+                                    {trackSubjects[track].map((subject, subjectIndex) => (
+                                        <TableRow key={subjectIndex}>
+                                            <TableCell className=''>{subject.subject_code}</TableCell>
+                                            <TableCell className="w-1/3">{subject.title_en}</TableCell>
+                                            <TableCell className="w-1/3">{subject.title_th}</TableCell>
+                                            <TableCell>{subject.credit}</TableCell>
+                                            <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
+                                            <TableCell>{calGrade(getEnrollmentGrade(subject.subject_code)) == null ? "-" : isNumber(calGrade(getEnrollmentGrade(subject.subject_code))) ? String(calGrade(getEnrollmentGrade(subject.subject_code))) : calGrade(getEnrollmentGrade(subject.subject_code))}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    ))}
+                </div>
+            );
+
+        } else {
+            return (
+                <div key={subgroupIndex}>
+                    <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
+                        <h3 className='text-md text-default-800 px-10'><li>{subgroup?.sub_group_title}</li></h3>
+                    </div>
+                    <Table
+                        classNames={tableClass}
+                        removeWrapper
+                        onRowAction={() => { }}
+                        aria-label="subjects table">
+                        <TableHeader>
+                            <TableColumn>รหัสวิชา</TableColumn>
+                            <TableColumn>ชื่อวิชา EN</TableColumn>
+                            <TableColumn>ชื่อวิชา TH</TableColumn>
+                            <TableColumn>หน่วยกิต</TableColumn>
+                            <TableColumn>เกรด</TableColumn>
+                            <TableColumn>ค่าคะแนน</TableColumn>
+                        </TableHeader>
+                        <TableBody>
+                            {subgroup.subjects && subgroup.subjects.map((subject, subjectIndex) => (
+                                <TableRow key={subjectIndex}>
+                                    <TableCell className=''>{subject.subject_code}</TableCell>
+                                    <TableCell className="w-1/3">{subject.title_en}</TableCell>
+                                    <TableCell className="w-1/3">{subject.title_th}</TableCell>
+                                    <TableCell>{subject.credit}</TableCell>
+                                    <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
+                                    <TableCell>{calGrade(getEnrollmentGrade(subject.subject_code)) == null ? "-" : isNumber(calGrade(getEnrollmentGrade(subject.subject_code))) ? String(calGrade(getEnrollmentGrade(subject.subject_code))) : calGrade(getEnrollmentGrade(subject.subject_code))}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>)
+        }
+    }
 
     const getSubg = (subgroups) => {
         if (!subgroups) return undefined;
@@ -167,44 +266,14 @@ const Page = () => {
                                 <h3 className='text-lg text-default-800 px-4'><li>{groupTitle}</li></h3>
                             </div>
                             {subgroupsWithSameGroupTitle.map((subgroup, subgroupIndex) => (
-                                <div key={subgroupIndex}>
-                                    <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
-                                        <h3 className='text-md text-default-800 px-10'><li>{subgroup?.sub_group_title}</li></h3>
-                                    </div>
-                                    <Table
-                                        classNames={tableClass}
-                                        removeWrapper
-                                        onRowAction={() => { }}
-                                        aria-label="subjects table">
-                                        <TableHeader>
-                                            <TableColumn>รหัสวิชา</TableColumn>
-                                            <TableColumn>ชื่อวิชา EN</TableColumn>
-                                            <TableColumn>ชื่อวิชา TH</TableColumn>
-                                            <TableColumn>หน่วยกิต</TableColumn>
-                                            <TableColumn>เกรด</TableColumn>
-                                            <TableColumn>ค่าคะแนน</TableColumn>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {subgroup.subjects && subgroup.subjects.map((subject, subjectIndex) => (
-                                                <TableRow key={subjectIndex}>
-                                                    <TableCell className=''>{subject.subject_code}</TableCell>
-                                                    <TableCell className="w-1/3">{subject.title_en}</TableCell>
-                                                    <TableCell className="w-1/3">{subject.title_th}</TableCell>
-                                                    <TableCell>{subject.credit}</TableCell>
-                                                    <TableCell>{"A"}</TableCell>
-                                                    <TableCell>{0}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </div>
+                                getSubTrack(subgroup, subgroupIndex)
                             ))}
                         </div>
                     );
                 })}
             </>
         );
-    };
+    }
 
     return (
         <>
@@ -221,14 +290,39 @@ const Page = () => {
                     :
                     !(verifySelect?.id) ?
                         <>
-                            <p>รอการประกาศจากอาจารย์ครับ/ค่ะ</p>
+                            <p className='text-center font-bold text-lg my-28'>
+                                Coming soon!
+                            </p>
                         </>
                         :
                         <>
-                            <div className='my-[30px] 2xl:px-32'>
-                                <div className='text-center text-xl text-black mb-5 px-5'>
-                                    <h1 className='text-3xl'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{program.title_th}(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
-                                    <h2 className='mt-6'>ขอยื่นแบบฟอร์มแสดงรายละเอียดการศึกษารายวิชาที่ได้เรียนมาทั้งหมด อย่างน้อย <span className='font-bold'>{verifySelect.main_at_least}</span> หน่วยกิต ต่องานทะเบียนและประมวลผลการศึกษา ดังต่อไปนี้คือ.—</h2>
+                            <div className='my-[30px] 2xl:px-44 xl:px-20'>
+                                <div className=' text-xl text-black mb-5 px-5'>
+                                    <h1 className='text-3xl text-center  leading-relaxed'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br /> หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{program.title_th} <br />(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
+                                    <div className='text-center mt-6'>
+                                        <p>ข้าพเจ้า {userData.first_name} {userData.last_name} รหัสประจำตัว {userData.stu_id}</p>
+                                        <div className='flex justify-center items-center'>
+                                            <p>คาดว่าจะได้รับปริญญาวิทยาศาสตรบัณฑิต  สาขาวิชา{program.title_th} เกียรตินิยมอันดับ</p>
+                                            <div className="relative ml-2 w-[70px]">
+                                                <input
+                                                    className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                                                    placeholder=" "
+                                                    type="text"
+                                                />
+                                                <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-fit w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[4.1] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                                    อันดับ
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className='flex flex-wrap justify-center items-center'>
+                                            <p>ภาคการศึกษา</p>
+                                            <Checkbox className='ml-2'>ต้น</Checkbox>
+                                            <Checkbox className='ml-2'>ปลาย</Checkbox>
+                                            <Checkbox className='mx-2'>ฤดูร้อน</Checkbox>
+                                            <p>ปีการศึกษา {userData.acadyear}</p>
+                                        </div>
+                                    </div>
+                                    <h2 className='mt-6 text-center '>ขอยื่นแบบฟอร์มแสดงรายละเอียดการศึกษารายวิชาที่ได้เรียนมาทั้งหมด อย่างน้อย <span className='font-bold'>{verifySelect.main_at_least}</span> หน่วยกิต ต่องานทะเบียนและประมวลผลการศึกษา ดังต่อไปนี้คือ.—</h2>
                                 </div>
                                 {Object.keys(groupedSubjectsByCategory).map((categoryId, index) => {
                                     const { category, groups, subgroups } = groupedSubjectsByCategory[categoryId];
@@ -266,8 +360,8 @@ const Page = () => {
                                                                         <TableCell className="w-1/3">{subject.title_en}</TableCell>
                                                                         <TableCell className="w-1/3">{subject.title_th}</TableCell>
                                                                         <TableCell>{subject.credit}</TableCell>
-                                                                        <TableCell>{"A"}</TableCell>
-                                                                        <TableCell>{0}</TableCell>
+                                                                        <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
+                                                                        <TableCell>{calGrade(getEnrollmentGrade(subject.subject_code)) == null ? "-" : isNumber(calGrade(getEnrollmentGrade(subject.subject_code))) ? String(calGrade(getEnrollmentGrade(subject.subject_code))) : calGrade(getEnrollmentGrade(subject.subject_code))}</TableCell>
                                                                     </TableRow>
                                                                 ))}
                                                             </TableBody>

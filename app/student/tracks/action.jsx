@@ -1,6 +1,5 @@
 "use server"
 import axios from "axios"
-import { hostname } from "@/app/api/hostname"
 import { revalidatePath } from "next/cache"
 import { getOptions } from "@/app/components/serverAction/TokenAction"
 

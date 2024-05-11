@@ -1,7 +1,7 @@
 'use client';
-import React, { useEffect, useState } from 'react'
+// import { useEffect, useState } from 'react'
 import '../../../style/exam.css';
-import { Navbar, Sidebar, ContentWrap } from '@/app/components';
+import { Navbar, Sidebar } from '@/app/components';
 import Link from 'next/link';
 const Page = () => {
     let data = [
@@ -38,12 +38,12 @@ const Page = () => {
                             <p className='font-light text-gray-500'>เน้นด้านระบบเครือข่าย ความมั่นคงปลอดภัย และอินเทอร์เน็ตของสรรพสิ่ง</p>
                         </div>
                         <div className='flex flex-col p-6 mx-auto max-w-lg text-gray-900 bg-white rounded-lg border border-gray-100 shadow xl:p-8 text-center'>
-                            <img src="/web.png" alt="" className='p-4 mb-2 md:mb-4 max-h-60 w-full object-contain rounded-lg' width={512} height={512} />
+                            <img src="/web and mobile.png" alt="" className='p-4 mb-2 md:mb-4 max-h-60 w-full object-contain rounded-lg' width={512} height={512} />
                             <h3 className='mt-4 mb-4 text-2xl font-semibold'>Mobile and Web Application Development</h3>
                             <p className='font-light text-gray-500'>เน้นในด้านการพัฒนาโปรแกรมประยุกต์บนอุปกรณ์เคลื่อนที่และเว็บ</p>
                         </div>
                         <div className='flex flex-col p-6 mx-auto max-w-lg text-gray-900 bg-white rounded-lg border border-gray-100 shadow xl:p-8 text-center'>
-                            <img src="/bi.png" alt="" className='p-4 mb-2 md:mb-4 max-h-60 w-full object-contain rounded-lg' width={512} height={512} />
+                            <img src="/bit.png" alt="" className='p-4 mb-2 md:mb-4 max-h-60 w-full object-contain rounded-lg' width={512} height={512} />
                             <h3 className='mt-4 mb-4 text-2xl font-semibold'>Business Information Technology</h3>
                             <p className='font-light text-gray-500'>เน้นเรียนเกี่ยวกับเทคโนโลยีสารสนเทศที่ใช้ในการสนับสนุนและพัฒนาธุรกิจ</p>
                         </div>

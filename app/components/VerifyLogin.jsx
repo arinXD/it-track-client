@@ -1,43 +1,9 @@
 "use client"
-import { useSession, signIn } from "next-auth/react"
-import SignInButton from "./SignInButton"
-import React, { useEffect, useState } from 'react'
+import { signIn } from "next-auth/react"
+import { useEffect } from 'react'
 import Swal from 'sweetalert2'
 
 const VerifyLogin = ({ verifyData }) => {
-
-    // const { data: session, update } = useSession();
-    // const [localEmail, setLocalEmail] = useState()
-
-    // const testLog = () => {
-    //     console.log(session);
-    // }
-    // const updateSession = async () => {
-    //     await update({
-    //         ...session,
-    //         user: {
-    //             ...session?.user,
-    //             test: "test session"
-    //         }
-    //     })
-    //         .then(result => {
-    //             console.log("result in update: ", result);
-    //         }).catch(err => {
-    //             console.log("error on update: ", err);
-    //         })
-    // }
-    // const getLocalStorage = async () => {
-    //     console.log(localEmail);
-    // }
-
-    // useEffect(() => {
-    //     if (localStorage.getItem("email")) {
-    //         setLocalEmail(localStorage.getItem("email"))
-    //     }
-    // }, [])
-    // useEffect(() => {
-    //     console.log(session);
-    // }, [session])
 
     useEffect(() => {
         if (verifyData.ok) {

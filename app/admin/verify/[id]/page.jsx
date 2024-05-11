@@ -44,7 +44,7 @@ const Page = ({ params }) => {
                const result = await fetchDataObj(`/api/verify/${id}`)
                setVerifySelect(result)
                setId(result.id)
-               console.log(result);
+               // console.log(result);
                // console.log(result);
                setProgram(result?.Program)
                // const subjects = result.SubjectVerifies.map(subjectVerify => subjectVerify.Subject);
@@ -112,11 +112,11 @@ const Page = ({ params }) => {
           initVerify(id);
      }, [])
 
-     
+
      const handleInsertModalOpen = () => {
           setInsertModalOpen(true);
      };
-     
+
      const handleInsertModalClose = () => {
           setInsertModalOpen(false);
      };
@@ -132,11 +132,89 @@ const Page = ({ params }) => {
           }
      };
 
+     const getSubTrack = useCallback((subgroup, subgroupIndex) => {
+          if (subgroup?.subjects.every(subject => subject?.Track)) {
+               const subjects = subgroup?.subjects
+               const trackSubjects = {}
+               for (let index = 0; index < subjects?.length; index++) {
+                    const track = subjects[index]?.Track.title_th
+                    if (!trackSubjects.hasOwnProperty(track)) {
+                         trackSubjects[track] = []
+                    }
+                    trackSubjects[track].push(subjects[index])
+               }
+               return (
+                    <div key={subgroupIndex}>
+                         <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
+                              <h3 className='text-md text-default-800 px-10'><li>{subgroup?.sub_group_title}</li></h3>
+                         </div>
+                         {trackSubjects && Object.keys(trackSubjects).map((track, trackIndex) => (
+                              <div key={trackIndex}>
+                                   <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
+                                        <h3 className='text-md text-default-800 px-16'><li>กลุ่มย่อยที่ {trackIndex+1} {track}</li></h3>
+                                   </div>
+                                   <Table
+                                        classNames={tableClass}
+                                        removeWrapper
+                                        onRowAction={() => { }}
+                                        aria-label="subjects table">
+                                        <TableHeader>
+                                             <TableColumn>รหัสวิชา</TableColumn>
+                                             <TableColumn>ชื่อวิชา EN</TableColumn>
+                                             <TableColumn>ชื่อวิชา TH</TableColumn>
+                                             <TableColumn>หน่วยกิต</TableColumn>
+                                        </TableHeader>
+                                        <TableBody>
+                                             {trackSubjects[track].map((subject, subjectIndex) => (
+                                                  <TableRow key={subjectIndex}>
+                                                       <TableCell className=''>{subject.subject_code}</TableCell>
+                                                       <TableCell className="w-1/3">{subject.title_en}</TableCell>
+                                                       <TableCell className="w-1/3">{subject.title_th}</TableCell>
+                                                       <TableCell>{subject.credit}</TableCell>
+                                                  </TableRow>
+                                             ))}
+                                        </TableBody>
+                                   </Table>
+                              </div>
+                         ))}
+                    </div>
+               );
+
+          } else {
+               return (
+                    <div key={subgroupIndex}>
+                         <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
+                              <h3 className='text-md text-default-800 px-10'><li>{subgroup?.sub_group_title}</li></h3>
+                         </div>
+                         <Table
+                              classNames={tableClass}
+                              removeWrapper
+                              onRowAction={() => { }}
+                              aria-label="subjects table">
+                              <TableHeader>
+                                   <TableColumn>รหัสวิชา</TableColumn>
+                                   <TableColumn>ชื่อวิชา EN</TableColumn>
+                                   <TableColumn>ชื่อวิชา TH</TableColumn>
+                                   <TableColumn>หน่วยกิต</TableColumn>
+                              </TableHeader>
+                              <TableBody>
+                                   {subgroup.subjects && subgroup.subjects.map((subject, subjectIndex) => (
+                                        <TableRow key={subjectIndex}>
+                                             <TableCell className=''>{subject.subject_code}</TableCell>
+                                             <TableCell className="w-1/3">{subject.title_en}</TableCell>
+                                             <TableCell className="w-1/3">{subject.title_th}</TableCell>
+                                             <TableCell>{subject.credit}</TableCell>
+                                        </TableRow>
+                                   ))}
+                              </TableBody>
+                         </Table>
+                    </div>)
+          }
+     }, [])
 
      const getSubg = useCallback((subgroups) => {
           if (!subgroups) return undefined
           if (Object.values(subgroups).length == 0) return undefined
-          console.log(subgroups);
           const groupedSubgroups = {};
           Object.values(subgroups).forEach((subgroup) => {
                const groupTitle = subgroup?.Group?.group_title;
@@ -145,7 +223,6 @@ const Page = ({ params }) => {
                }
                groupedSubgroups[groupTitle].push(subgroup);
           });
-
           return (
                <>
                     {Object.keys(groupedSubgroups).map((groupTitle, groupIndex) => {
@@ -157,33 +234,7 @@ const Page = ({ params }) => {
                                         <h2 className='text-sm text-default-800'>จำนวน {creditsubgroup} หน่วยกิต</h2>
                                    </div>
                                    {subgroupsWithSameGroupTitle.map((subgroup, subgroupIndex) => (
-                                        <div key={subgroupIndex}>
-                                             <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
-                                                  <h3 className='text-md text-default-800 px-10'><li>{subgroup?.sub_group_title}</li></h3>
-                                             </div>
-                                             <Table
-                                                  classNames={tableClass}
-                                                  removeWrapper
-                                                  onRowAction={() => { }}
-                                                  aria-label="subjects table">
-                                                  <TableHeader>
-                                                       <TableColumn>รหัสวิชา</TableColumn>
-                                                       <TableColumn>ชื่อวิชา EN</TableColumn>
-                                                       <TableColumn>ชื่อวิชา TH</TableColumn>
-                                                       <TableColumn>หน่วยกิต</TableColumn>
-                                                  </TableHeader>
-                                                  <TableBody>
-                                                       {subgroup.subjects && subgroup.subjects.map((subject, subjectIndex) => (
-                                                            <TableRow key={subjectIndex}>
-                                                                 <TableCell className=''>{subject.subject_code}</TableCell>
-                                                                 <TableCell className="w-1/3">{subject.title_en}</TableCell>
-                                                                 <TableCell className="w-1/3">{subject.title_th}</TableCell>
-                                                                 <TableCell>{subject.credit}</TableCell>
-                                                            </TableRow>
-                                                       ))}
-                                                  </TableBody>
-                                             </Table>
-                                        </div>
+                                        getSubTrack(subgroup, subgroupIndex)
                                    ))}
                               </div>
                          );
@@ -213,7 +264,7 @@ const Page = ({ params }) => {
                                    Object.keys(verifySelect).length > 0 ?
                                         <div className='my-[30px]'>
                                              <div className='text-center text-xl text-black mb-5'>
-                                                  <h1 className='text-3xl'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br></br>หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{program.title_th}<br></br>(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
+                                                  <h1 className='text-3xl leading-relaxed'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br></br>หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{program.title_th}<br></br>(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
                                                   <h2 className='mt-6'>ขอยื่นแบบฟอร์มแสดงรายละเอียดการศึกษารายวิชาที่ได้เรียนมาทั้งหมด อย่างน้อย <span className='font-bold'>{verifySelect.main_at_least}</span> หน่วยกิต ต่องานทะเบียนและประมวลผลการศึกษา ดังต่อไปนี้คือ.—</h2>
                                              </div>
                                              <div className='bg-gray-100 border-gray-200 border-1 p-2 justify-between items-center rounded-md mb-4 grid  grid-cols-4'>
@@ -255,7 +306,7 @@ const Page = ({ params }) => {
                                                             </div>
                                                             {Object.keys(groups).map((groupId, groupIndex) => {
                                                                  const group = groups[groupId];
-               
+
                                                                  return (
                                                                       <div key={groupIndex} >
                                                                            <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>

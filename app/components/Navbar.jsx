@@ -85,7 +85,7 @@ const Navbar = () => {
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
                         <div className="relative ml-3 flex flex-row gap-3">
                             {status == "authenticated" ?
-                                <div className='relative hidden sm:flex justify-center items-center gap-5'>
+                                <div className='relative hidden md:flex justify-center items-center gap-5'>
                                     <Dropdown
                                         radius="sm"
                                         classNames={{
@@ -144,17 +144,17 @@ const Navbar = () => {
                                                 aria-label="Help & Feedback"
                                                 className="mb-0"
                                             >
-                                                <DropdownItem key="help_and_feedback" className='mb-1'>
+                                                {/* <DropdownItem key="help_and_feedback" className='mb-1'>
                                                     <div className='flex gap-3 items-center'>
                                                         <GoQuestion className='w-5 h-5' />
                                                         <span>Help & Feedback</span>
 
                                                     </div>
-                                                </DropdownItem>
+                                                </DropdownItem> */}
                                                 <DropdownItem key="logout" onClick={() => signOut()}>
                                                     <div className='flex gap-3 items-center'>
                                                         <MdOutlineLogout className='w-5 h-5' />
-                                                        <span>Log Out</span>
+                                                        <span>ออกจากระบบ</span>
                                                     </div>
                                                 </DropdownItem>
                                             </DropdownSection>
@@ -218,7 +218,7 @@ const Navbar = () => {
                                 <div className='text-gray-900'>
                                     <MdOutlineLogout className='w-5 h-5' />
                                 </div>
-                                <button className='ml-3 text-sm'>Sign out</button>
+                                <button className='ml-3 text-sm'>ออกจากระบบ</button>
                             </div>
                         </div>
                     </div>

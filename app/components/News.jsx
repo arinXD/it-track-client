@@ -1,16 +1,14 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import Card1 from './Card1';
-import { Card, CardHeader, CardBody, CardFooter, Image, Button } from "@nextui-org/react";
+import { Card, CardFooter, Image, Button } from "@nextui-org/react";
 import Link from 'next/link';
 
-function linkTo(url) {
-    window.open(url, "_blank")
-}
-
-const News = ({ data }) => {
+const News = () => {
+    const linkTo = function (url) {
+        window.open(url, "_blank")
+    }
     useEffect(() => {
         AOS.init();
     }, []);

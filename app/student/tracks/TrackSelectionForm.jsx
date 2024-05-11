@@ -1,19 +1,15 @@
 "use client"
-import { useCallback } from 'react'
-import { hostname } from '@/app/api/hostname'
 import axios from 'axios'
 import { useState, useEffect, useReducer } from 'react'
 import { createTrackSelection } from './action'
 import Swal from 'sweetalert2'
-import { Button } from "@nextui-org/react";
+import { Button, Spinner } from "@nextui-org/react";
 import { DeleteIcon } from '@/app/components/icons'
 import { dmy, dmyt } from '@/src/util/dateFormater'
 import confetti from 'canvas-confetti';
-import { Loading } from '@/app/components'
 import TMonlicaEmail from '@/app/components/TMonlicaEmail'
 import { getOptions } from '@/app/components/serverAction/TokenAction'
 import Link from 'next/link'
-
 import { SmileOutlined } from '@ant-design/icons';
 import { Result } from 'antd';
 
@@ -108,7 +104,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 if (result.isConfirmed) {
                     swal.fire({
                         title: "ขออนุญาตผู้ใช้ทำแบบสอบถาม",
-                        text: `ขออนุญาตผู้ใช้ทำแบบสอบถามเพื่อนำ feed back มาปรับปรุงแก้ไขเว็บไซต์ให้มีประสิทธิภาพต่อไป`,
+                        text: `ขออนุญาตผู้ใช้ทำแบบสอบถามเพื่อนำ feedback มาปรับปรุงแก้ไขเว็บไซต์ให้มีประสิทธิภาพต่อไป`,
                         icon: "question",
                         showCancelButton: true,
                         confirmButtonColor: "#3085d6",
@@ -240,11 +236,29 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         return (
             <div className="relative flex flex-col rounded-xl bg-transparent bg-clip-border text-gray-700 shadow-none">
                 {loading ?
-                    <Loading />
+                    <div className='w-full flex justify-center h-[70vh]'>
+                        <Spinner label="กำลังโหลด..." color="primary" />
+                    </div>
                     :
                     !(trackSelect?.id) ?
                         <>
-                            รอการประกาศการคัดเลือกแทร็กจากอาจารย์ครับ/ค่ะ
+                            <h4
+                                style={{
+                                    fontSize: "clamp(16px, 5vw, 24px)",
+                                    margin: "auto"
+                                }}
+                                className="md:!mt-4 block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
+                                การคัดเลือกความเชี่ยวชาญ วิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ ปีการศึกษา 2566
+                            </h4>
+                            <p
+                                style={{
+                                    fontSize: "clamp(8px, 4vw, 16px)",
+                                    margin: "auto"
+                                }}
+                                className='text-center mb-3 text-lg text-default-600'>
+                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ 13 พฤษภาคม 2567 - 20 พฤษภาคม 2567 <br />
+                                ประกาศผลวันที่ 23 พฤษภาคม 2567
+                            </p>
                         </>
                         :
                         <>
@@ -252,21 +266,12 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                 trackResult ?
                                     (
                                         <div className='flex flex-col justify-center items-center h-[70vh]'>
-                                            {/* <h4
-                                                style={{
-                                                    fontSize: "clamp(16px, 5vw, 24px)",
-                                                    margin: "auto"
-                                                }}
-                                                className="md:!mt-4 max-w-screen-md block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
-                                                {trackSelect?.title}
-                                            </h4> */}
                                             <Result
                                                 icon={<SmileOutlined />}
                                                 title={`แทร็กของคุณ คือ ${trackResult?.title_en}`}
                                                 subTitle={<p className='text-lg'>{trackResult?.title_th}</p>}
-                                            // extra={<Button type="primary">Next</Button>}
                                             />
-                                            <Link href={`/tracks/${trackResult.track}`} className='text-blue-500 block'>รายละเอียดแทร็ก</Link>
+                                            <Link href={`/tracks/${trackResult?.track?.toLowerCase()}`} className='text-blue-500 block'>รายละเอียดแทร็ก</Link>
                                         </div>
                                     )
                                     :
@@ -307,7 +312,24 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             <div className='mt-5 text-center'>
                                                 <label className="block font-bold text-black text-base">รายละเอียดวิชาที่ใช้ในการคัดเลือกและเกรดที่ได้</label>
                                                 <label className="block text-sm font-medium text-black mt-2 mb-5">
-                                                    <span className='text-red-500 font-bold'>*</span>  โปรดตรวจสอบรายละเอียดเกรดของแต่ละวิชา <span className='text-red-500 font-bold'>*</span>
+                                                    <span className='text-red-500 font-bold'>*</span>
+                                                    <span> โปรดตรวจสอบรายละเอียดเกรดของแต่ละวิชา หากตรวจสอบแล้วเกรดไม่ถูกต้องสามารถติดต่อ: </span>
+                                                    <span className='text-red-500 font-bold'> *</span>
+                                                    <br />
+                                                    [ <Link
+                                                        className="text-blue-500"
+                                                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${"arinchawut.k@kkumail.com"}&authuser=1`}
+                                                        size="sm"
+                                                        isexternal="true">
+                                                        arinchawut.k@kkumail.com
+                                                    </Link> , &nbsp;
+                                                    <Link
+                                                        className="text-blue-500"
+                                                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${"pubes.k@kkumail.com"}&authuser=1`}
+                                                        size="sm"
+                                                        isexternal="true">
+                                                        pubes.k@kkumail.com
+                                                    </Link> ]
                                                 </label>
                                             </div>
                                             <div id='TrackSubjects'>
@@ -347,8 +369,10 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         </div>
                                         <div className="mb-1 flex flex-col mt-5">
                                             <div>
-                                                <label className="block font-bold text-black text-base">เลือกอันดับความเชี่ยวชาญ (แทร็ก) ที่ต้องการ</label>
-                                                <label className="block text-sm font-medium text-black mb-5 mt-2">* อันดับแรกคืออันดับที่ต้องการมากที่สุด จากนั้นเลือกอันดับที่ต้องการรองจากอับดับแรก ในกรณีที่อับดับแรกเต็ม</label>
+                                                <label className="block font-bold text-black text-base">เลือกลำดับความเชี่ยวชาญ (แทร็ก) ที่ต้องการ</label>
+                                                <label className="block text-sm font-medium mb-5 mt-2 text-default-500">
+                                                    การคัดเลือกแทร็กจะเริ่มเลือกจากคนที่มีเกรดสูงที่สุดไปหาน้อยที่สุด หากแทร็กที่เลือกลำดับที่ 1 เต็ม จะได้แทร็กลำดับที่ 2 หรือลำดับที่ 3 ตามแทร็กที่ว่าง <br /> ลำดับแรกคือลำดับที่ต้องการมากที่สุด จากนั้นเลือกลำดับที่ต้องการรองจากลำดับแรก
+                                                </label>
                                             </div>
                                             <div>
                                                 {/* {JSON.stringify([orders.order1, orders.order2, orders.order3].filter(e => e))} <br /> */}
@@ -358,7 +382,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             <div>
                                                 {tracks.map((e, index) => (
                                                     <div key={index}>
-                                                        <label className="block text-sm font-medium text-black mb-2">อันดับที่ {index + 1}</label>
+                                                        <label className="block text-sm font-medium text-black mb-2">ลำดับที่ {index + 1}</label>
                                                         <div className="relative h-11 w-full mb-4">
                                                             <select
                                                                 onChange={() => handleChange(event.target.value, index)}
@@ -395,7 +419,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                     <DeleteIcon className={"w-5 h-5"} />
                                                 }
                                                 color="primary">
-                                                Clear
+                                                เคลียร์ฟอร์ม
                                             </Button>
                                         </div>
                                         <div className="inline-flex items-center">
@@ -443,7 +467,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             type="submit"
                                             disabled={!isConfirm || processing}
                                         >
-                                            {!processing ? "ตกลง" : "บันทึกข้อมูล..."}
+                                            {!processing ? "บันทึกข้อมูล" : "บันทึกข้อมูล..."}
                                         </Button>
                                     </form>
                                 </>

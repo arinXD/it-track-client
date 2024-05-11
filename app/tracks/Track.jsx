@@ -1,25 +1,17 @@
 "use client"
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-// import { Button } from '@nextui-org/react';
-import Link from 'next/link';
 import { Empty } from 'antd';
-import { Card, CardHeader, CardBody, CardFooter, Button, Image } from "@nextui-org/react";
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Card, CardFooter, Image } from "@nextui-org/react";
 
 const Track = ({ tracks }) => {
-
-    const router = useMemo(() => useRouter(), [])
-
-    const linkTo = useCallback(function (url) {
-        router.push(url);
-        router.refresh()
-    }, [router])
-
     useEffect(() => {
         AOS.init();
-    }, [])
+    }, []);
+    const linkTo = function (url) {
+        window.location.href = url
+    }
     return (
         <>
             {
@@ -28,30 +20,42 @@ const Track = ({ tracks }) => {
                         <Empty />
                     </div>
                     :
-                    <div className='my-[30px] px-8 max-lg:px-4'>
+                    <div className='my-[20px] px-8 max-lg:px-4'>
                         <h1
                             style={{             //min def max
                                 fontSize: "clamp(45px, 3vw, 30px)",
                             }}
-                            className='text-center sm:text-start font-bold text-3xl mb-8'>
+                            className='text-center md:text-start font-bold text-3xl mb-[16px] md:mb-[8px] leading-[4rem]'>
                             แทร็กความเชี่ยวชาญ
                         </h1>
-                        <p className='text-center sm:text-start text-lg mb-8'>
+                        <p
+                            style={{
+                                fontSize: "clamp(8px, 3.5vw, 16px)",
+                            }}
+                            className='text-center md:text-start text-default-600 text-lg mb-8'>
                             ค้นพบแทร็กหลักสูตรไอทีล่าสุด! ยกระดับทักษะของคุณด้วยความเชี่ยวชาญที่ล้ำสมัย นำทางไปสู่อนาคตของความสำเร็จทางเทคโนโลยี
                         </p>
                         <div className='grid grid-cols-12 gap-4'>
                             {tracks.map((track, index) => {
                                 let colSpan;
+                                let duration
                                 if (index === 0) {
                                     colSpan = 'col-span-7';
+                                    duration = "500"
                                 } else if (index === 1) {
                                     colSpan = 'col-span-5';
+                                    duration = "800"
                                 } else {
                                     colSpan = 'col-span-12';
+                                    duration = "1000"
                                 }
 
                                 return (
-                                    <div key={index} className={`w-full grid max-lg:col-span-12 ${colSpan}`}>
+                                    <div
+                                        data-aos="fade-up"
+                                        data-aos-duration={duration}
+                                        key={index}
+                                        className={`w-full grid max-lg:col-span-12 ${colSpan}`}>
                                         <Card
                                             key={index}
                                             shadow="none"
@@ -66,10 +70,19 @@ const Track = ({ tracks }) => {
                                                 width={1000}
                                                 height={1000}
                                                 unoptimized="true"
-                                                className="z-0 w-full h-full object-cover"
+                                                className="z-0 w-full h-full object-cover brightness-75"
                                                 quality={100}
                                                 alt={track.track}
                                                 src={track.img} />
+                                            <p
+                                                style={{
+                                                    top: "50%",
+                                                    left: "50%",
+                                                    transform: "translate(-50%, -50%)"
+                                                }}
+                                                className='w-full font-bold text-white absolute uppercase px-10 text-xl text-center md:text-3xl'>
+                                                {track.track}
+                                            </p>
                                             <CardFooter className="flex-col justify-center h-full text-white bg-opacity-60 bg-black text-small absolute bottom-[-30em] group-hover:bottom-0 ease-in-out duration-400">
                                                 <span className='text-3xl font-extrabold'>{track.track}</span>
                                                 <hr className='w-10 mt-7 mb-5 border-2 border-gray-500'></hr>
@@ -80,54 +93,6 @@ const Track = ({ tracks }) => {
                                 );
                             })}
                         </div>
-                        {/* <ul className='space-y-6'>
-                            {tracks.map((track, index) => (
-                                <li key={index}
-                                    className='flex flex-col sm:flex-row justify-start items-start gap-6 border-b-1 pb-4'>
-                                    <div
-                                        className='w-full sm:w-[250px] h-[180px] relative'>
-                                        <Image
-                                            priority={true}
-                                            width={600}
-                                            height={400}
-                                            className='w-full h-full object-cover brightness-75'
-                                            alt={track.track}
-                                            src={track.img} />
-                                        <p
-                                            style={{
-                                                top: "50%",
-                                                left: "50%",
-                                                transform: "translate(-50%, -50%)"
-                                            }}
-                                            className='w-full font-bold text-white absolute uppercase px-10 text-xl text-center'>
-                                            {track.track}
-                                        </p>
-                                    </div>
-                                    <div className='flex flex-col items-start justify-between w-full h-full'>
-                                        <div className='flex flex-col gap-4'>
-                                            <div className='flex flex-col gap-1'>
-                                                <p className='font-bold text-lg'>{track.title_en}</p>
-                                                <p>{track.title_th}</p>
-                                            </div>
-                                            <p className='text-default-500'>
-                                                {track.desc}
-                                            </p>
-                                        </div>
-                                        <Link
-                                            href={`/tracks/${track.track?.toLowerCase()}`}
-                                            className='flex w-full md:w-fit sm:justify-start mt-4'>
-                                            <Button
-                                                radius='sm'
-                                                className='!w-full'
-                                                color={"primary"}
-                                            >
-                                                รายละเอียด
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul> */}
                     </div >
             }
         </>
