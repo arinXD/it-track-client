@@ -8,7 +8,7 @@ const TeacherItem = ({ teacher }) => {
                 height={800}
                 src={teacher?.image}
                 alt={teacher?.teacherName}
-                className="rounded-md w-[200px] h-[200px]"
+                className="rounded-md w-[200px] h-[200px] sm:w-[100px] sm:h-[100px]"
             />
             <p className="text-center">{teacher?.teacherName}</p>
         </div>
