@@ -74,7 +74,7 @@ const Track = ({ tracks }) => {
                                                     left: "50%",
                                                     transform: "translate(-50%, -50%)"
                                                 }}
-                                                className='w-full font-bold text-white absolute uppercase px-10 text-xl text-center'>
+                                                className='w-full font-bold text-white absolute uppercase px-10 text-xl text-center md:text-3xl'>
                                                 {track.track}
                                             </p>
                                             <CardFooter className="flex-col justify-center h-full text-white bg-opacity-60 bg-black text-small absolute bottom-[-30em] group-hover:bottom-0 ease-in-out duration-400">
