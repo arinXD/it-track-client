@@ -85,7 +85,7 @@ const Navbar = () => {
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
                         <div className="relative ml-3 flex flex-row gap-3">
                             {status == "authenticated" ?
-                                <div className='relative hidden sm:flex justify-center items-center gap-5'>
+                                <div className='relative hidden md:flex justify-center items-center gap-5'>
                                     <Dropdown
                                         radius="sm"
                                         classNames={{

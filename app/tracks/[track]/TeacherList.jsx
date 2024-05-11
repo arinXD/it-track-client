@@ -16,9 +16,9 @@ const TeacherList = ({ teachers }) => {
                     </div>
                     :
                     <>
-                        <div className="grid justify-items-center max-lg:justify-items-center grid-cols-4 gap-4 px-80 my-9 max-2xl:px-0">
+                        <div className="flex flex-wrap justify-center items-center gap-4 w-full my-9 max-2xl:px-0">
                             {teachers.map((teacher, index) => (
-                                <div key={index} className="grid col-span-1 max-lg:col-span-2 ">
+                                <div key={index} className="">
                                     <Image
                                         width={800}
                                         height={800}

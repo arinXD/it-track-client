@@ -20,7 +20,7 @@ const CoverImage = ({ track }) => {
                 >
                     <span
                         style={{
-                            fontSize: "clamp(16px, 5vw, 24px)",
+                            fontSize: "clamp(8px, 3.5vw, 24px)",
                             margin: "auto"
                         }}
                         className='block'>
@@ -28,7 +28,7 @@ const CoverImage = ({ track }) => {
                     </span>
                     <span
                         style={{
-                            fontSize: "clamp(16px, 5vw, 24px)",
+                            fontSize: "clamp(8px, 3.5vw, 24px)",
                             margin: "auto"
                         }}
                         className='block'>
@@ -36,7 +36,7 @@ const CoverImage = ({ track }) => {
                     </span>
                     <span
                         style={{
-                            fontSize: "clamp(8px, 4vw, 16px)",
+                            fontSize: "clamp(6px, 3vw, 16px)",
                             margin: "auto"
                         }}
                         className='block text-lg mt-3 text-default-200 font-normal'>

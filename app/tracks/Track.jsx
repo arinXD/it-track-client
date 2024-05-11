@@ -22,12 +22,12 @@ const Track = ({ tracks }) => {
                         <Empty />
                     </div>
                     :
-                    <div className='my-[30px] px-8 max-lg:px-4'>
+                    <div className='my-[20px] px-8 max-lg:px-4'>
                         <h1
                             style={{             //min def max
                                 fontSize: "clamp(45px, 3vw, 30px)",
                             }}
-                            className='text-center sm:text-start font-bold text-3xl mb-8'>
+                            className='text-center sm:text-start font-bold text-3xl mb-[36px] leading-[4rem]'>
                             แทร็กความเชี่ยวชาญ
                         </h1>
                         <p className='text-center sm:text-start text-lg mb-8'>
