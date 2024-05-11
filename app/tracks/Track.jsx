@@ -27,10 +27,14 @@ const Track = ({ tracks }) => {
                             style={{             //min def max
                                 fontSize: "clamp(45px, 3vw, 30px)",
                             }}
-                            className='text-center sm:text-start font-bold text-3xl mb-[36px] leading-[4rem]'>
+                            className='text-center md:text-start font-bold text-3xl mb-[16px] md:mb-[8px] leading-[4rem]'>
                             แทร็กความเชี่ยวชาญ
                         </h1>
-                        <p className='text-center sm:text-start text-lg mb-8'>
+                        <p
+                            style={{
+                                fontSize: "clamp(8px, 3.5vw, 16px)",
+                            }}
+                            className='text-center md:text-start text-default-600 text-lg mb-8'>
                             ค้นพบแทร็กหลักสูตรไอทีล่าสุด! ยกระดับทักษะของคุณด้วยความเชี่ยวชาญที่ล้ำสมัย นำทางไปสู่อนาคตของความสำเร็จทางเทคโนโลยี
                         </p>
                         <div className='grid grid-cols-12 gap-4'>
