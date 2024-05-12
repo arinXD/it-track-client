@@ -5,7 +5,7 @@ const auth = withAuth(
     async function middleware(req) {
         const path = req.nextUrl.pathname
         // console.log("Middleware token: ", req?.nextauth?.token);
-        if (path === "/" && req.nextauth.token.role === "admin") {
+        if (path === "/" && (req.nextauth.token.role === "admin" || req.nextauth.token.role === "teacher" )) {
             const url = req.nextUrl.clone()
             url.pathname = '/admin'
             return NextResponse.redirect(url)
@@ -37,8 +37,7 @@ const auth = withAuth(
                 new URL("/permission/Admin-account", req.url)
             )
         }
-        if (path.startsWith("/admin") &&
-            req.nextauth.token.role !== "admin") {
+        if (path.startsWith("/admin") && (req.nextauth.token.role !== "admin" || req.nextauth.token.role !== "teacher" )) {
             return NextResponse.rewrite(
                 new URL("/permission/Admin-account", req.url)
             )
