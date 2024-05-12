@@ -262,7 +262,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                         </>
                         :
                         <>
-                            {(trackSelect?.has_finished || (new Date(trackSelect?.expiredAt) < new Date()) || (new Date(trackSelect?.startAt) >= new Date()) ) ?
+                            {(trackSelect?.has_finished || (new Date(trackSelect?.expiredAt) < new Date()) || (new Date(trackSelect?.startAt) >= new Date())) ?
                                 trackResult ?
                                     (
                                         <div className='flex flex-col justify-center items-center h-[70vh]'>
@@ -275,13 +275,34 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         </div>
                                     )
                                     :
-                                    (
-                                        <div>
-                                            การคัดเลือกความเชี่ยวชาญ หลักสูตรเทคโนโลยีสารสนเทศ
-                                            <strong> จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
-                                            ระบบจะทำการสุ่มให้ หากมีคำถามเพิ่มเติมติดต่อ <TMonlicaEmail />
-                                        </div>
-                                    )
+                                    (new Date(trackSelect?.startAt) >= new Date()) ?
+                                        <>
+                                            <h4
+                                                style={{
+                                                    fontSize: "clamp(16px, 5vw, 24px)",
+                                                    margin: "auto"
+                                                }}
+                                                className="md:!mt-4 max-w-screen-md block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
+                                                {trackSelect?.title}
+                                            </h4>
+                                            <p
+                                                style={{
+                                                    fontSize: "clamp(8px, 4vw, 16px)",
+                                                    margin: "auto"
+                                                }}
+                                                className='text-center mb-3 text-lg font-semibold text-gray-900'>
+                                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ {dmy(trackSelect.startAt)} - {dmy(trackSelect.expiredAt)} <br />
+                                                ประกาศผลวันที่ 23 พฤษภาคม 2567
+                                            </p>
+                                        </>
+                                        :
+                                        (
+                                            <div>
+                                                การคัดเลือกความเชี่ยวชาญ หลักสูตรเทคโนโลยีสารสนเทศ&nbsp;
+                                                 <strong className='underline decoration-pink-500 underline-offset-2 decoration-2'>จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
+                                                ระบบจะทำการสุ่มให้ หากมีคำถามเพิ่มเติมติดต่อ <TMonlicaEmail />
+                                            </div>
+                                        )
                                 :
                                 <>
 
