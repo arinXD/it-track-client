@@ -1,6 +1,8 @@
 import { withAuth, NextRequestWithAuth } from "next-auth/middleware"
 import { NextResponse, NextRequest } from "next/server"
 
+const accessRoles = ["admin", "teacher"]
+
 const auth = withAuth(
     async function middleware(req) {
         const path = req.nextUrl.pathname
@@ -37,7 +39,7 @@ const auth = withAuth(
                 new URL("/permission/Admin-account", req.url)
             )
         }
-        if (path.startsWith("/admin") && (req.nextauth.token.role !== "admin" || req.nextauth.token.role !== "teacher" )) {
+        if (path.startsWith("/admin") && !accessRoles.includes(req.nextauth.token.role)) {
             return NextResponse.rewrite(
                 new URL("/permission/Admin-account", req.url)
             )
