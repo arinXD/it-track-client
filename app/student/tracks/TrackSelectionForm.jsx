@@ -262,7 +262,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                         </>
                         :
                         <>
-                            {(trackSelect?.has_finished || (new Date(trackSelect?.expiredAt) < new Date())) ?
+                            {(trackSelect?.has_finished || (new Date(trackSelect?.expiredAt) < new Date()) || (new Date(trackSelect?.startAt) >= new Date()) ) ?
                                 trackResult ?
                                     (
                                         <div className='flex flex-col justify-center items-center h-[70vh]'>
