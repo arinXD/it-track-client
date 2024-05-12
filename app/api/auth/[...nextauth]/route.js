@@ -66,17 +66,19 @@ const handler = NextAuth({
                     withCredentials: true,
                     data: credentials
                 };
-                const res = await axios(options)
-                const data = res.data
-                if (data.ok && data) {
-                    let userData = data.user
-                    return {
-                        id: null,
-                        ...userData
+                try{
+                    const res = await axios(options)
+                    const data = res.data
+                    if (data.ok && data) {
+                        let userData = data.user
+                        return {
+                            id: null,
+                            ...userData
+                        }
                     }
+                }catch(error){
+                    throw new Error(error?.response?.data?.message || "ไม่สามารถเข้าสู่ระบบได้ ตรวจสอบชื่อผู้ใช้และรหัสผ่าน")
                 }
-                const { message } = response
-                throw new Error(message)
             }
         }),
         GoogleProvider({

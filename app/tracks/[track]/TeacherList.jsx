@@ -11,7 +11,7 @@ const TeacherList = ({ teachers }) => {
         AOS.init();
     }, []);
     return (
-        <section className="my-10">
+        <section className="my-16 md:mt-10">
             <h2 className="text-center font-bold text-3xl text-[#1C75BC] mb-3">คณาจารย์ประจำแทร็ก</h2>
             <div className="flex justify-center items-center">
                 <hr className='w-12 my-3 border-1 border-[#cbcbcb]'></hr>
