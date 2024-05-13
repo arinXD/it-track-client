@@ -299,7 +299,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                         (
                                             <div>
                                                 การคัดเลือกความเชี่ยวชาญ หลักสูตรเทคโนโลยีสารสนเทศ&nbsp;
-                                                 <strong className='underline decoration-pink-500 underline-offset-2 decoration-2'>จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
+                                                <strong className='underline decoration-pink-500 underline-offset-2 decoration-2'>จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
                                                 ระบบจะทำการสุ่มให้ หากมีคำถามเพิ่มเติมติดต่อ <TMonlicaEmail />
                                             </div>
                                         )
@@ -416,6 +416,9 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                                 <option value="" disabled hidden>เลือกแทร็ก</option>
                                                                 {tracks.map((track, index) => (
                                                                     <option
+                                                                        style={{
+                                                                            display: `${[orders.order1, orders.order2, orders.order3].includes(track.track) ? "none" : "block"}`
+                                                                        }}
                                                                         hidden={[orders.order1, orders.order2, orders.order3].includes(track.track)}
                                                                         key={index}
                                                                         value={track.track}
