@@ -200,7 +200,7 @@ const Navbar = () => {
                         {links.map((link, index) => (
                             <Link href={link.href}
                                 className={`${url == link.href ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                                onClick={() => setOpenToggle(false)}
+                                onClick={() => navstupid()}
                                 key={index}
                             >
                                 {url == link.href ?
