@@ -395,6 +395,11 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                 </label>
                                             </div>
                                             <div>
+                                                {/* {JSON.stringify([orders.order1, orders.order2, orders.order3].filter(e => e))} <br /> */}
+                                                {/* {JSON.stringify([orders.order1, orders.order2, orders.order3])} */}
+                                                {/* {JSON.stringify(tracks.filter((t) => ![orders.order1, orders.order2, orders.order3].includes(t.track)))} */}
+                                            </div>
+                                            <div>
                                                 {tracks.map((e, index) => (
                                                     <div key={index}>
                                                         <label className="block text-sm font-medium text-black mb-2">ลำดับที่ {index + 1}</label>

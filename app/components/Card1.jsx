@@ -1,10 +1,13 @@
 "use client"
+import * as React from 'react';
 import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
+import { Button } from '@nextui-org/react';
 
-export default function Card1({src}) {
+export default function Card1({src, }) {
     return (
         <Card sx={{ borderRadius:"8px",boxShadow: "none", border: "1px solid #cbd5e1" ,maxWidth: 345 }}>
             <CardMedia

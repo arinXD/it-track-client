@@ -1,5 +1,5 @@
 "use client"
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Card, CardFooter, Image, Button } from "@nextui-org/react";
