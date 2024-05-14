@@ -4,13 +4,15 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Empty } from 'antd';
 import { Card, CardFooter, Image } from "@nextui-org/react";
+import { useRouter } from 'next/navigation'
 
 const Track = ({ tracks }) => {
+    const router = useRouter()
     useEffect(() => {
         AOS.init();
     }, []);
     const linkTo = function (url) {
-        window.location.href = url
+        router.push(url);
     }
     return (
         <>

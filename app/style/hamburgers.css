@@ -44,7 +44,7 @@
   margin-top: -1px; }
   .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
     width: 100%;
-    height: 2px;
+    height: 1px;
     background-color: #000;
     border-radius: 4px;
     position: absolute;
