@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Autocomplete, AutocompleteSection, AutocompleteItem } from '@nextui-org/react';
 import axios from 'axios';
 import { fetchData, fetchDataObj } from '../../action'
@@ -10,17 +10,24 @@ import { Input, Textarea } from "@nextui-org/react";
 import { getOptions, getToken } from '@/app/components/serverAction/TokenAction';
 import { getAcadyears } from "@/src/util/academicYear";
 import { toast } from 'react-toastify';
+import { Empty, message } from 'antd';
+import { IoIosCloseCircle } from "react-icons/io";
+import { IoSearchOutline } from "react-icons/io5";
 
 
-export default function InsertSubjectModal({ isOpen, onClose, onDataInserted,verify_id }) {
+export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, verify_id }) {
     const [subjects, setSubjects] = useState([]);
     const [categories, setCategories] = useState([]);
     const [groups, setGroups] = useState([]);
     const [subgroups, setSubgroups] = useState([]);
-    const [selectedSubject, setSelectedSubject] = useState(null);
+    // const [selectedSubject, setSelectedSubject] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [selectedSubgroup, setSelectedSubgroup] = useState(null);
+
+    const [searchSubj, setSearchSubj] = useState("")
+    const [verifySubj, setVerifySubj] = useState([])
+    const [filterSubj, setFilterSubj] = useState([])
 
     const showToastMessage = useCallback((ok, message) => {
         toast[ok ? 'success' : 'warning'](message, {
@@ -52,14 +59,24 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted,ver
         };
         const fetchSubjects = async () => {
             try {
-                const result = await fetchDataObj(`/api/subjects`);
+                // const result = await fetchDataObj(`/api/subjects`);
 
-                const subjectsOptions = result.map(subject => ({
-                    value: subject.subject_id,
-                    label: subject.subject_code + " " + subject.title_th,
-                }));
+                // const subjectsOptions = result.map(subject => ({
+                //     value: subject.subject_id,
+                //     label: subject.subject_code + " " + subject.title_th,
+                // }));
 
-                setSubjects(subjectsOptions);
+                // setSubjects(subjectsOptions);
+                const url = `/api/subjects`
+                const option = await getOptions(url, "GET")
+                try {
+                    const res = await axios(option)
+                    const filterSubjects = res.data.data
+                    setSubjects(filterSubjects)
+                } catch (error) {
+                    setSubjects([])
+                    return
+                }
             } catch (error) {
                 console.error('Error fetching categories:', error);
             }
@@ -67,6 +84,53 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted,ver
         fetchSubjects();
         fetchCategories();
     }, []);
+
+    useEffect(() => setFilterSubj(subjects), [subjects])
+
+    useEffect(() => {
+        if (searchSubj) {
+            const data = subjects.filter(e => {
+                if (e.subject_code?.toLowerCase()?.includes(searchSubj.toLowerCase()) ||
+                    e.title_en?.toLowerCase()?.includes(searchSubj.toLowerCase()) ||
+                    e.title_th?.toLowerCase()?.includes(searchSubj.toLowerCase())) {
+                    return e
+                }
+            })
+            setFilterSubj(data)
+            return
+        }
+        setFilterSubj(subjects)
+    }, [searchSubj])
+
+    const addSubj = useCallback(function (subj) {
+        setVerifySubj((prevState) => {
+            const data = [...prevState];
+            let status = false
+            for (const e of data) {
+                if (e[subj.subject_code] === subj.subject_code) {
+                    status = true
+                    break
+                }
+            }
+            if (!status) {
+                let result = {
+                    subject_id: subj.subject_id,
+                    subject_code: subj.subject_code,
+                    title_th: subj.title_th,
+                    title_en: subj.title_en
+                }
+                data.push(result)
+            }
+            return data
+        })
+    }, [])
+
+    // useEffect(() => setDisabledInsertBtn(verifySubj.length == 0), [verifySubj])
+
+    const delSubj = useCallback(function (subject_code) {
+        const data = verifySubj.filter(element => element.subject_code !== subject_code)
+        setVerifySubj(data)
+    }, [verifySubj])
 
     const handleCategoryChange = async selectedOption => {
         setSelectedCategory(selectedOption);
@@ -114,17 +178,40 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted,ver
             setSelectedCategory(null);
             setSelectedGroup(null);
             setSelectedSubgroup(null);
-            setSelectedSubject(null);
+            // setSelectedSubject(null);
         }
     }, [isOpen]);
 
-    // console.log('selectedSubject:', selectedSubject);
-    // console.log('selectedCategory:', selectedCategory);
-    // console.log('selectedGroup:', selectedGroup);
-    // console.log('selectedSubgroup:', selectedSubgroup);
-
-    const handleSubmit = useCallback(async function (formData) {
+    const handleSubmit = useCallback(async function (verifySubj) {
         try {
+
+            const subData = verifySubj.map(subject => subject.subject_id)
+
+            if (subData.length === 0) {
+                showToastMessage(false, 'โปรดเลือกวิชา');
+                return;
+            }
+
+            if (!selectedGroup) {
+                showToastMessage(false, 'โปรดเลือกกลุ่มวิชา');
+                return;
+            }
+
+            let formData;
+            if (selectedSubgroup) {
+                formData = {
+                    verify_id: verify_id,
+                    subjects: subData,
+                    sub_group_id: selectedSubgroup.value
+                };
+            } else {
+                formData = {
+                    verify_id: verify_id,
+                    subjects: subData,
+                    group_id: selectedGroup.value
+                };
+            }
+
             let url = "/api/verify/group";
 
             if (selectedSubgroup) {
@@ -140,6 +227,8 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted,ver
             const result = await axios(options);
             const { ok, message } = result.data;
 
+            setVerifySubj([])
+            onClose()
             onDataInserted();
             showToastMessage(ok, message);
         } catch (error) {
@@ -148,32 +237,39 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted,ver
         }
     }, [selectedGroup, selectedSubgroup]);
 
-    const createForm = useCallback(function (e) {
-        e.preventDefault();
+    // const createForm = useCallback(function (e ,verifySubj) {
+    //     e.preventDefault();
 
-        let formData;
-        if (selectedSubgroup) {
-            formData = {
-                verify_id: verify_id,
-                subject_id: selectedSubject.value,
-                sub_group_id: selectedSubgroup.value
-            };
-        } else {
-            formData = {
-                verify_id: verify_id,
-                subject_id: selectedSubject.value,
-                group_id: selectedGroup.value
-            };
-        }
+    //     if (!selectedGroup) {
+    //         showToastMessage(false, 'โปรดเลือกกลุ่มวิชา');
+    //         return;
+    //     }
 
-        handleSubmit(formData);
-    }, [selectedSubject, selectedGroup, selectedSubgroup]);
+    //     const subData = verifySubj.map(subject => subject.subject_id)
+    //     let formData;
+    //     if (selectedSubgroup) {
+    //         formData = {
+    //             verify_id: verify_id,
+    //             subjects: subData,
+    //             sub_group_id: selectedSubgroup.value
+    //         };
+    //     } else {
+    //         formData = {
+    //             verify_id: verify_id,
+    //             subjects: subData,
+    //             group_id: selectedGroup.value
+    //         };
+    //     }
+    //     console.log(formData);
+
+    //     handleSubmit(formData);
+    // }, [ selectedGroup, selectedSubgroup]);
 
     return (
         <Modal
             isDismissable={false}
             isKeyboardDismissDisabled={true}
-            size="lg"
+            size="2xl"
             isOpen={isOpen}
             onClose={onClose}
             classNames={{
@@ -186,7 +282,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted,ver
             }}>
             <ModalContent>
                 {(onClose) => (
-                    <form onSubmit={createForm}>
+                    <div>
                         <ModalHeader className="flex flex-col gap-1">
                             <h2>เพิ่มแบบฟอร์มตรวจสอบจบ</h2>
                             <span className='text-base font-normal'>แบบฟอร์มตรวจสอบจบ</span>
@@ -235,7 +331,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted,ver
                                         )}
                                     </>
                                 )}
-                                <div className='col-span-4'>
+                                {/* <div className='col-span-4'>
                                     <label htmlFor="acadyear">วิชา</label>
                                     <Select
                                         className='z-20'
@@ -248,6 +344,58 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted,ver
                                         isSearchable
                                         isClearable
                                     />
+                                </div> */}
+                            </div>
+                            <div className='flex flex-row gap-3'>
+                                <div className='w-1/2 flex flex-col'>
+                                    <p>วิชาที่ต้องการจะเพิ่ม {verifySubj.length == 0 ? undefined : <>({verifySubj.length} วิชา)</>}</p>
+                                    <ul className='h-[210px] overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
+                                        {verifySubj.length > 0 ?
+                                            verifySubj.map((sbj, index) => (
+                                                <li key={index} className='bg-gray-100 rounded-md relative p-1 gap-2 border-1 border-b-gray-300'>
+                                                    <input
+                                                        readOnly
+                                                        className='bg-gray-100 block focus:outline-none font-bold'
+                                                        type="text"
+                                                        name="verifySubj[]"
+                                                        value={sbj.subject_code} />
+                                                    <p className='flex flex-col text-sm'>
+                                                        <span>{sbj.title_th}</span>
+                                                    </p>
+                                                    <IoIosCloseCircle onClick={() => delSubj(sbj.subject_code)} className="absolute top-1 right-1 w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
+                                                </li>
+                                            ))
+                                            :
+                                            <li className='flex justify-center items-center h-full'>
+                                                <Empty />
+                                            </li>}
+                                    </ul>
+                                </div>
+                                <div className='w-1/2'>
+                                    <p>ค้นหาวิชาที่ต้องการ</p>
+                                    <div className='flex flex-col'>
+                                        <div className='flex flex-row relative'>
+                                            <IoSearchOutline className='absolute left-3.5 top-[25%]' />
+                                            <input
+                                                className='ps-10 py-1 rounded-md border-1 w-full px-2 focus:outline-none mb-1 focus:border-blue-500'
+                                                type="search"
+                                                value={searchSubj}
+                                                onChange={(e) => setSearchSubj(e.target.value)}
+                                                placeholder='รหัสวิชา ชื่อวิชา' />
+                                        </div>
+                                        <ul className='rounded-md border-1 h-[180px] overflow-y-auto p-2 flex flex-col gap-1'>
+                                            {filterSubj.map((subject, index) => (
+                                                !(verifySubj.map(z => z.subject_code).includes(subject.subject_code)) &&
+                                                <li onClick={() => addSubj(subject)} key={index} className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border-1 border-b-gray-300 cursor-pointer'>
+                                                    <strong className='block'>{subject.subject_code}</strong>
+                                                    <p className='flex flex-col text-sm'>
+                                                        <span>{subject.title_en}</span>
+                                                        <span>{subject.title_th}</span>
+                                                    </p>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
 
@@ -256,11 +404,11 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted,ver
                             <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={onClose}>
                                 ยกเลิก
                             </Button>
-                            <Button type='submit' className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid'>
+                            <Button type='submit' onClick={() => handleSubmit(verifySubj)} className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid'>
                                 บันทึก
                             </Button>
                         </ModalFooter>
-                    </form>
+                    </div>
                 )}
             </ModalContent>
         </Modal>
