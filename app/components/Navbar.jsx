@@ -170,7 +170,7 @@ const Navbar = () => {
             </div >
             {
                 <div className="md:hidden relative w-50" id="mobile-menu">
-                    <div className="absolute space-y-1 p-2 border-t-1 w-full border-t-gray-200" id='navstupid'
+                    <div className="absolute space-y-1 p-2 border-y-1 w-full border-y-gray-200" id='navstupid'
                         style={{
                             background: 'white',
                             top: '-450px',
