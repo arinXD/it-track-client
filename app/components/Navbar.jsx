@@ -51,13 +51,17 @@ const Navbar = () => {
     const [openToggle, setOpenToggle] = useState(false)
     const url = usePathname();
 
+    function navstupid() {
+        setOpenToggle(!openToggle)
+        document.querySelector('#navstupid').classList.toggle('!top-0')
+    }
     return (
         <nav className="bg-white fixed top-0 left-0 z-40 w-full border-b">
-            <div className="px-2 md:px-6">
+            <div className="px-2 md:px-6 z-50 relative bg-white">
                 <div className="relative flex h-16 items-center justify-between">
                     <div className="absolute inset-y-0 left-0 flex items-center md:hidden">
                         <button
-                            onClick={() => setOpenToggle(!openToggle)}
+                            onClick={() => navstupid()}
                             className={`hamburger hamburger--spin${openToggle ? " is-active " : " "}`}
                             type="button">
                             <span className="hamburger-box">
@@ -164,9 +168,19 @@ const Navbar = () => {
                     </div >
                 </div >
             </div >
-            {openToggle &&
-                <div className="md:hidden relative" id="mobile-menu">
-                    <div className="space-y-1 p-2 border-t-1 border-t-gray-200">
+            {
+                <div className="md:hidden relative w-50" id="mobile-menu">
+                    <div className="absolute space-y-1 p-2 border-t-1 w-full border-t-gray-200" id='navstupid'
+                        style={{
+                            background:'white',
+                            top: '-450px', 
+                            left: '0px',
+                            WebkitTransition: '0.3s',
+                            MozTransition: '0.3s',
+                            OTransition: '0.3s',
+                            transition: '0.3s',
+                            zIndex:'0'
+                        }}>
                         {session &&
                             <div className="flex gap-4 items-start mb-1 border-b-1 border-b-gray-200 py-3 p-2">
                                 <Image
