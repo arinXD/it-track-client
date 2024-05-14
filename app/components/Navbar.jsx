@@ -1,6 +1,6 @@
 'use client';
-import React, { useState } from 'react'
-import { signIn, signOut } from "next-auth/react"
+import { useState } from 'react'
+import { signOut } from "next-auth/react"
 import Image from 'next/image'
 import Link from 'next/link';
 import { useSession } from "next-auth/react"
@@ -8,9 +8,9 @@ import { MdOutlineLogout } from "react-icons/md";
 import { Skeleton } from "@nextui-org/react";
 import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
-import { GoQuestion, GoHome, GoHomeFill } from "react-icons/go";
+import { GoHome, GoHomeFill } from "react-icons/go";
 import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
-
+import "../style/hamburgers.css"
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem } from "@nextui-org/react";
 import { AiFillEdit, AiOutlineEdit } from 'react-icons/ai';
 
@@ -53,23 +53,16 @@ const Navbar = () => {
 
     return (
         <nav className="bg-white fixed top-0 left-0 z-40 w-full border-b">
-            <div className="px-2 sm:px-6">
+            <div className="px-2 md:px-6">
                 <div className="relative flex h-16 items-center justify-between">
                     <div className="absolute inset-y-0 left-0 flex items-center md:hidden">
                         <button
                             onClick={() => setOpenToggle(!openToggle)}
-                            type="button"
-                            className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
-                            <span className="absolute -inset-0.5"></span>
-                            <span className="sr-only">Open main menu</span>
-
-                            <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                            </svg>
-
-                            <svg className="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            className={`hamburger hamburger--spin${openToggle ? " is-active " : " "}`}
+                            type="button">
+                            <span className="hamburger-box">
+                                <span className="hamburger-inner"></span>
+                            </span>
                         </button>
                     </div>
                     <div className="flex flex-1 items-center justify-center md:justify-start gap-4">
@@ -78,7 +71,7 @@ const Navbar = () => {
                                 <HiOutlineBars3 className='w-6 h-6 ms-2.5 max-sm:hidden' />
                             </button> */}
                             <Link href="/" className="flex items-center p-2 text-gray-900 rounded-lg ">
-                                <img className="h-6 mb-2 w-auto" src="/regular_logo.svg" alt="it kku" />
+                                <img className="h-6 mb-[0.4rem] w-auto" src="/regular_logo.svg" alt="it kku" />
                             </Link>
                         </div>
                     </div>
@@ -167,20 +160,12 @@ const Navbar = () => {
                                 </div>
 
                             }
-                            {/* {
-                                status == "unauthenticated" &&
-                                <div>
-                                    <button onClick={() => signIn()} className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded active:scale-90'>
-                                        เข้าสู่ระบบ
-                                    </button>
-                                </div>
-                            } */}
                         </div >
                     </div >
                 </div >
             </div >
             {openToggle &&
-                <div className="md:hidden" id="mobile-menu">
+                <div className="md:hidden relative" id="mobile-menu">
                     <div className="space-y-1 p-2 border-t-1 border-t-gray-200">
                         {session &&
                             <div className="flex gap-4 items-start mb-1 border-b-1 border-b-gray-200 py-3 p-2">

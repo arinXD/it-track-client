@@ -52,5 +52,4 @@ export {
     ProgramCodeUpdate,
     SubjectInsert,
     SubjectUpdate
-
 }

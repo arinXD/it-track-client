@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { HomeIcon, RightArrow } from './icons';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 const links = {
     "/": "หน้าหลัก",

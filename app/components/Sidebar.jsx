@@ -17,7 +17,7 @@ const Sidebar = () => {
                 <div className="h-full px-3 py-4 overflow-y-auto bg-white">
                     <ul className="font-medium space-y-1">
                         <li className="">
-                            {session?.user?.role == "admin" ?
+                            {session?.user?.role == "admin" || session?.user?.role == "teacher" ?
                                 <>
                                     <Link href={"/admin"}
                                         className={`${url.includes("admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
@@ -52,7 +52,7 @@ const Sidebar = () => {
                             }
                         </li>
                         <li>
-                            {session?.user?.role == "admin" &&
+                            {session?.user?.role == "admin" || session?.user?.role == "teacher"  &&
                                 <Link href={"/dashboard"}
                                     className={`${url.includes("dashboard") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
                                 >

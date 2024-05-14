@@ -275,9 +275,9 @@ const Page = () => {
                             </div>
                         </div>
 
-                        <p className="text-sm font-light text-gray-900">
+                        {/* <p className="text-sm font-light text-gray-900">
                             ต้องการสร้างบัญชีผู้ใช้ ? <span onClick={() => setDisplaySignUp(!displaySignUp)} className="font-medium cursor-pointer text-gray-900 hover:underline">สร้างบัญชีผู้ใช้</span>
-                        </p>
+                        </p> */}
                     </form>
                 </div>
             </div>
