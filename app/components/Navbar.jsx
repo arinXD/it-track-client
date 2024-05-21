@@ -59,6 +59,13 @@ const Navbar = () => {
         <nav className="bg-white fixed top-0 left-0 z-40 w-full border-b">
             <div className="px-2 md:px-6 z-50 relative bg-white">
                 <div className="relative flex h-16 items-center justify-between">
+                    <div className="flex flex-1 items-center justify-center md:justify-start gap-4">
+                        <div className="flex flex-shrink-0 gap-1 items-center">
+                            <Link href="/" className="flex items-center p-2 text-gray-900 rounded-lg ">
+                                <img className="h-6 mb-[0.4rem] w-auto" src="/regular_logo.svg" alt="it kku" />
+                            </Link>
+                        </div>
+                    </div>
                     <div className="absolute inset-y-0 left-0 flex items-center md:hidden">
                         <button
                             onClick={() => navstupid()}
@@ -69,20 +76,10 @@ const Navbar = () => {
                             </span>
                         </button>
                     </div>
-                    <div className="flex flex-1 items-center justify-center md:justify-start gap-4">
-                        <div className="flex flex-shrink-0 gap-1 items-center">
-                            {/* <button className='hidden md:block'>
-                                <HiOutlineBars3 className='w-6 h-6 ms-2.5 max-sm:hidden' />
-                            </button> */}
-                            <Link href="/" className="flex items-center p-2 text-gray-900 rounded-lg ">
-                                <img className="h-6 mb-[0.4rem] w-auto" src="/regular_logo.svg" alt="it kku" />
-                            </Link>
-                        </div>
-                    </div>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
+                    <div className="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
                         <div className="relative ml-3 flex flex-row gap-3">
                             {status == "authenticated" ?
-                                <div className='relative hidden md:flex justify-center items-center gap-5'>
+                                <div className='relative flex justify-center items-center gap-5'>
                                     <Dropdown
                                         radius="sm"
                                         classNames={{
@@ -141,13 +138,6 @@ const Navbar = () => {
                                                 aria-label="Help & Feedback"
                                                 className="mb-0"
                                             >
-                                                {/* <DropdownItem key="help_and_feedback" className='mb-1'>
-                                                    <div className='flex gap-3 items-center'>
-                                                        <GoQuestion className='w-5 h-5' />
-                                                        <span>Help & Feedback</span>
-
-                                                    </div>
-                                                </DropdownItem> */}
                                                 <DropdownItem key="logout" onClick={() => signOut()}>
                                                     <div className='flex gap-3 items-center'>
                                                         <MdOutlineLogout className='w-5 h-5' />
@@ -159,7 +149,7 @@ const Navbar = () => {
                                     </Dropdown>
                                 </div>
                                 :
-                                <div className='relative hidden sm:flex justify-center items-center gap-2'>
+                                <div className='relative hidden md:flex justify-center items-center gap-2'>
                                     <Skeleton className="w-[40px] h-[40px] rounded-full" />
                                 </div>
 

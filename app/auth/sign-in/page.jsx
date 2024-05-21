@@ -63,11 +63,6 @@ const Page = () => {
     }, [])
 
     // ===========================
-    // Toast notify
-    // ===========================
-
-
-    // ===========================
     // Close modal sign up
     // ===========================
     const closeModal = useCallback(() => {
@@ -152,7 +147,7 @@ const Page = () => {
     // If error then Got cha!!
     // ======================
     useEffect(() => {
-        if (searchParams.get('error')) {
+        if (searchParams.get('error') && !session) {
             setError(searchParams.get('error'))
         }
     }, [])

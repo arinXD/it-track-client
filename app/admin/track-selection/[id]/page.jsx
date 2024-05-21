@@ -79,7 +79,6 @@ const Page = ({ params }) => {
     const [startAt, setStartAt] = useState("")
     const [expiredAt, setExpiredAt] = useState("")
     const [hasFinished, setHasFinished] = useState("")
-
     const [valueChange, setValueChange] = useState(false)
 
     const initTrackSelect = useCallback(async function (id) {
@@ -91,6 +90,17 @@ const Page = ({ params }) => {
             setTrackSubj(result?.Subjects)
         } catch (err) {
             console.error("Error on init func:", err);
+        }
+    }, [])
+
+    const [nonSelectStudent, setNonSelectStudent] = useState([]);
+
+    const getStudentNonSelect = useCallback(async (id) => {
+        try {
+            const students = await fetchData(`/api/tracks/selects/${id}/non-select`)
+            setNonSelectStudent(students)
+        } catch (error) {
+            setNonSelectStudent([])
         }
     }, [])
 
@@ -107,6 +117,7 @@ const Page = ({ params }) => {
     useEffect(() => {
         setLoading(true)
         initTrackSelect(id)
+        getStudentNonSelect(id)
         getTracks()
         setLoading(false)
     }, []);
@@ -263,6 +274,7 @@ const Page = ({ params }) => {
             if (result.isConfirmed) {
                 const url = `/api/tracks/selects/${trackSelect.acadyear}`
                 const options = await getOptions(url, 'DELETE')
+                setDeleting(true)
                 axios(options)
                     .then(async result => {
                         const { ok, message } = result.data
@@ -274,6 +286,9 @@ const Page = ({ params }) => {
                     .catch(error => {
                         const message = error.response.data.message
                         showToastMessage(false, message)
+                    })
+                    .finally(() => {
+                        setDeleting(false)
                     })
             }
         });
@@ -567,13 +582,6 @@ const Page = ({ params }) => {
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
-                {/* <InsertSubjectModal
-                    callBack={initTrackSelect}
-                    showToastMessage={showToastMessage}
-                    trackId={trackSelect?.id}
-                    defaultTrackSubj={trackSubj}
-                    isOpen={isOpen}
-                    onClose={onClose} /> */}
                 {!trackSelect ?
                     <p>No data</p>
                     :
@@ -715,6 +723,18 @@ const Page = ({ params }) => {
                                                     className='bg-gray-300'>
                                                     ลบ
                                                 </Button>
+                                                <Button
+                                                    size='sm'
+                                                    radius='sm'
+                                                    color="default"
+                                                    isDisabled={deleting}
+                                                    isLoading={deleting}
+                                                    onPress={handleDelete}
+                                                    variant="solid"
+                                                    startContent={<DeleteIcon2 className="w-5 h-5" />}
+                                                    className='bg-gray-300'>
+                                                    ส่งอีเมลแจ้งเตือน
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
@@ -823,10 +843,61 @@ const Page = ({ params }) => {
                                     />
                                     {
                                         studentsSelect?.students?.length > 0 ?
-                                            <div>
-                                                <p className='text-default-900 text-small'>รายชื่อนักศึกษาที่เข้ารับการคัดเลือก</p>
-                                                <StudentTrackTable trackSubj={trackSubj} studentData={studentsSelect} title={false} track={"กำลังคัดเลือก"} />
-                                            </div>
+                                            <>
+                                                <Tabs
+                                                    aria-label="Options"
+                                                    selectedKey={selectedTrack}
+                                                    onSelectionChange={setSelectedTrack}
+                                                    color="primary"
+                                                    variant="bordered"
+                                                >
+                                                    <Tab
+                                                        key="all"
+                                                        title={
+                                                            <div className="flex items-center space-x-2">
+                                                                <span>นักศึกษาที่เข้าคัดแทร็ก</span>
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <div>
+                                                            <p className='text-default-900 text-small'>รายชื่อนักศึกษาที่เข้ารับการคัดเลือก ทั้งหมด {studentsSelect?.students?.length} คน</p>
+                                                            <StudentTrackTable trackSubj={trackSubj} studentData={studentsSelect} title={false} track={"กำลังคัดเลือก"} />
+                                                        </div>
+                                                    </Tab>
+                                                    <Tab
+                                                        key="download"
+                                                        title={
+                                                            <div className="flex items-center space-x-2">
+                                                                <span>นักศึกษาที่ไม่ได้เข้าคัดแทร็ก</span>
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <div>
+                                                            <p className='text-default-900 text-small'>รายชื่อนักศึกษาที่ไม่ได้เข้ารับการคัดเลือก ทั้งหมด {nonSelectStudent?.length} คน</p>
+                                                            <div className='h-[350px] overflow-y-auto overflow-hidden'>
+                                                                <table>
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th className='border-1 px-6 border-gray-500'>รหัสนักศึกษา</th>
+                                                                            <th className='border-1 px-6 border-gray-500'>ชื่อ - สกุล</th>
+                                                                            <th className='border-1 px-6 border-gray-500'>ประเภทโครงการ</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {nonSelectStudent && nonSelectStudent.map((student, index) => (
+                                                                            <tr key={index}>
+                                                                                <td className='border-1 px-6 border-gray-500'>{student?.stu_id}</td>
+                                                                                <td className='border-1 px-6 border-gray-500'>{student?.fullname}</td>
+                                                                                <td className='border-1 px-6 border-gray-500'>{student?.courses_type}</td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </Tab>
+                                                </Tabs>
+                                            </>
                                             : (studentsBit?.students?.length == 0 &&
                                                 studentsNetwork?.students?.length == 0 &&
                                                 studentsWeb?.students?.length == 0) ?
