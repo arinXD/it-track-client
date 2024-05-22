@@ -219,7 +219,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
     }, [orders]);
 
     useEffect(() => {
-        // if ((trackSelect?.has_finished || (new Date(trackSelect?.expiredAt) < new Date())) && trackResult) handleConfetti();
+        if ((trackSelect?.has_finished || (new Date(trackSelect?.expiredAt) < new Date())) && trackResult) handleConfetti();
     }, [trackResult, trackSelect])
 
     if (userData?.program !== "IT") {
