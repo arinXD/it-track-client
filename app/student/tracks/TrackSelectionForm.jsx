@@ -298,10 +298,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                 ประกาศผลวันที่ 23 พฤษภาคม 2567
                                             </p>
                                             <div
-                                                style={{
-                                                    fontSize: "clamp(8px, 4vw, 16px)",
-                                                }}
-                                                className='text-center my-5 text-lg'>
+                                                className='text-center my-5 text-[.85rem]'> 
                                                 การคัดเลือกความเชี่ยวชาญ หลักสูตรเทคโนโลยีสารสนเทศ&nbsp;
                                                 <strong className='underline decoration-pink-500 underline-offset-2 decoration-2'>จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
                                                 ระบบจะทำการสุ่มให้ หากมีคำถามเพิ่มเติมติดต่อ <TMonlicaEmail />
@@ -348,7 +345,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                 เริ่มคัดเลือกแทร็กตั้งแต่วันที่ {dmy(trackSelect.startAt)} - {dmy(trackSelect.expiredAt)} <br />
                                                 ประกาศผลวันที่ 23 พฤษภาคม 2567
                                             </p>
-                                            <div>
+                                            <div
+                                                className='text-center my-5 text-[.85rem]'> 
                                                 การคัดเลือกความเชี่ยวชาญ หลักสูตรเทคโนโลยีสารสนเทศ&nbsp;
                                                 <strong className='underline decoration-pink-500 underline-offset-2 decoration-2'>จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
                                                 ระบบจะทำการสุ่มให้ หากมีคำถามเพิ่มเติมติดต่อ <TMonlicaEmail />

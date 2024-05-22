@@ -369,21 +369,19 @@ const Page = ({ params }) => {
                     return gradeValue
                 })
                 let score = 0
-                let credit = 0
                 for (const detail of select?.SelectionDetails) {
                     const subjCode = detail?.Subject?.subject_code
                     grade[subjCode] = detail?.grade
                     const gradeValue = calGrade(detail?.grade)
                     if (isNumber(gradeValue)) {
-                        score += gradeValue * detail?.Subject?.credit
-                        credit += detail?.Subject?.credit
+                        score += gradeValue * (detail?.Subject?.credit || 3)
                     }
                 }
                 delete grade["0"]
                 delete grade["1"]
                 delete grade["2"]
                 delete grade["3"]
-                score = (score / credit || 1).toFixed(2)
+                score = floorGpa(score / 12)
                 const result = {
                     OR01: select?.track_order_1 || "-",
                     OR02: select?.track_order_2 || "-",
@@ -874,6 +872,10 @@ const Page = ({ params }) => {
                                                     >
                                                         <div>
                                                             <p className='text-default-900 text-small'>รายชื่อนักศึกษาที่ไม่ได้เข้ารับการคัดเลือก ทั้งหมด {nonSelectStudent?.length} คน</p>
+                                                            <p className='text-default-900 text-small'>
+                                                                โครงการปกติ {nonSelectStudent?.filter(student => student.courses_type == "โครงการปกติ")?.length} คน
+                                                                โครงการพิเศษ {nonSelectStudent?.filter(student => student.courses_type == "โครงการพิเศษ")?.length} คน
+                                                            </p>
                                                             <div className='h-[350px] overflow-y-auto overflow-hidden'>
                                                                 <table>
                                                                     <thead>

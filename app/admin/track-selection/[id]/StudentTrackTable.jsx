@@ -91,9 +91,9 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     g[element?.Subject?.subject_code] = element.grade
                     grade.push(g)
                     const gradeValue = calGrade(element.grade)
-                    if (isNumber(gradeValue)) totalScore += gradeValue
+                    if (isNumber(gradeValue)) totalScore += gradeValue * 3
                 });
-                const score = floorGpa(totalScore / (grade.length || 1))
+                const score = floorGpa(totalScore / 12)
                 return {
                     action: student.stu_id,
                     stuId: student.stu_id,

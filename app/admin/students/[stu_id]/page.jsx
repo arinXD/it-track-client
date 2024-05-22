@@ -120,7 +120,7 @@ export default function Page({ params }) {
     }
 
     async function getStudentStatuses() {
-        const filterStatus = [10, 50, 62]
+        const filterStatus = []
         let statuses = await fetchData("/api/statuses")
         statuses = statuses.filter(e => filterStatus.includes(e.id))
         setStatus(statuses)
