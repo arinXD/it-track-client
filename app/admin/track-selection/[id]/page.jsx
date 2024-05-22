@@ -521,12 +521,14 @@ const Page = ({ params }) => {
         regDataFilterKey = regData.map(obj => {
             return {
                 "รหัสนักศึกษา": obj.stuid,
+                "ชื่อ - สกุล": obj.name,
                 Track: obj.Result
             };
         });
         speDataFilterKey = speData.map(obj => {
             return {
                 "รหัสนักศึกษา ": obj.stuid,
+                "ชื่อ - สกุล ": obj.name,
                 "Track ": obj.Result
             };
         });
@@ -547,11 +549,11 @@ const Page = ({ params }) => {
                 });
             }
         }
-        const header = ["ภาคปกติ", "", "", "", "โครงการปกติ"];
+        const header = ["ภาคปกติ", "", "", "", "", "โครงการพิเศษ"];
         const newHeader = Object.keys(announce[0]);
         const merges = [
-            { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // Merge cells from A1 to C1
-            { s: { r: 0, c: 4 }, e: { r: 0, c: 6 } }  // Merge cells from E1 to G1
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }, // Merge cells from A1 to D1
+            { s: { r: 0, c: 5 }, e: { r: 0, c: 8 } }  // Merge cells from F1 to I1
         ];
 
         ws = utils.aoa_to_sheet([header, newHeader])
