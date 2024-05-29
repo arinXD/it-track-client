@@ -2,8 +2,10 @@
 // import { useEffect, useState } from 'react'
 import '../../../style/exam.css';
 import { Navbar, Sidebar } from '@/app/components';
+import { useToggleSideBarStore } from '@/src/store';
 import Link from 'next/link';
 const Page = () => {
+    const toggleSideBar = useToggleSideBarStore((state) => state.toggle)
     let data = [
         {
             question: 'คุณชอบที่จะทำงานกับข้อมูลที่มีขนาดเยอะ',
@@ -25,7 +27,7 @@ const Page = () => {
                 <Navbar />
             </header>
             <Sidebar />
-            <div className='bg-[#33A474] mt-16 px-8 md:ml-[240px] bg-imgs'>
+            <div className={`bg-[#33A474] mt-16 px-8 bg-imgs ${toggleSideBar ? 'md:ml-[240px]' : 'md:ml-[77px]'}`}>
                 <div className=' mx-auto max-w-2xl text-center py-12 lg:py-20'>
                     <h1 className='text-4xl font-bold tracking-tight text-white sm:text-5xl'>แบบทดสอบกลุ่มความเชี่ยวชาญ</h1>
                     <h2 className='mt-6 text-2xl leading-8 tracking-tighter text-white dark:text-gray-300'>ค้นพบความเชี่ยวชาญหลักสูตรไอทีล่าสุด! ยกระดับทักษะของคุณด้วยความเชี่ยวชาญที่ล้ำสมัย นำทางไปสู่อนาคตของความสำเร็จทางเทคโนโลยี</h2>
@@ -50,7 +52,7 @@ const Page = () => {
                     </div>
                 </div>
             </div>
-            <div className='mt-8 px-8 md:ml-[240px]'>
+            <div className={`mt-8 px-8 ${toggleSideBar ? 'md:ml-[240px]' : 'md:ml-[77px]'}`}>
                 <div className='text-center font-bold text-lg my-28'>
                     Coming soon!
                 </div>

@@ -111,19 +111,21 @@ const TrackForm = ({ track }) => {
                         <Spinner label="กำลังโหลด..." color="primary" />
                     </div>
                     :
-                    <div className='mt-4'>
+                    <div className='mt-4 border p-6 rounded-[10px]'>
                         {trackData && Object.keys(trackData).length !== 0 ?
                             <>
-                                <div className='flex flex-col md:flex-row gap-16 justify-between'>
-                                    <div className='w-full md:w-1/2 flex flex-col'>
+                                <div className='flex flex-col md:flex-col gap-6'>
+                                    <div className='w-full flex flex-row gap-6'>
                                         <UploadCover
+                                            containerWidth="w-[30%]"
                                             src={trackData?.img}
                                             label="ภาพแทร็ก"
-                                            width="w-[180px]"
+                                            width="w-full"
                                             setImageFile={setTrackImageFile}
                                             uploadProgress={uploadProgressImg}
-                                        />
+                                            />
                                         <UploadCover
+                                            containerWidth="w-[70%]"
                                             src={trackData?.coverImg}
                                             label="ภาพหน้าปก"
                                             width="w-full"
@@ -133,7 +135,7 @@ const TrackForm = ({ track }) => {
                                     </div>
                                     <form
                                         onSubmit={handleSubmit}
-                                        className='w-full md:w-1/2 flex flex-col'>
+                                        className='w-full md:w-[40%] flex flex-col'>
                                         <Input
                                             name='track'
                                             type="text"

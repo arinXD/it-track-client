@@ -26,10 +26,16 @@ const Page = () => {
                             <div className='space-y-6'>
                                 <TrackForm
                                     track={track} />
-                                <TeacherTrack
-                                    track={track} />
-                                <TrackSubject
-                                    track={track} />
+                                <div className='flex gap-6 flex-row-reverse'>
+                                    <div className="w-[40%]">
+                                        <TeacherTrack
+                                            track={track} />
+                                    </div>
+                                    <di className="w-[60%]">
+                                        <TrackSubject
+                                            track={track} />
+                                    </di>
+                                </div>
                             </div>
                     }
                 </div>

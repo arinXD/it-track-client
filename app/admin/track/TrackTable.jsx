@@ -1,12 +1,16 @@
 "use client"
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { DeleteIcon2, PlusIcon, SearchIcon } from '@/app/components/icons'
-import { Button, Input, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
+import { DeleteIcon, DeleteIcon2, EditIcon2, PlusIcon, SearchIcon } from '@/app/components/icons'
+import { Button, Input, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@nextui-org/react'
 import Link from 'next/link'
 import { TbRestore } from 'react-icons/tb'
 import { inputClass } from '@/src/util/ComponentClass'
+import { getOptions } from '@/app/components/serverAction/TokenAction'
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import { message } from 'antd'
 
-const TrackTable = ({ tracks, fetching, openInsertModal }) => {
+const TrackTable = ({ tracks, fetching, callBack }) => {
 
     const INITIAL_VISIBLE_COLUMNS = useMemo(() => (
         ["track", "title_en", "title_th", "actions"]
@@ -22,11 +26,11 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
             uid: "track",
             sortable: true
         },
-        {
-            name: "ชื่อแทร็ก (EN)",
-            uid: "title_en",
-            sortable: true
-        },
+        // {
+        //     name: "ชื่อแทร็ก (EN)",
+        //     uid: "title_en",
+        //     sortable: true
+        // },
         {
             name: "ชื่อแทร็ก (TH)",
             uid: "title_th",
@@ -98,21 +102,49 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
     // Display table body
     const renderCell = useCallback((track, columnKey) => {
         const cellValue = track[columnKey] || ""
-
+        console.log(columnKey);
         switch (columnKey) {
+            case "track":
+                return (
+                    <div>
+                        <Link
+                            className='text-blue-500'
+                            href={`/admin/track/detail?track=${cellValue}`}>
+                            {cellValue}
+                        </Link>
+                    </div>
+                )
             case "actions":
                 return (
                     <div className="relative flex justify-center items-center gap-2">
                         <Link href={`/admin/track/detail?track=${track.track}`}>
-                            <Button
-                                radius='sm'
-                                size="sm"
-                                color='default'
-                                className=''
+                            <Tooltip
+                                content="แก้ไข"
                             >
-                                รายละเอียด
-                            </Button>
+                                <Button
+                                    size='sm'
+                                    color='warning'
+                                    isIconOnly
+                                    aria-label="แก้ไข"
+                                    className='p-2'
+                                >
+                                    <EditIcon2 className="w-5 h-5 text-yellow-600" />
+                                </Button>
+                            </Tooltip>
                         </Link>
+                        <Tooltip
+                            content="ลบ"
+                        >
+                            <Button
+                                size='sm'
+                                color='danger'
+                                isIconOnly
+                                aria-label="ลบ"
+                                className='p-2 bg-red-400'
+                            >
+                                <DeleteIcon className="w-5 h-5" />
+                            </Button>
+                        </Tooltip>
                     </div>
                 );
             default:
@@ -170,65 +202,44 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
         setSelectedTracks(students)
     }, [selectedKeys])
 
-    const handleDelete = useCallback((selectedTracks) => {
+    const handleDelete = useCallback(async (selectedTracks) => {
         console.log("del", selectedTracks);
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+            },
+            buttonsStyling: false
+        })
+        swal.fire({
+            text: `ต้องการลบข้อมูลแทร็กหรือไม่ ?`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                setDeleting(true)
+                const options = await getOptions("/api/tracks/multiple", 'DELETE', selectedTracks)
+                axios(options)
+                    .then(async result => {
+                        const { message: msg } = result.data
+                        message.success(msg)
+                        callBack()
+                        setSelectedKeys([])
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        setDeleting(false)
+                    })
+            }
+        });
     }, [selectedTracks])
-
-    const topContent = useMemo(() => {
-        return (
-            <div className="flex flex-col gap-4">
-                <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-center gap-2 rounded-md'>
-                    <h1>ข้อมูลแทร็ก</h1>
-                    <div className="flex gap-2">
-                        <Button
-                            radius='sm'
-                            size='sm'
-                            onPress={openInsertModal}
-                            startContent={<PlusIcon className="w-5 h-5" />}>
-                            เพิ่มแทร็ก
-                        </Button>
-                        <Link href="/admin/track/restore">
-                            <Button
-                                size="sm"
-                                radius="sm"
-                                color="default"
-                                startContent={<TbRestore className="w-4 h-4" />}>
-                                รายการที่ถูกลบ
-                            </Button>
-                        </Link>
-                        <Button
-                            isDisabled={disableDeleteBtn || deleting}
-                            isLoading={deleting}
-                            radius='sm'
-                            size='sm'
-                            onClick={() => handleDelete(selectedTracks)}
-                            startContent={<DeleteIcon2 className="w-5 h-5" />}>
-                            ลบ
-                        </Button>
-                    </div>
-                </div>
-                <Input
-                    isClearable
-                    className="w-full h-fit"
-                    placeholder="ค้นหาแทร็ก"
-                    size="sm"
-                    classNames={inputClass}
-                    startContent={<SearchIcon />}
-                    value={filterValue}
-                    onClear={() => onClear()}
-                    onValueChange={onSearchChange}
-                />
-            </div>
-        );
-    }, [
-        filterValue,
-        visibleColumns,
-        onRowsPerPageChange,
-        onSearchChange,
-        hasSearchFilter,
-        disableDeleteBtn,
-        selectedTracks
-    ]);
 
     const bottomContent = useMemo(() => {
         return (
@@ -260,7 +271,52 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
     return (
-        <div>
+        <div className='border p-4 rounded-[10px]'>
+            <div className="flex flex-col gap-4 mb-4">
+                <div className="flex gap-4">
+                    <Link href="/admin/track/insert-track">
+                        <Button
+                            radius='sm'
+                            size='sm'
+                            className='bg-[#edf8f7] text-[#46bcaa]'
+                            startContent={<PlusIcon className="w-5 h-5" />}>
+                            เพิ่มแทร็ก
+                        </Button>
+                    </Link>
+                    <Link href="/admin/track/restore">
+                        <Button
+                            size="sm"
+                            radius="sm"
+                            color="default"
+                            className='bg-[#edf0ff] text-[#4d69fa]'
+                            startContent={<TbRestore className="w-4 h-4" />}>
+                            รายการที่ถูกลบ
+                        </Button>
+                    </Link>
+                    <Button
+                        isDisabled={disableDeleteBtn || deleting}
+                        isLoading={deleting}
+                        radius='sm'
+                        size='sm'
+                        onClick={() => handleDelete(selectedTracks)}
+                        color='danger'
+                        className='bg-red-400'
+                        startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                        ลบ
+                    </Button>
+                </div>
+                <Input
+                    isClearable
+                    className="w-full h-fit"
+                    placeholder="ค้นหาแทร็ก"
+                    size="sm"
+                    classNames={inputClass}
+                    startContent={<SearchIcon />}
+                    value={filterValue}
+                    onClear={() => onClear()}
+                    onValueChange={onSearchChange}
+                />
+            </div>
             <Table
                 aria-label="Student Table"
                 checkboxesProps={{
@@ -269,22 +325,31 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
                     },
                 }}
                 classNames={{
-                    table: "min-h-[250px]",
+                    th: ["bg-[#F6F6F6]", "text-black", "last:text-center"],
+                    td: [
+                        // first
+                        "group-data-[first=true]:first:before:rounded-none",
+                        "group-data-[first=true]:last:before:rounded-none",
+                        // middle
+                        "group-data-[middle=true]:before:rounded-none",
+                        // last
+                        "group-data-[last=true]:first:before:rounded-none",
+                        "group-data-[last=true]:last:before:rounded-none",
+                        "mb-4",
+                    ],
                 }}
 
                 bottomContent={bottomContent}
                 bottomContentPlacement="outside"
 
-                topContent={topContent}
-                topContentPlacement="outside"
-
-                isCompact
+                isStriped
                 removeWrapper
                 selectionMode="multiple"
                 sortDescriptor={sortDescriptor}
                 onSortChange={setSortDescriptor}
                 selectedKeys={selectedKeys}
                 onSelectionChange={setSelectedKeys}
+                onRowAction={() => { }}
             >
                 <TableHeader columns={headerColumns}>
                     {(column) => (

@@ -10,9 +10,11 @@ import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoHome, GoHomeFill } from "react-icons/go";
 import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
-import "../style/hamburgers.css"
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem } from "@nextui-org/react";
 import { AiFillEdit, AiOutlineEdit } from 'react-icons/ai';
+import { RxHamburgerMenu } from "react-icons/rx";
+import "../style/hamburgers.css"
+import { useToggleSideBarStore } from '@/src/store';
 
 const Navbar = () => {
     const links = [
@@ -49,20 +51,28 @@ const Navbar = () => {
     ]
     const { data: session, status } = useSession();
     const [openToggle, setOpenToggle] = useState(false)
+    const [toggleSideBar, setToggle] = useToggleSideBarStore((state) => [state.toggle, state.setToggle])
     const url = usePathname();
 
     function navstupid() {
         setOpenToggle(!openToggle)
         document.querySelector('#navstupid').classList.toggle('!top-0')
     }
+
     return (
-        <nav className="bg-white fixed top-0 left-0 z-40 w-full border-b">
-            <div className="px-2 md:px-6 z-50 relative bg-white">
-                <div className="relative flex h-16 items-center justify-between">
-                    <div className="flex flex-1 items-center justify-center md:justify-start gap-4">
+        <nav className="fixed top-0 left-0 z-40 w-full">
+            <div className="px-2 md:px-2 z-50 relative bg-white/20 backdrop-blur-md shadow-sm">
+                <div className="relative flex h-16 items-center justify-between p-2">
+                    <div className="flex flex-1 items-center justify-center md:justify-start gap-0">
+                        <div
+                            onClick={setToggle}
+                            className={`hidden md:block rounded-full ${toggleSideBar ? "p-2":"p-3"} cursor-pointer hover:bg-gray-200 active:bg-gray-300`}>
+                            <RxHamburgerMenu
+                                className='w-5 h-5' />
+                        </div>
                         <div className="flex flex-shrink-0 gap-1 items-center">
-                            <Link href="/" className="flex items-center p-2 text-gray-900 rounded-lg ">
-                                <img className="h-6 mb-[0.4rem] w-auto" src="/regular_logo.svg" alt="it kku" />
+                            <Link href="/" className="flex items-center p-2 md:ps-0 text-gray-900 rounded-lg ">
+                                <img className="h-6 mb-[0.4rem] w-auto ml-[10px]" src="/new_logo.svg" alt="it kku" />
                             </Link>
                         </div>
                     </div>

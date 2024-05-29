@@ -30,6 +30,7 @@ const inputClass = {
         "bg-white",
         "group-data-[focused=true]:bg-default-200/50",
         "!cursor-text",
+        "shadow-none"
     ],
 }
 

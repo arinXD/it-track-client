@@ -7,7 +7,7 @@ import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InsertTeacherModal from "./InsertTeacherModal";
 import EditTeacherModal from "./EditTeacherModal";
-import { message } from "antd";
+import { Empty, message } from "antd";
 import Swal from "sweetalert2";
 
 const TeacherTrack = ({ track }) => {
@@ -157,7 +157,7 @@ const TeacherTrack = ({ track }) => {
     }, [])
 
     return (
-        <div>
+        <div className="border-1 p-4 rounded-[10px] h-full">
             <InsertTeacherModal
                 getTeachers={getTeachers}
                 track={track}
@@ -172,12 +172,12 @@ const TeacherTrack = ({ track }) => {
                 isOpen={isOpenEdit}
                 onClose={onCloseEdit} />
 
-            <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-end rounded-md mb-4'>
-                <p>คณาจารย์ประจำแทร็ก</p>
-                <div className="flex gap-2">
+            <div className='flex flex-row justify-between items-center rounded-md mb-4'>
+                <p className="text-sm">คณาจารย์ประจำแทร็ก</p>
+                <div className="flex gap-4">
                     <Button
                         size="sm"
-                        className="bg-gray-300"
+                        className='bg-[#edf8f7] text-[#46bcaa]'
                         radius="sm"
                         color="default"
                         onPress={() => {
@@ -191,8 +191,8 @@ const TeacherTrack = ({ track }) => {
                         size="sm"
                         isDisabled={disableSelectDelete}
                         onPress={() => handleDelete(selectedTeachers)}
-                        color="default"
-                        className="bg-gray-300"
+                        color='danger'
+                        className='bg-red-400'
                         startContent={<DeleteIcon2 className="w-5 h-5" />}>
                         ลบ
                     </Button>
@@ -228,37 +228,47 @@ const TeacherTrack = ({ track }) => {
                                 <TableColumn className="w-1/2">ชื่ออาจารย์</TableColumn>
                                 <TableColumn align="center" className="w-1/2">Actions</TableColumn>
                             </TableHeader>
-                            <TableBody emptyContent={"ไม่มีข้อมูลอาจารย์"} items={items}>
+                            <TableBody
+                                emptyContent={
+                                    <Empty
+                                        className='my-4'
+                                        description={
+                                            "ไม่มีข้อมูลคณาจารย์"
+                                        } />
+                                }
+                                items={items}>
                                 {(item) => (
                                     <TableRow key={item.id}>
                                         <TableCell style={{ display: "none" }}>{item.id}</TableCell>
-                                        <TableCell className="w-1/2">
+                                        <TableCell className="">
                                             <div className="w-full flex justify-center p-2">
                                                 <img
-                                                    width={120}
-                                                    height={120}
+                                                    width={80}
+                                                    height={80}
                                                     src={item.image}
                                                     onError={({ currentTarget }) => {
                                                         currentTarget.onerror = null
                                                         currentTarget.src = "/image/user.png";
                                                     }}
-                                                    className=""
+                                                    className="rounded-full border border-gray-200"
                                                     alt={item.teacherName} />
                                             </div>
                                         </TableCell>
-                                        <TableCell className="w-1/2">{item.teacherName}</TableCell>
-                                        <TableCell className="w-1/2">
+                                        <TableCell className="">{item.teacherName}</TableCell>
+                                        <TableCell className="">
+                                            <div className="flex justify-center items-center">
                                             <Tooltip content="แก้ไข">
                                                 <Button
                                                     size="sm"
                                                     radius="sm"
                                                     isIconOnly
-                                                    color="default"
+                                                    color='warning'
                                                     onClick={() => handleEditTeacher(item.id, item.teacherName, item.image)}
                                                     aria-label="Edit">
-                                                    <EditIcon2 className="w-5 h-5" />
+                                                    <EditIcon2 className="w-5 h-5 text-yellow-600" />
                                                 </Button>
                                             </Tooltip>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 )}

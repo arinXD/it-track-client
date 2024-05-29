@@ -7,7 +7,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { message } from 'antd';
 import Image from 'next/image';
 
-const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress }) => {
+const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress, containerWidth="" }) => {
     const [uploadImageFile, setUploadImageFile] = useState({});
     const [previewImage, setPreviewImage] = useState(src)
 
@@ -38,7 +38,7 @@ const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress }) =
     }, [uploadImageFile]);
 
     return (
-        <div className='flex flex-col mb-6'>
+        <div className={`flex flex-col ${containerWidth}`}>
             <p className='text-center'>{label}</p>
             <div className={`${previewImage ? "!border-solid border-1 !h-auto" : "border-2"} border-gray-400 mx-auto border-dashed ${width} h-[180px] mt-1 mb-3 grid grid-cols-1 place-items-center`}>
                 {
@@ -48,7 +48,7 @@ const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress }) =
                             width={320}
                             height={180}
                             alt='cover image'
-                            className={`${width} object-cover h-auto`}
+                            className={`${width} object-cover h-[180px]`}
                         />
                         :
                         <div className='flex flex-col justify-center items-center gap-1 text-[#E5E7EB]'>

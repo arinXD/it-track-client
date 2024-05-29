@@ -24,7 +24,7 @@ const TeacherList = ({ teachers }) => {
                     :
                     <>
                         <div className="flex flex-wrap justify-center items-center gap-4 w-full my-9 max-2xl:px-0">
-                            {teachers.map((teacher, index) => (
+                            {teachers.length > 0 && teachers?.map((teacher, index) => (
                                 <div
                                     data-aos="fade-up"
                                     data-aos-duration={duration + (index * 200)}

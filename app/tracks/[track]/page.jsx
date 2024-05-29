@@ -5,6 +5,7 @@ import SubjectList from './SubjectList'
 import CoverImage from './CoverImage'
 import TeacherList from './TeacherList'
 import { Empty } from 'antd'
+import TrackSection from './TrackSection'
 
 const getTrack = async (track) => {
     try {
@@ -52,13 +53,20 @@ const Page = async ({ params }) => {
                 trackData && Object?.keys(trackData).length > 0 ?
                     <>
                         <CoverImage track={trackData} />
-                        <section className='p-4 md:p-6 md:ml-[240px]'>
+                        <TrackSection>
                             <BreadCrumb />
                             <TeacherList teachers={teachers} />
                             <SubjectList
                                 track={trackData}
                                 subjects={subjects} />
-                        </section>
+                        </TrackSection>
+                        {/* <section className='p-4 md:p-6 md:ml-[240px]'>
+                            <BreadCrumb />
+                            <TeacherList teachers={teachers} />
+                            <SubjectList
+                                track={trackData}
+                                subjects={subjects} />
+                        </section> */}
                     </>
                     :
                     <div className='mt-16 md:ml-[240px] pt-10 flex items-center justify-center'>

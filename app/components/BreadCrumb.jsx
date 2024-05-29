@@ -27,7 +27,7 @@ const links = {
     "web%20and%20mobile": "Mobile and Web Application Development",
     "network": "Network Systems, Information Technology Security, and Internet of Things (IoT)",
     "bit": "Business Information Technology",
-
+    "insert-track": "เพิ่มแทร็ก",
 };
 
 const BreadCrumb = () => {
@@ -62,7 +62,8 @@ const BreadCrumb = () => {
                                             style={{
                                                 fontSize: "clamp(3px, 3vw, 16px)",
                                             }}
-                                            href={`/${currentUrl}`} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                                            href={`/${currentUrl}`} 
+                                            className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                                             {links[currentUrl] || String(currentUrl)}
                                         </Link>
                                 }
@@ -70,21 +71,22 @@ const BreadCrumb = () => {
                             :
                             // index ต่อไป
                             <>
-                                <RightArrow />
+                                <RightArrow/>
                                 {
                                     isLastIndex ?
                                         <span
                                             style={{
                                                 fontSize: "clamp(3px, 3vw, 16px)",
                                             }}
-                                            className="text-sm font-medium text-gray-500">{links[currentUrl] || String(currentUrl)}</span>
+                                            className="ms-1.5 text-sm font-medium text-gray-500">{links[currentUrl] || String(currentUrl)}</span>
                                         :
                                         // แสดง link 
                                         <Link
                                             style={{
                                                 fontSize: "clamp(3px, 3vw, 16px)",
                                             }}
-                                            href={nextIndex} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                                            href={nextIndex} 
+                                            className="ms-1.5 inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                                             {links[currentUrl] || String(currentUrl)}
                                         </Link>
                                 }
