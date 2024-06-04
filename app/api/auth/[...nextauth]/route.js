@@ -100,7 +100,7 @@ const handler = NextAuth({
     callbacks: {
         async signIn({ user, account }) {
             if (account.provider === "google") {
-                const token = await signToken({ email: user.email, image: user.image })
+                const token = await signToken({ email: user.email })
                 const options = {
                     url: `${hostname}/api/auth/signin/google`,
                     method: 'POST',

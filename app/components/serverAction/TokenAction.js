@@ -11,9 +11,9 @@ export const decodeToken = async (data) => {
 }
 
 export async function signToken(data) {
-    const token = jwt.sign({
-        data,
-    }, process.env.TOKEN_KEY);
+    const token = jwt.sign({ data }, process.env.TOKEN_KEY, {
+        expiresIn: '1m', algorithm: "HS256"
+    });
     return token
 }
 
@@ -35,6 +35,7 @@ export async function getOptions(url, method = "GET", data = {}) {
             'authorization': `${token}`,
             'Content-Type': 'application/json;charset=UTF-8',
         },
+        withCredentials: true,
         data
     };
     return options

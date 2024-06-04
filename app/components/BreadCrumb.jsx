@@ -101,7 +101,7 @@ const BreadCrumb = () => {
 
     return (
         <>
-            <nav className="flex mb-3" aria-label="Breadcrumb">
+            <nav className="flex mb-3 w-full" aria-label="Breadcrumb">
                 <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                     {breadCrumbElements}
                 </ol>

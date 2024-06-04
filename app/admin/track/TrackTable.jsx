@@ -136,6 +136,7 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
                             content="ลบ"
                         >
                             <Button
+                                onPress={() => handleDelete([track.track])}
                                 size='sm'
                                 color='danger'
                                 isIconOnly
@@ -202,15 +203,15 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
         setSelectedTracks(students)
     }, [selectedKeys])
 
+    const swal = useCallback(Swal.mixin({
+        customClass: {
+            confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+            cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+        },
+        buttonsStyling: false
+    }), [])
+
     const handleDelete = useCallback(async (selectedTracks) => {
-        console.log("del", selectedTracks);
-        const swal = Swal.mixin({
-            customClass: {
-                confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
-                cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
-            },
-            buttonsStyling: false
-        })
         swal.fire({
             text: `ต้องการลบข้อมูลแทร็กหรือไม่ ?`,
             icon: "question",
@@ -239,7 +240,7 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
                     })
             }
         });
-    }, [selectedTracks])
+    }, [])
 
     const bottomContent = useMemo(() => {
         return (
@@ -271,7 +272,7 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
     return (
-        <div className='border p-4 rounded-[10px]'>
+        <div className='border p-4 rounded-[10px] w-full'>
             <div className="flex flex-col gap-4 mb-4">
                 <div className="flex gap-4">
                     <Link href="/admin/track/insert-track">

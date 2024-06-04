@@ -7,7 +7,7 @@ import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InsertTeacherModal from "./InsertTeacherModal";
 import EditTeacherModal from "./EditTeacherModal";
-import { Empty, message } from "antd";
+import { Empty, Image, message } from "antd";
 import Swal from "sweetalert2";
 
 const TeacherTrack = ({ track }) => {
@@ -66,7 +66,7 @@ const TeacherTrack = ({ track }) => {
                 <span className="w-[30%] text-small text-default-400">
                     {selectedKeys === "all"
                         ? "All items selected"
-                        : `${selectedKeys.size} of ${teachers.length} selected`}
+                        : `${selectedKeys.size || 0} of ${teachers.length} selected`}
                 </span>
                 <Pagination
                     isCompact
@@ -77,14 +77,6 @@ const TeacherTrack = ({ track }) => {
                     total={pages}
                     onChange={setPage}
                 />
-                <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
-                        Previous
-                    </Button>
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
-                        Next
-                    </Button>
-                </div>
             </div>
         );
     }, [selectedKeys, teachers, page, pages]);
@@ -242,7 +234,7 @@ const TeacherTrack = ({ track }) => {
                                         <TableCell style={{ display: "none" }}>{item.id}</TableCell>
                                         <TableCell className="">
                                             <div className="w-full flex justify-center p-2">
-                                                <img
+                                                <Image
                                                     width={80}
                                                     height={80}
                                                     src={item.image}

@@ -23,17 +23,17 @@ const Page = () => {
      const [uploadProgressCover, setuploadProgressCover] = useState(0);
      const [inserting, setInserting] = useState(false);
 
-     const fileIsEmpty = useCallback((file)=>{
+     const fileIsEmpty = useCallback((file) => {
           return (file instanceof Blob || file instanceof File) ? false : true
-     },[])
+     }, [])
 
      const handleSubmit = useCallback(async (e) => {
           e.preventDefault()
-          if(fileIsEmpty(trackImageFile)){
+          if (fileIsEmpty(trackImageFile)) {
                message.error("ภาพแทร็กต้องไม่ว่าง")
                return
           }
-          if(fileIsEmpty(coverImageFile)) {
+          if (fileIsEmpty(coverImageFile)) {
                message.error("ภาพหน้าปกต้องไม่ว่าง")
                return
           }
@@ -96,22 +96,16 @@ const Page = () => {
                <Sidebar />
                <ContentWrap>
                     <section>
-                    <BreadCrumb />
+                         <BreadCrumb />
                          <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-end rounded-md mt-6'>
                               <p>ข้อมูลแทร็ก</p>
                          </div>
                          <div className='mt-4'>
                               <>
-                                   <div className='flex flex-col md:flex-row gap-16 justify-between'>
-                                        <div className='w-full md:w-1/2 flex flex-col'>
+                                   <div className='flex flex-col gap-6'>
+                                        <div className='w-full flex flex-row gap-6'>
                                              <UploadCover
-                                                  src={""}
-                                                  label="ภาพแทร็ก"
-                                                  width="w-[180px]"
-                                                  setImageFile={setTrackImageFile}
-                                                  uploadProgress={uploadProgressImg}
-                                             />
-                                             <UploadCover
+                                                  containerWidth="w-[100%]"
                                                   src={""}
                                                   label="ภาพหน้าปก"
                                                   width="w-full"
@@ -119,85 +113,97 @@ const Page = () => {
                                                   uploadProgress={uploadProgressCover}
                                              />
                                         </div>
-                                        <form
-                                             onSubmit={handleSubmit}
-                                             className='w-full md:w-1/2 flex flex-col'>
-                                             <Input
-                                                  name='track'
-                                                  type="text"
-                                                  variant="bordered"
-                                                  radius='sm'
-                                                  label="แทร็ก"
-                                                  labelPlacement="outside"
-                                                  value={track}
-                                                  onValueChange={setTrack}
-                                                  classNames={inputClass}
-                                                  className='mb-4'
-                                                  isRequired
-                                             />
-                                             <Input
-                                                  name='title_th'
-                                                  type="text"
-                                                  variant="bordered"
-                                                  radius='sm'
-                                                  label="ชื่อแทร็กภาษาไทย"
-                                                  labelPlacement="outside"
-                                                  value={titleTh}
-                                                  onValueChange={setTitleTh}
-                                                  classNames={inputClass}
-                                                  className='mb-4'
-                                                  isRequired
-                                             />
-                                             <Input
-                                                  name='title_en'
-                                                  type="text"
-                                                  variant="bordered"
-                                                  radius='sm'
-                                                  label="ชื่อแทร็กภาษาอังกฤษ"
-                                                  labelPlacement="outside"
-                                                  value={titleEn}
-                                                  onValueChange={setTitleEn}
-                                                  classNames={inputClass}
-                                                  className='mb-4'
-                                                  isRequired
-                                             />
-                                             <Textarea
-                                                  name='desc'
-                                                  variant="bordered"
-                                                  label="คำอธิบายแทร็ก"
-                                                  labelPlacement="outside"
-                                                  value={desc}
-                                                  onValueChange={setDesc}
-                                                  classNames={inputClass}
-                                                  className='mb-4'
-                                             />
-                                             <Textarea
-                                                  name='information'
-                                                  variant="bordered"
-                                                  label="ข้อมูลแทร็ก"
-                                                  labelPlacement="outside"
-                                                  value={information}
-                                                  onValueChange={setInformation}
-                                                  classNames={inputClass}
-                                                  className='mb-4'
-                                             />
-                                             <Button
-                                                  type='submit'
-                                                  radius='sm'
-                                                  color='primary'
-                                                  className='bg-primary-500'
-                                                  isDisabled={inserting}
-                                                  isLoading={inserting}
-                                             >
+                                        <div className='flex flex-row gap-6'>
+                                             <div className='flex justify-center w-1/2'>
+                                                  <UploadCover
+                                                       containerWidth="w-[70%]"
+                                                       src={""}
+                                                       label="ภาพแทร็ก"
+                                                       width="w-full"
+                                                       setImageFile={setTrackImageFile}
+                                                       uploadProgress={uploadProgressImg}
+                                                  />
+                                             </div>
+                                             <form
+                                                  onSubmit={handleSubmit}
+                                                  className='w-full md:w-1/2 flex flex-col'>
+                                                  <Input
+                                                       name='track'
+                                                       type="text"
+                                                       variant="bordered"
+                                                       radius='sm'
+                                                       label="แทร็ก"
+                                                       labelPlacement="outside"
+                                                       value={track}
+                                                       onValueChange={setTrack}
+                                                       classNames={inputClass}
+                                                       className='mb-4'
+                                                       isRequired
+                                                  />
+                                                  <Input
+                                                       name='title_th'
+                                                       type="text"
+                                                       variant="bordered"
+                                                       radius='sm'
+                                                       label="ชื่อแทร็กภาษาไทย"
+                                                       labelPlacement="outside"
+                                                       value={titleTh}
+                                                       onValueChange={setTitleTh}
+                                                       classNames={inputClass}
+                                                       className='mb-4'
+                                                       isRequired
+                                                  />
+                                                  <Input
+                                                       name='title_en'
+                                                       type="text"
+                                                       variant="bordered"
+                                                       radius='sm'
+                                                       label="ชื่อแทร็กภาษาอังกฤษ"
+                                                       labelPlacement="outside"
+                                                       value={titleEn}
+                                                       onValueChange={setTitleEn}
+                                                       classNames={inputClass}
+                                                       className='mb-4'
+                                                       isRequired
+                                                  />
+                                                  <Textarea
+                                                       name='desc'
+                                                       variant="bordered"
+                                                       label="คำอธิบายแทร็ก"
+                                                       labelPlacement="outside"
+                                                       value={desc}
+                                                       onValueChange={setDesc}
+                                                       classNames={inputClass}
+                                                       className='mb-4'
+                                                  />
+                                                  <Textarea
+                                                       name='information'
+                                                       variant="bordered"
+                                                       label="ข้อมูลแทร็ก"
+                                                       labelPlacement="outside"
+                                                       value={information}
+                                                       onValueChange={setInformation}
+                                                       classNames={inputClass}
+                                                       className='mb-4'
+                                                  />
+                                                  <Button
+                                                       type='submit'
+                                                       radius='sm'
+                                                       color='primary'
+                                                       className='bg-primary-500'
+                                                       isDisabled={inserting}
+                                                       isLoading={inserting}
+                                                  >
 
-                                                  {
-                                                       inserting ?
-                                                            "กำลังบันทึก..."
-                                                            :
-                                                            "บันทึก"
-                                                  }
-                                             </Button>
-                                        </form>
+                                                       {
+                                                            inserting ?
+                                                                 "กำลังบันทึก..."
+                                                                 :
+                                                                 "บันทึก"
+                                                       }
+                                                  </Button>
+                                             </form>
+                                        </div>
                                    </div>
                               </>
                          </div>

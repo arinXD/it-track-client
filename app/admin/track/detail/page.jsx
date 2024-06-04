@@ -17,11 +17,13 @@ const Page = () => {
             </header>
             <Sidebar />
             <ContentWrap>
-                <BreadCrumb />
-                <div>
+                <div className='flex flex-col justify-center items-center w-full'>
+                    <BreadCrumb />
                     {
                         track == undefined ?
-                            <Empty className='my-16' />
+                            <Empty
+                                description="ไม่พบข้อมูลแทร็ก"
+                                className='my-16' />
                             :
                             <div className='space-y-6'>
                                 <TrackForm
@@ -37,6 +39,7 @@ const Page = () => {
                                     </di>
                                 </div>
                             </div>
+
                     }
                 </div>
             </ContentWrap>

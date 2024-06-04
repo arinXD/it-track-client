@@ -61,7 +61,7 @@ const Navbar = () => {
 
     return (
         <nav className="fixed top-0 left-0 z-40 w-full">
-            <div className="px-2 md:px-2 z-50 relative bg-white/20 backdrop-blur-md shadow-sm">
+            <div className="px-2 md:px-2 z-50 relative bg-white/60 backdrop-blur-md shadow-sm">
                 <div className="relative flex h-16 items-center justify-between p-2">
                     <div className="flex flex-1 items-center justify-center md:justify-start gap-0">
                         <div

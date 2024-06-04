@@ -4,8 +4,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { BsFillImageFill } from "react-icons/bs";
 import { GoPaperclip } from "react-icons/go";
 import { AiOutlineDelete } from "react-icons/ai";
-import { message } from 'antd';
-import Image from 'next/image';
+import { message, Image } from 'antd';
 
 const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress, containerWidth="" }) => {
     const [uploadImageFile, setUploadImageFile] = useState({});
@@ -45,7 +44,7 @@ const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress, con
                     previewImage ?
                         <Image
                             src={previewImage}
-                            width={320}
+                            width={"100%"}
                             height={180}
                             alt='cover image'
                             className={`${width} object-cover h-[180px]`}

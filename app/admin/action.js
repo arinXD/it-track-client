@@ -11,6 +11,7 @@ export async function fetchData(url) {
                 'Content-Type': 'application/json',
                 'authorization': `${token}`,
             },
+            withCredentials: true,
             signal: AbortController.signal
         })
         let data = res.data?.data;
@@ -31,6 +32,7 @@ export async function fetchDataObj(url) {
                 'Content-Type': 'application/json',
                 'authorization': `${token}`,
             },
+            withCredentials: true,
         })
         const data = res.data?.data || {}
         return data;
