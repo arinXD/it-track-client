@@ -5,15 +5,12 @@ import 'aos/dist/aos.css';
 import { Empty } from 'antd';
 import { Card, CardFooter, Image } from "@nextui-org/react";
 import { useRouter } from 'next/navigation'
+import Link from 'next/link';
 
 const Track = ({ tracks }) => {
-    const router = useRouter()
     useEffect(() => {
         AOS.init();
     }, []);
-    const linkTo = function (url) {
-        router.push(url);
-    }
     return (
         <>
             {
@@ -46,14 +43,15 @@ const Track = ({ tracks }) => {
                                     duration = "500"
                                 } else if (index === 1) {
                                     colSpan = 'col-span-5';
-                                    duration = "800"
+                                    duration = "700"
                                 } else {
                                     colSpan = 'col-span-12';
-                                    duration = "1000"
+                                    duration = "750"
                                 }
 
                                 return (
-                                    <div
+                                    <Link
+                                        href={`/tracks/${track.track?.toLowerCase()}`}
                                         data-aos="fade-up"
                                         data-aos-duration={duration}
                                         key={index}
@@ -62,7 +60,6 @@ const Track = ({ tracks }) => {
                                             key={index}
                                             shadow="none"
                                             isPressable
-                                            onClick={() => linkTo(`/tracks/${track.track?.toLowerCase()}`)}
                                             radius='none'
                                             isFooterBlurred
                                             className="group relative w-full h-[400px] max-xl:h-[250px]">
@@ -91,7 +88,7 @@ const Track = ({ tracks }) => {
                                                 <span className='text-2xl text-default-300'>{track.title_th}</span>
                                             </CardFooter>
                                         </Card>
-                                    </div>
+                                    </Link>
                                 );
                             })}
                         </div>

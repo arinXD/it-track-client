@@ -15,6 +15,7 @@ import { AiFillEdit, AiOutlineEdit } from 'react-icons/ai';
 import { RxHamburgerMenu } from "react-icons/rx";
 import "../style/hamburgers.css"
 import { useToggleSideBarStore } from '@/src/store';
+import NextTopLoader from 'nextjs-toploader';
 
 const Navbar = () => {
     const links = [
@@ -61,17 +62,26 @@ const Navbar = () => {
 
     return (
         <nav className="fixed top-0 left-0 z-40 w-full">
+            <NextTopLoader
+                color='#3b82f6'
+                height={3}
+                shadow="none"
+                showSpinner={false}
+                crawl={true}
+            />
             <div className="px-2 md:px-2 z-50 relative bg-white/60 backdrop-blur-md shadow-sm">
                 <div className="relative flex h-16 items-center justify-between p-2">
                     <div className="flex flex-1 items-center justify-center md:justify-start gap-0">
                         <div
                             onClick={setToggle}
-                            className={`hidden md:block rounded-full ${toggleSideBar ? "p-2":"p-3"} cursor-pointer hover:bg-gray-200 active:bg-gray-300`}>
+                            className={`hidden md:block rounded-full ${toggleSideBar ? "p-3" : "p-3"} cursor-pointer hover:bg-gray-200 active:bg-gray-300`}>
                             <RxHamburgerMenu
                                 className='w-5 h-5' />
                         </div>
                         <div className="flex flex-shrink-0 gap-1 items-center">
-                            <Link href="/" className="flex items-center p-2 md:ps-0 text-gray-900 rounded-lg ">
+                            <Link
+                                href="/"
+                                className="flex items-center p-2 md:ps-0 text-gray-900 rounded-lg active:scale-95">
                                 <img className="h-6 mb-[0.4rem] w-auto ml-[10px]" src="/new_logo.svg" alt="it kku" />
                             </Link>
                         </div>

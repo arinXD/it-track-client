@@ -4,11 +4,11 @@ import { DeleteIcon, DeleteIcon2, EditIcon2, PlusIcon, SearchIcon } from '@/app/
 import { Button, Input, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@nextui-org/react'
 import Link from 'next/link'
 import { TbRestore } from 'react-icons/tb'
-import { inputClass } from '@/src/util/ComponentClass'
+import { inputClass, minimalTableClass } from '@/src/util/ComponentClass'
 import { getOptions } from '@/app/components/serverAction/TokenAction'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import { message } from 'antd'
+import { Empty, message } from 'antd'
 
 const TrackTable = ({ tracks, fetching, callBack }) => {
 
@@ -244,30 +244,33 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
 
     const bottomContent = useMemo(() => {
         return (
-            <div className="py-2 px-2 flex justify-between items-center">
-                <span className="w-[30%] text-small text-default-400">
-                    {selectedKeys === "all"
-                        ? "All items selected"
-                        : `${selectedKeys.size} of ${filteredItems.length} selected`}
-                </span>
-                <Pagination
-                    isCompact
-                    showControls
-                    showShadow
-                    color="primary"
-                    page={page}
-                    total={pages}
-                    onChange={setPage}
-                />
-                <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
-                        Previous
-                    </Button>
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
-                        Next
-                    </Button>
+            Object.keys(tracks).length > 0 ?
+                <div className="py-2 px-2 flex justify-between items-center">
+                    <span className="w-[30%] text-small text-default-400">
+                        {selectedKeys === "all"
+                            ? "All items selected"
+                            : `${selectedKeys?.size || 0} of ${filteredItems?.length || 0} selected`}
+                    </span>
+                    <Pagination
+                        isCompact
+                        showControls
+                        showShadow
+                        color="primary"
+                        page={page}
+                        total={pages}
+                        onChange={setPage}
+                    />
+                    <div className="hidden sm:flex w-[30%] justify-end gap-2">
+                        <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
+                            Previous
+                        </Button>
+                        <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
+                            Next
+                        </Button>
+                    </div>
                 </div>
-            </div>
+                :
+                undefined
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
@@ -325,20 +328,7 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
                         wrapper: "after:bg-blue-500 after:text-background text-background",
                     },
                 }}
-                classNames={{
-                    th: ["bg-[#F6F6F6]", "text-black", "last:text-center"],
-                    td: [
-                        // first
-                        "group-data-[first=true]:first:before:rounded-none",
-                        "group-data-[first=true]:last:before:rounded-none",
-                        // middle
-                        "group-data-[middle=true]:before:rounded-none",
-                        // last
-                        "group-data-[last=true]:first:before:rounded-none",
-                        "group-data-[last=true]:last:before:rounded-none",
-                        "mb-4",
-                    ],
-                }}
+                classNames={minimalTableClass}
 
                 bottomContent={bottomContent}
                 bottomContentPlacement="outside"
@@ -366,7 +356,14 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
                 <TableBody
                     isLoading={fetching}
                     loadingContent={<Spinner />}
-                    // emptyContent={"ไม่มีข้อมูลแทร็ก"}
+                    emptyContent={
+                        <Empty
+                            className='my-4'
+                            description={
+                                <span className='text-gray-300'>ไม่มีข้อมูลแทร็ก</span>
+                            }
+                        />
+                    }
                     items={sortedItems}>
                     {(item) => (
                         <TableRow key={item.track}>

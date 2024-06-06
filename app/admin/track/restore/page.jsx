@@ -4,10 +4,11 @@ import { getOptions } from '@/app/components/serverAction/TokenAction';
 import { Spinner } from '@nextui-org/react';
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
+import RestoreTrack from './RestoreTrack';
 
 const Page = () => {
     const [delTracks, setdelTracks] = useState([]);
-    const [fetching, setfetching] = useState(true);
+    const [fetching, setfetching] = useState(false);
 
     const getDeletedTracks = useCallback(async () => {
         setfetching(true)
@@ -42,9 +43,11 @@ const Page = () => {
                                 <Spinner label="กำลังโหลด..." color="primary" />
                             </div>
                             :
-                            <div>
-                                {JSON.stringify(delTracks)}
-                            </div>
+                            <RestoreTrack
+                                fetching={fetching}
+                                tracks={delTracks}
+                                callBack={getDeletedTracks}
+                            />
                     }
                 </section>
 

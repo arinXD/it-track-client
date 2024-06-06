@@ -1,28 +1,79 @@
 import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '../components';
 import React from 'react';
 import Link from 'next/link';
+import { IoBook } from "react-icons/io5";
+import { BiSolidCategory, BiSolidBook } from "react-icons/bi";
+import { BsFillPersonFill } from "react-icons/bs";
+import { HiAcademicCap, HiUserGroup } from 'react-icons/hi2';
+import { AiFillEdit } from 'react-icons/ai';
 
 const Page = async () => {
-    const acadLinks = [
-        // { href: "/admin/acadyears", lable: "ปีการศึกษา" },
-        { href: "/admin/program", lable: "หลักสูตร" },
-        { href: "/admin/programcode", lable: "รหัสหลักสูตร" },
-        { href: "/admin/category", lable: "หมวดหมู่วิชา" },
-        { href: "/admin/group", lable: "กลุ่มวิชา" },
-        { href: "/admin/subgroup", lable: "กลุ่มย่อยวิชา" },
-        { href: "/admin/subject", lable: "วิชา" },
-        { href: "/admin/students", lable: "รายชื่อนักศึกษา" },
+    const masker = {
+        maskImage: 'url("/masker/grit.png")',
+    }
+    const categories = [
+        {
+            title: "ทั่วไป",
+            links: [
+                // { href: "/admin/acadyears", lable: "ปีการศึกษา" },
+                {
+                    href: "/admin/program", lable: "หลักสูตร",
+                    icon: <IoBook style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+                {
+                    href: "/admin/programcode", lable: "รหัสหลักสูตร",
+                    icon: <IoBook style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+                {
+                    href: "/admin/category", lable: "หมวดหมู่วิชา",
+                    icon: <BiSolidCategory style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+                {
+                    href: "/admin/group", lable: "กลุ่มวิชา",
+                    icon: <BiSolidBook style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+                {
+                    href: "/admin/subgroup", lable: "กลุ่มย่อยวิชา",
+                    icon: <BiSolidBook style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+                {
+                    href: "/admin/subject", lable: "วิชา",
+                    icon: <BiSolidBook style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+                {
+                    href: "/admin/students", lable: "รายชื่อนักศึกษา",
+                    icon: <BsFillPersonFill style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+            ]
+        },
+        {
+            title: "แทรค",
+            links: [
+                {
+                    href: "/admin/track", lable: "ข้อมูลแทรค",
+                    icon: <HiUserGroup style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+                {
+                    href: "/admin/track-selection", lable: "คัดเลือกแทรค",
+                    icon: <AiFillEdit style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+                {
+                    href: "/admin/trackstudent", lable: "รายชื่อนักศึกษาภายในแทรค",
+                    icon: <BsFillPersonFill style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+            ]
+        },
+        {
+            title: "ตรวจสอบจบ",
+            links: [
+                {
+                    href: "/admin/verify", lable: "แบบฟอร์มตรวจสอบจบ",
+                    icon: <HiAcademicCap style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+            ]
+        }
     ]
 
-    const tracks = [
-        { href: "/admin/track", lable: "ข้อมูลแทรค" },
-        { href: "/admin/track-selection", lable: "คัดเลือกแทรค" },
-        { href: "/admin/trackstudent", lable: "รายชื่อนักศึกษาภายในแทรค" },
-    ]
-
-    const verify = [
-        { href: "/admin/verify", lable: "แบบฟอร์มตรวจสอบจบ" },
-    ]
     return (
         <>
             <header>
@@ -31,37 +82,31 @@ const Page = async () => {
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
-                <div className='flex flex-col space-y-5 mt-5'>
-                    <div>
-                        <h2>ทั่วไป</h2>
-                        <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-2'>
-                            {acadLinks.map((e, index) => (
-                                <li key={index} className='bg-blue-800 text-white rounded-md overflow-hidden'>
-                                    <Link className='block w-full px-3 py-2' href={e.href}>{e.lable}</Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div>
-                        <h2>แทรค</h2>
-                        <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-2'>
-                            {tracks.map((e, index) => (
-                                <li key={index} className='bg-blue-800 text-white rounded-md overflow-hidden'>
-                                    <Link className='block w-full px-3 py-2' href={e.href}>{e.lable}</Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div>
-                        <h2>ตรวจสอบจบ</h2>
-                        <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-2'>
-                            {verify.map((e, index) => (
-                                <li key={index} className='bg-blue-800 text-white rounded-md overflow-hidden'>
-                                    <Link className='block w-full px-3 py-2' href={e.href}>{e.lable}</Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                <div className='flex flex-col space-y-8 mt-8'>
+                    {
+                        categories.map((category, index) => (
+                            <div key={index}
+                                className='first:mt-0'>
+                                <h2 className="font-bold text-2xl mb-4">{category.title}</h2>
+                                <ul className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 gap-y-6'>
+                                    {category.links.map((link, index) => (
+                                        <li key={index}>
+                                            <Link className='block group'
+                                                href={link.href}>
+                                                <div
+                                                    className='bg-[#ebecee] p-3 h-36 flex justify-center items-center'>
+                                                    {link.icon}
+                                                </div>
+                                                <p className='text-[#2C2F31] mt-1.5'>
+                                                    {link.lable}
+                                                </p>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))
+                    }
                 </div>
             </ContentWrap>
         </>

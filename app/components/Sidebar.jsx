@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoHome, GoHomeFill } from "react-icons/go";
-import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
+import { MdAdminPanelSettings, MdOutlineAdminPanelSettings, MdOutlineQuiz, MdQuiz } from "react-icons/md";
 import { useSession } from "next-auth/react"
 import { Icon } from '@iconify/react';
 import { AiFillEdit, AiOutlineEdit } from 'react-icons/ai';
@@ -23,56 +23,53 @@ const Sidebar = () => {
                 aria-label="Sidebar">
                 <div className="h-full px-4 py-4 overflow-y-auto bg-white">
                     <ul className="font-medium space-y-1">
-                        <li className="">
-                            {session?.user?.role == "admin" || session?.user?.role == "teacher" ?
-                                <>
-                                    <Tooltip placement="right" title={!toggleSideBar && "หน้าหลัก"}>
-                                        <Link href={"/admin"}
-                                            className={`${url.includes("admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-2" : "px-3"} rounded-lg group`}
-                                        >
-                                            {url.includes("admin") ?
-                                                <GoHomeFill
-                                                    className="w-5 h-5"
-                                                    set="bulk" stroke="bold" />
-                                                :
-                                                <GoHome
-                                                    className="w-5 h-5"
-                                                    set="bulk" stroke="bold" />
-                                            }
-                                            {
-                                                toggleSideBar &&
-                                                <span className="ml-5 text-sm">หน้าหลัก</span>
-                                            }
-                                        </Link>
-                                    </Tooltip>
-                                </>
-                                :
-                                <Tooltip placement="right" title={!toggleSideBar && "หน้าหลัก"}>
-                                    <Link href={"/"}
-                                        className={`${url == "/" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-2" : "px-3"} rounded-lg group`}
+                        <li>
+                            <Tooltip placement="right" title={!toggleSideBar && "หน้าหลัก"}>
+                                <Link href={"/"}
+                                    className={`${url == "/" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-3" : "px-3"} rounded-lg group`}
+                                >
+                                    {url == "/" ?
+                                        <GoHomeFill
+                                            className="w-5 h-5"
+                                            set="bulk" stroke="bold" />
+                                        :
+                                        <GoHome
+                                            className="w-5 h-5"
+                                            set="bulk" stroke="bold" />
+                                    }
+                                    {
+                                        toggleSideBar &&
+                                        <span className="ml-5 text-[13px]">หน้าหลัก</span>
+                                    }
+                                </Link>
+                            </Tooltip>
+                        </li>
+                        {(session?.user?.role == "admin" || session?.user?.role == "teacher") &&
+                            <li>
+                                <Tooltip placement="right" title={!toggleSideBar && "Admin Panel"}>
+                                    <Link href={"/admin"}
+                                        className={`${url.includes("admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-3" : "px-3"} rounded-lg group`}
                                     >
-                                        {url == "/" ?
-                                            <GoHomeFill
-                                                className="w-5 h-5"
-                                                set="bulk" stroke="bold" />
+                                        {url.includes("admin") ?
+                                            <MdAdminPanelSettings
+                                                className="w-5 h-5 text-white" />
                                             :
-                                            <GoHome
-                                                className="w-5 h-5"
-                                                set="bulk" stroke="bold" />
+                                            <MdOutlineAdminPanelSettings
+                                                className="w-5 h-5" />
                                         }
                                         {
                                             toggleSideBar &&
-                                            <span className="ml-5 text-sm">หน้าหลัก</span>
+                                            <span className="ml-5 text-[13px]">Admin Panel</span>
                                         }
                                     </Link>
                                 </Tooltip>
-                            }
-                        </li>
+                            </li>
+                        }
                         {(session?.user?.role == "admin" || session?.user?.role == "teacher") &&
                             <li>
                                 <Tooltip placement="right" title={!toggleSideBar && "Dashboard"}>
                                     <Link href={"/dashboard"}
-                                        className={`${url.includes("dashboard") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-2" : "px-3"} rounded-lg group`}
+                                        className={`${url.includes("dashboard") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-3" : "px-3"} rounded-lg group`}
                                     >
                                         {url.includes("dashboard") ?
                                             <Icon icon="mingcute:chart-pie-2-fill"
@@ -83,7 +80,7 @@ const Sidebar = () => {
                                         }
                                         {
                                             toggleSideBar &&
-                                            <span className="ml-5 text-sm">Dashboard</span>
+                                            <span className="ml-5 text-[13px]">Dashboard</span>
                                         }
                                     </Link>
                                 </Tooltip>
@@ -92,7 +89,7 @@ const Sidebar = () => {
                         <li className="">
                             <Tooltip placement="right" title={!toggleSideBar && "แทร็ก"}>
                                 <Link href={"/tracks"}
-                                    className={`${url.includes("/tracks") && url.startsWith("/tracks") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-2" : "px-3"} rounded-lg group`}
+                                    className={`${url.includes("/tracks") && url.startsWith("/tracks") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-3" : "px-3"} rounded-lg group`}
                                 >
                                     {url.includes("/tracks") && url.startsWith("/tracks") ?
                                         <HiUserGroup
@@ -103,7 +100,7 @@ const Sidebar = () => {
                                     }
                                     {
                                         toggleSideBar &&
-                                        <span className="ml-5 text-sm">แทร็ก</span>
+                                        <span className="ml-5 text-[13px]">แทร็ก</span>
                                     }
                                 </Link>
                             </Tooltip>
@@ -111,7 +108,7 @@ const Sidebar = () => {
                         <li className="">
                             <Tooltip placement="right" title={!toggleSideBar && "คัดเลือกแทร็ก"}>
                                 <Link href={"/student/tracks"}
-                                    className={`${url == "/student/tracks" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-2" : "px-3"} rounded-lg group`}
+                                    className={`${url == "/student/tracks" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-3" : "px-3"} rounded-lg group`}
                                 >
                                     {url == "/student/tracks" ?
                                         <AiFillEdit
@@ -122,7 +119,7 @@ const Sidebar = () => {
                                     }
                                     {
                                         toggleSideBar &&
-                                        <span className="ml-5 text-sm">คัดเลือกแทร็ก</span>
+                                        <span className="ml-5 text-[13px]">คัดเลือกแทร็ก</span>
                                     }
                                 </Link>
                             </Tooltip>
@@ -130,7 +127,7 @@ const Sidebar = () => {
                         <li className="">
                             <Tooltip placement="right" title={!toggleSideBar && "แนะนำแทร็ก"}>
                                 <Link href={"/student/tracks/exam"}
-                                    className={`${url == "/student/tracks/exam" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-2" : "px-3"} rounded-lg group`}
+                                    className={`${url == "/student/tracks/exam" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-3" : "px-3"} rounded-lg group`}
                                 >
                                     {url == "/student/tracks/exam" ?
                                         <MdQuiz
@@ -141,7 +138,7 @@ const Sidebar = () => {
                                     }
                                     {
                                         toggleSideBar &&
-                                        <span className="ml-5 text-sm">แนะนำแทร็ก</span>
+                                        <span className="ml-5 text-[13px]">แนะนำแทร็ก</span>
                                     }
                                 </Link>
                             </Tooltip>
@@ -149,7 +146,7 @@ const Sidebar = () => {
                         <li className="">
                             <Tooltip placement="right" title={!toggleSideBar && "ตรวจสอบสำเร็จการศึกษา"}>
                                 <Link href={"/student/verify"}
-                                    className={`${url == "/student/verify" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-2" : "px-3"} rounded-lg group`}
+                                    className={`${url == "/student/verify" ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center ${toggleSideBar ? "px-3" : "px-3"} rounded-lg group`}
                                 >
                                     {url == "/student/verify" ?
                                         <HiAcademicCap className="w-5 h-5" />
@@ -158,7 +155,7 @@ const Sidebar = () => {
                                     }
                                     {
                                         toggleSideBar &&
-                                        <span className="ml-5 text-sm">ตรวจสอบสำเร็จการศึกษา</span>
+                                        <span className="ml-5 text-[13px]">ตรวจสอบสำเร็จการศึกษา</span>
                                     }
                                 </Link>
                             </Tooltip>

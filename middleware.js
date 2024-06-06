@@ -16,12 +16,6 @@ export default async function middleware(req, event) {
             return NextResponse.redirect(new URL('/', req.url));
         }
 
-        if (path === "/" && (userRole === "admin" || userRole === "teacher")) {
-            const url = req.nextUrl.clone();
-            url.pathname = '/admin';
-            return NextResponse.redirect(url);
-        }
-
         if (path.startsWith("/student") && !["student", ...accessRoles].includes(userRole)) {
             return NextResponse.rewrite(new URL("/permission/kkumail.com", req.url));
         }

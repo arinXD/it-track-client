@@ -108,7 +108,7 @@ const TrackForm = ({ track }) => {
                         <Spinner label="กำลังโหลด..." color="primary" />
                     </div>
                     :
-                    <div className='mt-4 border p-6 rounded-[10px]'>
+                    <div className='mt-4 border p-6 rounded-[10px] w-full'>
                         {trackData && Object.keys(trackData).length !== 0 ?
                             <>
                                 <div className='flex flex-col gap-6'>

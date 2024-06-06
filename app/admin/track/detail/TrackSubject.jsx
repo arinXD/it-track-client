@@ -96,7 +96,7 @@ const TrackSubject = ({ track }) => {
     }, [selectedKeys, subjects])
 
     return (
-        <div className="border rounded-[10px] p-4 h-full">
+        <div className="border rounded-[10px] p-4 h-full w-full">
             <InsertSubjectModal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -183,9 +183,9 @@ const TrackSubject = ({ track }) => {
                             </Table>
                             :
                             <Empty
-                                className='my-4'
+                                className='my-6'
                                 description={
-                                    "ไม่มีข้อมูลวิชา"
+                                    <span className='text-gray-300'>ไม่มีข้อมูลวิชา</span>
                                 } />
                         }
                     </div>
