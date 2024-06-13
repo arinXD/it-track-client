@@ -1,10 +1,10 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Autocomplete, AutocompleteItem, RadioGroup, Radio } from "@nextui-org/react";
 import { getAcadyears } from '@/src/util/academicYear';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
-import { getToken } from '@/app/components/serverAction/TokenAction';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction';
 
 const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose }) => {
     const [stu_id, setStuId] = useState(null)
@@ -35,7 +35,7 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
         setAcadyears(result)
     }, [])
 
-    function validInput(formData) {
+    const validInput = useCallback(function (formData) {
         let bool = true;
         const updatedInvalid = {};
         Object.keys(formData).forEach(key => {
@@ -62,9 +62,9 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
         }));
 
         return bool;
-    }
+    }, [])
 
-    async function insertStudent(event) {
+    const insertStudent = async function (event) {
         setInserting(true)
         event.preventDefault()
         const formData = {
@@ -82,19 +82,8 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
         }
 
         try {
-            const token = await getToken()
-            const options = {
-                url: `${hostname}/api/students`,
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'authorization': `${token}`,
-                    'Content-Type': 'application/json;charset=UTF-8',
-                },
-                data: formData
-            };
-
-            const res = await axios(options)
+            const option = await getOptions("/api/students", "POST", formData)
+            const res = await axios(option)
             const { ok, message } = res.data
             showToastMessage(ok, message)
             getStudents()
@@ -107,7 +96,7 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
         }
     }
 
-    function closeForm() {
+    const closeForm = useCallback(function () {
         setInvalid({
             stu_id: false,
             email: false,
@@ -125,7 +114,7 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
         setProgram(null)
         setCourseType(null)
         onClose()
-    }
+    }, [])
 
     return (
         <>

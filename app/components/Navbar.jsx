@@ -1,10 +1,10 @@
 'use client';
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { signOut } from "next-auth/react"
 import Image from 'next/image'
 import Link from 'next/link';
 import { useSession } from "next-auth/react"
-import { MdOutlineLogout } from "react-icons/md";
+import { MdAdminPanelSettings, MdOutlineAdminPanelSettings, MdOutlineLogout } from "react-icons/md";
 import { Skeleton } from "@nextui-org/react";
 import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
@@ -16,49 +16,163 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import "../style/hamburgers.css"
 import { useToggleSideBarStore } from '@/src/store';
 import NextTopLoader from 'nextjs-toploader';
+import { Icon } from '@iconify/react';
 
 const Navbar = () => {
-    const links = [
-        {
-            href: "/",
-            activeIcon: <GoHomeFill className="w-5 h-5" />,
-            icon: <GoHome className="w-5 h-5" />,
-            label: "หน้าหลัก"
-        },
-        {
-            href: "/tracks",
-            activeIcon: <HiUserGroup className="w-5 h-5" />,
-            icon: <HiOutlineUserGroup className="w-5 h-5" />,
-            label: "แทร็ก"
-        },
-        {
-            href: "/student/tracks",
-            activeIcon: <AiFillEdit className="w-5 h-5" />,
-            icon: <AiOutlineEdit className="w-5 h-5" />,
-            label: "คัดเลือกแทร็ก"
-        },
-        {
-            href: "/student/tracks/exam",
-            activeIcon: <MdQuiz className="w-5 h-5" />,
-            icon: <MdOutlineQuiz className="w-5 h-5" />,
-            label: "แนะนำแทร็ก"
-        },
-        {
-            href: "/student/verify",
-            activeIcon: <HiAcademicCap className="w-5 h-5" />,
-            icon: <HiOutlineAcademicCap className="w-5 h-5" />,
-            label: "ตรวจสอบสำเร็จการศึกษา"
-        },
-    ]
     const { data: session, status } = useSession();
     const [openToggle, setOpenToggle] = useState(false)
     const [toggleSideBar, setToggle] = useToggleSideBarStore((state) => [state.toggle, state.setToggle])
     const url = usePathname();
 
-    function navstupid() {
-        setOpenToggle(!openToggle)
+    const links = useMemo(() => [
+        {
+            href: "/",
+            activeIcon: <GoHomeFill className="w-5 h-5" />,
+            icon: <GoHome className="w-5 h-5" />,
+            label: "หน้าหลัก",
+            condition: true
+        },
+        {
+            href: "/admin",
+            activeIcon: <MdAdminPanelSettings className="w-5 h-5 text-white" />,
+            icon: <MdOutlineAdminPanelSettings className="w-5 h-5" />,
+            label: "Admin Panel",
+            condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
+        },
+        {
+            href: "/dashboard",
+            activeIcon: <Icon icon="mingcute:chart-pie-2-fill" className="w-5 h-5 text-white" />,
+            icon: <Icon icon="mingcute:chart-pie-2-line" className="w-5 h-5" />,
+            label: "Dashboard",
+            condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
+        },
+        {
+            href: "/tracks",
+            activeIcon: <HiUserGroup className="w-5 h-5" />,
+            icon: <HiOutlineUserGroup className="w-5 h-5" />,
+            label: "แทร็ก",
+            condition: true
+        },
+        {
+            href: "/student/tracks",
+            activeIcon: <AiFillEdit className="w-5 h-5" />,
+            icon: <AiOutlineEdit className="w-5 h-5" />,
+            label: "คัดเลือกแทร็ก",
+            condition: true
+        },
+        {
+            href: "/student/tracks/exam",
+            activeIcon: <MdQuiz className="w-5 h-5" />,
+            icon: <MdOutlineQuiz className="w-5 h-5" />,
+            label: "แนะนำแทร็ก",
+            condition: true
+        },
+        {
+            href: "/student/verify",
+            activeIcon: <HiAcademicCap className="w-5 h-5" />,
+            icon: <HiOutlineAcademicCap className="w-5 h-5" />,
+            label: "ตรวจสอบสำเร็จการศึกษา",
+            condition: true
+        }
+    ], [session]);
+
+    const navstupid = useCallback(function () {
+        setOpenToggle(prevOpenToggle => !prevOpenToggle);
         document.querySelector('#navstupid').classList.toggle('!top-0')
-    }
+    }, [])
+
+    const renderUserProfile = useCallback(() => {
+        if (status === "authenticated") {
+            return (
+                <div className='relative flex justify-center items-center gap-5'>
+                    <Dropdown
+                        radius="sm"
+                        classNames={{
+                            content: "p-0 border-small border-divider bg-background shadow-none",
+                        }}
+                    >
+                        <DropdownTrigger>
+                            <Image
+                                id='user-profile'
+                                className='rounded-full active:scale-90 cursor-pointer'
+                                src={session?.user?.image || "/image/user.png"}
+                                width={40} height={40}
+                                alt="user image"
+                            />
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            aria-label="Profile Menu"
+                            disabledKeys={["profile"]}
+                            className="p-2"
+                            variant="flat"
+                            itemClasses={{
+                                base: [
+                                    "rounded-md",
+                                    "text-default-500",
+                                    "transition-opacity",
+                                    "data-[hover=true]:text-foreground",
+                                    "data-[hover=true]:bg-default-100",
+                                    "dark:data-[hover=true]:bg-default-50",
+                                    "data-[selectable=true]:focus:bg-default-50",
+                                    "data-[pressed=true]:opacity-70",
+                                    "data-[focus-visible=true]:ring-default-500",
+                                ],
+                            }}
+                        >
+                            <DropdownSection aria-label="Profile & Actions" showDivider>
+                                <DropdownItem
+                                    isReadOnly
+                                    key="profile"
+                                    className="h-14 gap-2 opacity-100"
+                                >
+                                    <div className="flex gap-3 items-center">
+                                        <Image
+                                            className='rounded-full'
+                                            src={session?.user?.image}
+                                            width={40} height={40}
+                                            alt="user image"
+                                        />
+                                        <div className='w-full'>
+                                            <p className='text-medium text-default-900'>{session.user.name}</p>
+                                            <p className='text-small text-default-500'>{session.user.email}</p>
+                                        </div>
+                                    </div>
+                                </DropdownItem>
+                            </DropdownSection>
+                            <DropdownSection aria-label="Help & Feedback" className="mb-0">
+                                <DropdownItem key="logout" onClick={() => signOut()}>
+                                    <div className='flex gap-3 items-center'>
+                                        <MdOutlineLogout className='w-5 h-5' />
+                                        <span>ออกจากระบบ</span>
+                                    </div>
+                                </DropdownItem>
+                            </DropdownSection>
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
+            );
+        }
+        return <Skeleton className="w-[40px] h-[40px] rounded-full" />;
+    }, [session, status]);
+
+    const mobileProfile = useCallback(() => {
+        return (
+            <div className="flex gap-4 items-start mb-1 border-b-1 border-b-gray-200 py-3 p-2">
+                <Image
+                    className='rounded-full border-1 border-slate-300'
+                    src={session?.user?.image || "/image/user.png"}
+                    width={45} height={45}
+                    alt="user image"
+                />
+                <div className='w-full'>
+                    <div>
+                        <div>{session?.user?.name}</div>
+                        <div className='text-sm text-gray-500'>{session?.user?.email}</div>
+                    </div>
+                </div>
+            </div>
+        )
+    }, [session])
 
     return (
         <nav className="fixed top-0 left-0 z-40 w-full">
@@ -98,92 +212,17 @@ const Navbar = () => {
                     </div>
                     <div className="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
                         <div className="relative ml-3 flex flex-row gap-3">
-                            {status == "authenticated" ?
-                                <div className='relative flex justify-center items-center gap-5'>
-                                    <Dropdown
-                                        radius="sm"
-                                        classNames={{
-                                            content: "p-0 border-small border-divider bg-background shadow-none",
-                                        }}
-                                    >
-                                        <DropdownTrigger>
-                                            <Image
-                                                id='user-profile'
-                                                className='rounded-full active:scale-90 cursor-pointer'
-                                                src={session?.user?.image}
-                                                width={40} height={40}
-                                                alt="user image"
-                                            />
-                                        </DropdownTrigger>
-                                        <DropdownMenu
-                                            aria-label="Custom item styles"
-                                            disabledKeys={["profile"]}
-                                            className="p-2"
-                                            variant="flat"
-                                            itemClasses={{
-                                                base: [
-                                                    "rounded-md",
-                                                    "text-default-500",
-                                                    "transition-opacity",
-                                                    "data-[hover=true]:text-foreground",
-                                                    "data-[hover=true]:bg-default-100",
-                                                    "dark:data-[hover=true]:bg-default-50",
-                                                    "data-[selectable=true]:focus:bg-default-50",
-                                                    "data-[pressed=true]:opacity-70",
-                                                    "data-[focus-visible=true]:ring-default-500",
-                                                ],
-                                            }}
-                                        >
-                                            <DropdownSection aria-label="Profile & Actions" showDivider>
-                                                <DropdownItem
-                                                    isReadOnly
-                                                    key="profile"
-                                                    className="h-14 gap-2 opacity-100"
-                                                >
-                                                    <div className="flex gap-3 items-center">
-                                                        <Image
-                                                            className='rounded-full'
-                                                            src={session?.user?.image}
-                                                            width={40} height={40}
-                                                            alt="user image"
-                                                        />
-                                                        <div className='w-full'>
-                                                            <p className='text-medium text-default-900'>{session.user.name}</p>
-                                                            <p className='text-small text-default-500'>{session.user.email}</p>
-                                                        </div>
-                                                    </div>
-                                                </DropdownItem>
-                                            </DropdownSection>
-                                            <DropdownSection
-                                                aria-label="Help & Feedback"
-                                                className="mb-0"
-                                            >
-                                                <DropdownItem key="logout" onClick={() => signOut()}>
-                                                    <div className='flex gap-3 items-center'>
-                                                        <MdOutlineLogout className='w-5 h-5' />
-                                                        <span>ออกจากระบบ</span>
-                                                    </div>
-                                                </DropdownItem>
-                                            </DropdownSection>
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                </div>
-                                :
-                                <div className='relative hidden md:flex justify-center items-center gap-2'>
-                                    <Skeleton className="w-[40px] h-[40px] rounded-full" />
-                                </div>
-
-                            }
+                            {renderUserProfile()}
                         </div >
                     </div >
                 </div >
             </div >
             {
-                <div className="md:hidden relative w-50" id="mobile-menu">
-                    <div className="absolute space-y-1 p-2 border-y-1 w-full border-y-gray-200" id='navstupid'
+                <div className={`md:hidden relative w-50`} id="mobile-menu">
+                    <div className="h-fit absolute space-y-1 p-2 border-y-1 w-full border-y-gray-200" id='navstupid'
                         style={{
                             background: 'white',
-                            top: '-450px',
+                            transform: openToggle ? 'translateY(0)' : 'translateY(-100%)',
                             left: '0px',
                             WebkitTransition: '0.3s',
                             MozTransition: '0.3s',
@@ -191,36 +230,21 @@ const Navbar = () => {
                             transition: '0.3s',
                             zIndex: '0'
                         }}>
-                        {session &&
-                            <div className="flex gap-4 items-start mb-1 border-b-1 border-b-gray-200 py-3 p-2">
-                                <Image
-                                    className='rounded-full border-1 border-slate-300'
-                                    src={session?.user?.image}
-                                    width={45} height={45}
-                                    alt="user image"
-                                />
-                                <div className='w-full'>
-                                    <div>
-                                        <div>{session?.user?.name}</div>
-                                        <div className='text-sm text-gray-500'>{session?.user?.email}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                        {links.map((link, index) => (
-                            <Link href={link.href}
-                                className={`${url == link.href || (url === "/admin" && link.href === "/" && session?.user?.role === "admin") ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                                onClick={() => navstupid()}
-                                key={index}
-                            >
-                                {url == link.href || (url === "/admin" && link.href === "/" && session?.user?.role === "admin") ?
-                                    <>{link.activeIcon}</>
-                                    :
-                                    <>{link.icon}</>
-                                }
-                                <span className="ml-3 text-sm">{link.label}</span>
-                            </Link>
-                        ))}
+                        {mobileProfile()}
+                        {links.map((link, index) => {
+                            if (!link.condition) return null;
+                            const isActive = url === link.href || (url.startsWith("/admin") && link.href.includes("/admin"));
+                            return (
+                                <Link
+                                    href={link.href}
+                                    className={`${isActive ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
+                                    onClick={() => navstupid()}
+                                    key={index}
+                                >
+                                    {isActive ? link.activeIcon : link.icon}
+                                    <span className="ml-3 text-sm">{link.label}</span>
+                                </Link>)
+                        })}
                         <div className='border-t-1 border-t-gray-200 cursor-pointer'
                             onClick={() => signOut()}>
                             <div className='flex rounded-md p-2 py-3 hover:bg-gray-200 mt-1'>

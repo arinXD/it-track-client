@@ -1,7 +1,7 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Link, useDisclosure } from "@nextui-org/react";
-import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } from "@/app/components/icons";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Link, useDisclosure, Tooltip } from "@nextui-org/react";
+import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2, DeleteIcon, EditIcon2, EyeIcon } from "@/app/components/icons";
 import { capitalize } from "@/src/util/utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from '../action'
@@ -20,6 +20,7 @@ import { getToken } from "@/app/components/serverAction/TokenAction";
 import { hostname } from "@/app/api/hostname";
 import InsertEnrollmentForm from "./InsertEnrollmentForm";
 import { Empty } from "antd";
+import { IoMdEye } from "react-icons/io";
 
 const Page = () => {
 
@@ -124,10 +125,8 @@ const Page = () => {
 
     // Fetching data
     const getStudentStatuses = useCallback(async function () {
-        const filterStatus = []
         try {
-            let statuses = await fetchData("/api/statuses")
-            statuses = statuses.filter(e => !filterStatus.includes(e.id))
+            const statuses = await fetchData("/api/statuses")
             setStatusOptions(statuses)
         } catch (err) {
             setStatusOptions([])
@@ -261,32 +260,49 @@ const Page = () => {
             case "actions":
                 return (
                     <div className="relative flex justify-center items-center gap-2">
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <Button isIconOnly size="sm" variant="light">
-                                    <VerticalDotsIcon className="text-default-300" />
-                                </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu
-                                onAction={
-                                    (key) => {
-                                        if (key == "delete") {
-                                            openDeleteModal(stu?.stu_id)
-                                        }
-                                    }
-                                }
+                        <Link href={`/admin/students/${stu?.stu_id}`} target="_blank">
+                            <Tooltip
+                                content="รายละเอียด"
                             >
-                                <DropdownItem href={`/admin/students/${stu?.stu_id}`}>
-                                    รายละเอียด
-                                </DropdownItem>
-                                <DropdownItem href={`/admin/students/${stu?.stu_id}?edit=1`}>
-                                    แก้ไข
-                                </DropdownItem>
-                                <DropdownItem key="delete" className="text-danger" color="danger">
-                                    ลบ
-                                </DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
+                                <Button
+                                    size='sm'
+                                    isIconOnly
+                                    aria-label="รายละเอียด"
+                                    className='p-2 bg-gray-200'
+                                >
+                                    <IoMdEye className="w-5 h-5 text-gray-600" />
+                                </Button>
+                            </Tooltip>
+                        </Link>
+                        <Link href={`/admin/students/${stu?.stu_id}?edit=1`} target="_blank">
+                            <Tooltip
+                                content="แก้ไข"
+                            >
+                                <Button
+                                    size='sm'
+                                    color='warning'
+                                    isIconOnly
+                                    aria-label="แก้ไข"
+                                    className='p-2'
+                                >
+                                    <EditIcon2 className="w-5 h-5 text-yellow-600" />
+                                </Button>
+                            </Tooltip>
+                        </Link>
+                        <Tooltip
+                            content="ลบ"
+                        >
+                            <Button
+                                onPress={() => openDeleteModal(stu?.stu_id)}
+                                size='sm'
+                                color='danger'
+                                isIconOnly
+                                aria-label="ลบ"
+                                className='p-2 bg-red-400'
+                            >
+                                <DeleteIcon className="w-5 h-5" />
+                            </Button>
+                        </Tooltip>
                     </div>
                 );
             default:
@@ -405,7 +421,7 @@ const Page = () => {
         }
     }, [])
 
-    const removeStatusFilter = (id) => {
+    const removeStatusFilter = useCallback((id) => {
         setStatusFilter((prev) => {
             const newStatusFilter = [...prev]
             const index = newStatusFilter.indexOf(String(id));
@@ -414,7 +430,7 @@ const Page = () => {
             }
             return newStatusFilter
         });
-    };
+    }, [])
 
     const topContent = useMemo(() => {
         return (
@@ -429,8 +445,10 @@ const Page = () => {
                                     {statusFilter == "all" ?
                                         statusOptions.map(s => (
                                             <Chip
+                                                key={s.id}
                                                 size="sm"
                                                 radius="sm"
+                                                className="bg-gray-200 text-gray-600"
                                                 onClose={() => removeStatusFilter(s.id)}
                                             >
                                                 {`${s.description} (${s.id})`}
@@ -441,8 +459,10 @@ const Page = () => {
                                             .filter(s => Array.from(statusFilter).includes(String(s.id)))
                                             .map(s => (
                                                 <Chip
+                                                    key={s.id}
                                                     size="sm"
                                                     radius="sm"
+                                                    className="bg-gray-200 text-gray-600"
                                                     onClose={() => removeStatusFilter(s.id)}
                                                 >
                                                     {`${s.description} (${s.id})`}
@@ -456,8 +476,10 @@ const Page = () => {
                                 <div className="flex gap-2 flex-wrap">
                                     {headerColumns.map(column => (
                                         <Chip
+                                            key={column.name}
                                             size="sm"
                                             radius="sm"
+                                            className="bg-gray-200 text-gray-600"
                                         >
                                             {column.name}
                                         </Chip>
@@ -468,7 +490,7 @@ const Page = () => {
                         <div className="flex justify-between items-center">
                             <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
                             <label className="flex items-center text-default-400 text-small">
-                                Rows per page:
+                                Rows per page
                                 <select
                                     id="rowPerPage"
                                     className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
@@ -486,10 +508,9 @@ const Page = () => {
                 <div className='flex flex-row justify-between items-center gap-4'>
                     <Input
                         isClearable
-                        className="w-[100%]"
-                        placeholder="รหัสนักศึกษา, อีเมล, ชื่อ"
+                        className="w-full h-fit"
+                        placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, อีเมล, ชื่อ)"
                         size="sm"
-                        radius="sm"
                         classNames={thinInputClass}
                         startContent={<SearchIcon />}
                         value={filterValue}
@@ -591,7 +612,7 @@ const Page = () => {
                     <span className="w-[30%] text-small text-default-400">
                         {selectedKeys === "all"
                             ? "All items selected"
-                            : `${selectedKeys.size} of ${filteredItems.length} selected`}
+                            : `${selectedKeys?.size} of ${filteredItems.length} selected`}
                     </span>
                     <Pagination
                         isCompact
@@ -656,6 +677,7 @@ const Page = () => {
                     delOnClose={delOnClose}
                     stuId={delStdId} />
                 <DeleteSelectModal
+                    setSelectedKeys={setSelectedKeys}
                     setDisableSelectDelete={setDisableSelectDelete}
                     setSelectedStudents={setSelectedStudents}
                     showToastMessage={showToastMessage}
@@ -765,7 +787,6 @@ const Page = () => {
                                 </Dropdown>
                             </div>
                             <div className="flex gap-4 items-center flex-wrap">
-                                <span className="text-sm ">ค้นหานักศึกษา</span>
                                 <select
                                     name="select-program"
                                     id="selectProgram"

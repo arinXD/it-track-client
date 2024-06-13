@@ -63,7 +63,7 @@ const BreadCrumb = () => {
                                                 fontSize: "clamp(3px, 3vw, 16px)",
                                             }}
                                             href={`/${currentUrl}`} 
-                                            className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 hover:underline hover:decoration-blue-500 hover:underline-offset-2 hover:decoration-1">
+                                            className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                                             {links[currentUrl] || String(currentUrl)}
                                         </Link>
                                 }
@@ -86,7 +86,7 @@ const BreadCrumb = () => {
                                                 fontSize: "clamp(3px, 3vw, 16px)",
                                             }}
                                             href={nextIndex} 
-                                            className="ms-1.5 inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 hover:underline hover:decoration-blue-500 hover:underline-offset-2 hover:decoration-1">
+                                            className="ms-1.5 inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                                             {links[currentUrl] || String(currentUrl)}
                                         </Link>
                                 }
