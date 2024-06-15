@@ -17,8 +17,8 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
 
     const [title, setTitle] = useState("")
     const [acadValue, setAcadValue] = useState("")
-    const [startValue, setStartValue] = useState(format(currentDateTime, 'yyyy-MM-dd HH:mm'));
-    const [expiredValue, setExpiredValue] = useState(format(currentDateTime, 'yyyy-MM-dd HH:mm'))
+    const [startValue, setStartValue] = useState(format(currentDateTime, 'yyyy-MM-dd\'T\'HH:mm'));
+    const [expiredValue, setExpiredValue] = useState(format(currentDateTime, 'yyyy-MM-dd\'T\'HH:mm'))
     const [trackSubj, setTrackSubj] = useState([])
 
     const [searchSubj, setSearchSubj] = useState("")

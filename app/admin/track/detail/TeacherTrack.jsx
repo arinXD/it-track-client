@@ -236,7 +236,7 @@ const TeacherTrack = ({ track }) => {
                                 {(item) => (
                                     <TableRow key={item.id}>
                                         <TableCell style={{ display: "none" }}>{item.id}</TableCell>
-                                        <TableCell className="">
+                                        <TableCell>
                                             <div className="w-full flex justify-center p-2">
                                                 <Image
                                                     width={80}
@@ -250,8 +250,8 @@ const TeacherTrack = ({ track }) => {
                                                     alt={item.teacherName} />
                                             </div>
                                         </TableCell>
-                                        <TableCell className="">{item.teacherName}</TableCell>
-                                        <TableCell className="">
+                                        <TableCell>{item.teacherName}</TableCell>
+                                        <TableCell>
                                             <div className="flex justify-center items-center">
                                                 <Tooltip content="แก้ไข">
                                                     <Button

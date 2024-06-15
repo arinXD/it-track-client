@@ -117,6 +117,7 @@ const TrackForm = ({ track }) => {
                                             containerWidth="w-[100%]"
                                             src={trackData?.coverImg}
                                             label="ภาพหน้าปก"
+                                            displayLabel={false}
                                             width="w-full"
                                             setImageFile={setCoverImageFile}
                                             uploadProgress={uploadProgressCover}
@@ -125,9 +126,10 @@ const TrackForm = ({ track }) => {
                                     <div className='flex flex-row gap-6'>
                                         <div className='flex justify-center w-1/2'>
                                             <UploadCover
-                                                containerWidth="w-[70%]"
+                                                containerWidth="w-[100%]"
                                                 src={trackData?.img}
                                                 label="ภาพแทร็ก"
+                                                displayLabel={false}
                                                 width="w-full"
                                                 setImageFile={setTrackImageFile}
                                                 uploadProgress={uploadProgressImg}

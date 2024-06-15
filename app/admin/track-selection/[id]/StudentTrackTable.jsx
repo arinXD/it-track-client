@@ -2,58 +2,57 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Input, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from "@nextui-org/react";
 import { SearchIcon } from "@/app/components/icons";
-import { tableClass } from '@/src/util/ComponentClass';
+import { minimalTableClass, tableClass, thinInputClass } from '@/src/util/ComponentClass';
 import { calGrade, floorGpa } from '@/src/util/grade';
 import { isNumber } from '../../../../src/util/grade';
-
-function displayNull(string) {
-    if (string) return string
-    return "-"
-}
-const initColumns = [
-    {
-        name: "รหัสนักศึกษา",
-        uid: "stuId",
-        sortable: true
-    },
-    {
-        name: "ชื่อ - สกุล",
-        uid: "fullName",
-        sortable: true
-    },
-    {
-        name: "โครงการ",
-        uid: "coursesType",
-        sortable: true
-    },
-    {
-        name: "เกรด",
-        uid: "score",
-        sortable: true
-    },
-    {
-        name: "เลือกลำดับ 1",
-        uid: "track_order_1",
-        sortable: true
-    },
-    {
-        name: "เลือกลำดับ 2",
-        uid: "track_order_2",
-        sortable: true
-    },
-    {
-        name: "เลือกลำดับ 3",
-        uid: "track_order_3",
-        sortable: true
-    },
-    {
-        name: "ผลลัพธ์",
-        uid: "result",
-        sortable: true
-    },
-];
+import { Empty } from 'antd';
 
 const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
+    const displayNull = useCallback(function (string) {
+        return string ? string === "Web and Mobile" ? "Web" : string : "-"
+    }, [])
+    const initColumns = useMemo(() => [
+        {
+            name: "รหัสนักศึกษา",
+            uid: "stuId",
+            sortable: true
+        },
+        {
+            name: "ชื่อ - สกุล",
+            uid: "fullName",
+            sortable: true
+        },
+        {
+            name: "โครงการ",
+            uid: "coursesType",
+            sortable: true
+        },
+        {
+            name: "เกรด",
+            uid: "score",
+            sortable: true
+        },
+        {
+            name: "เลือกลำดับ 1",
+            uid: "track_order_1",
+            sortable: true
+        },
+        {
+            name: "เลือกลำดับ 2",
+            uid: "track_order_2",
+            sortable: true
+        },
+        {
+            name: "เลือกลำดับ 3",
+            uid: "track_order_3",
+            sortable: true
+        },
+        {
+            name: "ผลลัพธ์",
+            uid: "result",
+            sortable: true
+        },
+    ], [])
     const subjects = trackSubj.map(subj => {
         return {
             name: subj.subject_code,
@@ -104,7 +103,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     track_order_1: displayNull(student.track_order_1),
                     track_order_2: displayNull(student.track_order_2),
                     track_order_3: displayNull(student.track_order_3),
-                    result: student.result ? student.result : "รอการคัดเลือก",
+                    result: student.result ? displayNull(student.result) : "รอการคัดเลือก",
                 }
             })
 
@@ -186,46 +185,6 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
         setPage(1)
     }, [])
 
-    const topContent = useMemo(() => {
-        return (
-            <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2 md:gap-0 md:flex-row justify-between items-end">
-                    <Input
-                        isClearable
-                        className="w-full md:max-w-[44%] h-fit"
-                        placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, ชื่อ, โครงการ, ผลลัพธ์)"
-                        size="sm"
-                        radius='sm'
-                        startContent={<SearchIcon />}
-                        value={filterValue}
-                        onClear={() => onClear()}
-                        onValueChange={onSearchChange}
-                    />
-                    <label className="flex items-center text-default-400 text-small">
-                        Rows per page:
-                        <select
-                            className="border border-gray-500 rounded-md outline-none ms-3 px-1 text-default-400 text-small"
-                            onChange={onRowsPerPageChange}
-                        >
-                            <option value="10">10</option>
-                            <option value="30">30</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value={studentData?.students?.length || 150}>ทั้งหมด</option>
-                        </select>
-                    </label>
-                </div>
-            </div>
-        );
-    }, [
-        filterValue,
-        visibleColumns,
-        onRowsPerPageChange,
-        students?.length,
-        onSearchChange,
-        hasSearchFilter,
-    ]);
-
     const bottomContent = useMemo(() => {
         if (!sortedItems.length) {
             return null
@@ -258,103 +217,103 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
 
     return (
         <div>
-            <h2 id={`${track.toLowerCase()}-students`} className='mb-3 text-default-900 text-small'>
-                {title && <> รายชื่อนักศึกษาแทร็ก {track} จำนวน {studentData?.students?.length} คน</>}
+            <h2 id={`${track.toLowerCase()}-students`} className='my-4 text-default-900 text-small'>
+                {title && <> รายชื่อนักศึกษาแทร็ก {track} จำนวน {studentData?.students?.length} คน </>}
                 {studentData?.normal > 0 && <>โครงการปกติ {studentData?.normal} คน</>}
                 {studentData?.vip > 0 && <>โครงการพิเศษ {studentData?.vip} คน</>}
             </h2>
-            {studentData && sortedItems.length > 0 &&
-                <Table
-                    aria-label={`Student Track Table`}
-                    removeWrapper
+            <div className="flex flex-col gap-4 mb-4">
+                <div className="flex flex-col gap-2 md:gap-0 md:flex-row justify-between items-end">
+                    <Input
+                        isClearable
+                        className="w-[50%] h-fit"
+                        classNames={thinInputClass}
+                        placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, ชื่อ, โครงการ, แทร็ก)"
+                        size="sm"
+                        radius='sm'
+                        startContent={<SearchIcon />}
+                        value={filterValue}
+                        onClear={() => onClear()}
+                        onValueChange={onSearchChange}
+                    />
+                    <label className="flex items-center text-default-400 text-small">
+                        Rows per page:
+                        <select
+                            className="border border-gray-500 rounded-md outline-none ms-3 px-1 text-default-400 text-small"
+                            onChange={onRowsPerPageChange}
+                        >
+                            <option value="10">10</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value={studentData?.students?.length || 150}>ทั้งหมด</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+            <Table
+                aria-label={`Student Track Table`}
+                removeWrapper
 
-                    topContent={topContent}
-                    topContentPlacement="outside"
+                bottomContent={bottomContent}
+                bottomContentPlacement="outside"
 
-                    bottomContent={bottomContent}
-                    bottomContentPlacement="outside"
-
-                    // selectionMode="multiple"
-                    classNames={{ ...tableClass, wrapper: "w-full" }}
-                    // onSelectionChange={setSelectedKeys}
-                    onSortChange={setSortDescriptor}
-                    sortDescriptor={sortDescriptor}
-                    onRowAction={() => { }}>
-                    <TableHeader columns={headerColumns}>
-                        {(column) => (
-                            <TableColumn
-                                key={column.uid}
-                                allowsSorting={column.sortable}
-                            >
-                                {column.name}
-                            </TableColumn>
-                        )}
-                    </TableHeader>
-                    {/* sortedItems */}
-                    <TableBody emptyContent={"ไม่มีรายชื่อนักศึกษา"} items={sortedItems}>
-                        {(item) => (
-                            <TableRow key={item.stuId}>
-                                <TableCell>{item?.stuId}</TableCell>
-                                <TableCell>{item?.fullName}</TableCell>
-                                <TableCell>{item?.coursesType}</TableCell>
-                                {
-                                    item.grade.map((g, index) => (
-                                        <TableCell key={index}>
-                                            {g[subjects[index].uid] || "-"}
-                                        </TableCell>
-                                    ))
-                                }
-                                <TableCell>{item?.score}</TableCell>
-                                <TableCell>{item?.track_order_1}</TableCell>
-                                <TableCell>{item?.track_order_2}</TableCell>
-                                <TableCell>{item?.track_order_3}</TableCell>
-                                <TableCell>{item?.result}</TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            }
+                // selectionMode="multiple"
+                classNames={{
+                    ...minimalTableClass,
+                    wrapper: "w-full",
+                    td: [
+                        "border-b"
+                    ]
+                }}
+                // onSelectionChange={setSelectedKeys}
+                onSortChange={setSortDescriptor}
+                sortDescriptor={sortDescriptor}
+                onRowAction={() => { }}>
+                <TableHeader columns={headerColumns}>
+                    {(column) => (
+                        <TableColumn
+                            key={column.uid}
+                            allowsSorting={column.sortable}
+                        >
+                            {column.name}
+                        </TableColumn>
+                    )}
+                </TableHeader>
+                {/* sortedItems */}
+                <TableBody
+                    emptyContent={
+                        <Empty
+                            className='my-4'
+                            description={
+                                <span className='text-gray-300'>ไม่พบข้อมูลนักศึกษา</span>
+                            }
+                        />
+                    }
+                    items={sortedItems}>
+                    {(item) => (
+                        <TableRow key={item.stuId}>
+                            <TableCell className='w-1/6'>{item?.stuId}</TableCell>
+                            <TableCell className='w-1/6'>{item?.fullName}</TableCell>
+                            <TableCell>{item?.coursesType}</TableCell>
+                            {
+                                item.grade.map((g, index) => (
+                                    <TableCell key={index}>
+                                        {g[subjects[index].uid] || "-"}
+                                    </TableCell>
+                                ))
+                            }
+                            <TableCell>{item?.score}</TableCell>
+                            <TableCell>{item?.track_order_1}</TableCell>
+                            <TableCell>{item?.track_order_2}</TableCell>
+                            <TableCell>{item?.track_order_3}</TableCell>
+                            <TableCell>{item?.result}</TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
         </div>
     )
 }
 
 export default StudentTrackTable
-
-// <>
-//     {JSON.stringify(headerColumns.map(e => e.name))} - {headerColumns.length} <br />
-//     <table>
-//         <thead>
-//             <tr>
-//                 {
-//                     headerColumns.map(head => (
-//                         <th className='border-1 bg-blue-300' key={head.name}>{head.name}</th>
-//                     ))
-//                 }
-//             </tr>
-//         </thead>
-//         <tbody>
-//             {
-//                 sortedItems.map((body, index) => (
-//                     <tr key={index}>
-//                         <td className='border-1'>{body?.stuId}</td>
-//                         <td className='border-1'>{body?.fullName}</td>
-//                         <td className='border-1'>{body?.coursesType}</td>
-//                         {
-//                             body.grade.map((g, index) => (
-//                                 <td className='border-1' key={index}>
-//                                     {g[subjects[index].uid] || "-"}
-//                                 </td>
-//                             ))
-//                         }
-//                         <td className='border-1'>{body?.score}</td>
-//                         <td className='border-1'>{body?.track_order_1}</td>
-//                         <td className='border-1'>{body?.track_order_2}</td>
-//                         <td className='border-1'>{body?.track_order_3}</td>
-//                         <td className='border-1'>{body?.result}</td>
-//                     </tr>
-//                 ))
-//             }
-//         </tbody>
-//     </table>
-//     {JSON.stringify(sortedItems[0])} - {Object?.keys(sortedItems[0]).length}
-// </>

@@ -116,7 +116,7 @@ const Page = () => {
                                         <div className='flex flex-row gap-6'>
                                              <div className='flex justify-center w-1/2'>
                                                   <UploadCover
-                                                       containerWidth="w-[70%]"
+                                                       containerWidth="w-[100%]"
                                                        src={""}
                                                        label="ภาพแทร็ก"
                                                        width="w-full"

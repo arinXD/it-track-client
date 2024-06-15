@@ -13,7 +13,8 @@ export default async function middleware(req, event) {
     if (isAuthenticated) {
 
         if (req.nextUrl.pathname.startsWith('/auth/sign-in') && isAuthenticated) {
-            return NextResponse.redirect(new URL('/', req.url));
+            const callbackUrl = req.nextUrl.searchParams.get('callbackUrl') || '/';
+            return NextResponse.redirect(new URL(callbackUrl, req.url));
         }
 
         if (path.startsWith("/student") && !["student", ...accessRoles].includes(userRole)) {

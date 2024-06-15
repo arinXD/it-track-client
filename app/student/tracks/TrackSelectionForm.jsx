@@ -5,13 +5,11 @@ import { createTrackSelection } from './action'
 import Swal from 'sweetalert2'
 import { Button, Spinner } from "@nextui-org/react";
 import { DeleteIcon } from '@/app/components/icons'
-import { dmy, dmyt } from '@/src/util/dateFormater'
 import confetti from 'canvas-confetti';
 import TMonlicaEmail from '@/app/components/TMonlicaEmail'
 import { getOptions } from '@/app/components/serverAction/TokenAction'
 import Link from 'next/link'
-import { SmileOutlined } from '@ant-design/icons';
-import { Result } from 'antd';
+import { simpleDMY, simpleDMYHM } from '@/src/util/simpleDateFormatter'
 
 const TrackSelectionForm = ({ enrollments, userData }) => {
     const initOrder = {
@@ -94,7 +92,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
 
             swal.fire({
                 title: "บันทึกข้อมูลการคัดเลือก",
-                text: `บันทึกข้อมูลการคัดเลือกของคุณ ณ วันที่ ${dmyt(data.updatedAt)}`,
+                text: `บันทึกข้อมูลการคัดเลือกของคุณ ณ วันที่ ${simpleDMYHM(data.updatedAt)}`,
                 icon: "success",
                 confirmButtonColor: "#3085d6",
                 confirmButtonText: "ตกลง"
@@ -269,43 +267,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                         :
                         <>
                             {(trackSelect?.has_finished || new Date(trackSelect?.expiredAt) < new Date() || new Date(trackSelect?.startAt) > new Date()) ?
-                                // trackResult ?
-                                //     (
-                                //         <div className='flex flex-col justify-center items-center h-[70vh]'>
-                                //             <Result
-                                //                 icon={<SmileOutlined />}
-                                //                 title={`แทร็กของคุณ คือ ${trackResult?.title_en}`}
-                                //                 subTitle={<p className='text-lg'>{trackResult?.title_th}</p>}
-                                //             />
-                                //             <Link href={`/tracks/${trackResult?.track?.toLowerCase()}`} className='text-blue-500 block'>รายละเอียดแทร็ก</Link>
-                                //         </div>
-                                //         // <>
-                                //         //     <h4
-                                //         //         style={{
-                                //         //             fontSize: "clamp(16px, 5vw, 24px)",
-                                //         //             margin: "auto"
-                                //         //         }}
-                                //         //         className="md:!mt-4 max-w-screen-md block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
-                                //         //         {trackSelect?.title}
-                                //         //     </h4>
-                                //         //     <p
-                                //         //         style={{
-                                //         //             fontSize: "clamp(8px, 4vw, 16px)",
-                                //         //             margin: "auto"
-                                //         //         }}
-                                //         //         className='text-center mb-3 text-lg font-semibold text-gray-900'>
-                                //         //         เริ่มคัดเลือกแทร็กตั้งแต่วันที่ {dmy(trackSelect.startAt)} - {dmy(trackSelect.expiredAt)} <br />
-                                //         //         ประกาศผลวันที่ 23 พฤษภาคม 2567
-                                //         //     </p>
-                                //         //     <div
-                                //         //         className='text-center my-5 text-[.85rem]'> 
-                                //         //         การคัดเลือกความเชี่ยวชาญ หลักสูตรเทคโนโลยีสารสนเทศ&nbsp;
-                                //         //         <strong className='underline decoration-pink-500 underline-offset-2 decoration-2'>จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
-                                //         //         ระบบจะทำการสุ่มให้ หากมีคำถามเพิ่มเติมติดต่อ <TMonlicaEmail />
-                                //         //     </div>
-                                //         // </>
-                                //     )
-                                //     :
                                     new Date(trackSelect?.startAt) > new Date() ?
                                         <>
                                             <h4
@@ -322,7 +283,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                     margin: "auto"
                                                 }}
                                                 className='text-center mb-3 text-lg font-semibold text-gray-900'>
-                                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ {dmy(trackSelect.startAt)} - {dmy(trackSelect.expiredAt)} <br />
+                                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ {simpleDMY(trackSelect.startAt)} - {simpleDMY(trackSelect.expiredAt)} <br />
                                                 ประกาศผลวันที่ 23 พฤษภาคม 2567
                                             </p>
                                         </>
@@ -342,7 +303,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                     margin: "auto"
                                                 }}
                                                 className='text-center mb-3 text-lg font-semibold text-gray-900'>
-                                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ {dmy(trackSelect.startAt)} - {dmy(trackSelect.expiredAt)} <br />
+                                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ {simpleDMY(trackSelect.startAt)} - {simpleDMY(trackSelect.expiredAt)} <br />
                                                 ประกาศผลวันที่ 23 พฤษภาคม 2567
                                             </p>
                                             <div
@@ -369,7 +330,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             margin: "auto"
                                         }}
                                         className='text-center mb-3 text-lg font-semibold text-gray-900'>
-                                        ตั้งแต่วันที่ {dmy(trackSelect.startAt)} - {dmy(trackSelect.expiredAt)}
+                                        ตั้งแต่วันที่ {simpleDMY(trackSelect.startAt)} - {simpleDMY(trackSelect.expiredAt)}
                                     </p>
                                     <form
                                         onSubmit={handleSubmit}
@@ -526,7 +487,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                 htmlFor="checkbox"
                                             >
                                                 <p className="flex items-center text-sm font-normal leading-normal text-gray-700 antialiased">
-                                                    ตรวจสอบข้อมูลเรียบร้อย (สามารถแก้ไขลำดับได้หลังจากยืนยัน จนถึงวันที่ {dmy(trackSelect.expiredAt)})
+                                                    ตรวจสอบข้อมูลเรียบร้อย (สามารถแก้ไขลำดับได้หลังจากยืนยัน จนถึงวันที่ {simpleDMY(trackSelect.expiredAt)})
                                                 </p>
                                             </label>
                                         </div>

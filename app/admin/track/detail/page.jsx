@@ -28,14 +28,12 @@ const Page = () => {
                             <div className='w-full space-y-6'>
                                 <TrackForm
                                     track={track} />
-                                <div className='w-full flex gap-6 flex-row-reverse'>
-                                    <div className="w-[40%]">
-                                        <TeacherTrack
-                                            track={track} />
+                                <div className='w-full flex gap-6 flex-row'>
+                                    <div className="w-[55%]">
+                                        <TrackSubject track={track} />
                                     </div>
-                                    <div className="w-[60%]">
-                                        <TrackSubject
-                                            track={track} />
+                                    <div className="w-[45%]">
+                                        <TeacherTrack track={track} />
                                     </div>
                                 </div>
                             </div>
