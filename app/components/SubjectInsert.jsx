@@ -22,9 +22,6 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
     const [information, setInformation] = useState('');
     const [credit, setCredit] = useState('');
 
-    const [selectedTrack, setSelectedTrack] = useState(null);
-    const [tracks, setTracks] = useState([]);
-
     const showToastMessage = (ok, message) => {
         toast[ok ? 'success' : 'warning'](message, {
             position: toast.POSITION.TOP_RIGHT,
@@ -39,33 +36,13 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
     };
 
     useEffect(() => {
-        const fetchTracks = async () => {
-            try {
-                const response = await axios.get(`${hostname}/api/tracks`);
-                const data = response.data.data;
-
-                const trackOptions = data.map(track => ({
-                    value: track.track,
-                    label: track.title_th
-                }));
-
-                setTracks(trackOptions);
-            } catch (error) {
-                console.error('Error fetching track:', error);
-            }
-        };
-
-        fetchTracks();
-    }, []);
-
-    useEffect(() => {
         if (isOpen) {
             setSubjectCode('');
             setTitleTh('');
             setTitleEn('');
             setInformation('');
             setCredit('');
-            setSelectedTrack(null);
+            // setSelectedTrack(null);
         }
     }, [isOpen]);
 
@@ -86,10 +63,7 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                 return;
             }
 
-            if (!subject_code.trim()) {
-                showToastMessage(false, 'รหัสวิชาห้ามเป็นค่าว่าง');
-                return;
-            }
+            const trimmedSubjectCode = subject_code.replace(/\s/g, '');
 
             const isDuplicate = await checkDuplicate(subject_code);
             if (isDuplicate) {
@@ -98,12 +72,12 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
             }
 
             const response = await axios.post(`${hostname}/api/subjects/insertSubject`, {
-                subject_code: subject_code || null,
+                subject_code: trimmedSubjectCode || null,
                 title_th: title_th || null,
                 title_en: title_en || null,
                 information: information || null,
                 credit: credit || null,
-                track: selectedTrack ? selectedTrack.value : null,
+                // track: selectedTrack ? selectedTrack.value : null,
             });
 
             onDataInserted();
@@ -134,9 +108,9 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                     <h2>เพิ่มวิชา</h2>
                     <span className='text-base font-normal'>แบบฟอร์มเพิ่มวิชา</span>
                 </ModalHeader>
-                <ModalBody className='grid grid-cols-9 gap-4'>
+                <ModalBody className='grid grid-cols-8 gap-4'>
                     <Input
-                        className='col-span-3'
+                        className='col-span-4'
                         type="text"
                         radius='sm'
                         variant="bordered"
@@ -148,7 +122,7 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                     />
 
                     <Input
-                        className='col-span-2'
+                        className='col-span-4'
                         type="number"
                         radius='sm'
                         variant="bordered"
@@ -159,23 +133,8 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                         onChange={(e) => setCredit(e.target.value)}
                     />
 
-                    <div className='group flex flex-col w-full group relative justify-end data-[has-label=true]:mt-[calc(theme(fontSize.small)_+_10px)] col-span-4'>
-                        <label className='absolute pointer-events-none origin-top-left subpixel-antialiased block  will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-foreground group-data-[filled-within=true]:pointer-events-auto pb-0 z-20 
-                         group-data-[filled-within=true]:left-0 text-foreground-800 top-0 text-small group-data-[filled-within=true]:-translate-y-[calc(100%_+_theme(fontSize.small)/2_+_20px)] pe-2 max-w-full text-ellipsis overflow-hidden' htmlFor="track">กลุ่มความเชี่ยวชาญ</label>
-                        <Select
-                            className='w-full font-normal bg-transparent !outline-none placeholder:text-foreground-500 focus-visible:outline-none text-small z-40'
-                            id="track"
-                            placeholder="เลือกกลุ่มความเชี่ยวชาญ"
-                            value={selectedTrack}
-                            options={tracks}
-                            onChange={(selectedOption) => setSelectedTrack(selectedOption)}
-                            isSearchable
-                            isClearable
-                        />
-                    </div>
-
                     <Input
-                        className='col-span-9'
+                        className='col-span-8'
                         type="text"
                         radius='sm'
                         variant="bordered"
@@ -187,7 +146,7 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                     />
 
                     <Input
-                        className='col-span-9'
+                        className='col-span-8'
                         type="text"
                         radius='sm'
                         variant="bordered"
@@ -199,7 +158,7 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
                     />
 
                     <Textarea
-                        className='col-span-9'
+                        className='col-span-8'
                         id="information"
                         label="รายละเอียด"
                         variant="bordered"

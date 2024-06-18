@@ -118,7 +118,6 @@ export default function Category() {
             reverseButtons: true
         });
 
-        // If the user clicks on "Yes, delete it!", proceed with deletion
         if (value) {
             try {
                 const result = await axios.delete(`${hostname}/api/categories/deleteCategory/${category.id}`);
@@ -131,7 +130,7 @@ export default function Category() {
 
             } catch (error) {
                 const message = error?.response?.data?.message
-                showToastMessage(false, message)
+                showToastMessage(false, "ข้อมูลถูกเชื่อมกับอีกตาราง")
             }
         }
     };

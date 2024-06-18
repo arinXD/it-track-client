@@ -19,19 +19,6 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
     const [information, setInformation] = useState('');
     const [credit, setCredit] = useState('');
 
-    const [selectedTrack, setSelectedTrack] = useState(null);
-    const [tracks, setTracks] = useState([]);
-
-    // const [selectedGroup, setSelectedGroup] = useState(null);
-    // const [groups, setGroups] = useState([]);
-
-    // const [selectedSubGroup, setSelectedSubGroup] = useState(null);
-    // const [subgroups, setSupGroups] = useState([]);
-
-    // const [selectedAcadyears, setSelectedAcadyears] = useState(null);
-    // const [acadyears, setAcadyears] = useState([]);
-
-
     const showToastMessage = (ok, message) => {
         toast[ok ? 'success' : 'warning'](message, {
             position: toast.POSITION.TOP_RIGHT,
@@ -48,60 +35,14 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
     useEffect(() => {
         const fetchDatas = async () => {
             try {
-                // Fetch the subject details
                 const subjectResult = await axios.get(`${hostname}/api/subjects/${subjectId}`);
                 const subjectData = subjectResult.data.data;
 
-                // setSemester(subjectData.semester ?? '');
                 setSubjectCode(subjectData.subject_code ?? '');
                 setNewTitleTH(subjectData.title_th ?? '');
                 setNewTitleEN(subjectData.title_en ?? '');
                 setInformation(subjectData.information ?? '');
                 setCredit(subjectData.credit ?? '');
-
-                const trackResult = await axios.get(`${hostname}/api/tracks`);
-                const tracks = trackResult.data.data;
-
-                const optionsTrack = tracks.map((track) => ({
-                    value: track.track,
-                    label: track.title_th
-                }));
-                setTracks(optionsTrack);
-
-                const selectedTrack = optionsTrack.find(option => option.value === subjectData.track);
-                setSelectedTrack(selectedTrack);
-
-                // const acadyearOptions = getAcadyears().map(acadyear => ({
-                //     value: acadyear,
-                //     label: acadyear
-                // }));
-                // setAcadyears(acadyearOptions);
-
-                // const selectedAcadyear = acadyearOptions.find(option => option.value === subjectData.acadyear);
-                // setSelectedAcadyears(selectedAcadyear);
-
-                // // Fetch the list of groups
-                // const groupResult = await axios.get(`${hostname}/api/groups`);
-                // const groups = groupResult.data.data;
-
-                // const subgroupResult = await axios.get(`${hostname}/api/subgroups`);
-                // const subgroups = subgroupResult.data.data;
-
-                // const optionsGroups = groups.map((group) => ({
-                //     value: group.id,
-                //     label: group.group_title
-                // }));
-                // setGroups(optionsGroups);
-                // const selectedGroup = optionsGroups.find(option => option.value === subjectData.group_id);
-                // setSelectedGroup(selectedGroup);
-
-                // const optionsSubGroups = subgroups.map((subgroup) => ({
-                //     value: subgroup.id,
-                //     label: subgroup.sub_group_title
-                // }));
-                // setSupGroups(optionsSubGroups);
-                // const selectedSupGroup = optionsSubGroups.find(option => option.value === subjectData.sub_group_id);
-                // setSelectedSubGroup(selectedSupGroup);
 
             } catch (error) {
                 console.error('Error fetching subject details:', error);
@@ -131,16 +72,9 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 title_en: title_en ? title_en : null,
                 information: information ? information : null,
                 credit: credit ? credit : null,
-                track: selectedTrack ? selectedTrack.value : null,
-                // sub_group_id: selectedSubGroup ? selectedSubGroup.value : null,
-                // group_id: selectedGroup ? selectedGroup.value : null,
-                // acadyear: selectedAcadyears ? selectedAcadyears.value : null,
+                // track: selectedTrack ? selectedTrack.value : null,
             });
-
-            // Notify the parent component that data has been updated
             onUpdate();
-
-            // Close the modal after updating
             onClose();
         } catch (error) {
             console.error('Error updating subject:', error);
@@ -168,50 +102,10 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                     <h2>แก้ไขวิชา</h2>
                     <span className='text-base font-normal'>แบบฟอร์มแก้ไขวิชา</span>
                 </ModalHeader>
-                <ModalBody className='grid grid-cols-9 gap-4'>
-                    {/* <div className='col-span-3'>
-                        <label htmlFor="group">กลุ่มวิชา</label>
-                        <Select
-                            className='z-50'
-                            id="group"
-                            value={selectedGroup}
-                            placeholder="เลือกกลุ่มยวิชา"
-                            options={groups}
-                            onChange={(selectedOption) => setSelectedGroup(selectedOption)}
-                            isSearchable
-                            isClearable
-                        />
-                    </div>
-                    <div className='col-span-3'>
-                        <label htmlFor="subgroup">กลุ่มย่อย</label>
-                        <Select
-                            className='z-50'
-                            id="subgroup"
-                            value={selectedSubGroup}
-                            placeholder="เลือกกลุ่มย่อยวิชา"
-                            options={subgroups}
-                            onChange={(selectedOption) => setSelectedSubGroup(selectedOption)}
-                            isSearchable
-                            isClearable
-                        />
-
-                    </div>
-                    <div className='col-span-3'>
-                        <label htmlFor="acadyear">ปีการศึกษา</label>
-                        <Select
-                            className='z-40'
-                            id="acadyear"
-                            value={selectedAcadyears}
-                            placeholder="เลือกปีการศึกษา"
-                            options={acadyears}
-                            onChange={(selectedOption) => setSelectedAcadyears(selectedOption)}
-                            isSearchable
-                            isClearable
-                        />
-                    </div> */}
+                <ModalBody className='grid grid-cols-8 gap-4'>
                     <Input
                         disabled
-                        className='col-span-3'
+                        className='col-span-4'
                         type="text"
                         radius='sm'
                         variant="bordered"
@@ -223,7 +117,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                     />
 
                     <Input
-                        className='col-span-2'
+                        className='col-span-4'
                         type="number"
                         radius='sm'
                         variant="bordered"
@@ -234,7 +128,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                         onChange={(e) => setCredit(e.target.value)}
                     />
 
-                    <div className='group flex flex-col w-full group relative justify-end data-[has-label=true]:mt-[calc(theme(fontSize.small)_+_10px)] col-span-4'>
+                    {/* <div className='group flex flex-col w-full group relative justify-end data-[has-label=true]:mt-[calc(theme(fontSize.small)_+_10px)] col-span-4'>
                         <label className='absolute pointer-events-none origin-top-left subpixel-antialiased block  will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-foreground group-data-[filled-within=true]:pointer-events-auto pb-0 z-20 
                          group-data-[filled-within=true]:left-0 text-foreground-800 top-0 text-small group-data-[filled-within=true]:-translate-y-[calc(100%_+_theme(fontSize.small)/2_+_20px)] pe-2 max-w-full text-ellipsis overflow-hidden' htmlFor="track">แทร็ก</label>
                         <Select
@@ -247,7 +141,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                             isSearchable
                             isClearable
                         />
-                    </div>
+                    </div> */}
                     {/* <Input
                         className='col-span-3'
                         type="number"
@@ -261,7 +155,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                     /> */}
 
                     <Input
-                        className='col-span-9'
+                        className='col-span-8'
                         type="text"
                         radius='sm'
                         variant="bordered"
@@ -273,7 +167,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                     />
 
                     <Input
-                        className='col-span-9'
+                        className='col-span-8'
                         type="text"
                         radius='sm'
                         variant="bordered"
@@ -285,7 +179,7 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                     />
 
                     <Textarea
-                        className='col-span-9'
+                        className='col-span-8'
                         id="information"
                         label="รายละเอียด"
                         variant="bordered"

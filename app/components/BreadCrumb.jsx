@@ -22,6 +22,7 @@ const links = {
     "restore": "รายการที่ถูกลบ",
     "trackstudent": "รายชื่อนักศึกษาภายในแทร็ก",
     "verify": "แบบฟอร์มตรวจสอบจบ",
+    "verify-selection": "อนุมัติจบการศึกษา",
     "detail": "รายละเอียด",
     "tracks": "แทร็ก",
     "web%20and%20mobile": "Mobile and Web Application Development",

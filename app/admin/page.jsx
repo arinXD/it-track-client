@@ -6,7 +6,7 @@ const Page = async () => {
     const acadLinks = [
         // { href: "/admin/acadyears", lable: "ปีการศึกษา" },
         { href: "/admin/program", lable: "หลักสูตร" },
-        { href: "/admin/programcode", lable: "รหัสหลักสูตร" },
+        // { href: "/admin/programcode", lable: "รหัสหลักสูตร" },
         { href: "/admin/category", lable: "หมวดหมู่วิชา" },
         { href: "/admin/group", lable: "กลุ่มวิชา" },
         { href: "/admin/subgroup", lable: "กลุ่มย่อยวิชา" },
@@ -22,6 +22,7 @@ const Page = async () => {
 
     const verify = [
         { href: "/admin/verify", lable: "แบบฟอร์มตรวจสอบจบ" },
+        { href: "/admin/verify-selection", lable: "อนุมัติจบการศึกษา" },
     ]
     return (
         <>
