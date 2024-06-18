@@ -17,20 +17,27 @@ const Page = () => {
             </header>
             <Sidebar />
             <ContentWrap>
-                <BreadCrumb />
-                <div>
+                <div className='flex flex-col justify-center items-center w-full'>
+                    <BreadCrumb />
                     {
                         track == undefined ?
-                            <Empty className='my-16' />
+                            <Empty
+                                description="ไม่พบข้อมูลแทร็ก"
+                                className='my-16' />
                             :
-                            <div className='space-y-6'>
+                            <div className='w-full space-y-6'>
                                 <TrackForm
                                     track={track} />
-                                <TeacherTrack
-                                    track={track} />
-                                <TrackSubject
-                                    track={track} />
+                                <div className='w-full flex gap-6 flex-row'>
+                                    <div className="w-[55%]">
+                                        <TrackSubject track={track} />
+                                    </div>
+                                    <div className="w-[45%]">
+                                        <TeacherTrack track={track} />
+                                    </div>
+                                </div>
                             </div>
+
                     }
                 </div>
             </ContentWrap>

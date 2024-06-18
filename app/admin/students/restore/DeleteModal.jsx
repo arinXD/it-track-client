@@ -1,28 +1,17 @@
 "use client"
-import { hostname } from '@/app/api/hostname'
-import { getToken } from '@/app/components/serverAction/TokenAction'
+import { getOptions } from '@/app/components/serverAction/TokenAction'
 import { Button, Modal, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react'
 import axios from 'axios'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
 const DeleteModal = ({ showToastMessage, callData, delIsOpen, delOnClose, stuId }) => {
     const [deleting, setDeleting] = useState(false)
 
-    async function handleDelete() {
+    const handleDelete = useCallback(async function () {
         setDeleting(true)
         try {
-            const token = await getToken()
-            const options = {
-                url: `${hostname}/api/students/${stuId}/force`,
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'authorization': `${token}`,
-                    'Content-Type': 'application/json;charset=UTF-8',
-                },
-            };
-
-            const res = await axios(options)
+            const option = await getOptions(`/api/students/${stuId}/force`, "DELETE")
+            const res = await axios(option)
             const { ok, message } = res.data
             await callData()
             await showToastMessage(ok, message)
@@ -34,7 +23,8 @@ const DeleteModal = ({ showToastMessage, callData, delIsOpen, delOnClose, stuId 
         } finally {
             setDeleting(false)
         }
-    }
+    }, [stuId])
+
     return (
         <>
             <Modal

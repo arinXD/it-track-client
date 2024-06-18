@@ -9,7 +9,7 @@ const getTracks = async () => {
         const option = await getOptions(URL, "GET")
         const response = await axios(option)
         return response.data.data
-    } catch (error) {
+    } catch (error) { 
         return []
     }
 }

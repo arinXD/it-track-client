@@ -96,19 +96,19 @@ const TrackSubject = ({ track }) => {
     }, [selectedKeys, subjects])
 
     return (
-        <div>
+        <div className="border rounded-[10px] p-4 h-full w-full">
             <InsertSubjectModal
                 isOpen={isOpen}
                 onClose={onClose}
                 track={track}
                 callBack={getSubjects}
             />
-            <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-end rounded-md mb-4'>
-                <p>รายวิชาประจำแทร็ก</p>
-                <div className="flex gap-2">
+            <div className='flex flex-row justify-between items-center rounded-md mb-4'>
+                <p className="text-sm">รายวิชาประจำแทร็ก</p>
+                <div className="flex gap-4">
                     <Button
                         size="sm"
-                        className="bg-gray-300"
+                        className='bg-[#edf8f7] text-[#46bcaa]'
                         radius="sm"
                         color="default"
                         onPress={onOpen}
@@ -121,8 +121,8 @@ const TrackSubject = ({ track }) => {
                         isDisabled={disableSelectDelete || deleting}
                         isLoading={deleting}
                         onPress={() => handleSelectDelete(selectSubjects)}
-                        color="default"
-                        className="bg-gray-300"
+                        color='danger'
+                        className='bg-red-400'
                         startContent={<DeleteIcon2 className="w-5 h-5" />}>
                         ลบ
                     </Button>
@@ -142,7 +142,21 @@ const TrackSubject = ({ track }) => {
                                         wrapper: "after:bg-blue-500 after:text-background text-background",
                                     },
                                 }}
-                                isCompact
+                                classNames={{
+                                    th: ["bg-[#F6F6F6]", "text-black", "last:text-center"],
+                                    td: [
+                                        // first
+                                        "group-data-[first=true]:first:before:rounded-none",
+                                        "group-data-[first=true]:last:before:rounded-none",
+                                        // middle
+                                        "group-data-[middle=true]:before:rounded-none",
+                                        // last
+                                        "group-data-[last=true]:first:before:rounded-none",
+                                        "group-data-[last=true]:last:before:rounded-none",
+                                        "mb-4",
+                                    ],
+                                }}
+                                isStriped
                                 removeWrapper
                                 selectionMode="multiple"
                                 selectedKeys={selectedKeys}
@@ -168,7 +182,11 @@ const TrackSubject = ({ track }) => {
                                 </TableBody>
                             </Table>
                             :
-                            <Empty className='my-4' />
+                            <Empty
+                                className='my-6'
+                                description={
+                                    <span className='text-gray-300'>ไม่มีข้อมูลวิชา</span>
+                                } />
                         }
                     </div>
             }

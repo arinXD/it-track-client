@@ -52,7 +52,7 @@ export default function Page({ params }) {
     const { isOpen: isOpenEnroll, onOpen: onOpenEnroll, onClose: onCloseEnroll } = useDisclosure();
     const { isOpen: isOpenEditEnroll, onOpen: onOpenEditEnroll, onClose: onCloseEditEnroll } = useDisclosure();
     const { isOpen: isOpenDeleteEnroll, onOpen: onOpenDeleteEnroll, onClose: onCloseDeleteEnroll } = useDisclosure();
-    
+
     const searchParams = useSearchParams()
     const editMode = searchParams.get('edit') || "0"
     const [student, setStudent] = useState({})
@@ -120,9 +120,7 @@ export default function Page({ params }) {
     }
 
     async function getStudentStatuses() {
-        const filterStatus = [10, 50, 62]
         let statuses = await fetchData("/api/statuses")
-        statuses = statuses.filter(e => filterStatus.includes(e.id))
         setStatus(statuses)
     }
 
@@ -132,12 +130,17 @@ export default function Page({ params }) {
         let sumCredit = 0
         for (const enrollment of enrollments) {
             const grade = calGrade(enrollment?.grade)
-            if (!grade || !isNumber(grade)) continue
+            if (grade == undefined || !isNumber(grade)) {
+                console.log(grade)
+                continue
+            }
             const credit = enrollment?.Subject?.credit || 0
             sumGrade += grade * credit
             sumCredit += credit
         }
-        return floorGpa(sumGrade/sumCredit)
+        console.log(sumGrade);
+        console.log(sumCredit);
+        return floorGpa(sumGrade / sumCredit)
     }
 
     async function initData() {

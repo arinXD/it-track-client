@@ -153,7 +153,7 @@ const InsertModal = ({ showToastMessage, isOpen, onClose }) => {
         }
     }, [])
 
-    function closeForm() {
+    const closeForm = useCallback(function () {
         setStudentData([])
         setSubjectData([])
         setStudent({})
@@ -161,16 +161,16 @@ const InsertModal = ({ showToastMessage, isOpen, onClose }) => {
         setSearchStudent("")
         setSearchSubject("")
         onClose()
-    }
+    }, [])
 
-    function selectStudent(student) {
+    const selectStudent = useCallback(function (student) {
         setStudent(student)
         setStudentData([])
-    }
-    function selectSubject(subject) {
+    }, [])
+    const selectSubject = useCallback(function (subject) {
         setSubject(subject)
         setSubjectData([])
-    }
+    }, [])
 
     return (
         <>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { dMyt } from '@/src/util/dateFormater'
 import { Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import { PlusIcon, CheckIcon, DeleteIcon2, SearchIcon } from "@/app/components/icons";
 import { Icon } from '@iconify/react';
 import { Loading } from '@/app/components';
 import axios from 'axios';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
+import { simpleDMYHM } from '@/src/util/simpleDateFormatter';
 
 const TrackSelectTable = ({ loading, trackSelection, handleOpen,
     handleDelete, handleStartSelect, swal, callTrackSelection, showToastMessage }) => {
@@ -202,8 +202,8 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
                                             }
                                         </TableCell>
 
-                                        <TableCell>{dMyt(e.startAt)}</TableCell>
-                                        <TableCell>{dMyt(e.expiredAt)}</TableCell>
+                                        <TableCell>{simpleDMYHM(e.startAt)}</TableCell>
+                                        <TableCell>{simpleDMYHM(e.expiredAt)}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody> :

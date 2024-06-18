@@ -1,66 +1,47 @@
-import { withAuth, NextRequestWithAuth } from "next-auth/middleware"
-import { NextResponse, NextRequest } from "next/server"
+import { withAuth } from "next-auth/middleware"
+import { NextResponse } from "next/server"
+import { getToken } from 'next-auth/jwt';
 
 const accessRoles = ["admin", "teacher"]
 
-const auth = withAuth(
-    async function middleware(req) {
-        const path = req.nextUrl.pathname
-        // console.log("Middleware token: ", req?.nextauth?.token);
-        if (path === "/" && (req.nextauth.token.role === "admin" || req.nextauth.token.role === "teacher" )) {
-            const url = req.nextUrl.clone()
-            url.pathname = '/admin'
-            return NextResponse.redirect(url)
-        }
-        if (path.startsWith("/auth") && req.nextauth.token) {
-            const url = req.nextUrl.clone()
-            url.pathname = '/'
-            return NextResponse.redirect(url)
-        }
-        if (path.startsWith("/student") &&
-            req.nextauth.token.role !== "student" &&
-            req.nextauth.token.role !== "teacher" &&
-            req.nextauth.token.role !== "admin") {
-            return NextResponse.rewrite(
-                new URL("/permission/kkumail.com", req.url)
-            )
-        }
-        if (path.startsWith("/teacher") &&
-            req.nextauth.token.role !== "teacher" &&
-            req.nextauth.token.role !== "admin") {
-            return NextResponse.rewrite(
-                new URL("/permission/Teacher-account", req.url)
-            )
-        }
-        if (path.startsWith("/dashboard") &&
-            req.nextauth.token.role !== "teacher" &&
-            req.nextauth.token.role !== "admin") {
-            return NextResponse.rewrite(
-                new URL("/permission/Admin-account", req.url)
-            )
-        }
-        if (path.startsWith("/admin") && !accessRoles.includes(req.nextauth.token.role)) {
-            return NextResponse.rewrite(
-                new URL("/permission/Admin-account", req.url)
-            )
+export default async function middleware(req, event) {
+    const path = req.nextUrl.pathname;
+    const token = await getToken({ req });
+    const userRole = token?.role;
+    const isAuthenticated = !!token;
+
+    if (isAuthenticated) {
+
+        if (req.nextUrl.pathname.startsWith('/auth/sign-in') && isAuthenticated) {
+            const callbackUrl = req.nextUrl.searchParams.get('callbackUrl') || '/';
+            return NextResponse.redirect(new URL(callbackUrl, req.url));
         }
 
-        return NextResponse.next()
-    }, {
-        callbacks: {
-            authorize: ({
-                token
-            }) => {
-                if (token) {
-                    return true
-                }
-                return false
-            }
+        if (path.startsWith("/student") && !["student", ...accessRoles].includes(userRole)) {
+            return NextResponse.rewrite(new URL("/permission/kkumail.com", req.url));
+        }
+
+        if (path.startsWith("/teacher") && !accessRoles.includes(userRole)) {
+            return NextResponse.rewrite(new URL("/permission/Teacher-account", req.url));
+        }
+
+        if (path.startsWith("/dashboard") && !accessRoles.includes(userRole)) {
+            return NextResponse.rewrite(new URL("/permission/Admin-account", req.url));
+        }
+
+        if (path.startsWith("/admin") && !accessRoles.includes(userRole)) {
+            return NextResponse.rewrite(new URL("/permission/Admin-account", req.url));
         }
     }
-)
 
-export default auth
+    const authMiddleware = withAuth({
+        pages: {
+            signIn: `/auth/sign-in`,
+        },
+    });
+
+    return authMiddleware(req, event);
+}
 
 export const config = {
     matcher: [
@@ -69,6 +50,7 @@ export const config = {
         "/teacher/:path*",
         "/tracks/:path*",
         "/admin/:path*",
-        "/dashboard"
+        "/dashboard",
+        "/((?!api|_next/static|_next/image|.*\\.png$).*)"
     ]
 }

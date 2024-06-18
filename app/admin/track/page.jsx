@@ -3,24 +3,20 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from '../action'
 import TrackTable from './TrackTable'
-import InsertTrackModal from './InsertTrackModal'
-import { useDisclosure } from '@nextui-org/react'
 
 const Page = () => {
     const [fetching, setFetching] = useState(false);
     const [tracks, setTracks] = useState([])
-    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const init = useCallback(async function () {
         try {
             setFetching(true)
-            setTimeout(async () => {
-                const tracks = await fetchData("/api/tracks/all")
-                setFetching(false)
-                setTracks(tracks)
-            }, 1500);
+            const tracks = await fetchData("/api/tracks/all")
+            setTracks(tracks)
         } catch (error) {
             setTracks([])
+        }finally{
+            setFetching(false)
         }
     }, [])
 
@@ -36,16 +32,10 @@ const Page = () => {
             <ContentWrap>
                 <BreadCrumb />
 
-                {/* insert */}
-                <InsertTrackModal
-                    isOpen={isOpen}
-                    onClose={onClose}
-                />
-
                 <TrackTable
                     fetching={fetching}
                     tracks={tracks}
-                    openInsertModal={onOpen}
+                    callBack={init}
                 />
             </ContentWrap>
         </>

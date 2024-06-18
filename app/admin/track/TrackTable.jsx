@@ -1,12 +1,16 @@
 "use client"
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { DeleteIcon2, PlusIcon, SearchIcon } from '@/app/components/icons'
-import { Button, Input, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
+import { DeleteIcon, DeleteIcon2, EditIcon2, PlusIcon, SearchIcon } from '@/app/components/icons'
+import { Button, Input, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@nextui-org/react'
 import Link from 'next/link'
 import { TbRestore } from 'react-icons/tb'
-import { inputClass } from '@/src/util/ComponentClass'
+import { inputClass, minimalTableClass } from '@/src/util/ComponentClass'
+import { getOptions } from '@/app/components/serverAction/TokenAction'
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import { Empty, message } from 'antd'
 
-const TrackTable = ({ tracks, fetching, openInsertModal }) => {
+const TrackTable = ({ tracks, fetching, callBack }) => {
 
     const INITIAL_VISIBLE_COLUMNS = useMemo(() => (
         ["track", "title_en", "title_th", "actions"]
@@ -22,11 +26,11 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
             uid: "track",
             sortable: true
         },
-        {
-            name: "ชื่อแทร็ก (EN)",
-            uid: "title_en",
-            sortable: true
-        },
+        // {
+        //     name: "ชื่อแทร็ก (EN)",
+        //     uid: "title_en",
+        //     sortable: true
+        // },
         {
             name: "ชื่อแทร็ก (TH)",
             uid: "title_th",
@@ -98,21 +102,50 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
     // Display table body
     const renderCell = useCallback((track, columnKey) => {
         const cellValue = track[columnKey] || ""
-
+        console.log(columnKey);
         switch (columnKey) {
+            case "track":
+                return (
+                    <div>
+                        <Link
+                            className='text-blue-500'
+                            href={`/admin/track/detail?track=${cellValue}`}>
+                            {cellValue}
+                        </Link>
+                    </div>
+                )
             case "actions":
                 return (
                     <div className="relative flex justify-center items-center gap-2">
                         <Link href={`/admin/track/detail?track=${track.track}`}>
-                            <Button
-                                radius='sm'
-                                size="sm"
-                                color='default'
-                                className=''
+                            <Tooltip
+                                content="แก้ไข"
                             >
-                                รายละเอียด
-                            </Button>
+                                <Button
+                                    size='sm'
+                                    color='warning'
+                                    isIconOnly
+                                    aria-label="แก้ไข"
+                                    className='p-2'
+                                >
+                                    <EditIcon2 className="w-5 h-5 text-yellow-600" />
+                                </Button>
+                            </Tooltip>
                         </Link>
+                        <Tooltip
+                            content="ลบ"
+                        >
+                            <Button
+                                onPress={() => handleDelete([track.track])}
+                                size='sm'
+                                color='danger'
+                                isIconOnly
+                                aria-label="ลบ"
+                                className='p-2 bg-red-400'
+                            >
+                                <DeleteIcon className="w-5 h-5" />
+                            </Button>
+                        </Tooltip>
                     </div>
                 );
             default:
@@ -170,42 +203,111 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
         setSelectedTracks(students)
     }, [selectedKeys])
 
-    const handleDelete = useCallback((selectedTracks) => {
-        console.log("del", selectedTracks);
-    }, [selectedTracks])
+    const swal = useCallback(Swal.mixin({
+        customClass: {
+            confirmButton: "btn bg-blue-500 border-1 border-blue-500 text-white ms-3 hover:bg-blue-600 hover:border-blue-500",
+            cancelButton: "btn border-1 text-blue-500 border-blue-500 bg-white hover:bg-gray-100 hover:border-blue-500"
+        },
+        buttonsStyling: false
+    }), [])
 
-    const topContent = useMemo(() => {
+    const handleDelete = useCallback(async (selectedTracks) => {
+        swal.fire({
+            text: `ต้องการลบข้อมูลแทร็กหรือไม่ ?`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                setDeleting(true)
+                const options = await getOptions("/api/tracks/multiple", 'DELETE', selectedTracks)
+                axios(options)
+                    .then(async result => {
+                        const { message: msg } = result.data
+                        message.success(msg)
+                        callBack()
+                        setSelectedKeys([])
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        setDeleting(false)
+                    })
+            }
+        });
+    }, [])
+
+    const bottomContent = useMemo(() => {
         return (
-            <div className="flex flex-col gap-4">
-                <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-center gap-2 rounded-md'>
-                    <h1>ข้อมูลแทร็ก</h1>
-                    <div className="flex gap-2">
+            Object.keys(tracks).length > 0 ?
+                <div className="py-2 px-2 flex justify-between items-center">
+                    <span className="w-[30%] text-small text-default-400">
+                        {selectedKeys === "all"
+                            ? "All items selected"
+                            : `${selectedKeys?.size || 0} of ${filteredItems?.length || 0} selected`}
+                    </span>
+                    <Pagination
+                        isCompact
+                        showControls
+                        showShadow
+                        color="primary"
+                        page={page}
+                        total={pages}
+                        onChange={setPage}
+                    />
+                    <div className="hidden sm:flex w-[30%] justify-end gap-2">
+                        <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
+                            Previous
+                        </Button>
+                        <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
+                            Next
+                        </Button>
+                    </div>
+                </div>
+                :
+                undefined
+        );
+    }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+
+    return (
+        <div className='border p-4 rounded-[10px] w-full'>
+            <div className="flex flex-col gap-4 mb-4">
+                <div className="flex gap-4">
+                    <Link href="/admin/track/insert-track">
                         <Button
                             radius='sm'
                             size='sm'
-                            onPress={openInsertModal}
+                            className='bg-[#edf8f7] text-[#46bcaa]'
                             startContent={<PlusIcon className="w-5 h-5" />}>
                             เพิ่มแทร็ก
                         </Button>
-                        <Link href="/admin/track/restore">
-                            <Button
-                                size="sm"
-                                radius="sm"
-                                color="default"
-                                startContent={<TbRestore className="w-4 h-4" />}>
-                                รายการที่ถูกลบ
-                            </Button>
-                        </Link>
+                    </Link>
+                    <Link href="/admin/track/restore">
                         <Button
-                            isDisabled={disableDeleteBtn || deleting}
-                            isLoading={deleting}
-                            radius='sm'
-                            size='sm'
-                            onClick={() => handleDelete(selectedTracks)}
-                            startContent={<DeleteIcon2 className="w-5 h-5" />}>
-                            ลบ
+                            size="sm"
+                            radius="sm"
+                            color="default"
+                            className='bg-[#edf0ff] text-[#4d69fa]'
+                            startContent={<TbRestore className="w-4 h-4" />}>
+                            รายการที่ถูกลบ
                         </Button>
-                    </div>
+                    </Link>
+                    <Button
+                        isDisabled={disableDeleteBtn || deleting}
+                        isLoading={deleting}
+                        radius='sm'
+                        size='sm'
+                        onClick={() => handleDelete(selectedTracks)}
+                        color='danger'
+                        className='bg-red-400'
+                        startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                        ลบ
+                    </Button>
                 </div>
                 <Input
                     isClearable
@@ -219,48 +321,6 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
                     onValueChange={onSearchChange}
                 />
             </div>
-        );
-    }, [
-        filterValue,
-        visibleColumns,
-        onRowsPerPageChange,
-        onSearchChange,
-        hasSearchFilter,
-        disableDeleteBtn,
-        selectedTracks
-    ]);
-
-    const bottomContent = useMemo(() => {
-        return (
-            <div className="py-2 px-2 flex justify-between items-center">
-                <span className="w-[30%] text-small text-default-400">
-                    {selectedKeys === "all"
-                        ? "All items selected"
-                        : `${selectedKeys.size} of ${filteredItems.length} selected`}
-                </span>
-                <Pagination
-                    isCompact
-                    showControls
-                    showShadow
-                    color="primary"
-                    page={page}
-                    total={pages}
-                    onChange={setPage}
-                />
-                <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
-                        Previous
-                    </Button>
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
-                        Next
-                    </Button>
-                </div>
-            </div>
-        );
-    }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
-
-    return (
-        <div>
             <Table
                 aria-label="Student Table"
                 checkboxesProps={{
@@ -268,23 +328,19 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
                         wrapper: "after:bg-blue-500 after:text-background text-background",
                     },
                 }}
-                classNames={{
-                    table: "min-h-[250px]",
-                }}
+                classNames={minimalTableClass}
 
                 bottomContent={bottomContent}
                 bottomContentPlacement="outside"
 
-                topContent={topContent}
-                topContentPlacement="outside"
-
-                isCompact
+                isStriped
                 removeWrapper
                 selectionMode="multiple"
                 sortDescriptor={sortDescriptor}
                 onSortChange={setSortDescriptor}
                 selectedKeys={selectedKeys}
                 onSelectionChange={setSelectedKeys}
+                onRowAction={() => { }}
             >
                 <TableHeader columns={headerColumns}>
                     {(column) => (
@@ -300,7 +356,14 @@ const TrackTable = ({ tracks, fetching, openInsertModal }) => {
                 <TableBody
                     isLoading={fetching}
                     loadingContent={<Spinner />}
-                    // emptyContent={"ไม่มีข้อมูลแทร็ก"}
+                    emptyContent={
+                        <Empty
+                            className='my-4'
+                            description={
+                                <span className='text-gray-300'>ไม่มีข้อมูลแทร็ก</span>
+                            }
+                        />
+                    }
                     items={sortedItems}>
                     {(item) => (
                         <TableRow key={item.track}>

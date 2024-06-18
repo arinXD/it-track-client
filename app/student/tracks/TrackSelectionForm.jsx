@@ -1,17 +1,15 @@
 "use client"
 import axios from 'axios'
-import { useState, useEffect, useReducer } from 'react'
+import { useState, useEffect, useReducer, useCallback } from 'react'
 import { createTrackSelection } from './action'
 import Swal from 'sweetalert2'
 import { Button, Spinner } from "@nextui-org/react";
 import { DeleteIcon } from '@/app/components/icons'
-import { dmy, dmyt } from '@/src/util/dateFormater'
 import confetti from 'canvas-confetti';
 import TMonlicaEmail from '@/app/components/TMonlicaEmail'
 import { getOptions } from '@/app/components/serverAction/TokenAction'
 import Link from 'next/link'
-import { SmileOutlined } from '@ant-design/icons';
-import { Result } from 'antd';
+import { simpleDMY, simpleDMYHM } from '@/src/util/simpleDateFormatter'
 
 const TrackSelectionForm = ({ enrollments, userData }) => {
     const initOrder = {
@@ -53,6 +51,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
     const [tracks, setTracks] = useState([])
     const [orders, dispatch] = useReducer(OrderReducer, initOrder);
     const [processing, isProcessing] = useState(false)
+    const [hasSelected, setHasSelected] = useState(false);
 
     const getEnrollmentGrade = (subjectCode) => {
         // ต้องการหา subjectCode ใน enrollments
@@ -62,12 +61,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         }
         return "ไม่มีเกรด";
     }
-    const clearForm = () => {
-        dispatch({
-            type: "CLEAR_ORDER",
 
-        });
-    }
     const handleConfetti = () => {
         confetti({
             particleCount: 200,
@@ -84,6 +78,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         const result = await createTrackSelection(formData)
         const data = result.data
         if (result.ok) {
+            setHasSelected(true)
+
             // จุดพลุฉลอง
             handleConfetti()
             const swal = Swal.mixin({
@@ -96,7 +92,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
 
             swal.fire({
                 title: "บันทึกข้อมูลการคัดเลือก",
-                text: `บันทึกข้อมูลการคัดเลือกของคุณ ณ วันที่ ${dmyt(data.updatedAt)}`,
+                text: `บันทึกข้อมูลการคัดเลือกของคุณ ณ วันที่ ${simpleDMYHM(data.updatedAt)}`,
                 icon: "success",
                 confirmButtonColor: "#3085d6",
                 confirmButtonText: "ตกลง"
@@ -130,6 +126,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
         }
         isProcessing(false)
     }
+
     const fetchData = async function () {
         try {
             let URL = `/api/tracks/selects/${userData.acadyear}`
@@ -148,6 +145,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
             const data = response.data.data;
             const trackData = trackResponse.data.data
             if (selectedData) {
+                setHasSelected(true)
                 setTrackResult(selectedData.Track)
                 for (let index = 1; index < 4; index++) {
                     const type = `SET_ORDER_${index}`
@@ -157,6 +155,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                     });
                 }
             } else {
+                setHasSelected(false)
                 dispatch({
                     type: "CLEAR_ORDER",
                 });
@@ -180,18 +179,23 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
     }
 
     useEffect(() => {
-        if (Object.keys(userData).length > 0) {
-            fetchData()
-        }
+        fetchData()
     }, [userData])
 
-    const handleChange = async (value, index) => {
+
+    const handleChange = useCallback(async (value, index) => {
         const type = `SET_ORDER_${index + 1}`;
         dispatch({
             type,
             payload: value,
         });
-    };
+    }, [])
+
+    const clearForm = useCallback(() => {
+        dispatch({
+            type: "CLEAR_ORDER",
+        });
+    }, [])
 
     useEffect(() => {
         if ([orders.order1, orders.order2, orders.order3].filter(e => e).length === 2) {
@@ -263,18 +267,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                         :
                         <>
                             {(trackSelect?.has_finished || new Date(trackSelect?.expiredAt) < new Date() || new Date(trackSelect?.startAt) > new Date()) ?
-                                trackResult ?
-                                    (
-                                        <div className='flex flex-col justify-center items-center h-[70vh]'>
-                                            <Result
-                                                icon={<SmileOutlined />}
-                                                title={`แทร็กของคุณ คือ ${trackResult?.title_en}`}
-                                                subTitle={<p className='text-lg'>{trackResult?.title_th}</p>}
-                                            />
-                                            <Link href={`/tracks/${trackResult?.track?.toLowerCase()}`} className='text-blue-500 block'>รายละเอียดแทร็ก</Link>
-                                        </div>
-                                    )
-                                    :
                                     new Date(trackSelect?.startAt) > new Date() ?
                                         <>
                                             <h4
@@ -291,18 +283,37 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                     margin: "auto"
                                                 }}
                                                 className='text-center mb-3 text-lg font-semibold text-gray-900'>
-                                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ {dmy(trackSelect.startAt)} - {dmy(trackSelect.expiredAt)} <br />
+                                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ {simpleDMY(trackSelect.startAt)} - {simpleDMY(trackSelect.expiredAt)} <br />
                                                 ประกาศผลวันที่ 23 พฤษภาคม 2567
                                             </p>
                                         </>
                                         :
-                                        (
-                                            <div>
+                                        <>
+                                            <h4
+                                                style={{
+                                                    fontSize: "clamp(16px, 5vw, 24px)",
+                                                    margin: "auto"
+                                                }}
+                                                className="md:!mt-4 max-w-screen-md block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
+                                                {trackSelect?.title}
+                                            </h4>
+                                            <p
+                                                style={{
+                                                    fontSize: "clamp(8px, 4vw, 16px)",
+                                                    margin: "auto"
+                                                }}
+                                                className='text-center mb-3 text-lg font-semibold text-gray-900'>
+                                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ {simpleDMY(trackSelect.startAt)} - {simpleDMY(trackSelect.expiredAt)} <br />
+                                                ประกาศผลวันที่ 23 พฤษภาคม 2567
+                                            </p>
+                                            <div
+                                                className='text-center my-5 text-[.85rem]'> 
                                                 การคัดเลือกความเชี่ยวชาญ หลักสูตรเทคโนโลยีสารสนเทศ&nbsp;
                                                 <strong className='underline decoration-pink-500 underline-offset-2 decoration-2'>จบลงแล้ว</strong> หากยังไม่ได้ทำการเลือก
                                                 ระบบจะทำการสุ่มให้ หากมีคำถามเพิ่มเติมติดต่อ <TMonlicaEmail />
                                             </div>
-                                        )
+                                        </>
+
                                 :
                                 <>
                                     <h4
@@ -319,7 +330,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             margin: "auto"
                                         }}
                                         className='text-center mb-3 text-lg font-semibold text-gray-900'>
-                                        ตั้งแต่วันที่ {dmy(trackSelect.startAt)} - {dmy(trackSelect.expiredAt)}
+                                        ตั้งแต่วันที่ {simpleDMY(trackSelect.startAt)} - {simpleDMY(trackSelect.expiredAt)}
                                     </p>
                                     <form
                                         onSubmit={handleSubmit}
@@ -336,19 +347,21 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                     <span> โปรดตรวจสอบรายละเอียดเกรดของแต่ละวิชา หากตรวจสอบแล้วเกรดไม่ถูกต้องสามารถติดต่อ: </span>
                                                     <span className='text-red-500 font-bold'> *</span>
                                                     <br />
-                                                    [ <Link
+                                                    [ FB: <Link
                                                         className="text-blue-500"
-                                                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${"arinchawut.k@kkumail.com"}&authuser=1`}
+                                                        href={`https://www.facebook.com/Arinchawut`}
                                                         size="sm"
+                                                        target='_blank'
                                                         isexternal="true">
-                                                        arinchawut.k@kkumail.com
+                                                        Arin Chawut
                                                     </Link> , &nbsp;
-                                                    <Link
+                                                    FB: <Link
                                                         className="text-blue-500"
-                                                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${"pubes.k@kkumail.com"}&authuser=1`}
+                                                        href={`https://www.facebook.com/kiok127523`}
                                                         size="sm"
+                                                        target='_blank'
                                                         isexternal="true">
-                                                        pubes.k@kkumail.com
+                                                        Phubes Komutiban
                                                     </Link> ]
                                                 </label>
                                             </div>
@@ -391,13 +404,8 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                             <div>
                                                 <label className="block font-bold text-black text-base">เลือกลำดับความเชี่ยวชาญ (แทร็ก) ที่ต้องการ</label>
                                                 <label className="block text-sm font-medium mb-5 mt-2 text-default-500">
-                                                    การคัดเลือกแทร็กจะเริ่มเลือกจากคนที่มีเกรดสูงที่สุดไปหาน้อยที่สุด หากแทร็กที่เลือกลำดับที่ 1 เต็ม จะได้แทร็กลำดับที่ 2 หรือลำดับที่ 3 ตามแทร็กที่ว่าง <br /> ลำดับแรกคือลำดับที่ต้องการมากที่สุด จากนั้นเลือกลำดับที่ต้องการรองจากลำดับแรก
+                                                    การคัดเลือกแทร็กจะเริ่มเลือกจากคนที่มีเกรดสูงที่สุดไปหาน้อยที่สุด หากแทร็กที่เลือกลำดับที่ 1 เต็ม จะได้แทร็กลำดับที่ 2 หรือลำดับที่ 3 ตามแทร็กที่ว่าง <br /> หากนักศึกษาไม่ดำเนินการในระยะเวลาที่กำหนด จะถือว่า <span className='italic font-bold'>สละสิทธิ์</span>  ในการเลือก และถือว่าให้ทางหลักสูตรดำเนินการแทน
                                                 </label>
-                                            </div>
-                                            <div>
-                                                {/* {JSON.stringify([orders.order1, orders.order2, orders.order3].filter(e => e))} <br /> */}
-                                                {/* {JSON.stringify([orders.order1, orders.order2, orders.order3])} */}
-                                                {/* {JSON.stringify(tracks.filter((t) => ![orders.order1, orders.order2, orders.order3].includes(t.track)))} */}
                                             </div>
                                             <div>
                                                 {tracks.map((e, index) => (
@@ -479,18 +487,22 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                 htmlFor="checkbox"
                                             >
                                                 <p className="flex items-center text-sm font-normal leading-normal text-gray-700 antialiased">
-                                                    ตรวจสอบข้อมูลเรียบร้อย (สามารถแก้ไขลำดับได้หลังจากยืนยัน จนถึงวันที่ {dmy(trackSelect.expiredAt)})
+                                                    ตรวจสอบข้อมูลเรียบร้อย (สามารถแก้ไขลำดับได้หลังจากยืนยัน จนถึงวันที่ {simpleDMY(trackSelect.expiredAt)})
                                                 </p>
                                             </label>
                                         </div>
-
                                         <Button
                                             radius='sm'
                                             className='bg-blue-500 mt-4 block w-full text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none'
                                             type="submit"
                                             disabled={!isConfirm || processing}
                                         >
-                                            {!processing ? "บันทึกข้อมูล" : "บันทึกข้อมูล..."}
+                                            {
+                                                !hasSelected ?
+                                                    !processing ? "บันทึกข้อมูล" : "บันทึกข้อมูล..."
+                                                    :
+                                                    !processing ? "แก้ไข" : "แก้ไข..."
+                                            }
                                         </Button>
                                     </form>
                                 </>

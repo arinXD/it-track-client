@@ -1,36 +1,25 @@
 "use client"
-import { hostname } from '@/app/api/hostname'
-import { getToken } from '@/app/components/serverAction/TokenAction'
+import { getOptions } from '@/app/components/serverAction/TokenAction'
 import { Button, Modal, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react'
 import axios from 'axios'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
-const DeleteSelectModal = ({ setDisableSelectDelete, setSelectedStudents, showToastMessage, getStudents, delIsOpen, delOnClose, stuIdList }) => {
+const DeleteSelectModal = ({ setSelectedKeys, setDisableSelectDelete, setSelectedStudents, showToastMessage, getStudents, delIsOpen, delOnClose, stuIdList }) => {
     const [deleting, setDeleting] = useState(false)
 
-    async function handleDelete() {
+    const handleDelete = useCallback(async function () {
         setDeleting(true)
         try {
-            const token = await getToken()
-            const options = {
-                url: `${hostname}/api/students/multiple/delete`,
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'authorization': `${token}`,
-                    'Content-Type': 'application/json;charset=UTF-8',
-                },
-                data: {
-                    students: stuIdList
-                }
-            };
-
-            const res = await axios(options)
+            const option = await getOptions("/api/students/multiple/delete", "DELETE", {
+                students: stuIdList
+            })
+            const res = await axios(option)
             const { ok, message } = res.data
             await getStudents()
             await showToastMessage(ok, message)
             setSelectedStudents([])
             setDisableSelectDelete(true)
+            setSelectedKeys([])
             delOnClose()
         } catch (error) {
             console.log(error);
@@ -39,7 +28,7 @@ const DeleteSelectModal = ({ setDisableSelectDelete, setSelectedStudents, showTo
         } finally {
             setDeleting(false)
         }
-    }
+    }, [stuIdList])
     return (
         <>
             <Modal

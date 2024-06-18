@@ -7,7 +7,7 @@ import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InsertTeacherModal from "./InsertTeacherModal";
 import EditTeacherModal from "./EditTeacherModal";
-import { message } from "antd";
+import { Empty, Image, message } from "antd";
 import Swal from "sweetalert2";
 
 const TeacherTrack = ({ track }) => {
@@ -62,30 +62,25 @@ const TeacherTrack = ({ track }) => {
 
     const bottomContent = useMemo(() => {
         return (
-            <div className="py-2 px-2 flex justify-between items-center">
-                <span className="w-[30%] text-small text-default-400">
-                    {selectedKeys === "all"
-                        ? "All items selected"
-                        : `${selectedKeys.size} of ${teachers.length} selected`}
-                </span>
-                <Pagination
-                    isCompact
-                    showControls
-                    showShadow
-                    color="primary"
-                    page={page}
-                    total={pages}
-                    onChange={setPage}
-                />
-                <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
-                        Previous
-                    </Button>
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
-                        Next
-                    </Button>
+            teachers?.length > 0 ?
+                <div className=" py-2 px-2 flex justify-between items-center">
+                    <span className="w-[30%] text-small text-default-400">
+                        {selectedKeys === "all"
+                            ? "All items selected"
+                            : `${selectedKeys.size || 0} of ${teachers.length} selected`}
+                    </span>
+                    <Pagination
+                        isCompact
+                        showControls
+                        showShadow
+                        color="primary"
+                        page={page}
+                        total={pages}
+                        onChange={setPage}
+                    />
                 </div>
-            </div>
+                :
+                undefined
         );
     }, [selectedKeys, teachers, page, pages]);
 
@@ -157,7 +152,7 @@ const TeacherTrack = ({ track }) => {
     }, [])
 
     return (
-        <div>
+        <div className="border-1 p-4 rounded-[10px] h-full w-full">
             <InsertTeacherModal
                 getTeachers={getTeachers}
                 track={track}
@@ -172,12 +167,12 @@ const TeacherTrack = ({ track }) => {
                 isOpen={isOpenEdit}
                 onClose={onCloseEdit} />
 
-            <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-end rounded-md mb-4'>
-                <p>คณาจารย์ประจำแทร็ก</p>
-                <div className="flex gap-2">
+            <div className='flex flex-row justify-between items-center rounded-md mb-4'>
+                <p className="text-sm">คณาจารย์ประจำแทร็ก</p>
+                <div className="flex gap-4">
                     <Button
                         size="sm"
-                        className="bg-gray-300"
+                        className='bg-[#edf8f7] text-[#46bcaa]'
                         radius="sm"
                         color="default"
                         onPress={() => {
@@ -191,8 +186,8 @@ const TeacherTrack = ({ track }) => {
                         size="sm"
                         isDisabled={disableSelectDelete}
                         onPress={() => handleDelete(selectedTeachers)}
-                        color="default"
-                        className="bg-gray-300"
+                        color='danger'
+                        className='bg-red-400'
                         startContent={<DeleteIcon2 className="w-5 h-5" />}>
                         ลบ
                     </Button>
@@ -221,6 +216,7 @@ const TeacherTrack = ({ track }) => {
 
                             selectedKeys={selectedKeys}
                             onSelectionChange={setSelectedKeys}
+                            onRowAction={() => { }}
                         >
                             <TableHeader>
                                 <TableColumn style={{ display: "none" }}>ID</TableColumn>
@@ -228,37 +224,47 @@ const TeacherTrack = ({ track }) => {
                                 <TableColumn className="w-1/2">ชื่ออาจารย์</TableColumn>
                                 <TableColumn align="center" className="w-1/2">Actions</TableColumn>
                             </TableHeader>
-                            <TableBody emptyContent={"ไม่มีข้อมูลอาจารย์"} items={items}>
+                            <TableBody
+                                emptyContent={
+                                    <Empty
+                                        className='my-6'
+                                        description={
+                                            <span className='text-gray-300'>ไม่มีข้อมูลคณาจารย์</span>
+                                        } />
+                                }
+                                items={items}>
                                 {(item) => (
                                     <TableRow key={item.id}>
                                         <TableCell style={{ display: "none" }}>{item.id}</TableCell>
-                                        <TableCell className="w-1/2">
+                                        <TableCell>
                                             <div className="w-full flex justify-center p-2">
-                                                <img
-                                                    width={120}
-                                                    height={120}
+                                                <Image
+                                                    width={80}
+                                                    height={80}
                                                     src={item.image}
                                                     onError={({ currentTarget }) => {
                                                         currentTarget.onerror = null
                                                         currentTarget.src = "/image/user.png";
                                                     }}
-                                                    className=""
+                                                    className="rounded-full border border-gray-200"
                                                     alt={item.teacherName} />
                                             </div>
                                         </TableCell>
-                                        <TableCell className="w-1/2">{item.teacherName}</TableCell>
-                                        <TableCell className="w-1/2">
-                                            <Tooltip content="แก้ไข">
-                                                <Button
-                                                    size="sm"
-                                                    radius="sm"
-                                                    isIconOnly
-                                                    color="default"
-                                                    onClick={() => handleEditTeacher(item.id, item.teacherName, item.image)}
-                                                    aria-label="Edit">
-                                                    <EditIcon2 className="w-5 h-5" />
-                                                </Button>
-                                            </Tooltip>
+                                        <TableCell>{item.teacherName}</TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-center items-center">
+                                                <Tooltip content="แก้ไข">
+                                                    <Button
+                                                        size="sm"
+                                                        radius="sm"
+                                                        isIconOnly
+                                                        color='warning'
+                                                        onClick={() => handleEditTeacher(item.id, item.teacherName, item.image)}
+                                                        aria-label="Edit">
+                                                        <EditIcon2 className="w-5 h-5 text-yellow-600" />
+                                                    </Button>
+                                                </Tooltip>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 )}

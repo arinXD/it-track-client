@@ -1,9 +1,12 @@
+"use client"
+import { useToggleSideBarStore } from '@/src/store'
 import Image from 'next/image'
 
 const CoverImage = ({ track }) => {
+    const toggleSideBar = useToggleSideBarStore((state) => state.toggle)
     return (
         <>
-            <section className='mt-16 md:ml-[240px] h-[350px] relative'>
+            <section className={`mt-16 h-[350px] relative ${toggleSideBar ? 'md:ml-[240px]' : 'md:ml-[77px]'}`}>
                 <Image
                     width={1000}
                     height={500}

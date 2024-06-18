@@ -13,9 +13,6 @@ const prompt = localFont({ src: '../public/fonts/Prompt-Regular.woff2' })
 export default function RootLayout({ children }) {
     return (
         <html>
-            <head>
-                <link rel="icon" href="/logo.png" sizes="any" />
-            </head>
             <body
                 className={prompt.className}
                 suppressHydrationWarning={true}

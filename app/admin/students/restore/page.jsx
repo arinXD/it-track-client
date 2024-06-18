@@ -1,19 +1,19 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, User, Pagination, Link, useDisclosure, Spinner, } from "@nextui-org/react";
-import { VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2 } from "@/app/components/icons";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, User, Pagination, Link, useDisclosure, Spinner, Chip, Tooltip, } from "@nextui-org/react";
+import { VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2, DeleteIcon, EditIcon2 } from "@/app/components/icons";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from "../../action";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { inputClass, tableClass } from "@/src/util/ComponentClass";
+import { deleteColor, inputClass, minimalTableClass, restoreColor, tableClass, thinInputClass } from "@/src/util/ComponentClass";
 import { capitalize } from "../../../../src/util/utils";
 import { TbRestore } from "react-icons/tb";
-import { getOptions, getToken } from "@/app/components/serverAction/TokenAction";
-import { hostname } from "@/app/api/hostname";
+import { getOptions } from "@/app/components/serverAction/TokenAction";
 import axios from "axios";
 import DeleteModal from "./DeleteModal";
 import DeleteSelectModal from "./DeleteSelectModal";
+import { Empty } from "antd";
 
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"];
 const columns = [{
@@ -89,11 +89,14 @@ const Page = () => {
 
     // Fetching data
     const getStudentStatuses = useCallback(async function () {
-        const filterStatus = [10, 50, 62]
-        let statuses = await fetchData("/api/statuses")
-        statuses = statuses.filter(e => filterStatus.includes(e.id))
-        setStatusOptions(statuses)
+        try {
+            const statuses = await fetchData("/api/statuses")
+            setStatusOptions(statuses)
+        } catch (err) {
+            setStatusOptions([])
+        }
     }, [])
+
     const getStudents = useCallback(async function () {
         let students = await fetchData(`/api/students/get/restores`)
         setStudents(students);
@@ -121,7 +124,7 @@ const Page = () => {
     const [filterValue, setFilterValue] = useState("");
     const [selectedKeys, setSelectedKeys] = useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = useState("all");
+    const [statusFilter, setStatusFilter] = useState(["10", "50", "62"]);
     const [rowsPerPage, setRowsPerPage] = useState(50);
     const [sortDescriptor, setSortDescriptor] = useState({
         column: "id",
@@ -215,32 +218,34 @@ const Page = () => {
             case "actions":
                 return (
                     <div className="relative flex justify-center items-center gap-2">
-                        <Dropdown aria-label={`${stu?.stu_id} actions`}>
-                            <DropdownTrigger>
-                                <Button isIconOnly size="sm" variant="light">
-                                    <VerticalDotsIcon className="text-default-300" />
-                                </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu
-                                onAction={
-                                    (key) => {
-                                        if (key == "restore") {
-                                            restoreStudent(stu?.stu_id)
-                                        }
-                                        else if (key == "delete") {
-                                            openDeleteModal(stu?.stu_id)
-                                        }
-                                    }
-                                }
+                        <Tooltip
+                            content="แก้ไข"
+                        >
+                            <Button
+                                size='sm'
+                                isIconOnly
+                                aria-label="แก้ไข"
+                                className={restoreColor.color}
+                                onClick={()=>restoreStudent(stu?.stu_id)}
                             >
-                                <DropdownItem key={"restore"}>
-                                    กู้คืน
-                                </DropdownItem>
-                                <DropdownItem key="delete" className="text-danger" color="danger">
-                                    ลบ
-                                </DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
+                                <TbRestore className="w-4 h-4" />
+                            </Button>
+                        </Tooltip>
+
+                        <Tooltip
+                            content="ลบ"
+                        >
+                            <Button
+                                onPress={() => openDeleteModal(stu?.stu_id)}     
+                                size='sm'
+                                color='danger'
+                                isIconOnly
+                                aria-label="ลบ"
+                                className={deleteColor.color}
+                            >
+                                <DeleteIcon className="w-5 h-5" />
+                            </Button>
+                        </Tooltip>
                     </div>
                 );
             default:
@@ -324,75 +329,113 @@ const Page = () => {
         delOnOpen()
     }, [])
 
+    const removeStatusFilter = useCallback((id) => {
+        setStatusFilter((prev) => {
+            const newStatusFilter = [...prev]
+            console.log(id, newStatusFilter);
+            const index = newStatusFilter.indexOf(String(id));
+            if (index > -1) {
+                newStatusFilter.splice(index, 1)
+            }
+            return newStatusFilter
+        });
+    }, [])
+
     const topContent = useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
-                <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-center gap-2 rounded-md'>
-                    <div className="flex gap-2">
-                        <Dropdown>
-                            <DropdownTrigger className="hidden sm:flex">
-                                <Button
-                                    size="sm"
-                                    className="bg-gray-300"
-                                    radius="sm"
-                                    endContent={<ChevronDownIcon className="text-small" />}
-                                    variant="flat">
-                                    สถานะภาพ
-                                </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu
-                                disallowEmptySelection
-                                aria-label="Table Columns"
-                                closeOnSelect={false}
-                                selectedKeys={statusFilter}
-                                selectionMode="multiple"
-                                onSelectionChange={setStatusFilter}
-                            >
-                                {statusOptions.map((status) => (
-                                    <DropdownItem key={status.id} className="capitalize">
-                                        {status.id} {status.description}
-                                    </DropdownItem>
-                                ))}
-                            </DropdownMenu>
-                        </Dropdown>
-                        <Dropdown>
-                            <DropdownTrigger className="hidden sm:flex">
-                                <Button
-                                    radius="sm"
-                                    size="sm"
-                                    className="bg-gray-300"
-                                    endContent={<ChevronDownIcon className="text-small" />}
-                                    variant="flat">
-                                    คอลัมน์
-                                </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu
-                                disallowEmptySelection
-                                aria-label="Table Columns"
-                                closeOnSelect={false}
-                                selectedKeys={visibleColumns}
-                                selectionMode="multiple"
-                                onSelectionChange={setVisibleColumns}
-                            >
-                                {columns.map((column) => (
-                                    <DropdownItem key={column.uid} className="capitalize">
-                                        {capitalize(column.name)}
-                                    </DropdownItem>
-                                ))}
-                            </DropdownMenu>
-                        </Dropdown>
+                {
+                    students.length > 0 &&
+                    <div className="flex flex-col text-small">
+                        <div className="flex flex-col text-small mb-2 text-default-400 gap-2">
+                            <div>
+                                <p className="mb-1">สถานะ:</p>
+                                <div className="flex gap-2 flex-wrap">
+                                    {statusFilter == "all" ?
+                                        statusOptions.map(s => (
+                                            <Chip
+                                                key={s.id}
+                                                size="sm"
+                                                radius="sm"
+                                                className="bg-gray-200 text-gray-600"
+                                                onClose={() => removeStatusFilter(s.id)}
+                                            >
+                                                {`${s.description} (${s.id})`}
+                                            </Chip>
+                                        ))
+                                        :
+                                        statusOptions
+                                            .filter(s => Array.from(statusFilter).includes(String(s.id)))
+                                            .map(s => (
+                                                <Chip
+                                                    key={s.id}
+                                                    size="sm"
+                                                    radius="sm"
+                                                    className="bg-gray-200 text-gray-600"
+                                                    onClose={() => removeStatusFilter(s.id)}
+                                                >
+                                                    {`${s.description} (${s.id})`}
+                                                </Chip>
+                                            ))
+                                    }
+                                </div>
+                            </div>
+                            <div>
+                                <p className="mb-1">คอลัมน์: </p>
+                                <div className="flex gap-2 flex-wrap">
+                                    {headerColumns.map(column => (
+                                        <Chip
+                                            key={column.name}
+                                            size="sm"
+                                            radius="sm"
+                                            className="bg-gray-200 text-gray-600"
+                                        >
+                                            {column.name}
+                                        </Chip>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
+                            <label className="flex items-center text-default-400 text-small">
+                                Rows per page
+                                <select
+                                    id="rowPerPage"
+                                    className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
+                                    onChange={onRowsPerPageChange}
+                                >
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="150">150</option>
+                                    <option value={students?.length}>ทั้งหมด</option>
+                                </select>
+                            </label>
+                        </div>
                     </div>
-                    <div className="flex gap-2">
+                }
+                <div className='flex flex-row justify-between items-center gap-4'>
+                    <Input
+                        isClearable
+                        className="w-full h-fit"
+                        placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, อีเมล, ชื่อ)"
+                        size="sm"
+                        classNames={thinInputClass}
+                        startContent={<SearchIcon />}
+                        value={filterValue}
+                        onClear={() => onClear()}
+                        onValueChange={onSearchChange}
+                    />
+                    <div className="flex gap-4">
                         <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
                             <Button
                                 radius="sm"
                                 size="sm"
-                                className="bg-gray-300"
+                                className={restoreColor.color}
                                 isLoading={restoring}
                                 isDisabled={disableSelectDelete || restoring}
                                 onPress={handleSelectRestore}
-                                color="default"
-                                startContent={<TbRestore className="w-[18px] h-[18px]" />}>
+                                startContent={<TbRestore className="w-4 h-4" />}>
                                 กู้คืนรายการที่เลือก
                             </Button>
                         </div>
@@ -402,55 +445,14 @@ const Page = () => {
                                 size="sm"
                                 isDisabled={disableSelectDelete}
                                 onPress={handleSelectDelete}
-                                color="default"
-                                className="bg-gray-300"
-                                startContent={<DeleteIcon2 width={16} height={16} />}>
+                                color="danger"
+                                className={deleteColor.color}
+                                startContent={<DeleteIcon2 className="w-5 h-5" />}>
                                 ลบรายการที่เลือก
                             </Button>
                         </div>
                     </div>
                 </div>
-                {
-                    !students?.length ? undefined :
-                        <div className="flex flex-col text-small">
-                            <div className="flex flex-col text-small mb-2 text-default-400">
-                                <div>สถานะ: {statusFilter == "all" ?
-                                    statusOptions.map(s => `${s.id} ${s.description}`).join(", ") :
-                                    statusOptions
-                                        .filter(s => Array.from(statusFilter).includes(String(s.id)))
-                                        .map(s => `${s.id} ${s.description}`).join(", ")
-                                }</div>
-                                <div>คอลัมน์: {headerColumns.map(column => column.name).join(", ")}</div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
-                                <label className="flex items-center text-default-400 text-small">
-                                    Rows per page:
-                                    <select
-                                        id="rowPerPage"
-                                        className="ms-2 border-1 rounded-md bg-transparent outline-none text-default-400 text-small"
-                                        onChange={onRowsPerPageChange}
-                                    >
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                        <option value="150">150</option>
-                                        <option value={students?.length}>ทั้งหมด</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
-                }
-                <Input
-                    isClearable
-                    className="w-full h-fit"
-                    placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, อีเมล, ชื่อ)"
-                    size="sm"
-                    classNames={inputClass}
-                    startContent={<SearchIcon />}
-                    value={filterValue}
-                    onClear={() => onClear()}
-                    onValueChange={onSearchChange}
-                />
             </div>
         );
     }, [
@@ -467,30 +469,33 @@ const Page = () => {
 
     const bottomContent = useMemo(() => {
         return (
-            <div className="py-2 px-2 flex justify-between items-center">
-                <span className="w-[30%] text-small text-default-400">
-                    {selectedKeys === "all"
-                        ? "All items selected"
-                        : `${selectedKeys.size} of ${filteredItems.length} selected`}
-                </span>
-                <Pagination
-                    isCompact
-                    showControls
-                    showShadow
-                    color="primary"
-                    page={page}
-                    total={pages}
-                    onChange={setPage}
-                />
-                <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
-                        Previous
-                    </Button>
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
-                        Next
-                    </Button>
+            Object.keys(students).length > 0 ?
+                <div className="py-2 px-2 flex justify-between items-center">
+                    <span className="w-[30%] text-small text-default-400">
+                        {selectedKeys === "all"
+                            ? "All items selected"
+                            : `${selectedKeys.size || 0} of ${filteredItems.length} selected`}
+                    </span>
+                    <Pagination
+                        isCompact
+                        showControls
+                        showShadow
+                        color="primary"
+                        page={page}
+                        total={pages}
+                        onChange={setPage}
+                    />
+                    <div className="hidden sm:flex w-[30%] justify-end gap-2">
+                        <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
+                            Previous
+                        </Button>
+                        <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
+                            Next
+                        </Button>
+                    </div>
                 </div>
-            </div>
+                :
+                undefined
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
@@ -542,48 +547,116 @@ const Page = () => {
                         </div>
                         :
                         <>
-                            <Table
-                                aria-label="Student Table"
-                                checkboxesProps={{
-                                    classNames: {
-                                        wrapper: "after:bg-blue-500 after:text-background text-background",
-                                    },
-                                }}
-                                classNames={tableClass}
-
-                                bottomContent={bottomContent}
-                                bottomContentPlacement="outside"
-
-                                topContent={topContent}
-                                topContentPlacement="outside"
-
-                                isCompact
-                                removeWrapper
-                                selectionMode="multiple"
-                                sortDescriptor={sortDescriptor}
-                                onSortChange={setSortDescriptor}
-                                selectedKeys={selectedKeys}
-                                onSelectionChange={setSelectedKeys}
-                            >
-                                <TableHeader columns={headerColumns}>
-                                    {(column) => (
-                                        <TableColumn
-                                            key={column.uid}
-                                            align={column.uid === "actions" ? "center" : "start"}
-                                            allowsSorting={column.sortable}
+                            <div className='border p-4 rounded-[10px] w-full flex flex-row justify-between items-center gap-4 mb-4'>
+                                <div className="flex gap-4">
+                                    <Dropdown>
+                                        <DropdownTrigger className="hidden sm:flex">
+                                            <Button
+                                                size="sm"
+                                                className="bg-blue-100 text-blue-500"
+                                                radius="sm"
+                                                endContent={<ChevronDownIcon className="text-small" />}
+                                                variant="flat">
+                                                สถานะภาพ
+                                            </Button>
+                                        </DropdownTrigger>
+                                        <DropdownMenu
+                                            disallowEmptySelection
+                                            aria-label="Table Columns"
+                                            closeOnSelect={false}
+                                            selectedKeys={statusFilter}
+                                            selectionMode="multiple"
+                                            onSelectionChange={setStatusFilter}
+                                            className="h-[500px] overflow-y-auto"
                                         >
-                                            {column.name}
-                                        </TableColumn>
-                                    )}
-                                </TableHeader>
-                                <TableBody emptyContent={"ไม่มีข้อมูลนักศึกษา"} items={sortedItems}>
-                                    {(item) => (
-                                        <TableRow key={item.id}>
-                                            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
+                                            {statusOptions.map((status) => (
+                                                <DropdownItem key={status.id} className="capitalize">
+                                                    {status.id} {status.description}
+                                                </DropdownItem>
+                                            ))}
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                    <Dropdown>
+                                        <DropdownTrigger className="hidden sm:flex">
+                                            <Button
+                                                radius="sm"
+                                                size="sm"
+                                                className="bg-blue-100 text-blue-500"
+                                                endContent={<ChevronDownIcon className="text-small" />}
+                                                variant="flat">
+                                                คอลัมน์
+                                            </Button>
+                                        </DropdownTrigger>
+                                        <DropdownMenu
+                                            disallowEmptySelection
+                                            aria-label="Table Columns"
+                                            closeOnSelect={false}
+                                            selectedKeys={visibleColumns}
+                                            selectionMode="multiple"
+                                            onSelectionChange={setVisibleColumns}
+                                        >
+                                            {columns.map((column) => (
+                                                <DropdownItem key={column.uid} className="capitalize">
+                                                    {capitalize(column.name)}
+                                                </DropdownItem>
+                                            ))}
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </div>
+                            </div>
+                            <div className="border p-4 rounded-[10px] w-full">
+                                <Table
+                                    aria-label="Student Table"
+                                    checkboxesProps={{
+                                        classNames: {
+                                            wrapper: "after:bg-blue-500 after:text-background text-background",
+                                        },
+                                    }}
+                                    classNames={minimalTableClass}
+
+                                    topContent={topContent}
+                                    topContentPlacement="outside"
+
+                                    bottomContent={bottomContent}
+                                    bottomContentPlacement="outside"
+
+                                    isCompact
+                                    removeWrapper
+                                    selectionMode="multiple"
+                                    sortDescriptor={sortDescriptor}
+                                    onSortChange={setSortDescriptor}
+                                    selectedKeys={selectedKeys}
+                                    onSelectionChange={setSelectedKeys}
+                                >
+                                    <TableHeader columns={headerColumns}>
+                                        {(column) => (
+                                            <TableColumn
+                                                key={column.uid}
+                                                align={column.uid === "actions" ? "center" : "start"}
+                                                allowsSorting={column.sortable}
+                                            >
+                                                {column.name}
+                                            </TableColumn>
+                                        )}
+                                    </TableHeader>
+                                    <TableBody
+                                        emptyContent={
+                                            <Empty
+                                                className='my-4'
+                                                description={
+                                                    <span className='text-gray-300'>ไม่มีข้อมูลนักศึกษาที่ถูกลบ</span>
+                                                }
+                                            />
+                                        }
+                                        items={sortedItems}>
+                                        {(item) => (
+                                            <TableRow key={item.id}>
+                                                {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </>
                     }
                 </div>

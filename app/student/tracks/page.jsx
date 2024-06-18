@@ -12,7 +12,7 @@ const Page = () => {
     const [enrollments, setEnrollment] = useState([])
     const { data: session } = useSession();
 
-    const fetchEnrollment = useCallback(async function (stu_id) {
+    const fetchStudentData = useCallback(async function (stu_id) {
         try {
             const URL = `/api/students/enrollments/${stu_id}`
             const option = await getOptions(URL, "GET")
@@ -32,25 +32,10 @@ const Page = () => {
 
     useEffect(() => {
         if (session?.user?.stu_id != undefined) {
-            fetchEnrollment(session?.user?.stu_id)
+            fetchStudentData(session?.user?.stu_id)
         }
     }, [session])
 
-    if (!session?.user?.stu_id) {
-        return (
-            <>
-                <header>
-                    <Navbar />
-                </header>
-                <Sidebar />
-                <ContentWrap>
-                    <div>
-                        ไม่สามารถเข้าถึงข้อมูลของคุณได้ กรุณาติดต่อ <TMonlicaEmail />
-                    </div>
-                </ContentWrap>
-            </>
-        )
-    }
     return (
         <>
             <header>
@@ -58,7 +43,14 @@ const Page = () => {
             </header>
             <Sidebar />
             <ContentWrap>
-                <TrackSelectionForm enrollments={enrollments} userData={userData} />
+                {
+                    !session?.user?.stu_id ?
+                        <div>
+                            ไม่สามารถเข้าถึงข้อมูลของคุณได้ กรุณาติดต่อ <TMonlicaEmail />
+                        </div>
+                        :
+                        <TrackSelectionForm enrollments={enrollments} userData={userData} />
+                }
             </ContentWrap>
         </>
 

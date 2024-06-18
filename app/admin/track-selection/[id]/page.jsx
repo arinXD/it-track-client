@@ -79,18 +79,28 @@ const Page = ({ params }) => {
     const [startAt, setStartAt] = useState("")
     const [expiredAt, setExpiredAt] = useState("")
     const [hasFinished, setHasFinished] = useState("")
-
     const [valueChange, setValueChange] = useState(false)
 
     const initTrackSelect = useCallback(async function (id) {
         try {
             const result = await fetchDataObj(`/api/tracks/selects/${id}/subjects/students`)
-            result.startAt = format(new Date(result?.startAt), 'yyyy-MM-dd HH:mm')
-            result.expiredAt = format(new Date(result?.expiredAt), 'yyyy-MM-dd HH:mm')
+            result.startAt = format(new Date(result?.startAt), 'yyyy-MM-dd\'T\'HH:mm')
+            result.expiredAt = format(new Date(result?.expiredAt), 'yyyy-MM-dd\'T\'HH:mm')
             setTrackSelect(result)
             setTrackSubj(result?.Subjects)
         } catch (err) {
             console.error("Error on init func:", err);
+        }
+    }, [])
+
+    const [nonSelectStudent, setNonSelectStudent] = useState([]);
+
+    const getStudentNonSelect = useCallback(async (id) => {
+        try {
+            const students = await fetchData(`/api/tracks/selects/${id}/non-select`)
+            setNonSelectStudent(students)
+        } catch (error) {
+            setNonSelectStudent([])
         }
     }, [])
 
@@ -107,6 +117,7 @@ const Page = ({ params }) => {
     useEffect(() => {
         setLoading(true)
         initTrackSelect(id)
+        getStudentNonSelect(id)
         getTracks()
         setLoading(false)
     }, []);
@@ -263,6 +274,7 @@ const Page = ({ params }) => {
             if (result.isConfirmed) {
                 const url = `/api/tracks/selects/${trackSelect.acadyear}`
                 const options = await getOptions(url, 'DELETE')
+                setDeleting(true)
                 axios(options)
                     .then(async result => {
                         const { ok, message } = result.data
@@ -274,6 +286,9 @@ const Page = ({ params }) => {
                     .catch(error => {
                         const message = error.response.data.message
                         showToastMessage(false, message)
+                    })
+                    .finally(() => {
+                        setDeleting(false)
                     })
             }
         });
@@ -354,21 +369,19 @@ const Page = ({ params }) => {
                     return gradeValue
                 })
                 let score = 0
-                let credit = 0
                 for (const detail of select?.SelectionDetails) {
                     const subjCode = detail?.Subject?.subject_code
                     grade[subjCode] = detail?.grade
                     const gradeValue = calGrade(detail?.grade)
                     if (isNumber(gradeValue)) {
-                        score += gradeValue * detail?.Subject?.credit
-                        credit += detail?.Subject?.credit
+                        score += gradeValue * (detail?.Subject?.credit || 3)
                     }
                 }
                 delete grade["0"]
                 delete grade["1"]
                 delete grade["2"]
                 delete grade["3"]
-                score = (score / credit || 1).toFixed(2)
+                score = floorGpa(score / 12)
                 const result = {
                     OR01: select?.track_order_1 || "-",
                     OR02: select?.track_order_2 || "-",
@@ -508,12 +521,14 @@ const Page = ({ params }) => {
         regDataFilterKey = regData.map(obj => {
             return {
                 "รหัสนักศึกษา": obj.stuid,
+                "ชื่อ - สกุล": obj.name,
                 Track: obj.Result
             };
         });
         speDataFilterKey = speData.map(obj => {
             return {
                 "รหัสนักศึกษา ": obj.stuid,
+                "ชื่อ - สกุล ": obj.name,
                 "Track ": obj.Result
             };
         });
@@ -534,11 +549,11 @@ const Page = ({ params }) => {
                 });
             }
         }
-        const header = ["ภาคปกติ", "", "", "", "โครงการปกติ"];
+        const header = ["ภาคปกติ", "", "", "", "", "โครงการพิเศษ"];
         const newHeader = Object.keys(announce[0]);
         const merges = [
-            { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // Merge cells from A1 to C1
-            { s: { r: 0, c: 4 }, e: { r: 0, c: 6 } }  // Merge cells from E1 to G1
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }, // Merge cells from A1 to D1
+            { s: { r: 0, c: 5 }, e: { r: 0, c: 8 } }  // Merge cells from F1 to I1
         ];
 
         ws = utils.aoa_to_sheet([header, newHeader])
@@ -567,13 +582,6 @@ const Page = ({ params }) => {
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
-                {/* <InsertSubjectModal
-                    callBack={initTrackSelect}
-                    showToastMessage={showToastMessage}
-                    trackId={trackSelect?.id}
-                    defaultTrackSubj={trackSubj}
-                    isOpen={isOpen}
-                    onClose={onClose} /> */}
                 {!trackSelect ?
                     <p>No data</p>
                     :
@@ -715,6 +723,18 @@ const Page = ({ params }) => {
                                                     className='bg-gray-300'>
                                                     ลบ
                                                 </Button>
+                                                <Button
+                                                    size='sm'
+                                                    radius='sm'
+                                                    color="default"
+                                                    isDisabled={deleting}
+                                                    isLoading={deleting}
+                                                    onPress={handleDelete}
+                                                    variant="solid"
+                                                    startContent={<DeleteIcon2 className="w-5 h-5" />}
+                                                    className='bg-gray-300'>
+                                                    ส่งอีเมลแจ้งเตือน
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
@@ -823,9 +843,73 @@ const Page = ({ params }) => {
                                     />
                                     {
                                         studentsSelect?.students?.length > 0 ?
-                                            <div>
-                                                <p className='text-default-900 text-small'>รายชื่อนักศึกษาที่เข้ารับการคัดเลือก</p>
-                                                <StudentTrackTable trackSubj={trackSubj} studentData={studentsSelect} title={false} track={"กำลังคัดเลือก"} />
+                                            <div className="border p-4 rounded-[10px] w-full flex flex-col mb-4">
+                                                <Tabs
+                                                    aria-label="selection options"
+                                                    selectedKey={selectedTrack}
+                                                    onSelectionChange={setSelectedTrack}
+                                                    color="primary"
+                                                    variant="underlined"
+                                                    disabledKeys={["download"]}
+                                                    classNames={{
+                                                        tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider !text-[1px]",
+                                                        cursor: "w-full",
+                                                        tab: "max-w-fit h-10",
+                                                        tabContent: "group-data-[selected=true]:text-black group-data-[selected=true]:font-bold"
+                                                    }}
+                                                >
+                                                    <Tab
+                                                        className='p-0'
+                                                        key="all"
+                                                        title={
+                                                            <div className="flex items-center space-x-2">
+                                                                <span>นักศึกษาที่เข้าคัดแทร็ก</span>
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <div>
+                                                            <p className='text-default-900 text-small my-4'>รายชื่อนักศึกษาที่เข้ารับการคัดเลือก ทั้งหมด {studentsSelect?.students?.length} คน</p>
+                                                            <StudentTrackTable trackSubj={trackSubj} studentData={studentsSelect} title={false} track={"กำลังคัดเลือก"} />
+                                                        </div>
+                                                    </Tab>
+                                                    <Tab
+                                                        className='p-0'
+                                                        key="nonSelect"
+                                                        title={
+                                                            <div className="flex items-center space-x-2">
+                                                                <span>นักศึกษาที่ไม่ได้เข้าคัดแทร็ก</span>
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <div>
+                                                            <p className='text-default-900 text-small my-4'>รายชื่อนักศึกษาที่ไม่ได้เข้ารับการคัดเลือก ทั้งหมด {nonSelectStudent?.length} คน</p>
+                                                            <p className='text-default-900 text-small mb-2'>
+                                                                โครงการปกติ {nonSelectStudent?.filter(student => student.courses_type == "โครงการปกติ")?.length} คน
+                                                                โครงการพิเศษ {nonSelectStudent?.filter(student => student.courses_type == "โครงการพิเศษ")?.length} คน
+                                                            </p>
+                                                            <div className='h-[350px] overflow-y-auto overflow-hidden'>
+                                                                <table>
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th className='border-1 px-6 border-gray-500'>รหัสนักศึกษา</th>
+                                                                            <th className='border-1 px-6 border-gray-500'>ชื่อ - สกุล</th>
+                                                                            <th className='border-1 px-6 border-gray-500'>ประเภทโครงการ</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {nonSelectStudent && nonSelectStudent.map((student, index) => (
+                                                                            <tr key={index}>
+                                                                                <td className='border-1 px-6 border-gray-500'>{student?.stu_id}</td>
+                                                                                <td className='border-1 px-6 border-gray-500'>{student?.fullname}</td>
+                                                                                <td className='border-1 px-6 border-gray-500'>{student?.courses_type}</td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </Tab>
+                                                </Tabs>
                                             </div>
                                             : (studentsBit?.students?.length == 0 &&
                                                 studentsNetwork?.students?.length == 0 &&
@@ -834,89 +918,91 @@ const Page = ({ params }) => {
                                                 :
                                                 null
                                     }
-                                    <div className="flex w-full flex-col mb-4">
-                                        {studentsBit?.students?.length == 0 &&
-                                            studentsNetwork?.students?.length == 0 &&
-                                            studentsWeb?.students?.length == 0 ? null :
-                                            <>
-                                                <Tabs
-                                                    aria-label="Options"
-                                                    selectedKey={selectedTrack}
-                                                    onSelectionChange={setSelectedTrack}
-                                                    color="primary"
-                                                    variant="light"
-                                                    disabledKeys={["download"]}
-                                                    classNames={{
-                                                        tabList: "gap-6 w-full relative rounded-none p-0 pb-2 border-b border-divider",
-                                                        cursor: "w-full",
-                                                        tab: "max-w-fit h-10 last:p-0 last:absolute last:right-0 last:!cursor-default last:!opacity-100",
-                                                        tabContent: "group-data-[selected=true]:text-white group-data-[selected=true]:font-bold"
-                                                    }}
+                                    {studentsBit?.students?.length == 0 &&
+                                        studentsNetwork?.students?.length == 0 &&
+                                        studentsWeb?.students?.length == 0 ? null :
+                                        <div className="border p-4 rounded-[10px] w-full flex flex-col mb-4">
+                                            <Tabs
+                                                aria-label="Track result options"
+                                                selectedKey={selectedTrack}
+                                                onSelectionChange={setSelectedTrack}
+                                                color="primary"
+                                                variant="underlined"
+                                                disabledKeys={["download"]}
+                                                classNames={{
+                                                    tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider !text-[1px]",
+                                                    cursor: "w-full",
+                                                    tab: "max-w-fit h-10 last:p-0 last:absolute last:right-0 last:!cursor-default last:!opacity-100",
+                                                    tabContent: "group-data-[selected=true]:text-black group-data-[selected=true]:font-bold"
+                                                }}
+                                            >
+                                                <Tab
+                                                    className='p-0'
+                                                    key="all"
+                                                    title={
+                                                        <div className="flex items-center space-x-2">
+                                                            <span>ทั้งหมด</span>
+                                                        </div>
+                                                    }
                                                 >
+                                                    {allTrack?.students?.length === 0 ? null : displayResult}
+                                                </Tab>
+                                                {studentsBit?.students?.length === 0 ? null :
                                                     <Tab
-                                                        key="all"
+                                                        className='p-0'
+                                                        key={"BIT"}
                                                         title={
                                                             <div className="flex items-center space-x-2">
-                                                                <span>ทั้งหมด</span>
+                                                                <span>BIT</span>
                                                             </div>
                                                         }
                                                     >
-                                                        {allTrack?.students?.length === 0 ? null : displayResult}
+                                                        {displayResult}
                                                     </Tab>
-                                                    {studentsBit?.students?.length === 0 ? null :
-                                                        <Tab
-                                                            key={"BIT"}
-                                                            title={
-                                                                <div className="flex items-center space-x-2">
-                                                                    <span>BIT</span>
-                                                                </div>
-                                                            }
-                                                        >
-                                                            {displayResult}
-                                                        </Tab>
-                                                    }
+                                                }
 
-                                                    {studentsNetwork?.students?.length === 0 ? null :
-                                                        <Tab
-                                                            key={"Network"}
-                                                            title={
-                                                                <div className="flex items-center space-x-2">
-                                                                    <span>Network</span>
-                                                                </div>
-                                                            }
-                                                        >
-                                                            {displayResult}
-                                                        </Tab>
-                                                    }
-
-                                                    {studentsWeb?.students?.length === 0 ? null :
-                                                        <Tab
-                                                            key={"Web and Mobile"}
-                                                            title={
-                                                                <div className="flex items-center space-x-2">
-                                                                    <span>Web and Mobile</span>
-                                                                </div>
-                                                            }
-                                                        >
-                                                            {displayResult}
-                                                        </Tab>
-                                                    }
+                                                {studentsNetwork?.students?.length === 0 ? null :
                                                     <Tab
-                                                        key="download"
+                                                        className='p-0'
+                                                        key={"Network"}
                                                         title={
-                                                            <div
-                                                                onClick={() => downloadTrack(trackSelect)}
-                                                                className='flex gap-2 bg-gray-200 px-3 py-1.5 rounded-md cursor-pointer active:scale-95'>
-                                                                <FiDownload className="w-4 h-4" />
-                                                                ดาวน์โหลด
+                                                            <div className="flex items-center space-x-2">
+                                                                <span>Network</span>
                                                             </div>
                                                         }
-                                                    />
-                                                </Tabs>
-                                            </>
-                                        }
-                                    </div>
+                                                    >
+                                                        {displayResult}
+                                                    </Tab>
+                                                }
 
+                                                {studentsWeb?.students?.length === 0 ? null :
+                                                    <Tab
+                                                        className='p-0'
+                                                        key={"Web and Mobile"}
+                                                        title={
+                                                            <div className="flex items-center space-x-2">
+                                                                <span>Web and Mobile</span>
+                                                            </div>
+                                                        }
+                                                    >
+                                                        {displayResult}
+                                                    </Tab>
+                                                }
+                                                <Tab
+                                                    key="download"
+                                                    className='hover:border-b-2 border-blue-500'
+                                                    title={
+                                                        <div
+                                                            onClick={() => downloadTrack(trackSelect)}
+                                                            className='flex gap-2 px-3 py-1.5 cursor-pointer active:scale-95'>
+                                                            <FiDownload className="w-4 h-4" />
+                                                            ดาวน์โหลด
+                                                        </div>
+                                                    }
+                                                />
+                                            </Tabs>
+                                        </div>
+                                    }
                                 </div>
                                 :
                                 <>

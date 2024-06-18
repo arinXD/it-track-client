@@ -19,17 +19,17 @@ const Page = () => {
     // ======================
     // Redirect if has session
     // ======================
-    useEffect(() => {
-        if (session) {
-            toast.custom(() => (
-                <div className='px-3 py-2 rounded-md bg-blue-400 text-white text-xs shadow-md'>
-                    Authenticate as {session.user.email}
-                </div>
-            ));
-            router.push(callbackUrl);
-            router.refresh()
-        }
-    }, [session]);
+    // useEffect(() => {
+        // if (session) {
+        //     toast.custom(() => (
+        //         <div className='px-3 py-2 rounded-md bg-blue-400 text-white text-xs shadow-md'>
+        //             Authenticate as {session.user.email}
+        //         </div>
+        //     ));
+        //     router.push(callbackUrl);
+        //     router.refresh()
+        // }
+    // }, [session]);
 
     const email = useRef(null)
     const pass = useRef(null)
@@ -63,11 +63,6 @@ const Page = () => {
     }, [])
 
     // ===========================
-    // Toast notify
-    // ===========================
-
-
-    // ===========================
     // Close modal sign up
     // ===========================
     const closeModal = useCallback(() => {
@@ -97,7 +92,7 @@ const Page = () => {
         const eValue = email.current.value
         const pValue = pass.current.value
 
-        setEmptyEmail(empty => {
+        setEmptyEmail(() => {
             if (eValue === "") {
                 return true;
             } else {
@@ -105,7 +100,7 @@ const Page = () => {
             }
         });
 
-        setEmptyPass(empty => {
+        setEmptyPass(() => {
             if (pValue === "") {
                 return true;
             } else {

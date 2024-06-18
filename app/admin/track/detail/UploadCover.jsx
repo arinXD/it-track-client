@@ -4,10 +4,11 @@ import { UploadOutlined } from '@ant-design/icons';
 import { BsFillImageFill } from "react-icons/bs";
 import { GoPaperclip } from "react-icons/go";
 import { AiOutlineDelete } from "react-icons/ai";
-import { message } from 'antd';
-import Image from 'next/image';
+import { message, Image, Tooltip } from 'antd';
 
-const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress }) => {
+const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress, containerWidth = "",
+    displayLabel = true
+}) => {
     const [uploadImageFile, setUploadImageFile] = useState({});
     const [previewImage, setPreviewImage] = useState(src)
 
@@ -38,17 +39,20 @@ const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress }) =
     }, [uploadImageFile]);
 
     return (
-        <div className='flex flex-col mb-6'>
-            <p className='text-center'>{label}</p>
-            <div className={`${previewImage ? "!border-solid border-1 !h-auto" : "border-2"} border-gray-400 mx-auto border-dashed ${width} h-[180px] mt-1 mb-3 grid grid-cols-1 place-items-center`}>
+        <div className={`flex flex-col ${containerWidth}`}>
+            {
+                displayLabel &&
+                <p className='text-center mb-1'>{label}</p>
+            }
+            <div className={`relative rounded-[10px] ${previewImage ? "border-0 !h-auto" : "border-1"} mx-auto border-solid ${width} h-[180px] grid grid-cols-1 place-items-center`}>
                 {
                     previewImage ?
                         <Image
                             src={previewImage}
-                            width={320}
+                            width={"100%"}
                             height={180}
                             alt='cover image'
-                            className={`${width} object-cover h-auto`}
+                            className={`${width} object-cover h-[180px] rounded-[10px]`}
                         />
                         :
                         <div className='flex flex-col justify-center items-center gap-1 text-[#E5E7EB]'>
@@ -56,19 +60,23 @@ const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress }) =
                             <p className='text-sm text-[#d5d9df]'>Preview {label}</p>
                         </div>
                 }
-            </div>
-            <div className='flex justify-center items-center'>
-                <label className="w-fit hover:border-blue-500 hover:text-blue-500 transition duration-75 cursor-pointer border-1 border-default-300 rounded-md px-3.5 py-1 text-default-700">
-                    <input
-                        type="file"
-                        accept='.jpg, .png, .jpeg'
-                        name="coverImg"
-                        id="coverImg"
-                        onChange={handleUpload}
-                        style={{ display: "none" }} />
-                    <UploadOutlined className='w-3.5 h-3.5' />
-                    <span className='ms-2.5 text-sm'>Click to Upload</span>
-                </label>
+                <div className='absolute flex justify-center items-center bottom-2 right-2'>
+                    <Tooltip
+                        placement="bottom"
+                        title={"Upload image"}>
+                        <label className="w-fit bg-white/80 hover:border-blue-500 hover:text-blue-500 transition duration-75 cursor-pointer border-1 border-default-300 rounded-md px-3.5 py-1 text-default-700">
+                            <input
+                                type="file"
+                                accept='.jpg, .png, .jpeg'
+                                name="coverImg"
+                                id="coverImg"
+                                onChange={handleUpload}
+                                style={{ display: "none" }} />
+                            <UploadOutlined className='w-3.5 h-3.5' />
+                            {/* <span className='ms-2.5 text-sm'>Click to Upload</span> */}
+                        </label>
+                    </Tooltip>
+                </div>
             </div>
             <div className='flex flex-col'>
                 {
