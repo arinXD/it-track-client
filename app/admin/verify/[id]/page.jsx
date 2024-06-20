@@ -143,6 +143,7 @@ const Page = ({ params }) => {
                     }
                     trackSubjects[track].push(subjects[index])
                }
+               console.log(trackSubjects);
                return (
                     <div key={subgroupIndex}>
                          <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
@@ -262,7 +263,7 @@ const Page = ({ params }) => {
                                    </div>
                                    :
                                    Object.keys(verifySelect).length > 0 ?
-                                        <div className='my-[30px]'>
+                                        <div className='my-[30px] 2xl:px-44 xl:px-20'>
                                              <div className='text-center text-xl text-black mb-5'>
                                                   <h1 className='text-3xl leading-relaxed'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br></br>หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{program.title_th}<br></br>(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
                                                   <h2 className='mt-6'>ขอยื่นแบบฟอร์มแสดงรายละเอียดการศึกษารายวิชาที่ได้เรียนมาทั้งหมด อย่างน้อย <span className='font-bold'>{verifySelect.main_at_least}</span> หน่วยกิต ต่องานทะเบียนและประมวลผลการศึกษา ดังต่อไปนี้คือ.—</h2>

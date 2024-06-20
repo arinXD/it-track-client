@@ -70,6 +70,10 @@ const Page = async () => {
                     href: "/admin/verify", lable: "แบบฟอร์มตรวจสอบจบ",
                     icon: <HiAcademicCap style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
                 },
+                {
+                    href: "/admin/verify-selection", lable: "อนุมัติจบการศึกษา",
+                    icon: <HiAcademicCap style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
             ]
         }
     ]
