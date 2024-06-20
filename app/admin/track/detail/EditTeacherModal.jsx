@@ -7,7 +7,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { GoPaperclip } from "react-icons/go";
 import { AiOutlineDelete } from "react-icons/ai";
 import axios from "axios";
-import { message } from "antd";
+import { Image, message } from "antd";
 import { getToken } from "@/app/components/serverAction/TokenAction";
 import { hostname } from "@/app/api/hostname";
 
@@ -94,23 +94,24 @@ const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName, ti
                 size={"3xl"}
                 isOpen={isOpen}
                 onClose={closeForm}
+                isDismissable={false}
             >
                 <ModalContent>
                     {(closeForm) => (
                         <form
                             onSubmit={handleSubmit}>
-                            <ModalHeader className="flex flex-col gap-1">แบบฟอร์มแก้ไขคณาจารย์ประจำแทร็ก</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">แบบฟอร์มแก้ไขข้อมูลอาจารย์</ModalHeader>
                             <ModalBody>
                                 <div className="flex gap-6">
-                                    <div className={`${previewImage ? "!border-solid border-1 !h-auto" : "border-2"} border-gray-400 border-dashed w-1/2 h-[180px] mt-1 mb-3 grid grid-cols-1 place-items-center`}>
+                                    <div className={`${previewImage ? "border-0 !h-auto" : "border-1"} border-solid w-1/2 h-[300px] mt-1 mb-3 grid grid-cols-1 place-items-center`}>
                                         {
                                             previewImage ?
-                                                <img
+                                                <Image
                                                     src={previewImage || "/image/user.png"}
-                                                    width={320}
-                                                    height={180}
+                                                    width={350}
+                                                    height={350}
                                                     alt='cover image'
-                                                    className={`w-full object-contain h-auto`}
+                                                    className={`w-full object-contain h-auto rounded-[10px]`}
                                                 />
                                                 :
                                                 <div className='flex flex-col justify-center items-center gap-1 text-[#E5E7EB]'>

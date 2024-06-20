@@ -103,7 +103,7 @@ const TrackSubject = ({ track }) => {
                 track={track}
                 callBack={getSubjects}
             />
-            <div className='flex flex-row justify-between items-center rounded-md mb-4'>
+            <div className='flex flex-row flex-wrap justify-between items-center rounded-md mb-4 gap-2'>
                 <p className="text-sm">รายวิชาประจำแทร็ก</p>
                 <div className="flex gap-4">
                     <Button
@@ -113,7 +113,7 @@ const TrackSubject = ({ track }) => {
                         color="default"
                         onPress={onOpen}
                         startContent={<PlusIcon className="w-5 h-5" />}>
-                        เพิ่มวิชา
+                        เพิ่ม
                     </Button>
                     <Button
                         radius="sm"
@@ -133,7 +133,7 @@ const TrackSubject = ({ track }) => {
                     <div className='w-full flex justify-center my-6'>
                         <Spinner label="กำลังโหลด..." color="primary" />
                     </div> :
-                    <div>
+                    <div className="overflow-x-auto">
                         {subjects && Object.keys(subjects).length > 0 ?
                             <Table
                                 aria-label="track subject table"
@@ -143,6 +143,7 @@ const TrackSubject = ({ track }) => {
                                     },
                                 }}
                                 classNames={{
+                                    table: [""],
                                     th: ["bg-[#F6F6F6]", "text-black", "last:text-center"],
                                     td: [
                                         // first

@@ -64,6 +64,10 @@ const Track = ({ tracks }) => {
                                             isFooterBlurred
                                             className="group relative w-full h-[400px] max-xl:h-[250px]">
                                             <Image
+                                                style={{
+                                                    imageRendering: ""
+                                                }}
+                                                loading='lazy'
                                                 radius='none'
                                                 removeWrapper
                                                 width={1000}
