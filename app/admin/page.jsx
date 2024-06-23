@@ -6,6 +6,7 @@ import { BiSolidCategory, BiSolidBook } from "react-icons/bi";
 import { BsFillPersonFill } from "react-icons/bs";
 import { HiAcademicCap, HiUserGroup } from 'react-icons/hi2';
 import { AiFillEdit } from 'react-icons/ai';
+import { IoMdCheckboxOutline } from "react-icons/io";
 
 const Page = async () => {
     const masker = {
@@ -47,7 +48,7 @@ const Page = async () => {
             ]
         },
         {
-            title: "แทรค",
+            title: "แทร็ก",
             links: [
                 {
                     href: "/admin/track", lable: "ข้อมูลแทรค",
@@ -60,6 +61,15 @@ const Page = async () => {
                 {
                     href: "/admin/trackstudent", lable: "รายชื่อนักศึกษาภายในแทรค",
                     icon: <BsFillPersonFill style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                },
+            ]
+        },
+        {
+            title: "แนะนำแทร็ก",
+            links: [
+                {
+                    href: "/admin/track", lable: "ข้อมูลแทรค",
+                    icon: <IoMdCheckboxOutline  style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
                 },
             ]
         },
