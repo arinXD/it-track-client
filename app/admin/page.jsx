@@ -68,7 +68,7 @@ const Page = async () => {
             title: "แนะนำแทร็ก",
             links: [
                 {
-                    href: "/admin/track", lable: "ข้อมูลแทรค",
+                    href: "/admin/suggest-form", lable: "แบบฟอร์มแนะนำแทร็ก",
                     icon: <IoMdCheckboxOutline  style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
                 },
             ]

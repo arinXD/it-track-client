@@ -12,7 +12,7 @@ import CareerTable from './CareerTable';
 
 const Page = () => {
     const queryTrack = useSearchParams().get('track')
-    const [track, setTrack] = useState();
+    const [track, setTrack] = useState("");
     const getTrack = useCallback(async () => {
         const option = await getOptions(`/api/tracks/${queryTrack}/get-track`)
         const res = await axios(option)

@@ -12,8 +12,9 @@ export const decodeToken = async (data) => {
 
 export async function signToken(data) {
     const token = jwt.sign({ data }, process.env.TOKEN_KEY, {
-        expiresIn: '1m', algorithm: "HS256"
+        expiresIn: '1d', algorithm: "HS256"
     });
+    console.log(token);
     return token
 }
 
