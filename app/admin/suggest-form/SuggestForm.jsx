@@ -11,7 +11,11 @@ const SuggestForm = ({ formId }) => {
      const [desc, setDesc] = useState("");
      const [fetching, setFetching] = useState(false);
 
-     const getForm = useCallback(async () => {
+     const getForm = useCallback(async (formId) => {
+          if (!formId) {
+               setFetching(false)
+               return
+          }
           const option = await getOptions(`/api/suggestion-forms/get-form/${formId}`, "get")
           try {
                setFetching(true)
@@ -23,10 +27,10 @@ const SuggestForm = ({ formId }) => {
           } finally {
                setFetching(false)
           }
-     }, [formId])
+     }, [])
 
      useEffect(() => {
-          getForm()
+          getForm(formId)
      }, [formId])
 
      return (
@@ -58,7 +62,7 @@ const SuggestForm = ({ formId }) => {
                               onValueChange={setDesc}
                               classNames={inputClass}
                               className='mb-4'
-                              required
+                              isRequired
                          />
                     </div>
                )}

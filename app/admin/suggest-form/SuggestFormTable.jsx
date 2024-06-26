@@ -295,7 +295,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
           <div className='border p-4 rounded-[10px] w-full'>
                <div className="flex flex-col gap-4 mb-4">
                     <div className="flex gap-4">
-                         <Link href="/admin/track/insert-track">
+                         <Link href="/admin/suggest-form/create">
                               <Button
                                    radius='sm'
                                    size='sm'

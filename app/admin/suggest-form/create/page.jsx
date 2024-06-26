@@ -1,10 +1,9 @@
 "use client"
-import { useSearchParams } from "next/navigation";
 import { BreadCrumb, ContentWrap, Navbar, Sidebar } from '@/app/components'
 import ManageForm from "../ManageForm";
 
 const Page = () => {
-     const formId = useSearchParams().get('id')
+     const formId = null
      return (
           <>
                <header>
