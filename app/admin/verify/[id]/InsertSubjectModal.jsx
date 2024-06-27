@@ -15,7 +15,7 @@ import { IoIosCloseCircle } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
 import { Checkbox } from "@nextui-org/checkbox";
 
-export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, verify_id }) {
+export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, verify_id, category_page }) {
     const [subjects, setSubjects] = useState([]);
     const [categories, setCategories] = useState([]);
     const [groups, setGroups] = useState([]);
@@ -30,6 +30,8 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
     const [filterSubj, setFilterSubj] = useState([]);
 
     const [isSelected, setIsSelected] = useState(false);
+
+    const [defaultCategories, setDefaultCategories] = useState([]);
 
     const showToastMessage = useCallback((ok, message) => {
         toast[ok ? 'success' : 'warning'](message, {
@@ -54,22 +56,18 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                     label: category.category_title,
                 }));
 
+                // console.log(categoriesOptions);
                 setCategories(categoriesOptions);
+                setDefaultCategories(categoriesOptions);
+
             } catch (error) {
                 console.error('Error fetching categories:', error);
             }
         };
+
         const fetchSubjects = async () => {
             try {
-                // const result = await fetchDataObj(`/api/subjects`);
-
-                // const subjectsOptions = result.map(subject => ({
-                //     value: subject.subject_id,
-                //     label: subject.subject_code + " " + subject.title_th,
-                // }));
-
-                // setSubjects(subjectsOptions);
-                const url = `/api/subjects`
+                const url = `/api/subjects/`
                 const option = await getOptions(url, "GET")
                 try {
                     const res = await axios(option)
@@ -80,12 +78,13 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                     return
                 }
             } catch (error) {
-                console.error('Error fetching categories:', error);
+                console.error('Error fetching subjects:', error);
             }
         };
         fetchSubjects();
         fetchCategories();
     }, []);
+
 
     useEffect(() => setFilterSubj(subjects), [subjects])
 
@@ -127,8 +126,6 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
         })
     }, [])
 
-    // useEffect(() => setDisabledInsertBtn(verifySubj.length == 0), [verifySubj])
-
     const delSubj = useCallback(function (subject_code) {
         const data = verifySubj.filter(element => element.subject_code !== subject_code)
         setVerifySubj(data)
@@ -147,7 +144,6 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                 Group: group
             }));
             setGroups(groupsOptions);
-            console.log(groupsOptions);
         } catch (error) {
             console.error('Error fetching groups:', error);
         }
@@ -164,7 +160,6 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                 label: subgroup.sub_group_title,
             }));
             setSubgroups(subgroupsOptions);
-            console.log(subgroupsOptions);
         } catch (error) {
             console.error('Error fetching subgroups:', error);
         }
@@ -184,19 +179,36 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
         }
     }, [isOpen]);
 
+    useEffect(() => {
+        if (isSelected || !isSelected) {
+            setSelectedCategory(null);
+            setSelectedGroup(null);
+            setSelectedSubgroup(null);
+            setVerifySubj([]);
+        }
+    }, [isSelected]);
+
+    useEffect(() => {
+        if (isSelected) {
+            const page = category_page?.map(page => page.id)
+            const category = categories?.map(category => category.value)
+            const filter = category.filter(cat => !page.includes(cat))
+            setCategories(prev =>{
+                return prev.filter(cat => filter.includes(cat.value))
+            })
+        }else{
+            setCategories(defaultCategories);
+        }
+    }, [isSelected]);
+
     const handleSubmit = useCallback(async function (verifySubj) {
         try {
 
             const subData = verifySubj.map(subject => subject.subject_id)
 
-            if (!isSelected) {
-                if (subData.length === 0) {
-                    showToastMessage(false, 'โปรดเลือกวิชา');
-                    return;
-                }
-    
-                if (!selectedGroup) {
-                    showToastMessage(false, 'โปรดเลือกกลุ่มวิชา');
+            if (isSelected) {
+                if (!selectedCategory) {
+                    showToastMessage(false, 'โปรดเลือกหมวดหมู่วิชา');
                     return;
                 }
             } else {
@@ -204,32 +216,56 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                     showToastMessage(false, 'โปรดเลือกหมวดหมู่วิชา');
                     return;
                 }
+
+                if (subData.length === 0) {
+                    showToastMessage(false, 'โปรดเลือกวิชา');
+                    return;
+                }
+
+                if (!selectedGroup) {
+                    showToastMessage(false, 'โปรดเลือกกลุ่มวิชา');
+                    return;
+                }
             }
 
             let formData;
-            if (selectedSubgroup) {
-                formData = {
-                    verify_id: verify_id,
-                    subjects: subData,
-                    sub_group_id: selectedSubgroup.value
-                };
-            } else {
-                formData = {
-                    verify_id: verify_id,
-                    subjects: subData,
-                    group_id: selectedGroup.value
-                };
-            }
-
             let url = "/api/verify/group";
 
-            if (selectedSubgroup) {
-                url = "/api/verify/subgroup";
-                formData.verify_id = verify_id;
-                formData.sub_group_id = selectedSubgroup.value;
+            if (isSelected) {
+                formData = {
+                    verify_id: verify_id,
+                    category_id: selectedCategory.value
+                };
             } else {
+                if (selectedSubgroup) {
+                    formData = {
+                        verify_id: verify_id,
+                        subjects: subData,
+                        sub_group_id: selectedSubgroup.value
+                    };
+                } else {
+                    formData = {
+                        verify_id: verify_id,
+                        subjects: subData,
+                        group_id: selectedGroup.value
+                    };
+                }
+            }
+
+
+            if (isSelected) {
+                url = "/api/verify/category";
                 formData.verify_id = verify_id;
-                formData.group_id = selectedGroup.value;
+                formData.category_id = selectedCategory.value;
+            } else {
+                if (selectedSubgroup) {
+                    url = "/api/verify/subgroup";
+                    formData.verify_id = verify_id;
+                    formData.sub_group_id = selectedSubgroup.value;
+                } else {
+                    formData.verify_id = verify_id;
+                    formData.group_id = selectedGroup.value;
+                }
             }
 
             const options = await getOptions(url, "POST", formData);
@@ -244,7 +280,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
             const message = error?.response?.data?.message;
             showToastMessage(false, message);
         }
-    }, [selectedGroup, selectedSubgroup]);
+    }, [selectedGroup, selectedSubgroup, selectedCategory, isSelected]);
 
     return (
         <Modal
@@ -282,7 +318,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                                         isClearable
                                     />
                                 </div>
-                                {selectedCategory && (
+                                {selectedCategory && groups.length > 0 && !isSelected && (
                                     <>
                                         <div className='col-span-4'>
                                             <label htmlFor="group">กลุ่มวิชา</label>
@@ -296,7 +332,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                                                 isClearable
                                             />
                                         </div>
-                                        {selectedGroup && (
+                                        {selectedGroup && subgroups.length > 0 && (
                                             <div className='col-span-4'>
                                                 <label htmlFor="subgroup">กลุ่มรองวิชา</label>
                                                 <Select
@@ -316,7 +352,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                                     <Switch isSelected={isSelected} onValueChange={setIsSelected}>
                                         ให้นักศึกษาเพิ่มวิชา
                                     </Switch>
-                                    <p className="text-small text-default-500">Selected: {isSelected ? "true" : "false"}</p>
+                                    {/* <p className="text-small text-default-500">Selected: {isSelected ? "true" : "false"}</p> */}
                                 </div>
                             </div>
                             {!isSelected && (

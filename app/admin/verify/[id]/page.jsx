@@ -19,10 +19,10 @@ import { FiDownload } from "react-icons/fi";
 import { calGrade, floorGpa, isNumber } from '@/src/util/grade';
 import { utils, writeFile } from "xlsx";
 import { tableClass } from '@/src/util/ComponentClass'
-import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useKbd, Spinner } from '@nextui-org/react'
+import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useKbd, Spinner, Tooltip } from '@nextui-org/react'
 import { Loading } from '@/app/components';
 import InsertSubjectModal from './InsertSubjectModal';
-
+import { Empty, message } from 'antd';
 
 const Page = ({ params }) => {
      const [loading, setLoading] = useState(true)
@@ -39,36 +39,49 @@ const Page = ({ params }) => {
      const [creditgroup, setCreditGroup] = useState(0)
      const [creditsubgroup, setCreditSubgroup] = useState(0)
 
+     const [category, setCategories] = useState([])
+     const [categoryverify, setCategoryVerifies] = useState([])
+
+     const [highestIndex, setHighestIndex] = useState(0);
+
+     const showToastMessage = useCallback((ok, message) => {
+          toast[ok ? 'success' : 'warning'](message, {
+               position: toast.POSITION.TOP_RIGHT,
+               position: "top-right",
+               autoClose: 3000,
+               hideProgressBar: false,
+               closeOnClick: true,
+               pauseOnHover: true,
+               draggable: true,
+               progress: undefined,
+          });
+     }, []);
+
      const initVerify = useCallback(async function (id) {
           try {
                const result = await fetchDataObj(`/api/verify/${id}`)
+               // console.log(result);
                setVerifySelect(result)
                setId(result.id)
-               // console.log(result);
-               // console.log(result);
                setProgram(result?.Program)
-               // const subjects = result.SubjectVerifies.map(subjectVerify => subjectVerify.Subject);
-               // setSubjects(subjects);
+
+               const categoryverifies = result.CategoryVerifies?.map(categoryVerify => categoryVerify.Categorie);
+               setCategoryVerifies(categoryverifies);
 
                const subgroupData = result.SubjectVerifies.map(subjectVerify => {
                     const subject = subjectVerify.Subject;
-                    const subgroups = subject.SubgroupSubjects.map(subgroupSubject => subgroupSubject.SubGroup);
+                    const subgroups = subject.SubgroupSubjects?.map(subgroupSubject => subgroupSubject.SubGroup);
                     return { subject, subgroups };
                });
                setSubgroupData(subgroupData);
 
                const groupData = result.SubjectVerifies.map(subjectVerify => {
                     const subject = subjectVerify.Subject;
-                    const groups = subject.GroupSubjects.map(groupSubject => groupSubject.Group);
+                    const groups = subject.GroupSubjects?.map(groupSubject => groupSubject.Group);
                     return { subject, groups };
                });
                setGroupData(groupData);
 
-               // console.log("Subgroup");
-               // console.table(subgroupData);
-
-               // console.log("Group");
-               // console.table(groupData);
           } catch (err) {
                console.error("Error on init func:", err);
           }
@@ -76,36 +89,53 @@ const Page = ({ params }) => {
 
      const { id } = params
 
-     const groupedSubjectsByCategory = {};
+     const number1 = 1;
+     const number2 = 2;
 
-     subgroupData.forEach(({ subject, subgroups }) => {
-          subgroups.forEach(subgroup => {
-               const category = subgroup?.Group?.Categorie;
-               if (!groupedSubjectsByCategory[category.id]) {
-                    groupedSubjectsByCategory[category.id] = { category, groups: {}, subgroups: {} };
-               }
-               if (!groupedSubjectsByCategory[category.id].subgroups[subgroup.id]) {
-                    groupedSubjectsByCategory[category.id].subgroups[subgroup.id] = subgroup;
-                    groupedSubjectsByCategory[category.id].subgroups[subgroup.id].subjects = [];
-               }
-               groupedSubjectsByCategory[category.id].subgroups[subgroup.id].subjects.push(subject);
+     const groupedSubjectsByCategory = useMemo(() => {
+          const groupedSubjects = {};
+
+          subgroupData.forEach(({ subject, subgroups }) => {
+               subgroups.forEach(subgroup => {
+                    const category = subgroup?.Group?.Categorie;
+                    if (category) {
+                         if (!groupedSubjects[category.id]) {
+                              groupedSubjects[category.id] = { category, groups: {}, subgroups: {} };
+                         }
+                         if (!groupedSubjects[category.id].subgroups[subgroup.id]) {
+                              groupedSubjects[category.id].subgroups[subgroup.id] = { ...subgroup, subjects: [] };
+                         }
+                         groupedSubjects[category.id].subgroups[subgroup.id].subjects.push(subject);
+                    }
+               });
           });
-     });
 
-     groupData.forEach(({ subject, groups }) => {
-          groups.forEach(group => {
-               const category = group?.Categorie;
-               if (!groupedSubjectsByCategory[category.id]) {
-                    groupedSubjectsByCategory[category.id] = { category, groups: {}, subgroups: {} };
-               }
-               if (!groupedSubjectsByCategory[category.id].groups[group.id]) {
-                    groupedSubjectsByCategory[category.id].groups[group.id] = group;
-                    groupedSubjectsByCategory[category.id].groups[group.id].subjects = [];
-               }
-               groupedSubjectsByCategory[category.id].groups[group.id].subjects.push(subject);
+          groupData.forEach(({ subject, groups }) => {
+               groups.forEach(group => {
+                    const category = group?.Categorie;
+                    if (category) {
+                         if (!groupedSubjects[category.id]) {
+                              groupedSubjects[category.id] = { category, groups: {}, subgroups: {} };
+                         }
+                         if (!groupedSubjects[category.id].groups[group.id]) {
+                              groupedSubjects[category.id].groups[group.id] = { ...group, subjects: [] };
+                         }
+                         groupedSubjects[category.id].groups[group.id].subjects.push(subject);
+                    }
+               });
           });
-     });
 
+          return groupedSubjects;
+     }, [subgroupData, groupData]);
+
+     useEffect(() => {
+          const categoryData = Object.keys(groupedSubjectsByCategory).map(categoryId => {
+               const category = groupedSubjectsByCategory[categoryId].category;
+               return { id: category.id, category_title: category.category_title };
+          });
+
+          setCategories(categoryData);
+     }, [groupedSubjectsByCategory]);
 
      useEffect(() => {
           setLoading(false)
@@ -132,6 +162,61 @@ const Page = ({ params }) => {
           }
      };
 
+     ///////////////////////////////////////////////////////////
+
+     const handleDeleteGroupSubject = async (gs) => {
+          // console.log(`Deleting GroupSubject with id: ${gs}`);
+
+          const url = `/api/verify/group/${gs}`
+          const options = await getOptions(url, 'DELETE')
+          axios(options)
+               .then(async result => {
+                    const { ok, message } = result.data
+                    showToastMessage(ok, message)
+                    initVerify(id);
+               })
+               .catch(error => {
+                    showToastMessage(false, error)
+               })
+
+     };
+
+     const handleDeleteSubGroupSubjectAndTrack = async (sgt) => {
+          // console.log(`Deleting SubGroupSubjectAndTrack with id: ${sgt}`);
+
+          const url = `/api/verify/subgroup/${sgt}`
+          const options = await getOptions(url, 'DELETE')
+          axios(options)
+               .then(async result => {
+                    const { ok, message } = result.data
+                    showToastMessage(ok, message)
+                    initVerify(id);
+               })
+               .catch(error => {
+                    showToastMessage(false, error)
+               })
+
+     };
+
+     const handleDeleteCategory = async (cat) => {
+          // console.log(`Deleting handleDeleteCategory with id: ${cat}`);
+
+          const url = `/api/verify/category/${cat}`
+          const options = await getOptions(url, 'DELETE')
+          axios(options)
+               .then(async result => {
+                    const { ok, message } = result.data
+                    showToastMessage(ok, message)
+                    initVerify(id);
+               })
+               .catch(error => {
+                    showToastMessage(false, error)
+               })
+
+     };
+
+     ///////////////////////////////////////////////////////////
+
      const getSubTrack = useCallback((subgroup, subgroupIndex) => {
           if (subgroup?.subjects.every(subject => subject?.Track)) {
                const subjects = subgroup?.subjects
@@ -143,7 +228,9 @@ const Page = ({ params }) => {
                     }
                     trackSubjects[track].push(subjects[index])
                }
-               console.log(trackSubjects);
+               ////// Subgroup มีแทรค
+               // console.log(subgroup);
+               // console.log(trackSubjects);
                return (
                     <div key={subgroupIndex}>
                          <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
@@ -152,7 +239,7 @@ const Page = ({ params }) => {
                          {trackSubjects && Object.keys(trackSubjects).map((track, trackIndex) => (
                               <div key={trackIndex}>
                                    <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
-                                        <h3 className='text-md text-default-800 px-16'><li>กลุ่มย่อยที่ {trackIndex+1} {track}</li></h3>
+                                        <h3 className='text-md text-default-800 px-16'><li>กลุ่มย่อยที่ {trackIndex + 1} {track}</li></h3>
                                    </div>
                                    <Table
                                         classNames={tableClass}
@@ -160,18 +247,31 @@ const Page = ({ params }) => {
                                         onRowAction={() => { }}
                                         aria-label="subjects table">
                                         <TableHeader>
+                                             {/* <TableColumn>รหัสวิชา</TableColumn> */}
                                              <TableColumn>รหัสวิชา</TableColumn>
                                              <TableColumn>ชื่อวิชา EN</TableColumn>
                                              <TableColumn>ชื่อวิชา TH</TableColumn>
                                              <TableColumn>หน่วยกิต</TableColumn>
+                                             <TableColumn></TableColumn>
                                         </TableHeader>
                                         <TableBody>
                                              {trackSubjects[track].map((subject, subjectIndex) => (
                                                   <TableRow key={subjectIndex}>
+                                                       {/* <TableCell className=''>{subject.subject_id}</TableCell> */}
                                                        <TableCell className=''>{subject.subject_code}</TableCell>
                                                        <TableCell className="w-1/3">{subject.title_en}</TableCell>
                                                        <TableCell className="w-1/3">{subject.title_th}</TableCell>
                                                        <TableCell>{subject.credit}</TableCell>
+                                                       <TableCell>
+                                                            <div className='relative flex items-center gap-2'>
+                                                                 <Tooltip color="danger" content="ลบ">
+                                                                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                                                                           <DeleteIcon2 onClick={() => handleDeleteSubGroupSubjectAndTrack(subject.subject_id)} />
+                                                                           {/* {subject.subject_id} */}
+                                                                      </span>
+                                                                 </Tooltip>
+                                                            </div>
+                                                       </TableCell>
                                                   </TableRow>
                                              ))}
                                         </TableBody>
@@ -182,6 +282,7 @@ const Page = ({ params }) => {
                );
 
           } else {
+               ////// Subgroup ไม่มีแทรค
                return (
                     <div key={subgroupIndex}>
                          <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
@@ -197,6 +298,7 @@ const Page = ({ params }) => {
                                    <TableColumn>ชื่อวิชา EN</TableColumn>
                                    <TableColumn>ชื่อวิชา TH</TableColumn>
                                    <TableColumn>หน่วยกิต</TableColumn>
+                                   <TableColumn></TableColumn>
                               </TableHeader>
                               <TableBody>
                                    {subgroup.subjects && subgroup.subjects.map((subject, subjectIndex) => (
@@ -205,6 +307,17 @@ const Page = ({ params }) => {
                                              <TableCell className="w-1/3">{subject.title_en}</TableCell>
                                              <TableCell className="w-1/3">{subject.title_th}</TableCell>
                                              <TableCell>{subject.credit}</TableCell>
+
+                                             <TableCell>
+                                                  <div className='relative flex items-center gap-2'>
+                                                       <Tooltip color="danger" content="ลบ">
+                                                            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                                                                 <DeleteIcon2 onClick={() => handleDeleteSubGroupSubjectAndTrack(subject.subject_id)} />
+                                                                 {/* {subject.subject_id} */}
+                                                            </span>
+                                                       </Tooltip>
+                                                  </div>
+                                             </TableCell>
                                         </TableRow>
                                    ))}
                               </TableBody>
@@ -228,11 +341,12 @@ const Page = ({ params }) => {
                <>
                     {Object.keys(groupedSubgroups).map((groupTitle, groupIndex) => {
                          const subgroupsWithSameGroupTitle = groupedSubgroups[groupTitle];
+
                          return (
                               <div key={groupIndex}>
                                    <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
                                         <h3 className='text-lg text-default-800 px-4'><li>{groupTitle}</li></h3>
-                                        <h2 className='text-sm text-default-800'>จำนวน {creditsubgroup} หน่วยกิต</h2>
+                                        {/* <h2 className='text-sm text-default-800'>จำนวน {creditsubgroup} หน่วยกิต</h2> */}
                                    </div>
                                    {subgroupsWithSameGroupTitle.map((subgroup, subgroupIndex) => (
                                         getSubTrack(subgroup, subgroupIndex)
@@ -283,31 +397,25 @@ const Page = ({ params }) => {
                                                                  startContent={<PlusIcon className="w-5 h-5" />}>
                                                                  เพิ่มวิชาภายในแบบฟอร์ม
                                                             </Button>
-                                                            {/* <div>
-                                                            <Button
-                                                                 radius="sm"
-                                                                 className='bg-gray-300'
-                                                                 size='sm'
-                                                                 color="default"
-                                                                 startContent={<DeleteIcon2 className="w-5 h-5" />}>
-                                                                 ลบรายการที่เลือก
-                                                            </Button>
-                                                       </div> */}
                                                        </div>
                                                   </div>
                                              </div>
 
                                              {Object.keys(groupedSubjectsByCategory).map((categoryId, index) => {
+                                                  if (index > highestIndex) {
+                                                       setHighestIndex(index);
+                                                  }
                                                   const { category, groups, subgroups } = groupedSubjectsByCategory[categoryId];
                                                   return (
                                                        <div key={index} className='mb-5'>
                                                             <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
                                                                  <h2 className='text-lg text-default-800'>{index + 1}. {category?.category_title}</h2>
-                                                                 <h2 className='text-sm text-default-800'>จำนวน {creditgroup} หน่วยกิต</h2>
+                                                                 {/* <h2 className='text-sm text-default-800'>จำนวน {creditgroup} หน่วยกิต</h2> */}
                                                             </div>
                                                             {Object.keys(groups).map((groupId, groupIndex) => {
                                                                  const group = groups[groupId];
-
+                                                                 // console.log(group);
+                                                                 ///// วิชาที่อยู่ใน group
                                                                  return (
                                                                       <div key={groupIndex} >
                                                                            <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
@@ -323,6 +431,7 @@ const Page = ({ params }) => {
                                                                                      <TableColumn>ชื่อวิชา EN</TableColumn>
                                                                                      <TableColumn>ชื่อวิชา TH</TableColumn>
                                                                                      <TableColumn>หน่วยกิต</TableColumn>
+                                                                                     <TableColumn></TableColumn>
                                                                                 </TableHeader>
                                                                                 <TableBody>
                                                                                      {group.subjects && group.subjects.map((subject, subjectIndex) => (
@@ -331,6 +440,18 @@ const Page = ({ params }) => {
                                                                                                <TableCell className="w-1/3">{subject.title_en}</TableCell>
                                                                                                <TableCell className="w-1/3">{subject.title_th}</TableCell>
                                                                                                <TableCell>{subject.credit}</TableCell>
+                                                                                               {subject.GroupSubjects && subject.GroupSubjects.map((z, zIndex) => (
+                                                                                                    <TableCell key={zIndex} className="">
+                                                                                                         <div className='relative flex items-center gap-2'>
+                                                                                                              <Tooltip color="danger" content="ลบ">
+                                                                                                                   <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                                                                                                                        <DeleteIcon2 onClick={() => handleDeleteGroupSubject(z.id)} />
+                                                                                                                        {/* {z.id} */}
+                                                                                                                   </span>
+                                                                                                              </Tooltip>
+                                                                                                         </div>
+                                                                                                    </TableCell>
+                                                                                               ))}
                                                                                           </TableRow>
                                                                                      ))}
                                                                                 </TableBody>
@@ -341,10 +462,30 @@ const Page = ({ params }) => {
                                                             {
                                                                  getSubg(subgroups)
                                                             }
+
                                                        </div>
                                                   );
                                              })}
-                                             {Object.keys(groupedSubjectsByCategory).length === 0 && (
+
+                                             {categoryverify && categoryverify.map((categorie, catIndex) => (
+                                                  <div key={catIndex}>
+                                                       <div className='flex justify-between items-center bg-gray-200 border-gray-300 border-1 p-2 px-3 flex-row  mt-5 rounded-t-md text-lg text-default-800'>
+                                                            <h2 className=''>{catIndex + highestIndex + 2}. {categorie.category_title}</h2>
+                                                            <div className='relative flex items-center gap-2'>
+                                                                 <Tooltip color="danger" content="ลบ">
+                                                                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                                                                           <DeleteIcon2 onClick={() => handleDeleteCategory(categorie.id)} />
+                                                                      </span>
+                                                                 </Tooltip>
+                                                            </div>
+                                                       </div>
+                                                       <div className='flex justify-center items-center h-full w-full border-1'>
+                                                            <p className='my-5'>ให้นักศึกษาเพิ่มวิชาเอง</p>
+                                                       </div>
+                                                  </div>
+                                             ))}
+
+                                             {Object.keys(groupedSubjectsByCategory).length === 0 && categoryverify.length === 0 && (
                                                   <>
                                                        <p className='text-center mt-10'>ไม่มีวิชาภายในแบบฟอร์ม</p>
                                                   </>
@@ -363,6 +504,7 @@ const Page = ({ params }) => {
                          onClose={handleInsertModalClose}
                          onDataInserted={handleDataInserted}
                          verify_id={ids}
+                         category_page={category}
                     />
 
                </ContentWrap >

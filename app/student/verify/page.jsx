@@ -11,6 +11,10 @@ import { ToastContainer, toast } from "react-toastify";
 import { tableClass } from '@/src/util/ComponentClass'
 import { Checkbox } from "@nextui-org/checkbox";
 import { calGrade, isNumber } from '@/src/util/grade';
+import { Empty, message } from 'antd';
+import { IoIosCloseCircle } from "react-icons/io";
+import { IoSearchOutline } from "react-icons/io5";
+import InsertSubject from './InsertSubject';
 
 const Page = () => {
     const [loading, setLoading] = useState(true)
@@ -21,7 +25,15 @@ const Page = () => {
     const [program, setProgram] = useState([])
     const [subgroupData, setSubgroupData] = useState([]);
     const [groupData, setGroupData] = useState([]);
+
+    const [categoryverify, setCategoryVerifies] = useState([])
+    const [highestIndex, setHighestIndex] = useState(0);
+
+    const [subjects, setSubjects] = useState([]);
+
     const { data: session } = useSession();
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     const fetchEnrollment = useCallback(async function (stu_id) {
         try {
@@ -30,6 +42,7 @@ const Page = () => {
             const response = await axios(option)
             const data = response.data.data
             setUserData(data)
+            console.log(data);
             if (data.Enrollments.length > 0) {
                 setEnrollment(data.Enrollments)
             } else {
@@ -56,6 +69,8 @@ const Page = () => {
         return "ไม่มีเกรด";
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////
+
     const fetchData = async function () {
         try {
             let URL = `/api/verify/selects/${userData.program}/${userData.acadyear}`
@@ -65,6 +80,8 @@ const Page = () => {
             const data = response.data.data;
             setProgram(data?.Program)
             setVerifySelect(data);
+            const categoryverifies = data.CategoryVerifies.map(categoryVerify => categoryVerify.Categorie);
+            setCategoryVerifies(categoryverifies);
 
             const subgroupData = data.SubjectVerifies.map(subjectVerify => {
                 const subject = subjectVerify.Subject;
@@ -100,6 +117,30 @@ const Page = () => {
         }
     }, [userData])
 
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        const fetchSubjects = async () => {
+            try {
+                const url = `/api/subjects/student`
+                const option = await getOptions(url, "GET")
+                try {
+                    const res = await axios(option)
+                    const filterSubjects = res.data.data
+                    setSubjects(filterSubjects)
+                } catch (error) {
+                    setSubjects([])
+                    return
+                }
+            } catch (error) {
+                console.error('Error fetching subjects:', error);
+            }
+        };
+        fetchSubjects();
+    }, [])
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
     const groupedSubjectsByCategory = {};
 
     subgroupData.forEach(({ subject, subgroups }) => {
@@ -155,7 +196,7 @@ const Page = () => {
     // console.log(groupedSubjectsByCategory);
 
     const getSubTrack = (subgroup, subgroupIndex) => {
-        console.log(subgroup);
+        // console.log(subgroup);
         if (subgroup?.subjects.every(subject => subject?.Track)) {
             const subjects = subgroup?.subjects
             const trackSubjects = {}
@@ -197,7 +238,19 @@ const Page = () => {
                                             <TableCell className="w-1/3">{subject.title_th}</TableCell>
                                             <TableCell>{subject.credit}</TableCell>
                                             <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
-                                            <TableCell>{calGrade(getEnrollmentGrade(subject.subject_code)) == null ? "-" : isNumber(calGrade(getEnrollmentGrade(subject.subject_code))) ? String(calGrade(getEnrollmentGrade(subject.subject_code))) : calGrade(getEnrollmentGrade(subject.subject_code))}</TableCell>
+                                            <TableCell>
+                                                {(() => {
+                                                    const grade = calGrade(getEnrollmentGrade(subject.subject_code));
+                                                    const credit = subject.credit;
+                                                    if (grade == null) {
+                                                        return "-";
+                                                    } else if (isNumber(grade)) {
+                                                        return String(grade * credit);
+                                                    } else {
+                                                        return grade;
+                                                    }
+                                                })()}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -234,7 +287,19 @@ const Page = () => {
                                     <TableCell className="w-1/3">{subject.title_th}</TableCell>
                                     <TableCell>{subject.credit}</TableCell>
                                     <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
-                                    <TableCell>{calGrade(getEnrollmentGrade(subject.subject_code)) == null ? "-" : isNumber(calGrade(getEnrollmentGrade(subject.subject_code))) ? String(calGrade(getEnrollmentGrade(subject.subject_code))) : calGrade(getEnrollmentGrade(subject.subject_code))}</TableCell>
+                                    <TableCell>
+                                        {(() => {
+                                            const grade = calGrade(getEnrollmentGrade(subject.subject_code));
+                                            const credit = subject.credit;
+                                            if (grade == null) {
+                                                return "-";
+                                            } else if (isNumber(grade)) {
+                                                return String(grade * credit);
+                                            } else {
+                                                return grade;
+                                            }
+                                        })()}
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -246,7 +311,7 @@ const Page = () => {
     const getSubg = (subgroups) => {
         if (!subgroups) return undefined;
         if (Object.values(subgroups).length === 0) return undefined;
-        console.log(subgroups);
+        // console.log(subgroups);
         const groupedSubgroups = {};
         Object.values(subgroups).forEach((subgroup) => {
             const groupTitle = subgroup?.Group?.group_title;
@@ -326,6 +391,9 @@ const Page = () => {
                                 </div>
                                 {Object.keys(groupedSubjectsByCategory).map((categoryId, index) => {
                                     const { category, groups, subgroups } = groupedSubjectsByCategory[categoryId];
+                                    if (index > highestIndex) {
+                                        setHighestIndex(index);
+                                    }
                                     return (
                                         <div key={index} className='mb-5'>
                                             <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
@@ -361,7 +429,19 @@ const Page = () => {
                                                                         <TableCell className="w-1/3">{subject.title_th}</TableCell>
                                                                         <TableCell>{subject.credit}</TableCell>
                                                                         <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
-                                                                        <TableCell>{calGrade(getEnrollmentGrade(subject.subject_code)) == null ? "-" : isNumber(calGrade(getEnrollmentGrade(subject.subject_code))) ? String(calGrade(getEnrollmentGrade(subject.subject_code))) : calGrade(getEnrollmentGrade(subject.subject_code))}</TableCell>
+                                                                        <TableCell>
+                                                                            {(() => {
+                                                                                const grade = calGrade(getEnrollmentGrade(subject.subject_code));
+                                                                                const credit = subject.credit;
+                                                                                if (grade == null) {
+                                                                                    return "-";
+                                                                                } else if (isNumber(grade)) {
+                                                                                    return String(grade * credit);
+                                                                                } else {
+                                                                                    return grade;
+                                                                                }
+                                                                            })()}
+                                                                        </TableCell>
                                                                     </TableRow>
                                                                 ))}
                                                             </TableBody>
@@ -375,6 +455,14 @@ const Page = () => {
                                         </div>
                                     );
                                 })}
+                                {categoryverify && categoryverify.map((categorie, catIndex) => (
+                                    <InsertSubject
+                                        catIndex={catIndex}
+                                        categorie={categorie}
+                                        subjects={subjects}
+                                        highestIndex={highestIndex}
+                                    />
+                                ))}
                                 {Object.keys(groupedSubjectsByCategory).length === 0 && (
                                     <>
                                         <p className='text-center mt-10'>ไม่มีวิชาภายในแบบฟอร์ม</p>
