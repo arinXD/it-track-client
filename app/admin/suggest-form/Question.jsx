@@ -40,12 +40,14 @@ const Question = ({ formId }) => {
                setFetching(true)
                const option1 = await getOptions(`/api/questions/in-form/${formId}`, "get")
                const option2 = await getOptions(`/api/questions/not-in-form/${formId}`, "get")
-               const [res1, res2] = await Promise.all([axios(option1), axios(option2)]);
+               const option3 = await getOptions(`/api/questions`, "get")
+               const [res1, res2, res3] = await Promise.all([axios(option1), axios(option2), axios(option3)]);
                const questionsInForm = res1.data.data
                const questionsNotInForm = res2.data.data
+               const allQuestions = res3.data.data
                setQuestions(questionsInForm)
                setQuestionsBank(questionsNotInForm)
-               setDefaultQuestionBank(questionsNotInForm)
+               setDefaultQuestionBank(allQuestions)
           } catch (error) {
                setQuestions([])
                setQuestionsBank([])
@@ -114,6 +116,7 @@ const Question = ({ formId }) => {
                return prevQuestions.filter((_, index) => index !== questionIndex)
           })
           const filterQID = defaultQuestionBank.filter(q => q.id === qid)
+          console.log(qid);
           if (filterQID.length > 0) {
                setQuestionsBank(prev => {
                     return [
@@ -222,8 +225,8 @@ const Question = ({ formId }) => {
                                              onValueChange={onSearchChange}
                                         />
                                    </ModalHeader>
-                                   <ModalBody className="">
-                                        <section className="!h-[350px] overflow-y-auto flex flex-col gap-2 pe-2">
+                                   <ModalBody className="py-4">
+                                        <section className="!h-[350px] overflow-y-auto flex flex-col gap-2">
                                              {
                                                   filteredItems?.length > 0 ?
                                                        filteredItems.map((q, index) => (

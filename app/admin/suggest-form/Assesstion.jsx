@@ -7,7 +7,6 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDi
 import { Checkbox, Empty } from 'antd';
 import { PlusIcon, SearchIcon } from "@/app/components/icons";
 import { thinInputClass } from "@/src/util/ComponentClass";
-import { IoCloseOutline } from "react-icons/io5";
 import { FaRegTrashAlt } from "react-icons/fa";
 
 const Assesstion = ({ formId }) => {
@@ -23,7 +22,7 @@ const Assesstion = ({ formId }) => {
         if (!formId) {
             try {
                 setFetching(true)
-                const option = await getOptions(`/api/questions`, "get")
+                const option = await getOptions(`/api/assessments`, "get")
                 const res = await axios(option)
                 const allQuestions = res.data.data
                 setQuestionsBank(allQuestions)
@@ -38,8 +37,8 @@ const Assesstion = ({ formId }) => {
         }
         try {
             setFetching(true)
-            const option1 = await getOptions(`/api/questions/in-form/${formId}`, "get")
-            const option2 = await getOptions(`/api/questions/not-in-form/${formId}`, "get")
+            const option1 = await getOptions(`/api/assessments/in-form/${formId}`, "get")
+            const option2 = await getOptions(`/api/assessments/not-in-form/${formId}`, "get")
             const [res1, res2] = await Promise.all([axios(option1), axios(option2)]);
             const questionsInForm = res1.data.data
             const questionsNotInForm = res2.data.data
@@ -87,11 +86,6 @@ const Assesstion = ({ formId }) => {
             const newQuestion = {
                 id: newId,
                 question: `คำถามที่ ${id}`,
-                Answers: [{
-                    id: null,
-                    answer: `ตัวเลือกที่ 1`,
-                    isCorrect: false,
-                }]
             }
 
             const updatedQuestions = [...prevQuestions, newQuestion]
@@ -123,41 +117,6 @@ const Assesstion = ({ formId }) => {
             })
         }
     }, [defaultQuestionBank])
-
-    const addMoreAnswer = useCallback((qid) => {
-        setQuestions((prevQuestions) => {
-            return prevQuestions.map((q) => {
-                if (q.id === qid) {
-                    const newAnswer = {
-                        id: null,
-                        answer: `ตัวเลือกที่ ${(q.Answers.length || 0) + 1}`,
-                        isCorrect: false,
-                    }
-
-                    return {
-                        ...q,
-                        Answers: [...q.Answers, newAnswer]
-                    }
-                }
-                return q
-            })
-        })
-    }, [])
-
-    const removeAnswer = useCallback((questionId, answerIndex) => {
-        setQuestions((prevQuestions) => {
-            return prevQuestions.map((q) => {
-                if (q.id === questionId) {
-                    const newAnswers = q.Answers.filter((_, index) => index !== answerIndex)
-                    return {
-                        ...q,
-                        Answers: newAnswers
-                    }
-                }
-                return q
-            })
-        })
-    }, [])
 
     const [selectedQuestions, setSelectedQuestions] = useState([])
 
@@ -222,8 +181,8 @@ const Assesstion = ({ formId }) => {
                                     onValueChange={onSearchChange}
                                 />
                             </ModalHeader>
-                            <ModalBody className="">
-                                <section className="!h-[350px] overflow-y-auto flex flex-col gap-2 pe-2">
+                            <ModalBody className="py-4">
+                                <section className="!h-[350px] overflow-y-auto flex flex-col gap-2">
                                     {
                                         filteredItems?.length > 0 ?
                                             filteredItems.map((q, index) => (
@@ -237,16 +196,6 @@ const Assesstion = ({ formId }) => {
                                                         <p>
                                                             {q.question}
                                                         </p>
-                                                        <ol className="ms-4 text-start">
-                                                            {q?.Answers.map((ans, j) => (
-                                                                <li
-                                                                    className={`text-start ${ans.isCorrect ? "text-green-700" : ""}`}
-                                                                    key={j}>
-                                                                    <span className="inline-block me-1.5 w-[15px]">{j + 1}. </span>
-                                                                    <span>{ans.answer}</span>
-                                                                </li>
-                                                            ))}
-                                                        </ol>
                                                     </div>
                                                 </Checkbox>
                                             ))
@@ -316,54 +265,16 @@ const Assesstion = ({ formId }) => {
                                                 <div
                                                     key={index}
                                                     ref={questionRefs.current[index]}
-                                                    className="w-full bg-white border-1 p-4 flex flex-col rounded-[5px]">
-                                                    <div className="flex items-center justify-between">
+                                                    className="w-full bg-white border-1 p-4 flex flex-row rounded-[5px] justify-between items-center">
+                                                    <div className="w-[80%] flex items-center justify-between">
                                                         <input readOnly type="hidden" name="qID[]" defaultValue={q.id} />
                                                         <input
-                                                            className="text-black p-2 border-b-black border-b bg-gray-100 w-1/2 outline-none focus:border-b-blue-500 focus:border-b-2"
+                                                            className="text-black p-2 border-b-black border-b bg-gray-100 w-full outline-none focus:border-b-blue-500 focus:border-b-2"
                                                             type="text"
                                                             name="qTitle[]"
                                                             defaultValue={q.question} />
                                                     </div>
-                                                    <ul className="mt-4 flex flex-col gap-4" id={`q${q.id}`}>
-                                                        {
-                                                            q?.Answers?.map((ans, j) => (
-                                                                <li
-                                                                    key={j}
-                                                                    className="flex flex-row justify-between gap-4">
-                                                                    <div className="flex gap-4 w-full items-center">
-                                                                        <div>
-                                                                            <input className="w-6 h-6 cursor-pointer" type="radio" name={`answersQ${q.id}`} />
-                                                                        </div>
-                                                                        <input readOnly type="hidden" name="aID[]" defaultValue={ans?.id} />
-                                                                        <input
-                                                                            className="text-black w-full outline-none focus:border-b-blue-500 focus:border-b-2"
-                                                                            type="text"
-                                                                            name="answers[]"
-                                                                            defaultValue={ans.answer}
-                                                                        />
-                                                                    </div>
-                                                                    <Button
-                                                                        isIconOnly
-                                                                        variant="light"
-                                                                        radius="full"
-                                                                        color="default"
-                                                                        onClick={() => removeAnswer(q.id, j)}
-                                                                        aria-label="remove">
-                                                                        <IoCloseOutline className="w-7 h-7" />
-                                                                    </Button>
-                                                                </li>
-                                                            ))
-                                                        }
-                                                    </ul>
-                                                    <div className="flex gap-4 mt-4">
-                                                        <div className="rounded-full border-2 w-7 h-7 border-gray-300"></div>
-                                                        <p
-                                                            onClick={() => addMoreAnswer(q.id)}
-                                                            className="hover:cursor-text hover:border-b border-b-gray-300">เพิ่มตัวเลือก</p>
-                                                    </div>
-                                                    <hr className="mt-8 mb-4" />
-                                                    <div className="flex justify-end items-center gap-2">
+                                                    <div className="w-fit flex justify-end items-center gap-2">
                                                         <div className="flex gap-2">
                                                             <input
                                                                 defaultChecked={true}
