@@ -457,6 +457,7 @@ const Page = () => {
                                 })}
                                 {categoryverify && categoryverify.map((categorie, catIndex) => (
                                     <InsertSubject
+                                        key={catIndex}
                                         catIndex={catIndex}
                                         categorie={categorie}
                                         subjects={subjects}
