@@ -102,7 +102,6 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
     // Display table body
     const renderCell = useCallback((track, columnKey) => {
         const cellValue = track[columnKey] || ""
-        console.log(columnKey);
         switch (columnKey) {
             case "track":
                 return (
@@ -151,7 +150,7 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
             default:
                 return cellValue;
         }
-    }, [deleting]);
+    }, []);
 
     // Pagination handle
     const onNextPage = useCallback(() => {

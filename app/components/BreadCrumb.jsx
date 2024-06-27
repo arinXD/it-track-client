@@ -2,36 +2,36 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { HomeIcon, RightArrow } from './icons';
-import { useEffect, useMemo } from 'react';
-
-const links = {
-    "/": "หน้าหลัก",
-    "admin": "Admin Panel",
-    "acadyears": "ปีการศึกษา",
-    "program": "หลักสูตร",
-    "programcode": "รหัสหลักสูตร",
-    "category": "หมวดหมู่วิชา",
-    "group": "กลุ่มวิชา",
-    "subgroup": "กลุ่มย่อยวิชา",
-    "subject": "วิชา",
-    "track": "ข้อมูลแทร็ก",
-    "track-selection": "คัดเลือกแทร็ก",
-    "track-student": "รายชื่อนักศึกษาภายในแทร็ก",
-    "dashboard": "Dashboard",
-    "students": "รายชื่อนักศึกษา",
-    "restore": "รายการที่ถูกลบ",
-    "trackstudent": "รายชื่อนักศึกษาภายในแทร็ก",
-    "verify": "แบบฟอร์มตรวจสอบจบ",
-    "verify-selection": "อนุมัติจบการศึกษา",
-    "detail": "รายละเอียด",
-    "tracks": "แทร็ก",
-    "web%20and%20mobile": "Mobile and Web Application Development",
-    "network": "Network Systems, Information Technology Security, and Internet of Things (IoT)",
-    "bit": "Business Information Technology",
-    "insert-track": "เพิ่มแทร็ก",
-};
+import { useMemo } from 'react';
 
 const BreadCrumb = () => {
+    const links = useMemo(()=>({
+        "/": "หน้าหลัก",
+        "admin": "Admin Panel",
+        "acadyears": "ปีการศึกษา",
+        "program": "หลักสูตร",
+        "programcode": "รหัสหลักสูตร",
+        "category": "หมวดหมู่วิชา",
+        "group": "กลุ่มวิชา",
+        "subgroup": "กลุ่มย่อยวิชา",
+        "subject": "วิชา",
+        "track": "ข้อมูลแทร็ก",
+        "track-selection": "คัดเลือกแทร็ก",
+        "track-student": "รายชื่อนักศึกษาภายในแทร็ก",
+        "dashboard": "Dashboard",
+        "students": "รายชื่อนักศึกษา",
+        "restore": "รายการที่ถูกลบ",
+        "trackstudent": "รายชื่อนักศึกษาภายในแทร็ก",
+        "verify": "แบบฟอร์มตรวจสอบจบ",
+        "verify-selection": "อนุมัติจบการศึกษา",
+        "detail": "รายละเอียด",
+        "tracks": "แทร็ก",
+        "web%20and%20mobile": "Mobile and Web Application Development",
+        "network": "Network Systems, Information Technology Security, and Internet of Things (IoT)",
+        "bit": "Business Information Technology",
+        "insert-track": "เพิ่มแทร็ก",
+        "suggest-form": "แบบฟอร์มแนะนำแทร็ก"
+    }), [])
     const url = usePathname();
     const urls = useMemo(() => (url.split("/").filter(e => e)), [url])
 

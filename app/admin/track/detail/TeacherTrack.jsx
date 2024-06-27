@@ -1,5 +1,4 @@
 "use client"
-
 import { DeleteIcon2, EditIcon2, PlusIcon } from "@/app/components/icons";
 import { getOptions } from "@/app/components/serverAction/TokenAction";
 import { Button, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip, useDisclosure } from "@nextui-org/react";
@@ -63,7 +62,7 @@ const TeacherTrack = ({ track }) => {
     const bottomContent = useMemo(() => {
         return (
             teachers?.length > 0 ?
-                <div className=" py-2 px-2 flex justify-between items-center">
+                <div className="w-full py-2 px-2 flex justify-between items-center">
                     <span className="w-[30%] text-small text-default-400">
                         {selectedKeys === "all"
                             ? "All items selected"
@@ -167,7 +166,7 @@ const TeacherTrack = ({ track }) => {
                 isOpen={isOpenEdit}
                 onClose={onCloseEdit} />
 
-            <div className='flex flex-row justify-between items-center rounded-md mb-4'>
+            <div className='flex flex-row flex-wrap gap-2 justify-between items-center rounded-md mb-4'>
                 <p className="text-sm">คณาจารย์ประจำแทร็ก</p>
                 <div className="flex gap-4">
                     <Button
@@ -179,7 +178,7 @@ const TeacherTrack = ({ track }) => {
                             onOpen()
                         }}
                         startContent={<PlusIcon className="w-5 h-5" />}>
-                        เพิ่มรายชื่อ
+                        เพิ่ม
                     </Button>
                     <Button
                         radius="sm"
@@ -198,7 +197,7 @@ const TeacherTrack = ({ track }) => {
                     <div className='w-full flex justify-center my-6'>
                         <Spinner label="กำลังโหลด..." color="primary" />
                     </div> :
-                    <div>
+                    <div className="w-full h-fit overflow-x-scroll">
                         <Table
                             aria-label="teachers tracks table"
                             checkboxesProps={{
@@ -206,9 +205,8 @@ const TeacherTrack = ({ track }) => {
                                     wrapper: "after:bg-blue-500 after:text-background text-background",
                                 },
                             }}
-
-                            bottomContent={bottomContent}
-                            bottomContentPlacement="outside"
+                            // bottomContent={bottomContent}
+                            // bottomContentPlacement="outside"
 
                             isCompact
                             removeWrapper
@@ -270,6 +268,7 @@ const TeacherTrack = ({ track }) => {
                                 )}
                             </TableBody>
                         </Table>
+                        {bottomContent}
                     </div>
             }
         </div>

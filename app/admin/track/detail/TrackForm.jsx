@@ -123,8 +123,8 @@ const TrackForm = ({ track }) => {
                                             uploadProgress={uploadProgressCover}
                                         />
                                     </div>
-                                    <div className='flex flex-row gap-6'>
-                                        <div className='flex justify-center w-1/2'>
+                                    <div className='flex flex-col sm:flex-row gap-6'>
+                                        <div className='flex justify-center w-full md:w-1/2'>
                                             <UploadCover
                                                 containerWidth="w-[100%]"
                                                 src={trackData?.img}

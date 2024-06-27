@@ -124,12 +124,14 @@ const InsertSubjectModal = ({ isOpen, onClose, track, callBack }) => {
                                             trackSubj.map((sbj, index) => (
                                                 <li key={index} className='bg-gray-100 rounded-md relative p-1 gap-2 border-1 border-b-gray-300'>
                                                     <input
+                                                        hidden
                                                         readOnly
-                                                        className='bg-gray-100 block focus:outline-none font-bold'
+                                                        className='bg-gray-100 focus:outline-none font-bold'
                                                         type="text"
                                                         name="trackSubj[]"
                                                         value={sbj.subject_code} />
                                                     <p className='flex flex-col text-sm'>
+                                                        <span className='font-bold'>{sbj.title_en}</span>
                                                         <span>{sbj.title_th}</span>
                                                     </p>
                                                     <IoIosCloseCircle onClick={() => delSubj(sbj.subject_code)} className="absolute top-1 right-1 w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
@@ -157,9 +159,9 @@ const InsertSubjectModal = ({ isOpen, onClose, track, callBack }) => {
                                             {filterSubj.map((subject, index) => (
                                                 !(trackSubj.map(z => z.subject_code).includes(subject.subject_code)) &&
                                                 <li onClick={() => addSubj(subject)} key={index} className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border-1 border-b-gray-300 cursor-pointer'>
-                                                    <strong className='block'>{subject.subject_code}</strong>
+                                                    {/* <strong className='block'>{subject.subject_code}</strong> */}
                                                     <p className='flex flex-col text-sm'>
-                                                        <span>{subject.title_en}</span>
+                                                        <strong className='font-bold'>{subject.title_en}</strong>
                                                         <span>{subject.title_th}</span>
                                                     </p>
                                                 </li>
