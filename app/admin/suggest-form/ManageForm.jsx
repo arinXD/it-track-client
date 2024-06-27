@@ -4,6 +4,7 @@ import { message, Steps, theme } from 'antd';
 import { Button } from "@nextui-org/react";
 import SuggestForm from "./SuggestForm";
 import Question from "./Question";
+import Assesstion from "./Assesstion";
 
 const ManageForm = ({ formId }) => {
      const { token } = theme.useToken()
@@ -19,7 +20,7 @@ const ManageForm = ({ formId }) => {
           },
           {
                title: 'Step 3',
-               description: 'เพิ่มแบบประเมิณตนเอง',
+               description: 'เพิ่มแบบประเมินตนเอง',
           },
           {
                title: 'Finish',
@@ -80,17 +81,13 @@ const ManageForm = ({ formId }) => {
                          style={contentStyle}
                          className="w-full">
                          <section className={`w-full p-4 ${current === 0 ? "block" : "hidden"}`}>
-                              <SuggestForm
-                                   formId={formId}
-                              />
+                              <SuggestForm formId={formId} />
                          </section>
                          <section className={`w-full p-4 ${current === 1 ? "block" : "hidden"}`}>
-                              <Question
-                                   formId={formId}
-                              />
+                              <Question formId={formId} />
                          </section>
                          <section className={`w-full p-4 ${current === 2 ? "block" : "hidden"}`}>
-                              เพิ่มแบบสอบถาม
+                              <Assesstion formId={formId} />
                          </section>
                          <section className={`w-full p-4 ${current === 3 ? "block" : "hidden"}`}>
                               เพิ่มอาชีพ

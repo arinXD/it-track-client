@@ -12,6 +12,7 @@ import { FaRegTrashAlt } from "react-icons/fa";
 
 const Question = ({ formId }) => {
      const questionRefs = useRef([]);
+     const [defaultQuestionBank, setDefaultQuestionBank] = useState([]);
      const [filterValue, setFilterValue] = useState("");
      const { isOpen, onOpen, onClose } = useDisclosure();
      const [fetching, setFetching] = useState(false);
@@ -26,8 +27,10 @@ const Question = ({ formId }) => {
                     const res = await axios(option)
                     const allQuestions = res.data.data
                     setQuestionsBank(allQuestions)
+                    setDefaultQuestionBank(allQuestions)
                } catch (error) {
                     setQuestionsBank([])
+                    setDefaultQuestionBank([])
                } finally {
                     setFetching(false)
                }
@@ -42,9 +45,11 @@ const Question = ({ formId }) => {
                const questionsNotInForm = res2.data.data
                setQuestions(questionsInForm)
                setQuestionsBank(questionsNotInForm)
+               setDefaultQuestionBank(questionsNotInForm)
           } catch (error) {
                setQuestions([])
                setQuestionsBank([])
+               setDefaultQuestionBank([])
           } finally {
                setFetching(false)
           }
@@ -100,7 +105,7 @@ const Question = ({ formId }) => {
           })
      }, [])
 
-     const removeQuestion = useCallback((questionIndex) => {
+     const removeQuestion = useCallback((questionIndex, qid) => {
           setQuestions((prevQuestions) => {
                questionRefs.current = prevQuestions
                     .filter((_, index) => index !== questionIndex)
@@ -108,7 +113,16 @@ const Question = ({ formId }) => {
 
                return prevQuestions.filter((_, index) => index !== questionIndex)
           })
-     }, [])
+          const filterQID = defaultQuestionBank.filter(q => q.id === qid)
+          if (filterQID.length > 0) {
+               setQuestionsBank(prev => {
+                    return [
+                         ...prev,
+                         ...filterQID
+                    ]
+               })
+          }
+     }, [defaultQuestionBank])
 
      const addMoreAnswer = useCallback((qid) => {
           setQuestions((prevQuestions) => {
@@ -145,6 +159,46 @@ const Question = ({ formId }) => {
           })
      }, [])
 
+     const [selectedQuestions, setSelectedQuestions] = useState([])
+
+     const selectQuestion = useCallback((e, id) => {
+          const isChecked = e.target.checked
+          setSelectedQuestions((prev) => {
+               if (isChecked) {
+                    if (!prev.includes(id)) {
+                         return [...prev, id]
+                    }
+               } else {
+                    return prev.filter((qId) => qId !== id)
+               }
+               return prev
+          })
+     }, [])
+
+     const addToQuestion = useCallback(() => {
+          setQuestionsBank((prevQuestionsBank) => {
+               const questionsToAdd = selectedQuestions.map((id) =>
+                    prevQuestionsBank.find(q => q.id === id)
+               ).filter(Boolean)
+
+               if (questionsToAdd.length > 0) {
+                    setQuestions((prevQuestions) => [...prevQuestions, ...questionsToAdd])
+
+                    const remainingQuestionsBank = prevQuestionsBank.filter(q => !selectedQuestions.includes(q.id))
+                    setSelectedQuestions([])
+
+                    return remainingQuestionsBank
+               }
+               return prevQuestionsBank
+          })
+          onClose()
+     }, [selectedQuestions])
+
+     const closeForm = useCallback(() => {
+          setSelectedQuestions([])
+          onClose()
+     }, [])
+
      return (
           <section>
                <Modal
@@ -170,11 +224,11 @@ const Question = ({ formId }) => {
                                    </ModalHeader>
                                    <ModalBody className="">
                                         <section className="!h-[350px] overflow-y-auto flex flex-col gap-2 pe-2">
-
                                              {
                                                   filteredItems?.length > 0 ?
                                                        filteredItems.map((q, index) => (
                                                             <Checkbox
+                                                                 onChange={(e) => selectQuestion(e, q.id)}
                                                                  key={index}
                                                                  className="w-full cursor-pointer flex gap-2 border p-4 rounded-[5px]"
                                                                  name={`questionBank[]`}
@@ -212,13 +266,13 @@ const Question = ({ formId }) => {
                                              color="default"
                                              variant="light"
                                              className="rounded-[5px]"
-                                             onPress={onClose}>
+                                             onPress={closeForm}>
                                              ยกเลิก
                                         </Button>
                                         <Button
+                                             onClick={addToQuestion}
                                              color="primary"
-                                             className="rounded-[5px]"
-                                             onPress={onClose}>
+                                             className="rounded-[5px]">
                                              เพิ่ม
                                         </Button>
                                    </ModalFooter>
@@ -227,124 +281,138 @@ const Question = ({ formId }) => {
                     </ModalContent>
                </Modal>
                {
-                    // fetching ?
-                    //      <div className='w-full flex justify-center my-6'>
-                    //           <Spinner label="กำลังโหลด..." color="primary" />
-                    //      </div>
-                    //      :
-                    <>
-                         <div className="flex justify-between">
-                              <h2>คำถามภายในแบบฟอร์ม</h2>
-                              <div className="flex justify-end gap-4">
-                                   <Button
-                                        isIconOnly
-                                        radius="full"
-                                        color="default"
-                                        onClick={createQuestion}
-                                        aria-label="create">
-                                        <PlusIcon />
-                                   </Button>
-                                   <Button
-                                        startContent={<MdOutlineInventory2 />}
-                                        className="rounded-[5px]"
-                                        onClick={onOpen}
-                                   >
-                                        คลังคำถาม
-                                   </Button>
+                    fetching ?
+                         <div className='w-full flex justify-center my-6'>
+                              <Spinner label="กำลังโหลด..." color="primary" />
+                         </div>
+                         :
+                         <>
+                              <div className="flex justify-between">
+                                   <h2>คำถามภายในแบบฟอร์ม</h2>
+                                   <div className="flex justify-end gap-4">
+                                        <Button
+                                             isIconOnly
+                                             radius="full"
+                                             color="default"
+                                             onClick={createQuestion}
+                                             aria-label="create">
+                                             <PlusIcon />
+                                        </Button>
+                                        <Button
+                                             startContent={<MdOutlineInventory2 />}
+                                             className="rounded-[5px]"
+                                             onClick={onOpen}
+                                        >
+                                             คลังคำถาม
+                                        </Button>
+                                   </div>
                               </div>
-                         </div>
-                         <div id="questionsWrap">
-                              {
-                                   questions?.length > 0 ?
-                                        <div className="flex flex-col gap-4 mt-4">
-                                             {JSON.stringify(questions)}
-                                             {
-                                                  questions.map((q, index) => (
-                                                       <div
-                                                            key={index}
-                                                            ref={questionRefs.current[index]}
-                                                            className="w-full bg-white border-1 p-4 flex flex-col rounded-[5px]">
-                                                            <div className="flex items-center justify-between">
-                                                                 <input readOnly type="hidden" name="qID[]" defaultValue={q.id} />
-                                                                 <input
-                                                                      className="text-black p-2 border-b-black border-b bg-gray-100 w-1/2 outline-none focus:border-b-blue-500 focus:border-b-2"
-                                                                      type="text"
-                                                                      name="qTitle[]"
-                                                                      defaultValue={q.question} />
-                                                            </div>
-                                                            <ul className="mt-4 flex flex-col gap-4" id={`q${q.id}`}>
-                                                                 {
-                                                                      q?.Answers?.map((ans, j) => (
-                                                                           <li
-                                                                                key={j}
-                                                                                className="flex flex-row justify-between gap-4">
-                                                                                <div className="flex gap-4 w-full items-center">
-                                                                                     <div>
-                                                                                          <input className="w-6 h-6 cursor-pointer" type="radio" name={`answersQ${q.id}`} />
-                                                                                     </div>
-                                                                                     <input readOnly type="hidden" name="aID[]" defaultValue={ans?.id} />
-                                                                                     <input
-                                                                                          className="text-black w-full outline-none focus:border-b-blue-500 focus:border-b-2"
-                                                                                          type="text"
-                                                                                          name="answers[]"
-                                                                                          defaultValue={ans.answer}
-                                                                                     />
-                                                                                </div>
-                                                                                <Button
-                                                                                     isIconOnly
-                                                                                     variant="light"
-                                                                                     radius="full"
-                                                                                     color="default"
-                                                                                     onClick={() => removeAnswer(q.id, j)}
-                                                                                     aria-label="remove">
-                                                                                     <IoCloseOutline className="w-7 h-7" />
-                                                                                </Button>
-                                                                           </li>
-                                                                      ))
-                                                                 }
-                                                            </ul>
-                                                            <div className="flex gap-4 mt-4">
-                                                                 <div className="rounded-full border-2 w-7 h-7 border-gray-300"></div>
-                                                                 <p
-                                                                      onClick={() => addMoreAnswer(q.id)}
-                                                                      className="hover:cursor-text hover:border-b border-b-gray-300">เพิ่มตัวเลือก</p>
-                                                            </div>
-                                                            <hr className="mt-8 mb-4" />
-                                                            <div className="flex justify-end items-center gap-2">
-                                                                 <div className="flex gap-2">
-                                                                      <input
-                                                                           defaultChecked={true}
-                                                                           type="checkbox"
-                                                                           className="w-4 h-4"
-                                                                           name={`enableQ${q.id}`}
-                                                                      />
-                                                                      <span className="text-sm">ใช้งาน</span>
+                              <div id="questionsWrap">
+                                   {
+                                        questions?.length > 0 ?
+                                             <div className="flex flex-col gap-4 mt-4">
+                                                  {
+                                                       questions.map((q, index) => (
+                                                            <div
+                                                                 key={index}
+                                                                 ref={questionRefs.current[index]}
+                                                                 className="w-full bg-white border-1 p-4 flex flex-col rounded-[5px]">
+                                                                 <div className="flex justify-between items-center">
+                                                                      <div className="flex items-center justify-between w-1/2">
+                                                                           <input readOnly type="hidden" name="qID[]" defaultValue={q.id} />
+                                                                           <input
+                                                                                className="text-black p-2 border-b-black border-b bg-gray-100 w-full outline-none focus:border-b-blue-500 focus:border-b-2"
+                                                                                type="text"
+                                                                                name="qTitle[]"
+                                                                                defaultValue={q.question} />
+                                                                      </div>
+                                                                      <select
+                                                                           className="border-1 border-gray-200 rounded-[5px] p-2"
+                                                                           name=""
+                                                                           id="" defaultValue={q.track}>
+                                                                           <option value="">Selected Track</option>
+                                                                           <option value="BIT">BIT</option>
+                                                                           <option value="Web and Mobile">Web and Mobile</option>
+                                                                           <option value="Network">Network</option>
+                                                                      </select>
                                                                  </div>
-                                                                 <Button
-                                                                      isIconOnly
-                                                                      variant="light"
-                                                                      radius="full"
-                                                                      color="default"
-                                                                      className="p-2"
-                                                                      onClick={() => removeQuestion(index)}
-                                                                      aria-label="remove">
-                                                                      <FaRegTrashAlt className="w-5 h-5" />
-                                                                 </Button>
+                                                                 <ul className="mt-4 flex flex-col gap-4" id={`q${q.id}`}>
+                                                                      {
+                                                                           q?.Answers?.map((ans, j) => (
+                                                                                <li
+                                                                                     key={j}
+                                                                                     className="flex flex-row justify-between gap-4">
+                                                                                     <div className="flex gap-4 w-full items-center">
+                                                                                          <div>
+                                                                                               <input
+                                                                                                    className="w-6 h-6 cursor-pointer"
+                                                                                                    type="radio"
+                                                                                                    name={`answersQ${q.id}`}
+                                                                                                    defaultChecked={ans.isCorrect} />
+                                                                                          </div>
+                                                                                          <input readOnly type="hidden" name="aID[]" defaultValue={ans?.id} />
+                                                                                          <input
+                                                                                               className="text-black w-full outline-none focus:border-b-blue-500 focus:border-b-2"
+                                                                                               type="text"
+                                                                                               name="answers[]"
+                                                                                               defaultValue={ans.answer}
+                                                                                          />
+                                                                                     </div>
+                                                                                     <Button
+                                                                                          isIconOnly
+                                                                                          variant="light"
+                                                                                          radius="full"
+                                                                                          color="default"
+                                                                                          onClick={() => removeAnswer(q.id, j)}
+                                                                                          aria-label="remove">
+                                                                                          <IoCloseOutline className="w-7 h-7" />
+                                                                                     </Button>
+                                                                                </li>
+                                                                           ))
+                                                                      }
+                                                                 </ul>
+                                                                 <div className="flex gap-4 mt-4">
+                                                                      <div className="rounded-full border-2 w-7 h-7 border-gray-300"></div>
+                                                                      <p
+                                                                           onClick={() => addMoreAnswer(q.id)}
+                                                                           className="hover:cursor-text hover:border-b border-b-gray-300">เพิ่มตัวเลือก</p>
+                                                                 </div>
+                                                                 <hr className="mt-8 mb-4" />
+                                                                 <div className="flex justify-end items-center gap-2">
+                                                                      <div className="flex gap-2">
+                                                                           <input
+                                                                                defaultChecked={true}
+                                                                                type="checkbox"
+                                                                                className="w-4 h-4"
+                                                                                name={`enableQ${q.id}`}
+                                                                           />
+                                                                           <span className="text-sm">ใช้งาน</span>
+                                                                      </div>
+                                                                      <Button
+                                                                           isIconOnly
+                                                                           variant="light"
+                                                                           radius="full"
+                                                                           color="default"
+                                                                           className="p-2"
+                                                                           onClick={() => removeQuestion(index, q.id)}
+                                                                           aria-label="remove">
+                                                                           <FaRegTrashAlt className="w-5 h-5" />
+                                                                      </Button>
+                                                                 </div>
                                                             </div>
-                                                       </div>
-                                                  ))
-                                             }
-                                        </div>
-                                        :
-                                        <Empty
-                                             className='my-6'
-                                             description={
-                                                  <span className='text-gray-300'>ไม่มีข้อมูล</span>
-                                             }
-                                        />
-                              }
-                         </div>
-                    </>
+                                                       ))
+                                                  }
+                                             </div>
+                                             :
+                                             <Empty
+                                                  className='my-6'
+                                                  description={
+                                                       <span className='text-gray-300'>ไม่มีข้อมูล</span>
+                                                  }
+                                             />
+                                   }
+                              </div>
+                         </>
                }
 
           </section >
@@ -352,62 +420,3 @@ const Question = ({ formId }) => {
 }
 
 export default Question
-
-// const createQuestion = useCallback(() => {
-//      setQuestions((prevQuestions) => {
-//           const id = prevQuestions.length + 1
-//           const newId = `new${id}`
-
-//           const newQuestion = {
-//                id: newId,
-//                question: `คำถามที่ ${id}`,
-//                Answers: [{
-//                     id: null,
-//                     answer: `ตัวเลือกที่ 1`,
-//                     isCorrect: false,
-//                }]
-//           }
-
-//           return [...prevQuestions, newQuestion]
-//      })
-// }, [])
-// const removeQuestion = useCallback((questionIndex) => {
-//      setQuestions((prevQuestions) => {
-//           return prevQuestions.filter((_, index) => index !== questionIndex)
-//      })
-// }, [])
-
-// const addMoreAnswer = useCallback((qid) => {
-//      setQuestions((prevQuestions) => {
-//           return prevQuestions.map((q) => {
-//                if (q.id === qid) {
-//                     const newAnswer = {
-//                          id: null,
-//                          answer: `ตัวเลือกที่ ${(q.Answers.length || 0) + 1}`,
-//                          isCorrect: false,
-//                     }
-
-//                     return {
-//                          ...q,
-//                          Answers: [...q.Answers, newAnswer]
-//                     }
-//                }
-//                return q
-//           })
-//      })
-// }, [])
-
-// const removeAnswer = useCallback((questionId, answerIndex) => {
-//      setQuestions((prevQuestions) => {
-//           return prevQuestions.map((q) => {
-//                if (q.id === questionId) {
-//                     const newAnswers = q.Answers.filter((_, index) => index !== answerIndex)
-//                     return {
-//                          ...q,
-//                          Answers: newAnswers
-//                     }
-//                }
-//                return q
-//           })
-//      })
-// }, [])
