@@ -1,10 +1,20 @@
+"use client"
 const SubjectList = ({ track, subjects }) => {
+    const trackImagePath = track?.track ? `/${track.track.toLowerCase()}.png` : '/track.jpg';
+
     return (
         <section className="grid grid-cols-2 gap-10 mt-20 mb-5 ">
             <div className="flex justify-center lg:justify-end max-lg:col-span-2">
                 <img
-                    src={`/${track?.track?.toLowerCase()}.png`} alt={track.track}
-                    className="object-cover w-[500px]" />
+                    src={"/track.jpg"}
+                    onError={({ currentTarget }) => {
+                        // Fallback image on error
+                        currentTarget.onerror = null; // Prevent infinite loop
+                        currentTarget.src = "/track.jpg";
+                    }}
+                    alt={track?.track || "track"}
+                    className="object-cover w-[500px]"
+                />
             </div>
             <div className="pr-48 max-2xl:pr-5 max-md:pr-0 max-md:px-5 mb-5 max-lg:col-span-2">
                 <h3 className="font-semibold">วิชาเรียนประจำแทร็ก {track.title_th}</h3>

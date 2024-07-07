@@ -30,7 +30,8 @@ const BreadCrumb = () => {
         "network": "Network Systems, Information Technology Security, and Internet of Things (IoT)",
         "bit": "Business Information Technology",
         "insert-track": "เพิ่มแทร็ก",
-        "suggest-form": "แบบฟอร์มแนะนำแทร็ก"
+        "suggest-form": "แบบฟอร์มแนะนำแทร็ก",
+        "create": "เพิ่มข้อมูล",
     }), [])
     const url = usePathname();
     const urls = useMemo(() => (url.split("/").filter(e => e)), [url])
