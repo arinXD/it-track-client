@@ -10,7 +10,7 @@ import InsertCareer from "./InsertCareer";
 import CareerInventory from "./CareerInventory";
 import { IoCloseOutline } from "react-icons/io5";
 
-const CareerForm = ({ prev, formStyle, tracks, formId, setCareers }) => {
+const CareerForm = ({ prev, formStyle, tracks, formId, setCareers, creating }) => {
      const { isOpen, onOpen, onClose } = useDisclosure();
      const { isOpen: isOpenInventory, onOpen: onOpenInventory, onClose: onCloseInventory } = useDisclosure();
      const [fetching, setFetching] = useState(false);
@@ -192,6 +192,7 @@ const CareerForm = ({ prev, formStyle, tracks, formId, setCareers }) => {
                          Previous
                     </Button>
                     <Button
+                         isLoading={creating}
                          type="submit"
                          color="primary"
                          className="rounded-[5px]"

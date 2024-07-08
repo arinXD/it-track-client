@@ -10,6 +10,7 @@ import { getOptions } from "@/app/components/serverAction/TokenAction";
 import axios from "axios";
 
 const ManageForm = ({ formId }) => {
+     const [creating, setCreating] = useState(false);
      const [fetching, setFetching] = useState(false);
      const [fetchingFormData, setfetchingFormData] = useState(false);
 
@@ -113,6 +114,7 @@ const ManageForm = ({ formId }) => {
           if (!assesstion.length) { message.warning("จำเป็นต้องเพิ่มแบบประเมินตนเอง"); setCurrent(2); return; }
           if (!careers.length) { message.warning("จำเป็นต้องเพิ่มอาชีพ"); setCurrent(3); return; }
           const formData = {
+               id: formId,
                ...suggestForm,
                Questions: questions,
                Assesstions: assesstion,
@@ -122,12 +124,14 @@ const ManageForm = ({ formId }) => {
           console.log(formData);
           const option = await getOptions("/api/suggestion-forms/", "POST", formData)
           try {
+               setCreating(true)
                await axios(option)
                message.success("สร้างแบบฟอร์มสำเร็จ")
                setTimeout(() => {
                     window.location.href = "/admin/suggest-form"
                }, 1500);
           } catch (error) {
+               setCreating(false)
                console.log(error);
                message.error("ไม่สามารถสร้างแบบฟอร์มได้")
           }
@@ -152,6 +156,9 @@ const ManageForm = ({ formId }) => {
                                    :
                                    <>
                                         <section className={`w-full ${current === 0 ? "block" : "hidden"}`}>
+                                             {
+                                                  formId && <input type="text" name="id" defaultValue={formId} readOnly/>
+                                             }
                                              <SuggestForm
                                                   next={next}
                                                   fetching={fetchingFormData}
@@ -182,6 +189,7 @@ const ManageForm = ({ formId }) => {
                                         </section>
                                         <section className={`w-full ${current === 3 ? "block" : "hidden"}`}>
                                              <CareerForm
+                                                  creating={creating}
                                                   setCareers={setCareers}
                                                   prev={prev}
                                                   formStyle={contentStyle}

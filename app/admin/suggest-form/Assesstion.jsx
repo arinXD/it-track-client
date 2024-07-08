@@ -11,10 +11,10 @@ import { FaRegTrashAlt } from "react-icons/fa";
 
 const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAssesstion }) => {
     const questionRefs = useRef([]);
-    const [defaultQuestionBank, setDefaultQuestionBank] = useState([]);
     const [filterValue, setFilterValue] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [fetching, setFetching] = useState(false);
+    const [defaultQuestionBank, setDefaultQuestionBank] = useState([]);
     const [questionsBank, setQuestionsBank] = useState([]);
 
     const getQuestions = useCallback(async (formId) => {
@@ -38,12 +38,14 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
             setFetching(true)
             const option1 = await getOptions(`/api/assessments/in-form/${formId}`, "get")
             const option2 = await getOptions(`/api/assessments/not-in-form/${formId}`, "get")
-            const [res1, res2] = await Promise.all([axios(option1), axios(option2)]);
+            const option3 = await getOptions(`/api/assessments`, "get")
+            const [res1, res2, res3] = await Promise.all([axios(option1), axios(option2), axios(option3)]);
             const questionsInForm = res1.data.data
             const questionsNotInForm = res2.data.data
+            const allQuestions = res3.data.data
             setAssesstion(questionsInForm)
             setQuestionsBank(questionsNotInForm)
-            setDefaultQuestionBank(questionsNotInForm)
+            setDefaultQuestionBank(allQuestions)
         } catch (error) {
             setAssesstion([])
             setQuestionsBank([])
@@ -137,9 +139,11 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
 
     const addToQuestion = useCallback(() => {
         setQuestionsBank((prevQuestionsBank) => {
-            const questionsToAdd = selectedQuestions.map((id) =>
+            let questionsToAdd = selectedQuestions.map((id) =>
                 prevQuestionsBank.find(q => q.id === id)
             ).filter(Boolean)
+            console.log(questionsToAdd);
+            questionsToAdd = questionsToAdd.map(q => ({ ...q, isEnable: true }))
 
             if (questionsToAdd.length > 0) {
                 setAssesstion((prevQuestions) => [...prevQuestions, ...questionsToAdd])

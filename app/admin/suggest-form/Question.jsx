@@ -181,9 +181,11 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
 
      const addToQuestion = useCallback(() => {
           setQuestionsBank((prevQuestionsBank) => {
-               const questionsToAdd = selectedQuestions.map((id) =>
+               let questionsToAdd = selectedQuestions.map((id) =>
                     prevQuestionsBank.find(q => q.id === id)
                ).filter(Boolean)
+               console.log(questionsToAdd);
+               questionsToAdd = questionsToAdd.map(q => ({ ...q, isEnable: true }))
 
                if (questionsToAdd.length > 0) {
                     setQuestions((prevQuestions) => [...prevQuestions, ...questionsToAdd])
