@@ -6,7 +6,7 @@ import axios from 'axios';
 import { fetchData, fetchDataObj } from '../../action'
 import { hostname } from '@/app/api/hostname';
 import Select from 'react-select';
-import { Input, Textarea, Switch } from "@nextui-org/react";
+import { Input, Textarea, Switch, Tabs, Tab, Link, Card, CardBody, CardHeader } from "@nextui-org/react";
 import { getOptions, getToken } from '@/app/components/serverAction/TokenAction';
 import { getAcadyears } from "@/src/util/academicYear";
 import { toast } from 'react-toastify';
@@ -20,10 +20,12 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
     const [categories, setCategories] = useState([]);
     const [groups, setGroups] = useState([]);
     const [subgroups, setSubgroups] = useState([]);
+    const [semisubgroups, setSemiSubgroups] = useState([]);
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [selectedSubgroup, setSelectedSubgroup] = useState(null);
+    const [selectedSemiSubgroup, setSelectedSemiSubgroup] = useState(null);
 
     const [searchSubj, setSearchSubj] = useState("");
     const [verifySubj, setVerifySubj] = useState([]);
@@ -135,6 +137,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
         setSelectedCategory(selectedOption);
         setSelectedGroup(null);
         setSelectedSubgroup(null);
+        setSelectedSemiSubgroup(null);
 
         try {
             const result = await fetchDataObj(`/api/categories/${selectedOption?.value}/groups`);
@@ -152,6 +155,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
     const handleGroupChange = async selectedOption => {
         setSelectedGroup(selectedOption);
         setSelectedSubgroup(null);
+        setSelectedSemiSubgroup(null);
 
         try {
             const result = await fetchDataObj(`/api/groups/${selectedOption?.value}/subgroups`);
@@ -165,9 +169,25 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
         }
     };
 
-
-    const handleSubgroupChange = selectedOption => {
+    const handleSubGroupChange = async selectedOption => {
         setSelectedSubgroup(selectedOption);
+        setSelectedSemiSubgroup(null);
+
+        try {
+            const result = await fetchDataObj(`/api/subgroups/${selectedOption?.value}/semisubgroups`);
+            const subgroupsOptions = result.map(semisubgroup => ({
+                value: semisubgroup.id,
+                label: semisubgroup.semi_sub_group_title,
+            }));
+            setSemiSubgroups(subgroupsOptions);
+        } catch (error) {
+            console.error('Error fetching subgroups:', error);
+        }
+    };
+
+
+    const handlesSemiSubgroupChange = selectedOption => {
+        setSelectedSemiSubgroup(selectedOption);
     };
 
     useEffect(() => {
@@ -175,6 +195,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
             setSelectedCategory(null);
             setSelectedGroup(null);
             setSelectedSubgroup(null);
+            setSelectedSemiSubgroup(null);
             setIsSelected(false);
         }
     }, [isOpen]);
@@ -184,6 +205,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
             setSelectedCategory(null);
             setSelectedGroup(null);
             setSelectedSubgroup(null);
+            setSelectedSemiSubgroup(null);
             setVerifySubj([]);
         }
     }, [isSelected]);
@@ -193,10 +215,10 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
             const page = category_page?.map(page => page.id)
             const category = categories?.map(category => category.value)
             const filter = category.filter(cat => !page.includes(cat))
-            setCategories(prev =>{
+            setCategories(prev => {
                 return prev.filter(cat => filter.includes(cat.value))
             })
-        }else{
+        } else {
             setCategories(defaultCategories);
         }
     }, [isSelected]);
@@ -237,7 +259,13 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                     category_id: selectedCategory.value
                 };
             } else {
-                if (selectedSubgroup) {
+                if (selectedSemiSubgroup) {
+                    formData = {
+                        verify_id: verify_id,
+                        subjects: subData,
+                        semi_sub_group_id: selectedSemiSubgroup.value
+                    };
+                } else if (selectedSubgroup) {
                     formData = {
                         verify_id: verify_id,
                         subjects: subData,
@@ -258,7 +286,11 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                 formData.verify_id = verify_id;
                 formData.category_id = selectedCategory.value;
             } else {
-                if (selectedSubgroup) {
+                if (selectedSemiSubgroup) {
+                    url = "/api/verify/semisubgroup";
+                    formData.verify_id = verify_id;
+                    formData.semi_sub_group_id = selectedSemiSubgroup.value;
+                } else if (selectedSubgroup) {
                     url = "/api/verify/subgroup";
                     formData.verify_id = verify_id;
                     formData.sub_group_id = selectedSubgroup.value;
@@ -280,7 +312,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
             const message = error?.response?.data?.message;
             showToastMessage(false, message);
         }
-    }, [selectedGroup, selectedSubgroup, selectedCategory, isSelected]);
+    }, [selectedGroup, selectedSubgroup, selectedCategory, selectedSemiSubgroup, isSelected]);
 
     return (
         <Modal
@@ -333,18 +365,34 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                                             />
                                         </div>
                                         {selectedGroup && subgroups.length > 0 && (
-                                            <div className='col-span-4'>
-                                                <label htmlFor="subgroup">กลุ่มรองวิชา</label>
-                                                <Select
-                                                    className='z-30'
-                                                    value={selectedSubgroup}
-                                                    options={subgroups}
-                                                    onChange={handleSubgroupChange}
-                                                    isSearchable
-                                                    placeholder="เลือกกลุ่มรองวิชา"
-                                                    isClearable
-                                                />
-                                            </div>
+                                            <>
+                                                <div className='col-span-4'>
+                                                    <label htmlFor="subgroup">กลุ่มรองวิชา</label>
+                                                    <Select
+                                                        className='z-30'
+                                                        value={selectedSubgroup}
+                                                        options={subgroups}
+                                                        onChange={handleSubGroupChange}
+                                                        isSearchable
+                                                        placeholder="เลือกกลุ่มรองวิชา"
+                                                        isClearable
+                                                    />
+                                                </div>
+                                                {selectedSubgroup && semisubgroups.length > 0 && (
+                                                    <div className='col-span-4'>
+                                                        <label htmlFor="subgroup">กลุ่มรองวิชา</label>
+                                                        <Select
+                                                            className='z-20'
+                                                            value={selectedSemiSubgroup}
+                                                            options={semisubgroups}
+                                                            onChange={handlesSemiSubgroupChange}
+                                                            isSearchable
+                                                            placeholder="เลือกกลุ่มรองวิชา"
+                                                            isClearable
+                                                        />
+                                                    </div>
+                                                )}
+                                            </>
                                         )}
                                     </>
                                 )}

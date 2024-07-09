@@ -257,9 +257,9 @@ export default function InsertVerify({ isOpen, onClose, onDataInserted }) {
                                     type="number"
                                     radius='sm'
                                     variant="bordered"
-                                    label="เงื่อนไข(หน่วยกิต)"
+                                    label="เงื่อนไขหน่วยกิตขั้นต่ำ"
                                     labelPlacement="outside"
-                                    placeholder="กรอกเงื่อนไข"
+                                    placeholder="กรอกหน่วยกิต"
                                     value={mainAtLeast}
                                     onChange={(e) => setMainAtLeast(e.target.value)}
                                 />

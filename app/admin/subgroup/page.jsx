@@ -1,7 +1,6 @@
 "use client"
 
-// subgroup.js
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar, Sidebar, SubGroupInsert, SubGroupUpdate, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';

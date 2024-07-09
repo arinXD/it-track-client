@@ -25,7 +25,7 @@ const Page = () => {
     const [program, setProgram] = useState([])
     const [subgroupData, setSubgroupData] = useState([]);
     const [groupData, setGroupData] = useState([]);
-
+    const [semisubgroupData, setSemiSubgroupData] = useState([]);
     const [categoryverify, setCategoryVerifies] = useState([])
     const [highestIndex, setHighestIndex] = useState(0);
 
@@ -42,7 +42,6 @@ const Page = () => {
             const response = await axios(option)
             const data = response.data.data
             setUserData(data)
-            console.log(data);
             if (data.Enrollments.length > 0) {
                 setEnrollment(data.Enrollments)
             } else {
@@ -73,43 +72,58 @@ const Page = () => {
 
     const fetchData = async function () {
         try {
-            let URL = `/api/verify/selects/${userData.program}/${userData.acadyear}`
-            let option = await getOptions(URL, "GET")
-            const response = await axios(option)
+            let URL = `/api/verify/selects/${userData.program}/${userData.acadyear}`;
+            let option = await getOptions(URL, "GET");
+            const response = await axios(option);
 
             const data = response.data.data;
-            setProgram(data?.Program)
-            setVerifySelect(data);
-            const categoryverifies = data.CategoryVerifies.map(categoryVerify => categoryVerify.Categorie);
-            setCategoryVerifies(categoryverifies);
 
-            const subgroupData = data.SubjectVerifies.map(subjectVerify => {
-                const subject = subjectVerify.Subject;
-                const subgroups = subject.SubgroupSubjects.map(subgroupSubject => subgroupSubject.SubGroup);
-                return { subject, subgroups };
-            });
-            setSubgroupData(subgroupData);
+            if (data) {
+                setProgram(data?.Program);
+                setVerifySelect(data);
 
-            const groupData = data.SubjectVerifies.map(subjectVerify => {
-                const subject = subjectVerify.Subject;
-                const groups = subject.GroupSubjects.map(groupSubject => groupSubject.Group);
-                return { subject, groups };
-            });
-            setGroupData(groupData);
+                const categoryverifies = data.CategoryVerifies.map(categoryVerify => categoryVerify.Categorie);
+                setCategoryVerifies(categoryverifies);
 
-            if (data?.Subjects) {
-                setVerifySubjects(data.Subjects)
+                const subgroupData = data.SubjectVerifies.map(subjectVerify => {
+                    const subject = subjectVerify.Subject;
+                    const subgroups = subject.SubgroupSubjects.map(subgroupSubject => subgroupSubject.SubGroup);
+                    return { subject, subgroups };
+                });
+                setSubgroupData(subgroupData);
+
+                const groupData = data.SubjectVerifies.map(subjectVerify => {
+                    const subject = subjectVerify.Subject;
+                    const groups = subject.GroupSubjects.map(groupSubject => groupSubject.Group);
+                    return { subject, groups };
+                });
+                setGroupData(groupData);
+
+                const semisubgroupData = data.SubjectVerifies.map(subjectVerify => {
+                    const subject = subjectVerify.Subject;
+                    const semisubgroups = subject.SemiSubgroupSubjects?.map(semisubgroupSubject => semisubgroupSubject.SemiSubGroup);
+                    return { subject, semisubgroups };
+                });
+                setSemiSubgroupData(semisubgroupData);
+
+                if (data?.Subjects) {
+                    setVerifySubjects(data.Subjects);
+                } else {
+                    setVerifySubjects([]);
+                }
             } else {
-                setVerifySubjects([])
+                setVerifySelect({});
+                setVerifySubjects([]);
             }
         } catch (error) {
             console.log(error);
             setVerifySelect({});
-            setVerifySubjects([])
+            setVerifySubjects([]);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     }
+
 
     useEffect(() => {
         if (Object.keys(userData).length > 0) {
@@ -147,7 +161,7 @@ const Page = () => {
         subgroups.forEach(subgroup => {
             const category = subgroup?.Group?.Categorie;
             if (!groupedSubjectsByCategory[category.id]) {
-                groupedSubjectsByCategory[category.id] = { category, groups: {}, subgroups: {} };
+                groupedSubjectsByCategory[category.id] = { category, groups: {}, subgroups: {}, semisubgroups: {} };
             }
             if (!groupedSubjectsByCategory[category.id].subgroups[subgroup.id]) {
                 groupedSubjectsByCategory[category.id].subgroups[subgroup.id] = subgroup;
@@ -161,7 +175,7 @@ const Page = () => {
         groups.forEach(group => {
             const category = group?.Categorie;
             if (!groupedSubjectsByCategory[category.id]) {
-                groupedSubjectsByCategory[category.id] = { category, groups: {}, subgroups: {} };
+                groupedSubjectsByCategory[category.id] = { category, groups: {}, subgroups: {}, semisubgroups: {} };
             }
             if (!groupedSubjectsByCategory[category.id].groups[group.id]) {
                 groupedSubjectsByCategory[category.id].groups[group.id] = group;
@@ -170,6 +184,22 @@ const Page = () => {
             groupedSubjectsByCategory[category.id].groups[group.id].subjects.push(subject);
         });
     });
+
+    semisubgroupData.forEach(({ subject, semisubgroups }) => {
+        semisubgroups.forEach(semisubgroup => {
+            const category = semisubgroup?.SubGroup?.Group?.Categorie;
+            if (category) {
+                if (!groupedSubjectsByCategory[category.id]) {
+                    groupedSubjectsByCategory[category.id] = { category, groups: {}, subgroups: {}, semisubgroups: {} };
+                }
+                if (!groupedSubjectsByCategory[category.id].semisubgroups[semisubgroup.id]) {
+                    groupedSubjectsByCategory[category.id].semisubgroups[semisubgroup.id] = { ...semisubgroup, subjects: [] };
+                }
+                groupedSubjectsByCategory[category.id].semisubgroups[semisubgroup.id].subjects.push(subject);
+            }
+        });
+    });
+
 
 
     if (!session?.user?.stu_id) {
@@ -196,8 +226,75 @@ const Page = () => {
     // console.log(groupedSubjectsByCategory);
 
     const getSubTrack = (subgroup, subgroupIndex) => {
-        // console.log(subgroup);
-        if (subgroup?.subjects.every(subject => subject?.Track)) {
+        if (subgroup?.subjects?.every(subject => subject?.SemiSubgroupSubjects?.some(e => e?.SemiSubGroup))) {
+            const subjects = subgroup.subjects || [];
+            const SemiSubjects = {};
+
+            subjects.forEach(subject => {
+                const semiSubGroup = subject.SemiSubgroupSubjects?.find(e => e.SemiSubGroup);
+                if (semiSubGroup) {
+                    const name = semiSubGroup.SemiSubGroup.semi_sub_group_title;
+                    if (!SemiSubjects[name]) {
+                        SemiSubjects[name] = [];
+                    }
+                    SemiSubjects[name].push(subject);
+                }
+            });
+            return (
+                <div key={subgroupIndex}>
+                    <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
+                        <h3 className='text-md text-default-800 px-10'><li>{subgroup?.sub_group_title}</li></h3>
+                    </div>
+                    {SemiSubjects && Object.keys(SemiSubjects).map((semi, semiIndex) => (
+                        <div key={semiIndex}>
+                            <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
+                                <h3 className='text-md text-default-800 px-16'><li>{semi}</li></h3>
+                            </div>
+                            <Table
+                                classNames={tableClass}
+                                removeWrapper
+                                onRowAction={() => { }}
+                                aria-label="subjects table">
+                                <TableHeader>
+                                    {/* <TableColumn>รหัสวิชา</TableColumn> */}
+                                    <TableColumn>รหัสวิชา</TableColumn>
+                                    <TableColumn>ชื่อวิชา EN</TableColumn>
+                                    <TableColumn>ชื่อวิชา TH</TableColumn>
+                                    <TableColumn>หน่วยกิต</TableColumn>
+                                    <TableColumn>เกรด</TableColumn>
+                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                </TableHeader>
+                                <TableBody>
+                                    {SemiSubjects[semi].map((subject, subjectIndex) => (
+                                        <TableRow key={subjectIndex}>
+                                            {/* <TableCell className=''>{subject.subject_id}</TableCell> */}
+                                            <TableCell className=''>{subject.subject_code}</TableCell>
+                                            <TableCell className="w-1/3">{subject.title_en}</TableCell>
+                                            <TableCell className="w-1/3">{subject.title_th}</TableCell>
+                                            <TableCell>{subject.credit}</TableCell>
+                                            <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
+                                            <TableCell>
+                                                {(() => {
+                                                    const grade = calGrade(getEnrollmentGrade(subject.subject_code));
+                                                    const credit = subject.credit;
+                                                    if (grade == null) {
+                                                        return "-";
+                                                    } else if (isNumber(grade)) {
+                                                        return String(grade * credit);
+                                                    } else {
+                                                        return grade;
+                                                    }
+                                                })()}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    ))}
+                </div>
+            );
+        } else if (subgroup?.subjects.every(subject => subject?.Track)) {
             const subjects = subgroup?.subjects
             const trackSubjects = {}
             for (let index = 0; index < subjects?.length; index++) {
@@ -308,9 +405,10 @@ const Page = () => {
         }
     }
 
-    const getSubg = (subgroups) => {
-        if (!subgroups) return undefined;
-        if (Object.values(subgroups).length === 0) return undefined;
+    const getSubg = (subgroups, semisubgroups) => {
+        if (!subgroups || !semisubgroups) return undefined;
+        if (Object.values(subgroups).length === 0 && Object.values(semisubgroups).length === 0) return undefined;
+
         // console.log(subgroups);
         const groupedSubgroups = {};
         Object.values(subgroups).forEach((subgroup) => {
@@ -319,6 +417,15 @@ const Page = () => {
                 groupedSubgroups[groupTitle] = [];
             }
             groupedSubgroups[groupTitle].push(subgroup);
+        });
+
+        Object.values(semisubgroups).forEach((semisubgroup) => {
+            const groupTitle = semisubgroup?.SubGroup?.Group?.group_title;
+            if (!groupedSubgroups[groupTitle]) {
+                groupedSubgroups[groupTitle] = [];
+            }
+            semisubgroup.SubGroup.subjects = semisubgroup.subjects
+            groupedSubgroups[groupTitle].push(semisubgroup?.SubGroup);
         });
 
         return (
@@ -384,13 +491,13 @@ const Page = () => {
                                             <Checkbox className='ml-2'>ต้น</Checkbox>
                                             <Checkbox className='ml-2'>ปลาย</Checkbox>
                                             <Checkbox className='mx-2'>ฤดูร้อน</Checkbox>
-                                            <p>ปีการศึกษา {userData.acadyear}</p>
+                                            <p>ปีการศึกษา {userData.acadyear+4}</p>
                                         </div>
                                     </div>
                                     <h2 className='mt-6 text-center '>ขอยื่นแบบฟอร์มแสดงรายละเอียดการศึกษารายวิชาที่ได้เรียนมาทั้งหมด อย่างน้อย <span className='font-bold'>{verifySelect.main_at_least}</span> หน่วยกิต ต่องานทะเบียนและประมวลผลการศึกษา ดังต่อไปนี้คือ.—</h2>
                                 </div>
                                 {Object.keys(groupedSubjectsByCategory).map((categoryId, index) => {
-                                    const { category, groups, subgroups } = groupedSubjectsByCategory[categoryId];
+                                    const { category, groups, subgroups, semisubgroups } = groupedSubjectsByCategory[categoryId];
                                     if (index > highestIndex) {
                                         setHighestIndex(index);
                                     }
@@ -450,7 +557,7 @@ const Page = () => {
                                                 );
                                             })}
                                             {
-                                                getSubg(subgroups)
+                                                getSubg(subgroups, semisubgroups)
                                             }
                                         </div>
                                     );
