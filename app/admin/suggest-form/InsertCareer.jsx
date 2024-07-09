@@ -1,6 +1,6 @@
 "use client"
 import { inputClass } from "@/src/util/ComponentClass";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { BsFillImageFill } from "react-icons/bs";
 import { UploadOutlined } from '@ant-design/icons';
@@ -11,7 +11,8 @@ import { message } from "antd";
 import { getToken } from "@/app/components/serverAction/TokenAction";
 import { hostname } from "@/app/api/hostname";
 
-const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => {
+const InsertCareer = ({ isOpen, onClose, src = "", getCareers, tracks }) => {
+     const [track, setTrack] = useState("");
      const [uploadImageFile, setUploadImageFile] = useState({});
      const [previewImage, setPreviewImage] = useState(src)
      const [nameTh, setNameTh] = useState("");
@@ -121,9 +122,10 @@ const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => 
                                              </div>
                                              <div className="w-1/2 flex flex-col">
                                                   <input
+                                                       readOnly
                                                        type="hidden"
                                                        name="track"
-                                                       value={track} />
+                                                       value={track?.currentKey} />
                                                   <Input
                                                        name='name_th'
                                                        type="text"
@@ -152,6 +154,26 @@ const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => 
                                                        className='mb-4'
                                                        isRequired
                                                   />
+                                                  <Select
+                                                       classNames={{
+                                                            trigger: "border-1 rounded-[5px]",
+                                                            listboxWrapper: "rounded-[5px]",
+                                                       }}
+                                                       className='mb-4'
+                                                       labelPlacement="outside"
+                                                       label="แทร็ก"
+                                                       variant="bordered"
+                                                       isRequired
+                                                       placeholder="เลือกแทร็ก"
+                                                       selectedKeys={track}
+                                                       onSelectionChange={setTrack}
+                                                  >
+                                                       {tracks.map((track) => (
+                                                            <SelectItem key={track.track}>
+                                                                 {track.track}
+                                                            </SelectItem>
+                                                       ))}
+                                                  </Select>
                                                   <div className='flex flex-col justify-center items-start'>
                                                        <span className="text-sm mb-2">อัพโหลดไฟล์รูปภาพ [ jpeg, jpg, png ]</span>
                                                        <label className="w-fit hover:border-blue-500 hover:text-blue-500 transition duration-75 cursor-pointer border-1 border-default-300 rounded-md px-3.5 py-1 text-default-700">
@@ -231,4 +253,4 @@ const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => 
      )
 }
 
-export default InsertCareerModal
+export default InsertCareer

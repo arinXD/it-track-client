@@ -91,17 +91,6 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
           return filteredItems.slice(start, end);
      }, [page, filteredItems, rowsPerPage]);
 
-     // Sorting data
-     const sortedItems = useMemo(() => {
-          return [...items].sort((a, b) => {
-               const first = a[sortDescriptor.column];
-               const second = b[sortDescriptor.column];
-               const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-               return sortDescriptor.direction === "descending" ? -cmp : cmp;
-          });
-     }, [sortDescriptor, items]);
-
      const availableForm = async (id) => {
           if (updating) return
           setupdating(true)
@@ -161,6 +150,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
                                    content="ลบ"
                               >
                                    <Button
+                                        isDisabled={deleting}
                                         onPress={() => handleDelete([form.id])}
                                         size='sm'
                                         color='danger'
@@ -215,7 +205,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
      useEffect(() => {
           let students
           if (selectedKeys == "all") {
-               students = sortedItems.map(e => e.id)
+               students = items.map(e => e.id)
                setDisableDeleteBtn(false)
           } else {
                students = [...selectedKeys.values()]
@@ -230,7 +220,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
 
      const handleDelete = useCallback(async (selectedTracks) => {
           swal.fire({
-               text: `ต้องการลบข้อมูลแทร็กหรือไม่ ?`,
+               text: `ต้องการลบข้อมูลแบบฟอร์มหรือไม่ ?`,
                icon: "question",
                showCancelButton: true,
                confirmButtonColor: "#3085d6",
@@ -241,7 +231,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
           }).then(async (result) => {
                if (result.isConfirmed) {
                     setDeleting(true)
-                    const options = await getOptions("/api/tracks/multiple", 'DELETE', selectedTracks)
+                    const options = await getOptions("/api/suggestion-forms/multiple", 'DELETE', selectedTracks)
                     axios(options)
                          .then(async result => {
                               const { message: msg } = result.data
@@ -378,7 +368,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
                                    }
                               />
                          }
-                         items={sortedItems}>
+                         items={items}>
                          {(item) => (
                               <TableRow key={item.id}>
                                    {(columnKey) =>
