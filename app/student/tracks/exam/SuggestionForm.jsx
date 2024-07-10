@@ -1,9 +1,18 @@
 "use client"
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Steps, message } from 'antd';
 import "./stepperStyle.css"
+import Questions from "./Questions";
+import Assessments from "./Assessments";
+import Careers from "./Careers";
 
 const SuggestionForm = ({ form }) => {
+    const allQuestions = form?.Questions
+    const allAssessments = form?.Assessments
+    const allCareers = form?.Careers
+    const [questions, setQuestions] = useState([]);
+    const [assessments, setAssessments] = useState([]);
+    const [careers, setCareers] = useState([]);
     const [current, setCurrent] = useState(0)
     const steps = useMemo(() => ([
         {
@@ -13,18 +22,44 @@ const SuggestionForm = ({ form }) => {
             title: 'แบบประเมิน',
         },
         {
-            title: 'อาชีพ',
+            title: 'ความชอบ',
         },
         {
-            title: 'สำเร็จ',
+            title: 'ยืนยัน',
         },
     ]), [])
+
+    const next = useCallback(() => {
+        setCurrent(prev => prev + 1)
+    }, [])
+    const prev = useCallback(() => {
+        setCurrent(prev => prev - 1)
+    }, [])
+
+    useEffect(() => {
+        if (form && questions?.length == 0 && assessments?.length == 0) {
+            const allQuestions = form?.Questions?.map(q => ({
+                qId: q.id,
+                aId: null
+            }))
+            const allAssessments = form?.Assessments?.map(ass => ({
+                assId: ass.id,
+                index: null
+            }))
+            setQuestions(allQuestions)
+            setAssessments(allAssessments)
+        }
+    }, [form])
 
     const items = useMemo(() => steps.map((item) => ({
         key: item.title,
         title: item.title,
         description: item.description,
     })), [])
+
+    const handleSubmit = useCallback(() => {
+
+    }, [])
 
     return (
         <div className={`my-8 px-8`}>
@@ -40,7 +75,40 @@ const SuggestionForm = ({ form }) => {
                             current={current}
                             onChange={setCurrent}
                             items={items} />
-                        {JSON.stringify(form)}
+                        <form
+                            onSubmit={handleSubmit}>
+                            <section className="w-full">
+                                <section className={`w-full ${current === 0 ? "block" : "hidden"}`}>
+                                    <Questions
+                                        next={next}
+                                        questions={questions}
+                                        allQuestions={allQuestions}
+                                        setQuestions={setQuestions}
+                                    />
+                                </section>
+                                <section className={`w-full ${current === 1 ? "block" : "hidden"}`}>
+                                    <Assessments
+                                        next={next}
+                                        prev={prev}
+                                        assessments={assessments}
+                                        allAssessments={allAssessments}
+                                        setAssessments={setAssessments}
+                                    />
+                                </section>
+                                <section className={`w-full ${current === 2 ? "block" : "hidden"}`}>
+                                    <Careers
+                                        next={next}
+                                        prev={prev}
+                                        careers={careers}
+                                        setCareers={setCareers}
+                                        allCareers={allCareers}
+                                    />
+                                </section>
+                                <section className={`w-full ${current === 3 ? "block" : "hidden"}`}>
+
+                                </section>
+                            </section>
+                        </form>
                     </section>
             }
         </div>
@@ -48,56 +116,3 @@ const SuggestionForm = ({ form }) => {
 }
 
 export default SuggestionForm
-
-// data.map((question, index) => (
-//     <div key={index} id={`question${index}`} className='mx-auto max-w-7xl my-12'>
-//         <p className='text-center text-4xl text-gray-600'>{question.question}</p>
-//         <div className='flex justify-center items-center gap-16 text-2xl'>
-//             <h2 className='text-green-800'>ฉันเห็นด้วย</h2>
-//             <div className='flex justify-center items-center gap-12 my-20'>
-//                 <Link href={`#question${index + 1}`}>
-//                     <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
-//                         <span className="w-16 h-16 flex items-center justify-center border border-gray-300 rounded-full">
-//                             <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-//                             <span className="block rounded-full transition duration-400 hover:bg-green-800 w-16 h-16"></span>
-//                         </span>
-//                     </label>
-//                 </Link>
-//                 <Link href={`#question${index + 1}`}>
-//                     <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
-//                         <span className="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-full">
-//                             <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-//                             <span className="block rounded-full transition duration-400 hover:bg-green-800 w-14 h-14"></span>
-//                         </span>
-//                     </label>
-//                 </Link>
-//                 <Link href={`#question${index + 1}`}>
-//                     <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
-//                         <span className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full">
-//                             <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-//                             <span className="block rounded-full transition duration-400 hover:bg-gray-600 w-10 h-10"></span>
-//                         </span>
-//                     </label>
-//                 </Link>
-//                 <Link href={`#question${index + 1}`}>
-//                     <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
-//                         <span className="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-full">
-//                             <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-//                             <span className="block rounded-full transition duration-400 hover:bg-purple-900 w-14 h-14"></span>
-//                         </span>
-//                     </label>
-//                 </Link>
-//                 <Link href={`#question${index + 1}`}>
-//                     <label for="default-radio-1" className="flex justify-center items-center cursor-pointer">
-//                         <span className="w-16 h-16 flex items-center justify-center border border-gray-300 rounded-full">
-//                             <input id="default-radio-1" type="radio" value="" name="default-radio" className="hidden" />
-//                             <span className="block rounded-full transition duration-400 hover:bg-purple-900 w-16 h-16"></span>
-//                         </span>
-//                     </label>
-//                 </Link>
-//             </div>
-//             <h2 className='text-purple-800'>ฉันไม่เห็นด้วย</h2>
-//         </div>
-//         <hr className='border-1 border-gray-300' />
-//     </div>
-// ))

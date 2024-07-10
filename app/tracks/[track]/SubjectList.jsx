@@ -1,16 +1,16 @@
 "use client"
+import Image from "next/image";
+
 const SubjectList = ({ track, subjects }) => {
-    const trackImagePath = track?.track ? `/${track.track.toLowerCase()}.png` : '/track.jpg';
 
     return (
         <section className="grid grid-cols-2 gap-10 mt-20 mb-5 ">
             <div className="flex justify-center lg:justify-end max-lg:col-span-2">
-                <img
-                    src={"/track.jpg"}
+                <Image
+                    src={`/image/${track.track.toLowerCase()}.png`}
                     onError={({ currentTarget }) => {
-                        // Fallback image on error
-                        currentTarget.onerror = null; // Prevent infinite loop
-                        currentTarget.src = "/track.jpg";
+                        currentTarget.onerror = null;
+                        currentTarget.src = "/image/track.jpg";
                     }}
                     alt={track?.track || "track"}
                     className="object-cover w-[500px]"

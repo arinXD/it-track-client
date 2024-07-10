@@ -177,8 +177,8 @@ const Page = () => {
             <Toaster />
             <div
                 style={{ transform: 'translate(-50%, -50%)' }}
-                className='absolute w-full max-h-full max-w-7xl h-[calc(100%)] top-[50%] left-[50%] flex flex-col items-center gap-5 p-4'>
-                <div className='pt-8 pb-3 w-full max-h-full flex flex-col items-center justify-center'>
+                className='absolute w-full max-h-full max-w-7xl h-[calc(100%)] top-[50%] left-[50%] flex flex-col justify-center items-center gap-4 p-4'>
+                <div className='py-3 w-full max-h-full flex flex-col items-center justify-center'>
                     <div className='w-fit'>
                         <h1 className="font-bold text-4xl sm:text-5xl leading-tight tracking-tight text-blue-500 text-center">
                             KKU IT
@@ -190,7 +190,7 @@ const Page = () => {
                 </div>
                 <div className="max-h-full w-full sm:w-1/2 px-10 flex justify-start items-center">
                     <form className="w-full space-y-4" onSubmit={signInCredentials}>
-                        {(error) ?
+                        {/* {(error) ?
                             <div className='relative'>
                                 <div className={'flex gap-3 items-center bg-red-500 text-white px-3 py-3'}>
                                     <AiOutlineCloseCircle onClick={() => {
@@ -212,7 +212,6 @@ const Page = () => {
                             null
                         }
                         <div>
-                            {/* <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">Your email</label> */}
                             <input
                                 type="email"
                                 name="email"
@@ -223,7 +222,6 @@ const Page = () => {
                                 placeholder="อีเมล" />
                         </div>
                         <div className='relative select-none'>
-                            {/* <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900">Password</label> */}
                             {
                                 (displayPass) ?
                                     <BsEyeSlashFill
@@ -259,11 +257,10 @@ const Page = () => {
                             <hr className='border-slate-500 w-full' />
                             <div className='text-slate-500'>or</div>
                             <hr className='border-slate-500 w-full' />
-                        </div>
+                        </div> */}
 
-                        <div className="mt-3">
+                        <div className="mt-0">
                             <div onClick={signInGoogle} className='border border-slate-500 rounded-[5px] flex flex-row gap-4 items-center justify-center p-3 w-full cursor-pointer text-gray-500 hover:text-blue-500 hover:border-blue-500'>
-                                {/* <img className='w-5 h-auto' src="/LogoKKU.png" /> */}
                                 <img className='w-6 h-auto' src="/google.png" />
                                 <span className='text-sm'>
                                     เข้าสู่ระบบด้วยบัญชี Google หรือ KKU Mail
