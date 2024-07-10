@@ -91,6 +91,7 @@ const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress, con
                             onClick={() => {
                                 document.querySelector("#coverImg").value = ""
                                 setUploadImageFile({})
+                                setImageFile({})
                             }}
                             className='bg-gray-200 p-1 ms-auto cursor-pointer transition duration-75 hover:bg-gray-300 rounded-md'>
                             <AiOutlineDelete className='text-default-500 w-4 h-4' />

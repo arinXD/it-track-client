@@ -219,7 +219,7 @@ const Page = () => {
                                 id="email"
                                 ref={email}
                                 autoComplete="email"
-                                className={`${(emptyEmail) ? 'border-2 border-red-500' : 'border border-gray-400'} bg-gray-50 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 focus:outline-none`}
+                                className={`${(emptyEmail) ? 'border-2 border-red-500' : 'border border-gray-400'} bg-gray-50 text-gray-900 sm:text-sm rounded-[5px] focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 focus:outline-none`}
                                 placeholder="อีเมล" />
                         </div>
                         <div className='relative select-none'>
@@ -243,7 +243,7 @@ const Page = () => {
                                 ref={pass}
                                 placeholder="รหัสผ่าน"
                                 autoComplete="current-password"
-                                className={`${(emptyPass) ? 'border-2 border-red-500' : 'border border-gray-400'} bg-gray-50 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 focus:outline-none`} />
+                                className={`${(emptyPass) ? 'border-2 border-red-500' : 'border border-gray-400'} bg-gray-50 text-gray-900 sm:text-sm rounded-[5px] focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 focus:outline-none`} />
                         </div>
                         <div className="flex items-center justify-end">
                             <Link href="#" className="text-sm font-medium text-primary-600 hover:underline">ลืมรหัสผ่าน?</Link>
@@ -251,7 +251,7 @@ const Page = () => {
                         <button
                             disabled={isProcress}
                             type="submit"
-                            className={`${isProcress ? "opacity-70" : null} bg-blue-600 hover:bg-blue-700 w-full text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center`}>
+                            className={`${isProcress ? "opacity-70" : null} bg-blue-600 hover:bg-blue-700 w-full text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-[5px] text-sm px-5 py-2.5 text-center`}>
                             เข้าสู่ระบบ
                         </button>
 
@@ -262,10 +262,11 @@ const Page = () => {
                         </div>
 
                         <div className="mt-3">
-                            <div onClick={signInGoogle} className='border border-slate-500 rounded-lg flex flex-row gap-4 items-center justify-center py-3 w-full cursor-pointer text-gray-500 hover:text-blue-500 hover:border-blue-500'>
-                                <img className='w-5 h-auto' src="/LogoKKU.png" />
+                            <div onClick={signInGoogle} className='border border-slate-500 rounded-[5px] flex flex-row gap-4 items-center justify-center p-3 w-full cursor-pointer text-gray-500 hover:text-blue-500 hover:border-blue-500'>
+                                {/* <img className='w-5 h-auto' src="/LogoKKU.png" /> */}
+                                <img className='w-6 h-auto' src="/google.png" />
                                 <span className='text-sm'>
-                                    เข้าสู่ระบบด้วยบัญชี KKU Mail
+                                    เข้าสู่ระบบด้วยบัญชี Google หรือ KKU Mail
                                 </span>
                             </div>
                         </div>
@@ -284,9 +285,9 @@ const Page = () => {
                 <div
                     id='wrap'
                     style={{ transform: 'translate(-50%, -50%)' }}
-                    className="z-20 top-[50%] left-[50%] absolute w-full max-w-lg bg-white border-white rounded-lg">
+                    className="z-20 top-[50%] left-[50%] absolute w-full max-w-lg bg-white border-white rounded-[5px]">
                     {/* <!-- Modal content --> */}
-                    <div className="relative z-30 rounded-lg shadow">
+                    <div className="relative z-30 rounded-[5px] shadow">
                         {/* <!-- Modal body --> */}
                         <SignUp closeModal={closeModal} />
                     </div>

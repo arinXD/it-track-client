@@ -10,6 +10,7 @@ import { getOptions } from "@/app/components/serverAction/TokenAction";
 import axios from "axios";
 
 const ManageForm = ({ formId }) => {
+     const [createTrigger, setCreateTrigger] = useState(false);
      const [creating, setCreating] = useState(false);
      const [fetching, setFetching] = useState(false);
      const [fetchingFormData, setfetchingFormData] = useState(false);
@@ -109,6 +110,7 @@ const ManageForm = ({ formId }) => {
 
      const handleSubmit = async (e) => {
           e.preventDefault();
+          if(!createTrigger) return
           if (!Object.values(suggestForm).every(value => value)) { message.warning("จำเป็นต้องเพิ่มข้อมูลแบบฟอร์ม"); setCurrent(0); return; }
           if (!questions.length) { message.warning("จำเป็นต้องเพิ่มคำถาม"); setCurrent(1); return; }
           if (!assesstion.length) { message.warning("จำเป็นต้องเพิ่มแบบประเมินตนเอง"); setCurrent(2); return; }
@@ -157,7 +159,7 @@ const ManageForm = ({ formId }) => {
                                    <>
                                         <section className={`w-full ${current === 0 ? "block" : "hidden"}`}>
                                              {
-                                                  formId && <input type="text" name="id" defaultValue={formId} readOnly/>
+                                                  formId && <input type="text" name="id" defaultValue={formId} readOnly />
                                              }
                                              <SuggestForm
                                                   next={next}
@@ -189,6 +191,7 @@ const ManageForm = ({ formId }) => {
                                         </section>
                                         <section className={`w-full ${current === 3 ? "block" : "hidden"}`}>
                                              <CareerForm
+                                                  setCreateTrigger={setCreateTrigger}
                                                   creating={creating}
                                                   setCareers={setCareers}
                                                   prev={prev}

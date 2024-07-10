@@ -29,12 +29,12 @@ const Page = () => {
 
      const handleSubmit = useCallback(async (e) => {
           e.preventDefault()
-          if (fileIsEmpty(trackImageFile)) {
-               message.error("ภาพแทร็กต้องไม่ว่าง")
-               return
-          }
           if (fileIsEmpty(coverImageFile)) {
                message.error("ภาพหน้าปกต้องไม่ว่าง")
+               return
+          }
+          if (fileIsEmpty(trackImageFile)) {
+               message.error("ภาพแทร็กต้องไม่ว่าง")
                return
           }
           const formData = new FormData(e.target);
@@ -138,6 +138,7 @@ const Page = () => {
                                                        onValueChange={setTrack}
                                                        classNames={inputClass}
                                                        className='mb-4'
+                                                       pattern="^[a-zA-Z0-9]*$"
                                                        isRequired
                                                   />
                                                   <Input
