@@ -74,7 +74,7 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
                                    </div>
                                    <h2 className='text-purple-800'>ฉันไม่เห็นด้วย</h2>
                               </div>
-                              <hr className='border-1 border-gray-300' />
+                              {index !== assessments?.length - 1 && <hr className='border-1' />}
                          </div>
                     </div>
                ))}

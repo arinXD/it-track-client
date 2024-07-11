@@ -5,6 +5,9 @@ import "./stepperStyle.css"
 import Questions from "./Questions";
 import Assessments from "./Assessments";
 import Careers from "./Careers";
+import Summarize from "./Summarize";
+import { getOptions } from "@/app/components/serverAction/TokenAction";
+import axios from "axios";
 
 const SuggestionForm = ({ form }) => {
     const allQuestions = form?.Questions
@@ -25,9 +28,14 @@ const SuggestionForm = ({ form }) => {
             title: 'ความชอบ',
         },
         {
-            title: 'ยืนยัน',
+            title: 'สรุปผล',
         },
     ]), [])
+    const summarize = useMemo(() => ({
+        questions: questions?.filter(q => q.aId).length > 0,
+        assessments: assessments?.filter(q => q.index).length > 0,
+        careers: careers?.length > 0,
+    }), [questions, assessments, careers,])
 
     const next = useCallback(() => {
         setCurrent(prev => prev + 1)
@@ -57,9 +65,22 @@ const SuggestionForm = ({ form }) => {
         description: item.description,
     })), [])
 
-    const handleSubmit = useCallback(() => {
-
-    }, [])
+    const handleSubmit = useCallback(async (e) => {
+        e.preventDefault()
+        const formData = {
+            questions,
+            assessments,
+            careers,
+        }
+        const option = await getOptions("/api/suggestion-forms/summarize", "post", formData)
+        try {
+            const res = await axios(option)
+            const form = res.data.data
+            return form
+        } catch (error) {
+            return {}
+        }
+    }, [questions, assessments, careers])
 
     return (
         <div className={`my-8 px-8`}>
@@ -105,7 +126,11 @@ const SuggestionForm = ({ form }) => {
                                     />
                                 </section>
                                 <section className={`w-full ${current === 3 ? "block" : "hidden"}`}>
-
+                                    <Summarize
+                                        summarize={summarize}
+                                        setCurrent={setCurrent}
+                                        prev={prev}
+                                    />
                                 </section>
                             </section>
                         </form>
