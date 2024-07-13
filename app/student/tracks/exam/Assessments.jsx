@@ -28,34 +28,36 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
 
      const buttonSizes = [14, 12, 10, 12, 14];
      const buttonColors = [
-          { bgColor: '#166534' },
-          { bgColor: '#166534' },
-          { bgColor: '#4b5563' },
-          { bgColor: '#581c87' },
-          { bgColor: '#581c87' },
+          { bgColor: '#32A474' },
+          { bgColor: '#32A474' },
+          { bgColor: '#9B9FAA' },
+          { bgColor: '#886199' },
+          { bgColor: '#886199' },
      ];
 
      return (
           <div>
-               {JSON.stringify(assessments)}
                {allAssessments?.map((ass, index) => (
                     <div
                          ref={el => assessmentRefs.current[index] = el}
                          key={ass.id}
-                         className="mb-6">
+                         className="my-12">
                          <div className='mx-auto max-w-7xl my-12'>
                               <p className='text-center text-4xl text-gray-600'>{ass.question}</p>
                               <div className='flex justify-center items-center gap-16 text-2xl'>
-                                   <h2 className='text-green-800'>ฉันเห็นด้วย</h2>
-                                   <div className='flex justify-center items-center gap-16 my-20'>
+                                   <h2 className='text-[#32A474] w-[20%] text-[.85em] text-center'>ฉันเห็นด้วย</h2>
+                                   <div className='flex justify-center items-center gap-16 my-20 w-[50%]'>
                                         {[0, 1, 2, 3, 4].map(number => {
                                              const currentAssessment = assessments.find(assessment => assessment.assId === ass.id);
                                              const isSelected = currentAssessment?.index === number;
                                              return (
                                                   <button
+                                                       style={{
+                                                            borderColor: buttonColors[number].bgColor
+                                                       }}
                                                        key={number}
                                                        type="button"
-                                                       className="assessment-item border rounded-full"
+                                                       className="assessment-item border-2 rounded-full"
                                                        onClick={() => handleAnswerChange(ass.id, number)}
                                                   >
                                                        <label className="flex justify-center items-center cursor-pointer">
@@ -72,7 +74,7 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
                                              );
                                         })}
                                    </div>
-                                   <h2 className='text-purple-800'>ฉันไม่เห็นด้วย</h2>
+                                   <h2 className='text-[#886199] w-[20%] text-[.85em] text-center'>ฉันไม่เห็นด้วย</h2>
                               </div>
                               {index !== assessments?.length - 1 && <hr className='border-1' />}
                          </div>

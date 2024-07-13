@@ -1,14 +1,14 @@
 "use client"
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { CloseCircleOutlined } from '@ant-design/icons';
-import { Result, Typography } from 'antd';
+import { Result, Spin, Typography } from 'antd';
 import { Button } from "@nextui-org/react";
 import { BiCheckCircle } from "react-icons/bi";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { CiCircleCheck } from "react-icons/ci";
 import { GoCheckCircle } from "react-icons/go";
 import { useMemo } from "react";
-const Summarize = ({ prev, setCurrent, summarize }) => {
+const Summarize = ({ prev, setCurrent, summarize, summarizing }) => {
      const { Paragraph, Text } = Typography;
 
      const isSummarize = useMemo(() => (Object.values(summarize).every(value => value)), [summarize])
@@ -26,12 +26,13 @@ const Summarize = ({ prev, setCurrent, summarize }) => {
                                    type="submit"
                                    className="rounded-[5px]"
                                    color="primary"
+                                   isDisabled={summarizing}
                               >
                                    ยืนยัน
                               </Button>,
                          ]}
                >
-                    <div className="desc">
+                    <Spin spinning={summarizing}>
                          <Paragraph>
                               <Text
                                    strong
@@ -72,7 +73,7 @@ const Summarize = ({ prev, setCurrent, summarize }) => {
                               <span>Step 3) Answer careers.</span>
                               {!summarize.careers && <a onClick={() => setCurrent(2)}>Go to careers.</a>}
                          </Paragraph>
-                    </div>
+                    </Spin>
                </Result>
                <div className="w-full flex justify-between">
                     <div

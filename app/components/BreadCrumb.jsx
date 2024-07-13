@@ -3,11 +3,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { HomeIcon, RightArrow } from './icons';
 import { useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 
 const BreadCrumb = () => {
-    const links = useMemo(()=>({
+    const { data: session } = useSession();
+    const links = useMemo(() => ({
         "/": "หน้าหลัก",
-        "admin": "Admin Panel",
+        "admin": session?.user?.role === "admin" ? "Admin Panel" : "Teacher Panel",
         "acadyears": "ปีการศึกษา",
         "program": "หลักสูตร",
         "programcode": "รหัสหลักสูตร",
@@ -32,7 +34,7 @@ const BreadCrumb = () => {
         "insert-track": "เพิ่มแทร็ก",
         "suggest-form": "แบบฟอร์มแนะนำแทร็ก",
         "create": "เพิ่มข้อมูล",
-    }), [])
+    }), [session])
     const url = usePathname();
     const urls = useMemo(() => (url.split("/").filter(e => e)), [url])
 
@@ -64,7 +66,7 @@ const BreadCrumb = () => {
                                             style={{
                                                 fontSize: "clamp(3px, 3vw, 16px)",
                                             }}
-                                            href={`/${currentUrl}`} 
+                                            href={`/${currentUrl}`}
                                             className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                                             {links[currentUrl] || String(currentUrl)}
                                         </Link>
@@ -73,7 +75,7 @@ const BreadCrumb = () => {
                             :
                             // index ต่อไป
                             <>
-                                <RightArrow/>
+                                <RightArrow />
                                 {
                                     isLastIndex ?
                                         <span
@@ -87,7 +89,7 @@ const BreadCrumb = () => {
                                             style={{
                                                 fontSize: "clamp(3px, 3vw, 16px)",
                                             }}
-                                            href={nextIndex} 
+                                            href={nextIndex}
                                             className="ms-1.5 inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                                             {links[currentUrl] || String(currentUrl)}
                                         </Link>

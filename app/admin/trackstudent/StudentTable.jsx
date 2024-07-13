@@ -92,7 +92,7 @@ const StudentTable = () => {
           setSearching(false)
      }
      async function getTracks() {
-          let tracks = await fetchData(`/api/tracks`)
+          let tracks = await fetchData(`/api/tracks/all`)
           if (tracks?.length) {
                tracks = tracks.map(track => track.track)
           } else {

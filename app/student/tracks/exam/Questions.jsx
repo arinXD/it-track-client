@@ -25,29 +25,30 @@ const Questions = ({ questions, setQuestions, allQuestions, next }) => {
      };
      return (
           <section>
-               {JSON.stringify(questions)}
-               {allQuestions?.map((q, index) => (
-                    <div
-                         ref={r => questionsRef.current[index] = r}
-                         key={q.id}
-                         className="mb-6">
-                         <p className="mb-2">
-                              <span className="font-bold">{index + 1}. </span>
-                              <span>{q.question}</span>
-                         </p>
-                         <Radio.Group
-                              onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-                         >
-                              <Space direction="vertical">
-                                   {q?.Answers.map((ans) => (
-                                        <Radio key={ans.id} value={ans.id}>
-                                             {ans.answer}
-                                        </Radio>
-                                   ))}
-                              </Space>
-                         </Radio.Group>
-                    </div>
-               ))}
+               <section>
+                    {allQuestions?.map((q, index) => (
+                         <div
+                              ref={r => questionsRef.current[index] = r}
+                              key={q.id}
+                              className="mb-6">
+                              <p className="mb-2">
+                                   <span className="font-bold">{index + 1}. </span>
+                                   <span>{q.question}</span>
+                              </p>
+                              <Radio.Group
+                                   onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                              >
+                                   <Space direction="vertical">
+                                        {q?.Answers.map((ans) => (
+                                             <Radio key={ans.id} value={ans.id}>
+                                                  {ans.answer}
+                                             </Radio>
+                                        ))}
+                                   </Space>
+                              </Radio.Group>
+                         </div>
+                    ))}
+               </section>
                <div
                     className="w-full flex justify-end">
                     <div

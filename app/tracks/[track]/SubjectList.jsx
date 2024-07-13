@@ -7,10 +7,12 @@ const SubjectList = ({ track, subjects }) => {
         <section className="grid grid-cols-2 gap-10 mt-20 mb-5 ">
             <div className="flex justify-center lg:justify-end max-lg:col-span-2">
                 <Image
+                    width={800}
+                    height={800}
                     src={`/image/${track.track.toLowerCase()}.png`}
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null;
-                        currentTarget.src = "/image/track.jpg";
+                        currentTarget.src = "/image/track.png";
                     }}
                     alt={track?.track || "track"}
                     className="object-cover w-[500px]"

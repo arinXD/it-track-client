@@ -21,6 +21,7 @@ import TrackSubjectTable from './TrackSubjectTable';
 import { FiDownload } from "react-icons/fi";
 import { calGrade, floorGpa, isNumber } from '@/src/util/grade';
 import { utils, writeFile } from "xlsx";
+import { message } from 'antd';
 
 const Page = ({ params }) => {
     const swal = useCallback(Swal.mixin({
@@ -70,6 +71,7 @@ const Page = ({ params }) => {
     const [allTrack, setAllTrack] = useState([])
     const [tracks, setTracks] = useState([])
     const [selectedTrack, setSelectedTrack] = useState("all");
+    const [sendingEmail, setSendingEmail] = useState(false);
 
     const [starting, setStarting] = useState(false)
     const [updating, setUpdating] = useState(false)
@@ -574,6 +576,20 @@ const Page = ({ params }) => {
         }
     }, [trackSubj])
 
+    const handleSendingEmail = useCallback(async (acadyear) => {
+        const option = await getOptions(`/api/tracks/selects/${acadyear}/email/send`, "post")
+        try {
+            setSendingEmail(true)
+            await axios(option)
+            message.success("ส่งอีเมลแจ้งเตือนสำเร็จ")
+        } catch (error) {
+            console.log(error);
+            message.warning("ไม่สามารถส่งอีเมลแจ้งเตือนได้")
+        } finally {
+            setSendingEmail(false)
+        }
+    }, [])
+
     return (
         <>
             <header>
@@ -723,13 +739,15 @@ const Page = ({ params }) => {
                                                     className='bg-gray-300'>
                                                     ลบ
                                                 </Button>
+                                                {/* sendingEmail
+                                                setSendingEmail */}
                                                 <Button
                                                     size='sm'
                                                     radius='sm'
                                                     color="default"
-                                                    isDisabled={deleting}
-                                                    isLoading={deleting}
-                                                    onPress={handleDelete}
+                                                    isDisabled={sendingEmail}
+                                                    isLoading={sendingEmail}
+                                                    onPress={() => handleSendingEmail(trackSelect?.acadyear)}
                                                     variant="solid"
                                                     startContent={<DeleteIcon2 className="w-5 h-5" />}
                                                     className='bg-gray-300'>
