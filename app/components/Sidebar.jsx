@@ -15,7 +15,7 @@ const SidebarLink = ({ href, activeIcon, icon, label, isActive, toggleSideBar })
     <Tooltip placement="right" title={!toggleSideBar && label}>
         <Link
             href={href}
-            className={`${isActive ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center px-3 rounded-lg group`}
+            className={`${isActive ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center px-3 rounded-[5px] group`}
         >
             {isActive ? activeIcon : icon}
             {toggleSideBar && <span className="ml-5 text-[13px]">{label}</span>}

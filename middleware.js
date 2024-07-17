@@ -50,7 +50,7 @@ export const config = {
         "/teacher/:path*",
         "/tracks/:path*",
         "/admin/:path*",
-        "/dashboard",
+        "/profile/:path*",
         "/((?!api|_next/static|_next/image|.*\\.png$).*)"
     ]
 }

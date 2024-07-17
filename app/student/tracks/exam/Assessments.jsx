@@ -1,29 +1,14 @@
 "use client"
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import "./assessment.css"
-import { useRef } from "react";
 
 const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }) => {
-     const assessmentRefs = useRef([]);
-
      const handleAnswerChange = (assId, index) => {
           setAssessments(prevAssessment =>
                prevAssessment.map(assessment =>
                     assessment.assId === assId ? { ...assessment, index } : assessment
                )
           );
-          const currentIndex = allAssessments.findIndex(ass => ass.id === assId);
-          scrollToNextAssessment(currentIndex);
-     };
-
-     const scrollToNextAssessment = (currentIndex) => {
-          const nextIndex = currentIndex + 1;
-          if (nextIndex < allAssessments.length) {
-               assessmentRefs.current[nextIndex].scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-               });
-          }
      };
 
      const buttonSizes = [14, 12, 10, 12, 14];
@@ -39,7 +24,6 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
           <div>
                {allAssessments?.map((ass, index) => (
                     <div
-                         ref={el => assessmentRefs.current[index] = el}
                          key={ass.id}
                          className="my-12">
                          <div className='mx-auto max-w-7xl my-12'>

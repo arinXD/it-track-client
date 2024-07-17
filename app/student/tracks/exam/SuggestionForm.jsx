@@ -37,8 +37,8 @@ const SuggestionForm = ({ form }) => {
     ]), [])
 
     const summarize = useMemo(() => ({
-        questions: questions?.filter(q => q.aId).length > 0,
-        assessments: assessments?.filter(q => q.index !== null).length > 0,
+        questions: questions?.filter(q => q.aId).length === questions?.length,
+        assessments: assessments?.filter(q => q.index !== null).length === assessments?.length,
         careers: careers?.length > 0,
     }), [questions, assessments, careers,])
 
@@ -103,7 +103,7 @@ const SuggestionForm = ({ form }) => {
     }, [])
 
     useEffect(() => {
-        if(current) window.scrollTo(0, 1150)
+        if(current) window.scrollTo(0, 750)
     }, [current])
 
     return (

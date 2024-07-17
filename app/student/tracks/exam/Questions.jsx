@@ -1,34 +1,20 @@
 "use client"
 import { Radio, Space } from "antd"
-import { useRef } from "react";
 import { MdKeyboardArrowRight } from "react-icons/md";
 
-const Questions = ({ questions, setQuestions, allQuestions, next }) => {
-     const questionsRef = useRef([])
+const Questions = ({ setQuestions, allQuestions, next }) => {
      const handleAnswerChange = (questionId, answerId) => {
           setQuestions(prevQuestions =>
                prevQuestions.map(question =>
                     question.qId === questionId ? { ...question, aId: answerId } : question
                )
           );
-          const currentIndex = allQuestions.findIndex(q => q.id === questionId);
-          scrollToNextQuestions(currentIndex);
-     };
-     const scrollToNextQuestions = (currentIndex) => {
-          const nextIndex = currentIndex + 1;
-          if (nextIndex < allQuestions.length) {
-               questionsRef.current[nextIndex].scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-               });
-          }
      };
      return (
           <section>
                <section>
                     {allQuestions?.map((q, index) => (
                          <div
-                              ref={r => questionsRef.current[index] = r}
                               key={q.id}
                               className="mb-6">
                               <p className="mb-2">
