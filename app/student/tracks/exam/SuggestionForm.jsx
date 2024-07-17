@@ -110,7 +110,7 @@ const SuggestionForm = ({ form }) => {
         <div className={` px-12 pb-12 bg-[#F9F9F9]`}>
             {
                 Object.keys(form).length === 0 ?
-                    <section className='text-center font-bold text-lg my-28'>
+                    <section className='text-center font-bold text-lg py-28'>
                         Coming soon!
                     </section>
                     :

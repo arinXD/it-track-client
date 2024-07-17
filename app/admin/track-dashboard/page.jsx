@@ -1,10 +1,10 @@
 "use client"
 import { useEffect, useMemo, useState } from 'react'
-import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '../components';
+import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '@/app/components';
 import { getAcadyears } from '@/src/util/academicYear';
-import { SearchIcon } from '../components/icons';
+import { SearchIcon } from '@/app/components/icons';
 import { Button } from '@nextui-org/react';
-import { fetchDataObj } from '../admin/action';
+import { fetchDataObj } from '../action';
 import Select from 'react-select';
 import dynamic from 'next/dynamic';
 

@@ -2,7 +2,7 @@
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData, fetchDataObj } from '../../action'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { Button, Tab, Tabs, useDisclosure, Input, Spinner, Chip } from "@nextui-org/react";
+import { Button, Tab, Tabs, useDisclosure, Input, Spinner, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import { format } from 'date-fns';
 import Swal from 'sweetalert2'
 import axios from 'axios';
@@ -21,7 +21,7 @@ import TrackSubjectTable from './TrackSubjectTable';
 import { FiDownload } from "react-icons/fi";
 import { calGrade, floorGpa, isNumber } from '@/src/util/grade';
 import { utils, writeFile } from "xlsx";
-import { message } from 'antd';
+import { Empty, message } from 'antd';
 
 const Page = ({ params }) => {
     const swal = useCallback(Swal.mixin({
@@ -905,26 +905,38 @@ const Page = ({ params }) => {
                                                                 โครงการปกติ {nonSelectStudent?.filter(student => student.courses_type == "โครงการปกติ")?.length} คน
                                                                 โครงการพิเศษ {nonSelectStudent?.filter(student => student.courses_type == "โครงการพิเศษ")?.length} คน
                                                             </p>
-                                                            <div className='h-[350px] overflow-y-auto overflow-hidden'>
-                                                                <table>
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th className='border-1 px-6 border-gray-500'>รหัสนักศึกษา</th>
-                                                                            <th className='border-1 px-6 border-gray-500'>ชื่อ - สกุล</th>
-                                                                            <th className='border-1 px-6 border-gray-500'>ประเภทโครงการ</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {nonSelectStudent && nonSelectStudent.map((student, index) => (
-                                                                            <tr key={index}>
-                                                                                <td className='border-1 px-6 border-gray-500'>{student?.stu_id}</td>
-                                                                                <td className='border-1 px-6 border-gray-500'>{student?.fullname}</td>
-                                                                                <td className='border-1 px-6 border-gray-500'>{student?.courses_type}</td>
-                                                                            </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
+                                                            <Table
+                                                                isStriped
+                                                                isHeaderSticky
+                                                                classNames={{
+                                                                    wrapper: "max-h-[400px]",
+                                                                }}
+                                                                aria-label="Non select data">
+                                                                <TableHeader>
+                                                                    <TableColumn>รหัสนักศึกษา</TableColumn>
+                                                                    <TableColumn>ชื่อ - สกุล</TableColumn>
+                                                                    <TableColumn>ประเภทโครงการ</TableColumn>
+                                                                </TableHeader>
+                                                                <TableBody
+                                                                    items={nonSelectStudent}
+                                                                    emptyContent={
+                                                                        <Empty
+                                                                            className='my-4'
+                                                                            description={
+                                                                                <span className='text-gray-300'>นักศึกษาเลือกแทร็กทุกคนแล้ว</span>
+                                                                            }
+                                                                        />
+                                                                    }
+                                                                >
+                                                                    {(item) => (
+                                                                        <TableRow key={item.stu_id}>
+                                                                            <TableCell>{item?.stu_id}</TableCell>
+                                                                            <TableCell>{item?.fullname}</TableCell>
+                                                                            <TableCell>{item?.courses_type}</TableCell>
+                                                                        </TableRow>
+                                                                    )}
+                                                                </TableBody>
+                                                            </Table>
                                                         </div>
                                                     </Tab>
                                                 </Tabs>
@@ -932,7 +944,8 @@ const Page = ({ params }) => {
                                             : (studentsBit?.students?.length == 0 &&
                                                 studentsNetwork?.students?.length == 0 &&
                                                 studentsWeb?.students?.length == 0) ?
-                                                <p>ยังไม่มีนักศึกษาเลือกแทร็ก</p>
+                                                <p
+                                                    className='border-2 border-dashed p-4 text-center rounded-[5px] bg-gray-100'>ยังไม่มีนักศึกษาเลือกแทร็ก</p>
                                                 :
                                                 null
                                     }

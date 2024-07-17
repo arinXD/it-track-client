@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 
 const BreadCrumb = () => {
     const { data: session } = useSession();
-    const links = useMemo(() => ({
+    const links = {
         "/": "หน้าหลัก",
         "admin": session?.user?.role === "admin" ? "Admin Panel" : "Teacher Panel",
         "acadyears": "ปีการศึกษา",
@@ -20,7 +20,7 @@ const BreadCrumb = () => {
         "track": "ข้อมูลแทร็ก",
         "track-selection": "คัดเลือกแทร็ก",
         "track-student": "รายชื่อนักศึกษาภายในแทร็ก",
-        "dashboard": "Dashboard",
+        "track-dashboard": "สรุปผลการคัดเลือกแทร็ก",
         "students": "รายชื่อนักศึกษา",
         "restore": "รายการที่ถูกลบ",
         "trackstudent": "รายชื่อนักศึกษาภายในแทร็ก",
@@ -34,7 +34,7 @@ const BreadCrumb = () => {
         "insert-track": "เพิ่มแทร็ก",
         "suggest-form": "แบบฟอร์มแนะนำแทร็ก",
         "create": "เพิ่มข้อมูล",
-    }), [session])
+    }
     const url = usePathname();
     const urls = useMemo(() => (url.split("/").filter(e => e)), [url])
 
@@ -101,7 +101,7 @@ const BreadCrumb = () => {
             );
         }
         return elements
-    }, [urls])
+    }, [urls, session])
 
     return (
         <>

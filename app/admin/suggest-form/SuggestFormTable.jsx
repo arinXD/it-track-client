@@ -294,7 +294,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
                                    เพิ่มแบบฟอร์ม
                               </Button>
                          </Link>
-                         <Link href="/admin/track/restore">
+                         {/* <Link href="/admin/track/restore">
                               <Button
                                    size="sm"
                                    radius="sm"
@@ -303,7 +303,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
                                    startContent={<TbRestore className="w-4 h-4" />}>
                                    รายการที่ถูกลบ
                               </Button>
-                         </Link>
+                         </Link> */}
                          <Button
                               isDisabled={disableDeleteBtn || deleting}
                               isLoading={deleting}

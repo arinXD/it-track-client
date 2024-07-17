@@ -1,14 +1,18 @@
 "use client"
 import Link from 'next/link';
-import { IoBook } from "react-icons/io5";
+import { IoBookOutline } from "react-icons/io5";
 import { IoMdCheckboxOutline } from "react-icons/io";
-import { BiSolidCategory, BiSolidBook } from "react-icons/bi";
-import { BsFillPersonFill } from "react-icons/bs";
-import { HiAcademicCap } from "react-icons/hi2";
-import { HiUserGroup } from "react-icons/hi";
-import { AiFillEdit } from "react-icons/ai";
+import { BiCategory } from "react-icons/bi";
+import { BsPerson } from "react-icons/bs";
+import { HiOutlineAcademicCap, HiOutlineUserGroup } from "react-icons/hi2";
+import { AiOutlineEdit } from "react-icons/ai";
 import { useSession } from 'next-auth/react';
 import { useMemo } from 'react';
+import { GrPieChart } from "react-icons/gr";
+import { HiOutlineRectangleGroup } from "react-icons/hi2";
+import { LuUngroup } from "react-icons/lu";
+import { RiBookletLine } from 'react-icons/ri';
+import { TbCheckupList } from "react-icons/tb";
 
 const AdminList = () => {
      const { data: session } = useSession();
@@ -19,28 +23,29 @@ const AdminList = () => {
 
      const teacherList = useMemo(() => ([
           "รายชื่อนักศึกษา", "ข้อมูลแทรค", "คัดเลือกแทรค",
-          "รายชื่อนักศึกษาภายในแทรค", "อนุมัติจบการศึกษา"
+          "รายชื่อนักศึกษาภายในแทรค", "อนุมัติจบการศึกษา", "สรุปผลการคัดเลือก"
      ]), []);
 
      const categories = useMemo(() => ([
           {
                title: "ทั่วไป",
                links: [
-                    { href: "/admin/program", lable: "หลักสูตร", icon: IoBook },
-                    { href: "/admin/programcode", lable: "รหัสหลักสูตร", icon: IoBook },
-                    { href: "/admin/category", lable: "หมวดหมู่วิชา", icon: BiSolidCategory },
-                    { href: "/admin/group", lable: "กลุ่มวิชา", icon: BiSolidBook },
-                    { href: "/admin/subgroup", lable: "กลุ่มย่อยวิชา", icon: BiSolidBook },
-                    { href: "/admin/subject", lable: "วิชา", icon: BiSolidBook },
-                    { href: "/admin/students", lable: "รายชื่อนักศึกษา", icon: BsFillPersonFill },
+                    { href: "/admin/program", lable: "หลักสูตร", icon: IoBookOutline },
+                    // { href: "/admin/programcode", lable: "รหัสหลักสูตร", icon: IoBook },
+                    { href: "/admin/category", lable: "หมวดหมู่วิชา", icon: BiCategory },
+                    { href: "/admin/group", lable: "กลุ่มวิชา", icon: HiOutlineRectangleGroup },
+                    { href: "/admin/subgroup", lable: "กลุ่มย่อยวิชา", icon: LuUngroup },
+                    { href: "/admin/subject", lable: "วิชา", icon: RiBookletLine },
+                    { href: "/admin/students", lable: "รายชื่อนักศึกษา", icon: BsPerson },
                ]
           },
           {
                title: "แทร็ก",
                links: [
-                    { href: "/admin/track", lable: "ข้อมูลแทรค", icon: HiUserGroup },
-                    { href: "/admin/track-selection", lable: "คัดเลือกแทรค", icon: AiFillEdit },
-                    { href: "/admin/trackstudent", lable: "รายชื่อนักศึกษาภายในแทรค", icon: BsFillPersonFill },
+                    { href: "/admin/track", lable: "ข้อมูลแทรค", icon: HiOutlineUserGroup },
+                    { href: "/admin/track-selection", lable: "คัดเลือกแทรค", icon: AiOutlineEdit },
+                    { href: "/admin/trackstudent", lable: "รายชื่อนักศึกษาภายในแทรค", icon: BsPerson },
+                    { href: "/admin/track-dashboard", lable: "สรุปผลการคัดเลือกแทร็ก", icon: GrPieChart },
                ]
           },
           {
@@ -52,8 +57,8 @@ const AdminList = () => {
           {
                title: "ตรวจสอบจบ",
                links: [
-                    { href: "/admin/verify", lable: "แบบฟอร์มตรวจสอบจบ", icon: HiAcademicCap },
-                    { href: "/admin/verify-selection", lable: "อนุมัติจบการศึกษา", icon: HiAcademicCap },
+                    { href: "/admin/verify", lable: "แบบฟอร์มตรวจสอบจบ", icon: HiOutlineAcademicCap },
+                    { href: "/admin/verify-selection", lable: "อนุมัติจบการศึกษา", icon: TbCheckupList },
                ]
           }
      ]), []);
@@ -64,7 +69,7 @@ const AdminList = () => {
                <li key={index}>
                     <Link className='block group' href={link.href}>
                          <div className='bg-[#ebecee] p-3 h-36 flex justify-center items-center'>
-                              <Icon style={masker} className='w-20 h-20 group-hover:scale-110 transition-transform text-[#333333]' />
+                              <Icon style={masker} className='w-24 h-24 group-hover:scale-110 transition-transform text-[#333333]' />
                          </div>
                          <p className='text-[#2C2F31] mt-1.5'>{link.lable}</p>
                     </Link>

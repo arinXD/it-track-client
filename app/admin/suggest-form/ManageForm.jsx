@@ -110,7 +110,7 @@ const ManageForm = ({ formId }) => {
 
      const handleSubmit = async (e) => {
           e.preventDefault();
-          if(!createTrigger) return
+          if (!createTrigger) return
           if (!Object.values(suggestForm).every(value => value)) { message.warning("จำเป็นต้องเพิ่มข้อมูลแบบฟอร์ม"); setCurrent(0); return; }
           if (!questions.length) { message.warning("จำเป็นต้องเพิ่มคำถาม"); setCurrent(1); return; }
           if (!assesstion.length) { message.warning("จำเป็นต้องเพิ่มแบบประเมินตนเอง"); setCurrent(2); return; }
@@ -128,7 +128,8 @@ const ManageForm = ({ formId }) => {
           try {
                setCreating(true)
                await axios(option)
-               message.success("สร้างแบบฟอร์มสำเร็จ")
+               const msg = formId ? "แก้ไขแบบฟอร์มสำเร็จ" : "สร้างแบบฟอร์มสำเร็จ"
+               message.success(msg)
                setTimeout(() => {
                     window.location.href = "/admin/suggest-form"
                }, 1500);
@@ -159,7 +160,7 @@ const ManageForm = ({ formId }) => {
                                    <>
                                         <section className={`w-full ${current === 0 ? "block" : "hidden"}`}>
                                              {
-                                                  formId && <input type="text" name="id" defaultValue={formId} readOnly />
+                                                  formId && <input type="hidden" name="id" defaultValue={formId} readOnly />
                                              }
                                              <SuggestForm
                                                   next={next}
