@@ -34,7 +34,7 @@ const UserProfile = ({ userData }) => {
      ];
 
      return (
-          <div className="container mx-auto p-4">
+          <div className="p-4">
                <Card className="mb-4">
                     <Title level={2}>User Profile</Title>
                     <div className="grid grid-cols-2 gap-4">
