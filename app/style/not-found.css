@@ -7,18 +7,3 @@
     /* bring your own prefixes */
     transform: translate(-50%, -50%);
 }
-
-.four_zero_four_bg {
-    background-image: url(https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif);
-    height: 50vh;
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 400px;
-}
-
-.contant_box_404 {
-    margin-top: -50px;
-}
-.margins{
-    margin-bottom: 30px;
-}

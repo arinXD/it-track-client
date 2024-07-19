@@ -27,7 +27,7 @@ const Page = async () => {
                     <Navbar />
                </header>
                <Sidebar />
-               <ContentWrap className='bg-[#F5F5F5]'>
+               <ContentWrap className='bg-[#F5F5F5] h-full'>
                     <UserProfile userData={userData} />
                </ContentWrap>
           </>

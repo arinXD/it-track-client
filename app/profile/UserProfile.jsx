@@ -41,19 +41,23 @@ const UserProfile = ({ userData }) => {
           },
      ];
 
-     const enrollItems = useMemo(() => (
-          Object.keys(Student.Enrollments).map((year, index) => ({
-               label: `ปีการศึกษา ${year}`,
-               key: index,
-               children: <Table
-                    dataSource={Student.Enrollments[year]}
-                    columns={columns}
-                    rowKey={(record) => record.Subject.subject_code}
-                    pagination={true}
-                    className="w-full"
-               />,
-          }))
-     ), [Student])
+     const enrollItems = useMemo(() => {
+          if (Student?.Enrollments && Object.keys(Student.Enrollments).length > 0) {
+               return Object.keys(Student.Enrollments).map((year, index) => ({
+                    label: `ปีการศึกษา ${year}`,
+                    key: index,
+                    children: <Table
+                         dataSource={Student.Enrollments[year]}
+                         columns={columns}
+                         rowKey={(record) => record.Subject.subject_code}
+                         pagination={true}
+                         className="w-full"
+                    />,
+               }))
+          }
+          return null
+
+     }, [Student])
 
      return (
           <div className='max-w-4xl mx-auto'>

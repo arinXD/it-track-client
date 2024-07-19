@@ -156,7 +156,7 @@ const Navbar = () => {
                                         <span>ข้อมูลของฉัน</span>
                                     </div>
                                 </DropdownItem>
-                                <DropdownItem href='/helps-feedbacks' key="help_and_feedback">
+                                <DropdownItem href='/help-feedback' key="help_and_feedback">
                                     <div className='flex gap-3 items-center'>
                                         <div className='w-5 h-5 flex items-center justify-center'>
                                             <IoIosHelpCircle className='w-5 h-5' />
