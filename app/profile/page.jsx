@@ -4,11 +4,13 @@ import axios from 'axios'
 import { getServerSession } from 'next-auth'
 import UserProfile from './UserProfile'
 
-async function getUserData(email) {
+async function getUserData(email, session) {
      const option = await getOptions(`/api/users/${email}`, "get")
      try {
           const res = await axios(option)
           const data = res.data.data
+          data.image = session.user.image
+          data.username = session.user.name
           return data
      } catch (error) {
           return {}
@@ -17,7 +19,7 @@ async function getUserData(email) {
 
 const Page = async () => {
      const session = await getServerSession()
-     const userData = await getUserData(session.user.email)
+     const userData = await getUserData(session.user.email, session)
 
      return (
           <>
@@ -25,7 +27,7 @@ const Page = async () => {
                     <Navbar />
                </header>
                <Sidebar />
-               <ContentWrap>
+               <ContentWrap className='bg-[#F5F5F5]'>
                     <UserProfile userData={userData} />
                </ContentWrap>
           </>

@@ -18,6 +18,8 @@ import { useToggleSideBarStore } from '@/src/store';
 import NextTopLoader from 'nextjs-toploader';
 import { Icon } from '@iconify/react';
 import { FaUser } from "react-icons/fa6";
+import { IoIosHelpCircle } from "react-icons/io";
+import { BiSolidExit } from "react-icons/bi";
 
 const Navbar = () => {
     const { data: session, status } = useSession();
@@ -96,9 +98,13 @@ const Navbar = () => {
                             <Image
                                 id='user-profile'
                                 className='rounded-full active:scale-90 cursor-pointer'
-                                src={session?.user?.image || "/image/user.png"}
+                                src={session?.user?.image}
                                 width={40} height={40}
                                 alt="user image"
+                                onError={({ currentTarget }) => {
+                                    currentTarget.onerror = null;
+                                    currentTarget.src = "/image/admin.png";
+                                }}
                             />
                         </DropdownTrigger>
                         <DropdownMenu
@@ -150,9 +156,19 @@ const Navbar = () => {
                                         <span>ข้อมูลของฉัน</span>
                                     </div>
                                 </DropdownItem>
+                                <DropdownItem href='/helps-feedbacks' key="help_and_feedback">
+                                    <div className='flex gap-3 items-center'>
+                                        <div className='w-5 h-5 flex items-center justify-center'>
+                                            <IoIosHelpCircle className='w-5 h-5' />
+                                        </div>
+                                        <span>Help & Feedback</span>
+                                    </div>
+                                </DropdownItem>
                                 <DropdownItem key="logout" onClick={() => signOut()}>
                                     <div className='flex gap-3 items-center'>
-                                        <MdOutlineLogout className='w-5 h-5' />
+                                        <div className='w-5 h-5 flex items-center justify-center'>
+                                            <BiSolidExit className='w-5 h-5' />
+                                        </div>
                                         <span>ออกจากระบบ</span>
                                     </div>
                                 </DropdownItem>
