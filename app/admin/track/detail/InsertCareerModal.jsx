@@ -16,6 +16,7 @@ const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => 
      const [previewImage, setPreviewImage] = useState(src)
      const [nameTh, setNameTh] = useState("");
      const [nameEn, setNameEn] = useState("");
+     const [desc, setDesc] = useState(null);
      const [uploadProgress, setUploadProgress] = useState(0);
      const [inserting, setInserting] = useState(false);
 
@@ -131,7 +132,7 @@ const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => 
                                                        radius='sm'
                                                        label="อาชีพ (TH)"
                                                        labelPlacement="outside"
-                                                       placeholder=""
+                                                       placeholder="ชื่ออาชีพภาษาไทย"
                                                        value={nameTh}
                                                        onValueChange={setNameTh}
                                                        classNames={inputClass}
@@ -145,12 +146,25 @@ const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => 
                                                        radius='sm'
                                                        label="อาชีพ (EN)"
                                                        labelPlacement="outside"
-                                                       placeholder=""
+                                                       placeholder="ชื่ออาชีพภาษาอังกฤษ"
                                                        value={nameEn}
                                                        onValueChange={setNameEn}
                                                        classNames={inputClass}
                                                        className='mb-4'
                                                        isRequired
+                                                  />
+                                                  <Input
+                                                       name='desc'
+                                                       type="text"
+                                                       variant="bordered"
+                                                       radius='sm'
+                                                       label="คำอธิบายอาชีพ (optional)"
+                                                       labelPlacement="outside"
+                                                       placeholder="คำอธิบายอาชีพ"
+                                                       value={desc}
+                                                       onValueChange={setDesc}
+                                                       classNames={inputClass}
+                                                       className='mb-4'
                                                   />
                                                   <div className='flex flex-col justify-center items-start'>
                                                        <span className="text-sm mb-2">อัพโหลดไฟล์รูปภาพ [ jpeg, jpg, png ]</span>

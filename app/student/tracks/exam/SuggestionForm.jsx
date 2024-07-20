@@ -91,6 +91,7 @@ const SuggestionForm = ({ form }) => {
             setsummarizeData({})
         } finally {
             setSummarizing(false)
+            window.scrollTo(0, 750)
         }
     }, [questions, assessments, careers])
 
@@ -103,7 +104,7 @@ const SuggestionForm = ({ form }) => {
     }, [])
 
     useEffect(() => {
-        if(current) window.scrollTo(0, 750)
+        if (current) window.scrollTo(0, 750)
     }, [current])
 
     return (

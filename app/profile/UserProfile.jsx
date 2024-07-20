@@ -135,9 +135,9 @@ const UserProfile = ({ userData }) => {
                          <div className='grid grid-cols-2 gap-4'>
                               <Input
                                    classNames={{
-                                        label: "text-black/50 text-[.8em]",
+                                        label: "text-black/50 text-[.9em]",
                                         inputWrapper: ["rounded-none", "p-2"],
-                                        input: "text-[.9em]"
+                                        input: "text-[1em]"
                                    }}
                                    className='w-full text-sm'
                                    type="text"
@@ -147,9 +147,9 @@ const UserProfile = ({ userData }) => {
                               />
                               <Input
                                    classNames={{
-                                        label: "text-black/50 text-[.8em]",
+                                        label: "text-black/50 text-[.9em]",
                                         inputWrapper: ["rounded-none", "p-2"],
-                                        input: "text-[.9em]"
+                                        input: "text-[1em]"
                                    }}
                                    className='w-full text-sm'
                                    type="text"
@@ -159,9 +159,9 @@ const UserProfile = ({ userData }) => {
                               />
                               <Input
                                    classNames={{
-                                        label: "text-black/50 text-[.8em]",
+                                        label: "text-black/50 text-[.9em]",
                                         inputWrapper: ["rounded-none", "p-2"],
-                                        input: "text-[.9em]"
+                                        input: "text-[1em]"
                                    }}
                                    className='w-full text-sm'
                                    type="text"
@@ -171,9 +171,9 @@ const UserProfile = ({ userData }) => {
                               />
                               <Input
                                    classNames={{
-                                        label: "text-black/50 text-[.8em]",
+                                        label: "text-black/50 text-[.9em]",
                                         inputWrapper: ["rounded-none", "p-2"],
-                                        input: "text-[.9em]"
+                                        input: "text-[1em]"
                                    }}
                                    className='w-full text-sm'
                                    type="text"
@@ -183,9 +183,9 @@ const UserProfile = ({ userData }) => {
                               />
                               <Input
                                    classNames={{
-                                        label: "text-black/50 text-[.8em]",
+                                        label: "text-black/50 text-[.9em]",
                                         inputWrapper: ["rounded-none", "p-2"],
-                                        input: "text-[.9em]"
+                                        input: "text-[1em]"
                                    }}
                                    className='w-full text-sm'
                                    type="text"
@@ -197,9 +197,9 @@ const UserProfile = ({ userData }) => {
                                    Student.Program.program.toLowerCase() === "it" &&
                                    <Input
                                         classNames={{
-                                             label: "text-black/50 text-[.8em]",
+                                             label: "text-black/50 text-[.9em]",
                                              inputWrapper: ["rounded-none", "p-2"],
-                                             input: "text-[.9em]"
+                                             input: "text-[1em]"
                                         }}
                                         className='w-full text-sm'
                                         type="text"
@@ -215,7 +215,7 @@ const UserProfile = ({ userData }) => {
                {Student && (
                     <Card>
                          <div className='mb-4 flex gap-4'>
-                              <CiStar className={`text-5xl text-[${warningColor.border}] bg-[${warningColor.onlyColor}] pointer-events-none flex-shrink-0`} />
+                              <CiStar className={`text-5xl text-[#ffcf52] bg-[#fff5dc] pointer-events-none flex-shrink-0`} />
                               <div>
                                    <p className='font-bold text-base'>Enrollments</p>
                                    <p className='text-sm text-default-600'>ข้อมูลการลงทะเบียน</p>

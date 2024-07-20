@@ -94,7 +94,8 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
                          isCorrect: true,
                     }],
                     track: "BIT",
-                    isEnable: true
+                    isEnable: true,
+                    desc: null
                }
 
                const updatedQuestions = [...prevQuestions, newQuestion]
@@ -117,7 +118,6 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
                return prevQuestions.filter((_, index) => index !== questionIndex)
           })
           const filterQID = defaultQuestionBank.filter(q => q.id === qid)
-          console.log(qid);
           if (filterQID.length > 0) {
                setQuestionsBank(prev => {
                     return [
@@ -184,7 +184,6 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
                let questionsToAdd = selectedQuestions.map((id) =>
                     prevQuestionsBank.find(q => q.id === id)
                ).filter(Boolean)
-               console.log(questionsToAdd);
                questionsToAdd = questionsToAdd.map(q => ({ ...q, isEnable: true }))
 
                if (questionsToAdd.length > 0) {
@@ -428,33 +427,60 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
                                                                                 className="hover:cursor-text hover:border-b border-b-gray-300">เพิ่มตัวเลือก</p>
                                                                       </div>
                                                                       <hr className="mt-8 mb-4" />
-                                                                      <div className="flex justify-end items-center gap-2">
-                                                                           <div className="flex gap-2">
+                                                                      <div className="flex justify-between items-end">
+                                                                           <div className="flex flex-col w-full">
+                                                                                <label className="text-xs">คำอธิบาย (optional)</label>
                                                                                 <input
-                                                                                     checked={q.isEnable}
-                                                                                     type="checkbox"
-                                                                                     className="w-4 h-4"
-                                                                                     name={`qEnable_${q.id}`}
+                                                                                     className="text-black text-sm w-full p-2 border-b-black border-b bg-white outline-none focus:border-b-blue-500 focus:border-b-2"
+                                                                                     type="text"
+                                                                                     placeholder="เพิ่มคำอธิบาย"
+                                                                                     name={`qDesc_${q.id}`}
+                                                                                     value={q.desc}
                                                                                      onChange={(e) => {
                                                                                           setQuestions(prevQuestions =>
                                                                                                prevQuestions.map(question =>
-                                                                                                    question.id === q.id ? { ...question, isEnable: e.target.checked } : question
+                                                                                                    question.id === q.id ? { ...question, desc: e.target.value } : question
                                                                                                )
                                                                                           );
                                                                                      }}
                                                                                 />
-                                                                                <span className="text-sm">ใช้งาน</span>
                                                                            </div>
-                                                                           <Button
-                                                                                isIconOnly
-                                                                                variant="light"
-                                                                                radius="full"
-                                                                                color="default"
-                                                                                className="p-2"
-                                                                                onClick={() => removeQuestion(index, q.id)}
-                                                                                aria-label="remove">
-                                                                                <FaRegTrashAlt className="w-5 h-5" />
-                                                                           </Button>
+                                                                           <div className="flex justify-end items-center gap-2 w-full">
+                                                                                <div
+                                                                                     onClick={(e) => {
+                                                                                          setQuestions(prevQuestions =>
+                                                                                               prevQuestions.map(question =>
+                                                                                                    question.id === q.id ? { ...question, isEnable: !question.isEnable } : question
+                                                                                               )
+                                                                                          );
+                                                                                     }}
+                                                                                     className="flex items-center gap-2 w-fit cursor-pointer select-none">
+                                                                                     <input
+                                                                                          checked={q.isEnable}
+                                                                                          type="checkbox"
+                                                                                          className="w-4 h-4"
+                                                                                          name={`qEnable_${q.id}`}
+                                                                                          onChange={(e) => {
+                                                                                               setQuestions(prevQuestions =>
+                                                                                                    prevQuestions.map(question =>
+                                                                                                         question.id === q.id ? { ...question, isEnable: e.target.checked } : question
+                                                                                                    )
+                                                                                               );
+                                                                                          }}
+                                                                                     />
+                                                                                     <span className="text-sm w-fit">ใช้งาน</span>
+                                                                                </div>
+                                                                                <Button
+                                                                                     isIconOnly
+                                                                                     variant="light"
+                                                                                     radius="full"
+                                                                                     color="default"
+                                                                                     className="p-2"
+                                                                                     onClick={() => removeQuestion(index, q.id)}
+                                                                                     aria-label="remove">
+                                                                                     <FaRegTrashAlt className="w-5 h-5" />
+                                                                                </Button>
+                                                                           </div>
                                                                       </div>
                                                                  </div>
                                                             ))

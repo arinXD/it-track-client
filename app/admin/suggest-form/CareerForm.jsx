@@ -85,7 +85,6 @@ const CareerForm = ({ prev, formStyle, tracks, formId, setCareers, creating, set
                setSelectedCareers(prevCareers => prevCareers.filter(career => career.id !== id));
           } else {
                const careerToMove = existCareers.find(career => career.id === id);
-
                if (careerToMove) {
                     setExistCareers(prevCareers => prevCareers.filter(career => career.id !== id));
                     setDefaultCareer(prevCareers => [...prevCareers, careerToMove]);

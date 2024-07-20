@@ -113,7 +113,7 @@ const CareerTable = ({ track }) => {
                                         currentTarget.onerror = null
                                         currentTarget.src = "/image/user.png";
                                    }}
-                                   className="rounded-md border border-gray-200"
+                                   className="rounded-md border object-cover border-gray-200"
                                    alt={cellValue} />
                          </div>
                     )

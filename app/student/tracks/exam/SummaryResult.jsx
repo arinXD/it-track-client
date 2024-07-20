@@ -118,8 +118,8 @@ const SummaryResult = ({ data }) => {
                               <h2 className="text-2xl font-semibold text-yellow-800 mb-4">คำแนะนำ</h2>
                               <ul className="text-gray-800">
                                    {
-                                        recommendation.map(rec => (
-                                             <li>{rec}</li>
+                                        recommendation.map((rec, recKey) => (
+                                             <li key={recKey}>{rec}</li>
                                         ))
                                    }
                               </ul>

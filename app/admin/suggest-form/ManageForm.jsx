@@ -8,6 +8,8 @@ import Assesstion from "./Assesstion";
 import CareerForm from "./CareerForm";
 import { getOptions } from "@/app/components/serverAction/TokenAction";
 import axios from "axios";
+import toast, { Toaster } from 'react-hot-toast';
+import { IoIosCloseCircle } from "react-icons/io";
 
 const ManageForm = ({ formId }) => {
      const [createTrigger, setCreateTrigger] = useState(false);
@@ -123,7 +125,6 @@ const ManageForm = ({ formId }) => {
                Careers: careers
           }
 
-          console.log(formData);
           const option = await getOptions("/api/suggestion-forms/", "POST", formData)
           try {
                setCreating(true)
@@ -134,15 +135,37 @@ const ManageForm = ({ formId }) => {
                     window.location.href = "/admin/suggest-form"
                }, 1500);
           } catch (error) {
-               setCreating(false)
                console.log(error);
-               message.error("ไม่สามารถสร้างแบบฟอร์มได้")
+               const errMessage = error?.response?.data?.message
+               const inequalityInfo = error?.response?.data?.inequalityInfo
+               if (inequalityInfo?.items?.length > 0) {
+                    // message.error("resr")
+                    toast.custom(() => (
+                         <div>
+                              <div className='border p-4 rounded-md bg-white shadow-md text-black text-sm'>
+                                   <p className="flex justify-start items-center gap-1.5">
+                                        <IoIosCloseCircle className="text-red-500 w-4 h-4" />
+                                        <span>ไม่สามารถสร้างแบบฟอร์มได้ {errMessage}</span>
+                                   </p>
+                                   <ul className="ms-[36px] list-disc mt-2">
+                                        {inequalityInfo?.items?.map((info, index) => (
+                                             <li key={index}>แทร็ก {info.track} ต้องการ {info.difference} {inequalityInfo.type}</li>
+                                        ))}
+                                   </ul>
+                              </div>
+                         </div>
+                    ));
+               }
+          } finally {
+               setCreating(false)
+               setCreateTrigger(false)
           }
 
      };
 
      return (
           <section className="w-full">
+               <Toaster />
                <Steps
                     className="my-8"
                     current={current}

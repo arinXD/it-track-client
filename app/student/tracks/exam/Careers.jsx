@@ -3,6 +3,8 @@ import Image from "next/image"
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { useCallback, useState } from "react";
 import { Tooltip } from "antd";
+import { MdOutlineQuestionMark } from "react-icons/md";
+import { Popover, PopoverTrigger, PopoverContent, Button } from "@nextui-org/react";
 
 const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
      const handleSelectCareer = useCallback((careerId) => {
@@ -20,25 +22,49 @@ const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
                <section className="grid grid-cols-4 gap-4 mb-4" >
                     {
                          allCareers?.map(career => (
-                              <div
-                                   key={career.id}
-                                   onClick={() => handleSelectCareer(career.id)}
-                                   className={`flex flex-col justify-center items-center ${careers.includes(career.id) && "!border-blue-700"} text-center border-2 p-4 rounded-[5px] cursor-pointer hover:border-blue-500/50 active:scale-95 focus:scale-95`}
-                              >
-                                   <Image
-                                        src={career.image}
-                                        width={120}
-                                        height={120}
-                                        alt={career.name_en}
-                                        className="rounded-[2px] h-[100px] w-[120px] object-cover !select-none"
-                                   />
-                                   <div className="mt-4 w-full">
-                                        <Tooltip
-                                             placement="top"
-                                             title={career.name_en} >
-                                             <p title={career.name_en} className="mb-1 w-full whitespace-nowrap overflow-hidden text-ellipsis">{career.name_en}</p>
-                                        </Tooltip>
-                                        <p>{career.name_th}</p>
+                              <div className="relative group">
+                                   {career.desc &&
+                                        <Popover
+                                             placement="right-start"
+                                             showArrow={true}>
+                                             <PopoverTrigger>
+                                                  <button
+                                                       style={{
+                                                            padding: "5px"
+                                                       }}
+                                                       className="z-50 group-active:scale-85 group-active:top-2.5 group-active:right-2.5 absolute top-2 right-2 rounded-full bg-black"
+                                                       isIconOnly>
+                                                       <MdOutlineQuestionMark
+                                                            className="w-3 h-3 text-white" />
+                                                  </button>
+                                             </PopoverTrigger>
+                                             <PopoverContent className="rounded-[5px]">
+                                                  <div className="px-1 py-2">
+                                                       <div className="text-small font-bold mb-1">คำอธิบายอาชีพ</div>
+                                                       <div className="text-tiny">{career.desc}</div>
+                                                  </div>
+                                             </PopoverContent>
+                                        </Popover>}
+                                   <div
+                                        key={career.id}
+                                        onClick={() => handleSelectCareer(career.id)}
+                                        className={`relative flex flex-col justify-center items-center ${careers.includes(career.id) && "!border-blue-700"} text-center border-2 p-4 rounded-[5px] cursor-pointer hover:border-blue-500/50 focus:scale-95 active:scale-95`}
+                                   >
+                                        <Image
+                                             src={career.image}
+                                             width={120}
+                                             height={120}
+                                             alt={career.name_en}
+                                             className="rounded-[2px] h-[100px] w-[120px] object-cover !select-none"
+                                        />
+                                        <div className="mt-4 w-full">
+                                             <Tooltip
+                                                  placement="top"
+                                                  title={career.name_en} >
+                                                  <p title={career.name_en} className="mb-1 w-full whitespace-nowrap overflow-hidden text-ellipsis">{career.name_en}</p>
+                                             </Tooltip>
+                                             <p>{career.name_th}</p>
+                                        </div>
                                    </div>
                               </div>
                          ))

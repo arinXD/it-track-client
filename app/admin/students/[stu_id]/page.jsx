@@ -131,15 +131,12 @@ export default function Page({ params }) {
         for (const enrollment of enrollments) {
             const grade = calGrade(enrollment?.grade)
             if (grade == undefined || !isNumber(grade)) {
-                console.log(grade)
                 continue
             }
             const credit = enrollment?.Subject?.credit || 0
             sumGrade += grade * credit
             sumCredit += credit
         }
-        console.log(sumGrade);
-        console.log(sumCredit);
         return floorGpa(sumGrade / sumCredit)
     }
 
@@ -273,6 +270,10 @@ export default function Page({ params }) {
                                                 </p>
                                                 <p>นักศึกษาหลักสูตร {student?.Program?.title_th} {student?.courses_type}</p>
                                                 <p>สถานะภาพ: <span className='ms-1'>{student?.StudentStatus?.description} ({student?.StudentStatus?.id})</span></p>
+                                                <p>
+                                                    ปีการศึกษา: <span className='ms-1'>{student?.acadyear} </span>
+                                                    {student?.acadyear_desc && <span className='text-xs'>({student?.acadyear_desc})</span>}
+                                                </p>
                                                 <p>GPA: <span className='ms-1'>{gpa}</span></p>
                                                 {
                                                     student?.User?.createdAt &&

@@ -88,7 +88,8 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                 id: newId,
                 question: `คำถามที่ ${id}`,
                 isEnable: true,
-                track: tracks[0]?.track
+                track: tracks[0]?.track,
+                desc: null
             }
 
             const updatedQuestions = [...prevQuestions, newQuestion]
@@ -300,31 +301,54 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                                                                 ))}
                                                             </select>
                                                         </div>
-                                                        <div className="w-full flex justify-end items-center gap-2">
-                                                            <div className="flex gap-2">
+                                                        <div className="flex justify-between items-end w-full mt-4">
+                                                            <div className="flex flex-col w-full">
+                                                                <label className="text-xs">คำอธิบาย (optional)</label>
                                                                 <input
-                                                                    checked={q.isEnable}
-                                                                    type="checkbox"
-                                                                    className="w-4 h-4"
-                                                                    name={`assesstion_enable_${q.id}`}
+                                                                    className="text-black text-sm w-full p-2 border-b-black border-b bg-white outline-none focus:border-b-blue-500 focus:border-b-2"
+                                                                    type="text"
+                                                                    placeholder="เพิ่มคำอธิบาย"
+                                                                    name={`assesstion_desc_${q.id}`}
+                                                                    value={q.desc}
                                                                     onChange={(e) => {
                                                                         const updatedAssesstion = [...assesstion];
-                                                                        updatedAssesstion[index].isEnable = e.target.checked;
+                                                                        updatedAssesstion[index].desc = e.target.value;
                                                                         setAssesstion(updatedAssesstion);
                                                                     }}
                                                                 />
-                                                                <span className="text-sm">ใช้งาน</span>
                                                             </div>
-                                                            <Button
-                                                                isIconOnly
-                                                                variant="light"
-                                                                radius="full"
-                                                                color="default"
-                                                                className="p-2"
-                                                                onClick={() => removeQuestion(index, q.id)}
-                                                                aria-label="remove">
-                                                                <FaRegTrashAlt className="w-5 h-5" />
-                                                            </Button>
+                                                            <div className="w-full flex justify-end items-center gap-2">
+                                                                <div
+                                                                    onClick={(e) => {
+                                                                        const updatedAssesstion = [...assesstion];
+                                                                        updatedAssesstion[index].isEnable = !updatedAssesstion[index].isEnable
+                                                                        setAssesstion(updatedAssesstion);
+                                                                    }}
+                                                                    className="flex gap-2 items-center cursor-pointer select-none">
+                                                                    <input
+                                                                        checked={q.isEnable}
+                                                                        type="checkbox"
+                                                                        className="w-4 h-4"
+                                                                        name={`assesstion_enable_${q.id}`}
+                                                                        onChange={(e) => {
+                                                                            const updatedAssesstion = [...assesstion];
+                                                                            updatedAssesstion[index].isEnable = e.target.checked;
+                                                                            setAssesstion(updatedAssesstion);
+                                                                        }}
+                                                                    />
+                                                                    <span className="text-sm">ใช้งาน</span>
+                                                                </div>
+                                                                <Button
+                                                                    isIconOnly
+                                                                    variant="light"
+                                                                    radius="full"
+                                                                    color="default"
+                                                                    className="p-2"
+                                                                    onClick={() => removeQuestion(index, q.id)}
+                                                                    aria-label="remove">
+                                                                    <FaRegTrashAlt className="w-5 h-5" />
+                                                                </Button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 ))
