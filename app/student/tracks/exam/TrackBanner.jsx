@@ -7,7 +7,7 @@ const TrackBanner = ({ tracks, form }) => {
         <div className={`bg-[#33A474] mt-16 bg-imgs px-12 pb-12`}>
             <section className="max-w-4xl mx-auto">
                 <div className='mx-auto max-w-2xl text-center py-12 lg:py-20'>
-                    <h1 className='text-4xl font-bold tracking-tight text-white sm:text-5xl'>{form?.title || "แบบทดสอบกลุ่มความเชี่ยวชาญ"}</h1>
+                    <h1 style={{lineHeight:"1.3em"}} className='text-4xl font-bold tracking-tight text-white sm:text-5xl'>{form?.title || "แบบทดสอบกลุ่มความเชี่ยวชาญ"}</h1>
                     <h2 className='mt-6 text-2xl leading-8 tracking-tighter text-white dark:text-gray-300'>{form?.desc || "ค้นพบความเชี่ยวชาญหลักสูตรไอทีล่าสุด! ยกระดับทักษะของคุณด้วยความเชี่ยวชาญที่ล้ำสมัย นำทางไปสู่อนาคตของความสำเร็จทางเทคโนโลยี"}</h2>
                 </div>
                 <div className='mx-auto max-w-screen-xl'>

@@ -1,124 +1,264 @@
 "use client"
+import dynamic from 'next/dynamic';
+import { useCallback, useMemo } from "react";
+const BarChart = dynamic(() => import('@/app/components/charts/ApexBarChart'), { ssr: false });
 
-const SummaryResult = ({ data }) => {
-     const { questionScores, assessmentScores, trackSummaries, totalQuestionScore, totalCorrectAnswers, totalQuestions, overallCorrectPercentage, recommendation } = data;
+const SummaryResult = ({ data, prompt }) => {
+     const { assessmentScores, careersScores, trackSummaries, totalQuestionScore, totalCorrectAnswers, totalQuestions, recommendation } = data;
+     const getChartOption = useCallback((key, title = undefined, showXaxis = true) => ({
+          series: [{
+               data: trackSummaries.map((ts) => ts[key]),
+          }],
+          options: {
+               title: {
+                    text: title,
+                    style: {
+                         ...prompt.style
+                    }
+               },
+               chart: {
+                    height: 200,
+                    type: 'bar',
+                    events: {
+                         click: function (chart, w, e) {
+                         }
+                    },
+                    toolbar: {
+                         show: false,
+                    }
+               },
+               colors: ['#F4538A', '#FAA300', "#7EA1FF"],
+               plotOptions: {
+                    bar: {
+                         columnWidth: '50%',
+                         distributed: true,
+                         dataLabels: {
+                              position: 'top',
+                         },
+                    }
+               },
+               dataLabels: {
+                    enabled: false,
+               },
+               legend: {
+                    show: false
+               },
+               xaxis: {
+                    categories: trackSummaries.map((ts) => [ts.track.split(" ")[0]]),
+                    labels: {
+                         show: showXaxis,
+                         style: {
+                              fontSize: '12px',
+                              colors: ['#333'],
+                              ...prompt.style
+                         },
+                    },
+               },
+               yaxis: {
+                    title: {
+                         text: 'คะแนน',
+                         style: {
+                              paddingTop: "10px",
+                              fontSize: '10px',
+                              colors: ['#333'],
+                              ...prompt.style
+                         }
+                    },
+               },
+          },
+     }), [trackSummaries])
+
+     const optionQ = useMemo(() => (getChartOption("questionScore", "แบบทดสอบ")), [trackSummaries])
+     const optionA = useMemo(() => (getChartOption("assessmentScore", "แบบประเมิน")), [trackSummaries])
+     const optionC = useMemo(() => (getChartOption("careerScore", "ความชอบ")), [trackSummaries])
+     const optionAll = useMemo(() => {
+          const defOption = getChartOption("totalScore", "ทั้งหมด", true)
+          defOption.options.chart.stacked = true
+          defOption.options.stroke = {
+               width: 1,
+               colors: ['#fff']
+          }
+          defOption.options.legend = {
+               position: 'top',
+               horizontalAlign: 'center',
+               offsetX: 40
+          }
+          defOption.options.fill = {
+               opacity: 1
+          }
+          defOption.options.dataLabels.enabled = true
+          defOption.options.plotOptions.bar.distributed = false
+          defOption.options.plotOptions.bar.dataLabels.total = {
+               enabled: true,
+               style: {
+                    fontSize: '13px',
+                    fontWeight: 900
+               }
+          }
+          defOption.series = [
+               {
+                    name: "แบบทดสอบ",
+                    data: [trackSummaries[0].questionScore, trackSummaries[1].questionScore, trackSummaries[2].questionScore]
+               },
+               {
+                    name: "แบบประเมิน",
+                    data: [trackSummaries[0].assessmentScore, trackSummaries[1].assessmentScore, trackSummaries[2].assessmentScore]
+               },
+               {
+                    name: "ความชอบ",
+                    data: [trackSummaries[0].careerScore, trackSummaries[1].careerScore, trackSummaries[2].careerScore]
+               },
+          ]
+          delete defOption.options.colors
+          return defOption
+     }, [trackSummaries])
+
+     const optionPieAll = useMemo(() => ({
+          series: trackSummaries.map((ts) => ts["totalScore"]),
+          options: {
+               chart: {
+                    width: 380,
+                    type: 'pie',
+               },
+               colors: ['#F4538A', '#FAA300', "#7EA1FF"],
+               labels: trackSummaries.map((ts) => ts.track),
+               responsive: [{
+                    breakpoint: 480,
+                    options: {
+                         chart: {
+                              width: 200
+                         },
+                         legend: {
+                              position: 'bottom'
+                         }
+                    }
+               }],
+               legend: {
+                    show: true,
+                    position: 'top',
+                    fontSize: '10px',
+               },
+          },
+     }), [trackSummaries])
 
      return (
-          <section className="bg-gray-100 min-h-screen p-8 rounded-sm">
+          <section className="">
                <section className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
                     <header className="bg-blue-600 text-white p-6">
-                         <h1 className="text-3xl font-bold">สรุปผลการทำแบบทดสอบ</h1>
+                         <h1 className="text-3xl font-bold">สรุปผลแบบทดสอบกลุ่มความเชี่ยวชาญโดยรวม</h1>
                     </header>
-                    <div className="p-6 space-y-8">
-                         <section className="bg-blue-50 p-4 rounded-lg">
-                              <h2 className="text-2xl font-semibold text-blue-800 mb-4">สถิติโดยรวม</h2>
-                              <div className="grid grid-cols-2 gap-4">
-                                   <div className="bg-white p-3 rounded shadow">
-                                        <p className="text-sm text-gray-600">คะแนนทั้งหมด</p>
-                                        <p className="text-xl font-bold">{totalQuestionScore} คะแนน</p>
+                    <section className="p-6 w-full">
+                         <section className="p-6 bg-blue-50 gap-6 grid grid-cols-3">
+                              <section className="bg-white p-4 rounded-lg shadow">
+                                   <h2 className="text-base font-semibold text-blue-800 mb-2">แบบทดสอบ</h2>
+                                   <div className="grid grid-cols-1 gap-4">
+                                        <div className="bg-white p-3 rounded border">
+                                             <p className="text-xs text-gray-600 mb-1">ตอบถูกทั้งหมด</p>
+                                             <p className="text-sm font-bold">{totalCorrectAnswers} / {totalQuestions} ข้อ</p>
+                                        </div>
+                                        <div className="bg-white p-3 rounded border">
+                                             <p className="text-xs text-gray-600 mb-1">คะแนนทั้งหมด</p>
+                                             <p className="text-sm font-bold">{totalQuestionScore} / {totalQuestions * 10} คะแนน</p>
+                                        </div>
                                    </div>
-                                   <div className="bg-white p-3 rounded shadow">
-                                        <p className="text-sm text-gray-600">ตอบถูกทั้งหมด</p>
-                                        <p className="text-xl font-bold">{totalCorrectAnswers} ข้อ</p>
-                                   </div>
-                                   <div className="bg-white p-3 rounded shadow">
-                                        <p className="text-sm text-gray-600">คำถามทั้งหมด</p>
-                                        <p className="text-xl font-bold">{totalQuestions} ข้อ</p>
-                                   </div>
-                                   <div className="bg-white p-3 rounded shadow">
-                                        <p className="text-sm text-gray-600">ตอบถูกร้อยละ</p>
-                                        <p className="text-xl font-bold">{overallCorrectPercentage}</p>
-                                   </div>
-                              </div>
-                         </section>
+                              </section>
 
-                         <section>
-                              <h2 className="text-2xl font-semibold text-blue-800 mb-4">แบบทดสอบ</h2>
-                              <div className="bg-white shadow overflow-hidden rounded-lg">
-                                   <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
-                                             <tr>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question</th>
-                                                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
-                                                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Correct</th>
-                                             </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
-                                             {questionScores.map((qs) => (
-                                                  <tr key={qs.qId}>
-                                                       <td className="px-6 py-4 whitespace-nowrap">{qs.question}</td>
-                                                       <td className="px-6 py-4 whitespace-nowrap text-center">{qs.score}</td>
-                                                       <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${qs.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                                 {qs.isCorrect ? 'Yes' : 'No'}
-                                                            </span>
-                                                       </td>
-                                                  </tr>
-                                             ))}
-                                        </tbody>
-                                   </table>
-                              </div>
+                              <section className="bg-white p-4 rounded-lg shadow">
+                                   <h2 className="text-base font-semibold text-blue-800 mb-2">แบบประเมิน</h2>
+                                   <div className="grid grid-cols-1 gap-4">
+                                        <div className="bg-white p-3 rounded border">
+                                             <p className="text-xs text-gray-600 mb-1">คำถามทั้งหมด</p>
+                                             <p className="text-sm font-bold">{assessmentScores?.length} ข้อ</p>
+                                        </div>
+                                        <div className="bg-white p-3 rounded border">
+                                             <p className="text-xs text-gray-600 mb-1">คะแนนทั้งหมด</p>
+                                             <p className="text-sm font-bold">
+                                                  {assessmentScores.reduce((total, ass) => {
+                                                       return total + ass.score;
+                                                  }, 0)} คะแนน</p>
+                                        </div>
+                                   </div>
+                              </section>
+                              <section className="bg-white p-4 rounded-lg shadow">
+                                   <h2 className="text-base font-semibold text-blue-800 mb-2">ความชอบ</h2>
+                                   <div className="grid grid-cols-1 gap-4">
+                                        <div className="bg-white p-3 rounded border">
+                                             <p className="text-xs text-gray-600 mb-1">อาชีพทั้งหมด</p>
+                                             <p className="text-sm font-bold">{careersScores?.length} อาชีพ</p>
+                                        </div>
+                                        <div className="bg-white p-3 rounded border">
+                                             <p className="text-xs text-gray-600 mb-1">คะแนนทั้งหมด</p>
+                                             <p className="text-sm font-bold">
+                                                  {careersScores.reduce((total, ass) => {
+                                                       return total + ass.score;
+                                                  }, 0)} คะแนน</p>
+                                        </div>
+                                   </div>
+                              </section>
                          </section>
-
-                         <section>
-                              <h2 className="text-2xl font-semibold text-blue-800 mb-4">แบบประเมิน</h2>
-                              <div className="bg-white shadow overflow-hidden rounded-lg">
-                                   <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
-                                             <tr>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question</th>
-                                                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
-                                             </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
-                                             {assessmentScores.map((qs) => (
-                                                  <tr key={qs.qId}>
-                                                       <td className="px-6 py-4 whitespace-nowrap">{qs.question}</td>
-                                                       <td className="px-6 py-4 whitespace-nowrap text-center">{qs.score}</td>
-                                                  </tr>
-                                             ))}
-                                        </tbody>
-                                   </table>
-                              </div>
-                         </section>
-
-                         <section>
-                              <h2 className="text-2xl font-semibold text-blue-800 mb-4">สรุปผลแทร็ก</h2>
-                              <div className="space-y-4">
+                    </section>
+                    <div className="p-6 pt-0 space-y-8">
+                         <section className='bg-gray-100 p-6'>
+                              <h2 className="text-2xl font-semibold text-blue-800 mb-4 text-center">สรุปผลแทร็ก</h2>
+                              <div className="gap-4 grid grid-cols-3">
                                    {trackSummaries.map((ts) => (
-                                        <div key={ts.track} className="bg-white p-6 rounded-lg shadow">
-                                             <h3 className="text-xl font-semibold text-blue-600 mb-3">{ts.track}</h3>
-                                             <div className="grid grid-cols-2 gap-4 mb-4">
-                                                  <div>
-                                                       <p className="text-sm text-gray-600">คะแนนแบบทดสอบ</p>
-                                                       <p className="text-lg font-bold">{ts.questionScore}</p>
+                                        <div key={ts.track} className="bg-white p-6 rounded-lg border">
+                                             <h3 className="text-base font-semibold text-blue-600 mb-3">{ts.track}</h3>
+                                             <div className="grid grid-cols-1 gap-2">
+                                                  <div className="flex justify-between items-end">
+                                                       <p className="text-sm text-gray-600">คะแนนรวม</p>
+                                                       <p className="text-sm font-bold">{ts.totalScore} คะแนน</p>
                                                   </div>
-                                                  <div>
-                                                       <p className="text-sm text-gray-600">คะแนนแบบประเมิน</p>
-                                                       <p className="text-lg font-bold">{ts.assessmentScore}</p>
+                                                  <div className="flex justify-between items-end">
+                                                       <p className="text-sm text-gray-600">แบบทดสอบ</p>
+                                                       <p className="text-sm font-bold">{ts.questionScore} คะแนน</p>
                                                   </div>
-                                                  <div>
-                                                       <p className="text-sm text-gray-600">คะแนนความชอบ</p>
-                                                       <p className="text-lg font-bold">{ts.careerScore}</p>
+                                                  <div className="flex justify-between items-end">
+                                                       <p className="text-sm text-gray-600">แบบประเมิน</p>
+                                                       <p className="text-sm font-bold">{ts.assessmentScore} คะแนน</p>
                                                   </div>
-                                                  <div>
-                                                       <p className="text-sm text-gray-600">คะแนนทั้งหมด</p>
-                                                       <p className="text-lg font-bold">{ts.totalScore}</p>
+                                                  <div className="flex justify-between items-end">
+                                                       <p className="text-sm text-gray-600">ความชอบ</p>
+                                                       <p className="text-sm font-bold">{ts.careerScore} คะแนน</p>
                                                   </div>
                                              </div>
-                                             <p className="text-sm text-gray-600 mb-2">ตอบถูกทั้งหมด: {ts.correctAnswers} / {ts.totalQuestions} ({ts.correctPercentage})</p>
-                                             <p className="text-sm">{ts.summary}</p>
                                         </div>
                                    ))}
+                              </div>
+                              <div className="gap-4 grid grid-cols-3 mt-4">
+                                   <div className='bg-white border rounded p-1'>
+                                        <BarChart height={250} type={"bar"} option={optionQ} />
+                                   </div>
+                                   <div className='bg-white border rounded p-1'>
+                                        <BarChart height={250} type={"bar"} option={optionA} />
+                                   </div>
+                                   <div className='bg-white border rounded p-1'>
+                                        <BarChart height={250} type={"bar"} option={optionC} />
+                                   </div>
+                              </div>
+                              <div className='flex gap-4 mt-4'>
+                                   <div className='w-[50%] bg-white border rounded p-1'>
+                                        <BarChart height={280} type={"bar"} option={optionAll} />
+                                   </div>
+                                   <div className='w-[50%] bg-white border rounded p-1'>
+                                        <div className='mt-6'></div>
+                                        <BarChart height={280} type={"pie"} option={optionPieAll} />
+                                   </div>
                               </div>
                          </section>
 
                          <section className="bg-yellow-50 p-6 rounded-lg">
                               <h2 className="text-2xl font-semibold text-yellow-800 mb-4">คำแนะนำ</h2>
-                              <ul className="text-gray-800">
+                              <ul className="text-gray-800 flex flex-col gap-4">
                                    {
                                         recommendation.map((rec, recKey) => (
-                                             <li key={recKey}>{rec}</li>
+                                             <li key={recKey} className='flex gap-4'>
+                                                  <p className='w-[10px]'>{recKey + 1}) </p>
+                                                  <p className='flex flex-col'>
+                                                       <span>{rec.recText}</span>
+                                                       <span>{rec.descText}</span>
+                                                  </p>
+                                             </li>
                                         ))
                                    }
                               </ul>

@@ -86,7 +86,7 @@ const Page = () => {
                     </div>
                 </div>
                 <div className="max-h-full w-full sm:w-1/2 px-10 flex justify-start items-center">
-                    <form className="w-full space-y-4" onSubmit={signInCredentials}>
+                    <form className="w-full space-y-4">
                         <div className="mt-0">
                             <div onClick={signInGoogle} className='border border-slate-500 rounded-[5px] flex flex-row gap-4 items-center justify-center p-3 w-full cursor-pointer text-gray-500 hover:text-blue-500 hover:border-blue-500'>
                                 <img className='w-6 h-auto' src="/google.png" />

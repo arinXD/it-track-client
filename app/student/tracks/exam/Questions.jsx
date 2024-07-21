@@ -18,24 +18,16 @@ const Questions = ({ setQuestions, allQuestions, next }) => {
                          <div
                               key={q.id}
                               className="mb-6">
-                              <p className="mb-2 flex gap-2 items-center">
-                                   <span className="font-bold">{index + 1}. </span>
-                                   <span>{q.question}</span>
+                              <div className="flex gap-2 items-center mb-1">
+                                   <p className="font-bold">{index + 1}. </p>
+                                   <p>{q.question}</p>
                                    {q.desc &&
                                         <Popover
                                              key={`qDesc${index}`}
                                              placement="right-start"
                                              showArrow={true}>
                                              <PopoverTrigger>
-                                                  <button
-                                                       style={{
-                                                            padding: "2px"
-                                                       }}
-                                                       className="w-4 h-4 active:scale-95 rounded-full bg-black flex justify-center items-center"
-                                                       isIconOnly>
-                                                       <MdOutlineQuestionMark
-                                                            className="w-2.5 h-2.5 text-white" />
-                                                  </button>
+                                                  <p className="text-xs underline cursor-pointer">คำอธิบายเพิ่มเติม</p>
                                              </PopoverTrigger>
                                              <PopoverContent className="rounded-[5px]">
                                                   <div className="px-1 py-2">
@@ -45,7 +37,7 @@ const Questions = ({ setQuestions, allQuestions, next }) => {
                                              </PopoverContent>
                                         </Popover>
                                    }
-                              </p>
+                              </div>
                               <Radio.Group
                                    onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                               >

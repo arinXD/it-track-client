@@ -1,15 +1,15 @@
 "use client"
 import ReactApexChart from 'react-apexcharts'
-const BarChart = ({ option }) => {
+const Chart = ({ option, className, type, height = 400 }) => {
     return (
         <ReactApexChart
-            className={"w-full"}
+            className={`w-full ${className}`}
             options={option.options}
             series={option.series}
-            type="bar"
-            height={400}
+            type={type}
+            height={height}
         />
     )
 }
 
-export default BarChart
+export default Chart
