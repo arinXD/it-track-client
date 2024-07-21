@@ -10,6 +10,11 @@ import { getOptions } from "@/app/components/serverAction/TokenAction";
 import axios from "axios";
 import SummaryResult from "./SummaryResult";
 import { Button } from "@nextui-org/react";
+import SummarizeQuestions from "./SummarizeQuestions";
+import SummarizeAssessments from "./SummarizeAssessments";
+import SummarizeCareers from "./SummarizeCareers";
+import localFont from 'next/font/local'
+const prompt = localFont({ src: '../../../../public/fonts/Prompt-Regular.woff2' })
 
 const SuggestionForm = ({ form }) => {
     const allQuestions = form?.Questions
@@ -20,21 +25,109 @@ const SuggestionForm = ({ form }) => {
     const [careers, setCareers] = useState([]);
     const [current, setCurrent] = useState(0)
     const [summarizing, setSummarizing] = useState(false);
-    const [summarizeData, setsummarizeData] = useState({});
+    const [summarizeData, setsummarizeData] = useState({
+        "questionScores": [
+            {
+                "qId": 3,
+                "question": "คำถาม Web 3",
+                "track": "Web and Mobile",
+                "score": 0,
+                "isCorrect": false
+            },
+            {
+                "qId": 2,
+                "question": "คำถาม Network 1",
+                "track": "Network",
+                "score": 0,
+                "isCorrect": false
+            },
+            {
+                "qId": 1,
+                "question": "คำถาม BITs 1",
+                "track": "BIT",
+                "score": 0,
+                "isCorrect": false
+            }
+        ],
+        "assessmentScores": [
+            {
+                "assId": 1,
+                "question": "Bit assesstion",
+                "track": "BIT",
+                "score": 4
+            },
+            {
+                "assId": 3,
+                "question": "Web assesstion",
+                "track": "Web and Mobile",
+                "score": 4
+            },
+            {
+                "assId": 2,
+                "question": "Network assesstion",
+                "track": "Network",
+                "score": 4
+            }
+        ],
+        "trackSummaries": [
+            {
+                "track": "BIT",
+                "questionScore": 10,
+                "assessmentScore": 4,
+                "careerScore": 5,
+                "totalScore": 9,
+                "correctAnswers": 0,
+                "totalQuestions": 1,
+                "correctPercentage": "0.00%",
+                "summary": "คะแนนคำถาม 0 คะแนน, คะแนนแบบประเมิน 4 คะแนน, คะแนนความชอบ 5 คะแนน, ตอบคำถามถูก 0 จาก 1 ข้อ (0.00%)."
+            },
+            {
+                "track": "Network",
+                "questionScore": 20,
+                "assessmentScore": 4,
+                "careerScore": 0,
+                "totalScore": 4,
+                "correctAnswers": 0,
+                "totalQuestions": 1,
+                "correctPercentage": "0.00%",
+                "summary": "คะแนนคำถาม 0 คะแนน, คะแนนแบบประเมิน 4 คะแนน, คะแนนความชอบ 0 คะแนน, ตอบคำถามถูก 0 จาก 1 ข้อ (0.00%)."
+            },
+            {
+                "track": "Web and Mobile",
+                "questionScore": 30,
+                "assessmentScore": 4,
+                "careerScore": 0,
+                "totalScore": 4,
+                "correctAnswers": 0,
+                "totalQuestions": 1,
+                "correctPercentage": "0.00%",
+                "summary": "คะแนนคำถาม 0 คะแนน, คะแนนแบบประเมิน 4 คะแนน, คะแนนความชอบ 0 คะแนน, ตอบคำถามถูก 0 จาก 1 ข้อ (0.00%)."
+            }
+        ],
+        "totalQuestionScore": 0,
+        "totalCorrectAnswers": 0,
+        "totalQuestions": 3,
+        "overallCorrectPercentage": "0.00%",
+        "recommendation": [
+            "1) คุณเหมาะสมมากกับแทร็ก BIT คะแนนรวมของคุณคือ 9 คะแนน, คุณตอบคำถามถูก 0.00% จากคำถามทั้งหมดภายในแทร็ก",
+            "2) คุณค่อนข้างเหมาะสมกับแทร็ก Network คะแนนรวมของคุณคือ 4 คะแนน, คุณตอบคำถามถูก 0.00% จากคำถามทั้งหมดภายในแทร็ก",
+            "3) คุณทำได้ดีกับแทร็ก Web and Mobile คะแนนรวมของคุณคือ 4 คะแนน, คุณตอบคำถามถูก 0.00% จากคำถามทั้งหมดภายในแทร็ก"
+        ]
+    },);
     const steps = useMemo(() => ([
         {
-            title: 'แบบทดสอบ',
+            title: Object.keys(summarizeData).length === 0 ? 'แบบทดสอบ' : 'ผลสรุปแบบทดสอบ',
         },
         {
-            title: 'แบบประเมิน',
+            title: Object.keys(summarizeData).length === 0 ? 'แบบประเมิน' : 'ผลสรุปแบบประเมิน',
         },
         {
-            title: 'ความชอบ',
+            title: Object.keys(summarizeData).length === 0 ? 'ความชอบ' : 'ผลสรุปความชอบ',
         },
         {
-            title: 'สรุปผล',
+            title: Object.keys(summarizeData).length === 0 ? 'สรุปผล' : 'คำแนะนำ',
         },
-    ]), [])
+    ]), [Object.keys(summarizeData).length])
 
     const summarize = useMemo(() => ({
         questions: questions?.filter(q => q.aId).length === questions?.length,
@@ -87,6 +180,7 @@ const SuggestionForm = ({ form }) => {
             const res = await axios(option)
             const data = res.data.data
             setsummarizeData(data)
+            setCurrent(0)
         } catch (error) {
             setsummarizeData({})
         } finally {
@@ -116,16 +210,15 @@ const SuggestionForm = ({ form }) => {
                     </section>
                     :
                     <section className="min-h-screen p-8 max-w-4xl mx-auto bg-white shadow-sm rounded-[5px] border-1 border-gray-200">
-
+                        <Steps
+                            className="mb-8"
+                            current={current}
+                            onChange={setCurrent}
+                            items={items} />
                         {
                             Object.keys(summarizeData).length === 0
                                 ?
                                 <>
-                                    <Steps
-                                        className="mb-8"
-                                        current={current}
-                                        onChange={setCurrent}
-                                        items={items} />
                                     <form
                                         className=""
                                         onSubmit={handleSubmit}>
@@ -169,21 +262,51 @@ const SuggestionForm = ({ form }) => {
                                 </>
                                 :
                                 <section>
-                                    <SummaryResult
-                                        data={summarizeData}
-                                    />
-                                    <div className="flex justify-center mt-8">
-                                        <Button
-                                            onClick={resetForm}
-                                            color="primary"
-                                            className="rounded-[5px]"
-                                        >
-                                            ทำแบบทดสอบอีกครั้ง
-                                        </Button>
-                                    </div>
+                                    <section>
+                                        <section className={`w-full ${current === 0 ? "block" : "hidden"}`}>
+                                            <SummarizeQuestions
+                                                next={next}
+                                                data={summarizeData}
+                                                prompt={prompt}
+                                            />
+                                        </section>
+                                        <section className={`w-full ${current === 1 ? "block" : "hidden"}`}>
+                                            <SummarizeAssessments
+                                                next={next}
+                                                prev={prev}
+                                                data={summarizeData}
+                                                prompt={prompt}
+                                            />
+                                        </section>
+                                        <section className={`w-full ${current === 2 ? "block" : "hidden"}`}>
+                                            <SummarizeCareers
+                                                next={next}
+                                                prev={prev}
+                                                data={summarizeData}
+                                                prompt={prompt}
+                                            />
+                                        </section>
+                                        <section className={`w-full ${current === 3 ? "block" : "hidden"}`}>
+                                            <SummaryResult
+                                                data={summarizeData}
+                                                prompt={prompt}
+                                            />
+                                        </section>
+                                    </section>
+                                    {
+                                        current === 3 &&
+                                        <div className="flex justify-center mt-8">
+                                            <Button
+                                                onClick={resetForm}
+                                                color="primary"
+                                                className="rounded-[5px]"
+                                            >
+                                                ทำแบบทดสอบอีกครั้ง
+                                            </Button>
+                                        </div>
+                                    }
                                 </section>
                         }
-
                     </section>
             }
         </div>

@@ -4,12 +4,11 @@ const SummaryResult = ({ data }) => {
      const { questionScores, assessmentScores, trackSummaries, totalQuestionScore, totalCorrectAnswers, totalQuestions, overallCorrectPercentage, recommendation } = data;
 
      return (
-          <div className="bg-gray-100 min-h-screen p-8 rounded-sm">
-               <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          <section className="bg-gray-100 min-h-screen p-8 rounded-sm">
+               <section className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
                     <header className="bg-blue-600 text-white p-6">
                          <h1 className="text-3xl font-bold">สรุปผลการทำแบบทดสอบ</h1>
                     </header>
-
                     <div className="p-6 space-y-8">
                          <section className="bg-blue-50 p-4 rounded-lg">
                               <h2 className="text-2xl font-semibold text-blue-800 mb-4">สถิติโดยรวม</h2>
@@ -125,8 +124,8 @@ const SummaryResult = ({ data }) => {
                               </ul>
                          </section>
                     </div>
-               </div>
-          </div>
+               </section>
+          </section>
      );
 };
 
