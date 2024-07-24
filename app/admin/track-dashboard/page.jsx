@@ -51,8 +51,10 @@ export default function Page() {
         getPopularTracks(acadyear)
     }, [])
 
-    const getChartOption = useCallback((series, categories, title = undefined, showXaxis = true) => ({
-        series,
+    const getChartOption = useCallback((
+        series, categories, title = undefined, showXaxis = true, colors = ['#F4538A', '#FAA300', "#7EA1FF", "#2CD3E1"]
+    ) => ({
+        series: series,
         options: {
             title: {
                 text: title,
@@ -71,7 +73,7 @@ export default function Page() {
                     show: false,
                 }
             },
-            colors: ['#F4538A', '#FAA300', "#7EA1FF"],
+            colors: colors,
             plotOptions: {
                 bar: {
                     columnWidth: '50%',
@@ -138,6 +140,104 @@ export default function Page() {
         },
     ]), [dashboardData])
 
+    const popularityOption = useMemo(() => {
+        const series = [{
+            data: []
+        }]
+        const categories = []
+        for (let i = 0; i < dashboardData?.popularity?.length; i++) {
+            const pop = dashboardData.popularity[i]
+            series[0].data.push(pop.selected)
+            categories.push(pop.track?.split(" ")[0] ?? "ไม่เข้าคัดเลือก")
+        }
+        const option = getChartOption(series, categories, undefined, true)
+        option.options.legend = {
+            position: 'top',
+            horizontalAlign: 'center',
+            offsetX: 40
+        }
+        option.options.dataLabels.enabled = true
+        option.options.plotOptions.bar.dataLabels.total = {
+            enabled: true,
+            style: {
+                fontSize: '13px',
+                fontWeight: 900
+            }
+        }
+        return option
+    }, [dashboardData])
+
+    const ratioPopulation = useMemo(() => ({
+        series: dashboardData?.popularity?.map(pop => pop.selected),
+        options: {
+            chart: {
+                width: 380,
+                type: 'pie',
+            },
+            colors: ['#F4538A', '#FAA300', "#7EA1FF", "#2CD3E1"],
+            labels: dashboardData?.popularity?.map(pop => pop.track?.split(" ")[0] ?? "ไม่เข้าคัดเลือก"),
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }],
+            legend: {
+                show: true,
+                position: 'top',
+                fontSize: '10px',
+            },
+        },
+    }), [dashboardData])
+
+    const trackPopularityEachYear = useMemo(() => {
+        const allTracks = Array.from(new Set(popularity.flatMap(year => year.result.map(r => r.track || 'ไม่ระบุ'))));
+
+        const series = allTracks.map(track => ({
+            name: track,
+            data: popularity.map(year => {
+                const trackData = year.result.find(r => (r.track || 'ไม่ระบุ') === track);
+                return trackData ? trackData.count : 0;
+            })
+        }));
+
+        const categories = popularity.map(year => year.acadyear.toString());
+        const option = getChartOption(series, categories, "แทร็กที่ถูกเลือกเยอะที่สุดในแต่ละปี", true);
+
+        // Customize options
+        option.options.dataLabels.enabled = true;
+        option.options.plotOptions.bar.distributed = false
+        option.options.legend = {
+            position: 'top',
+            horizontalAlign: 'center',
+            offsetX: 40
+        };
+        option.options.plotOptions.bar.dataLabels.total = {
+            enabled: true,
+            style: {
+                fontSize: '13px',
+                fontWeight: 900
+            }
+        };
+        option.options.stroke = {
+            show: true,
+            width: 1,
+            colors: ['#fff']
+        }
+        option.options.tooltip = {
+            shared: true,
+            intersect: false
+        }
+
+        return option;
+    }, [popularity]);
+
+
     return (
         <>
             <header>
@@ -179,7 +279,7 @@ export default function Page() {
                                 ไม่พบข้อมูลการคัดเลือกที่ค้นหา
                             </p>
                             :
-                            <section className='w-full bg-gray-100 p-6 rounded-sm'>
+                            <section className='w-full bg-gray-100 p-6 rounded-sm h-full'>
                                 <section className='grid grid-cols-5 gap-6'>
                                     <Card
                                         className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-fit'
@@ -225,11 +325,64 @@ export default function Page() {
                                         ))
                                     }
                                 </section>
-                                <section className='w-full mt-6 grid grid-cols-5 h-[300px] '>
+                                <section className='w-full mt-6 grid grid-cols-5 gap-6'>
+                                    <section className='col col-span-4 grid grid-cols-2 gap-6'>
+                                        <Card
+                                            className='col-span-1 rounded-[5px] border-1 border-gray-300 shadow-none'
+                                        >
+                                            <CardBody>
+                                                <p className='text-center text-sm mb-7 mt-2'>แทร็กที่ถูกเลือกเยอะที่สุดในแต่ละปี</p>
+                                                <BarChart
+                                                    height={250}
+                                                    type={"bar"}
+                                                    option={popularityOption} />
+                                            </CardBody>
+                                        </Card>
+                                        <Card
+                                            className='col-span-1 rounded-[5px] border-1 border-gray-300 shadow-none'
+                                        >
+                                            <CardBody>
+                                                <p className='text-center text-sm mb-8 mt-2'>อัตราส่วนแทร็กที่ถูกเลือกเยอะที่สุด</p>
+                                                <BarChart
+                                                    height={250}
+                                                    type={"pie"}
+                                                    option={ratioPopulation} />
+                                            </CardBody>
+                                        </Card>
+                                    </section>
+                                    <section className='col-span-1 grid grid-cols-1 gap-6'>
+                                        {
+                                            dashboardData.result.map(rs => (
+                                                <Card className='w-full rounded-[5px] border-1 border-gray-300 shadow-none' >
+                                                    <CardBody>
+                                                        <section className='p-2 flex flex-col gap-3'>
+                                                            <p className='text-xs text-default-500 text-center'>เกรดเฉลี่ยรวมแทร็ก {rs.track?.split(" ")[0]}</p>
+                                                            <p className='flex gap-4 justify-center items-center'>
+                                                                <span className='text-2xl'>{rs.gpaAvg.toFixed(2)}</span>
+                                                            </p>
+                                                        </section>
+                                                    </CardBody>
+                                                </Card>
+                                            ))
+                                        }
+                                    </section>
+
+                                    <Card
+                                        className='col-span-5 rounded-[5px] border-1 border-gray-300 shadow-none'
+                                    >
+                                        <CardBody>
+                                            <BarChart
+                                                height={250}
+                                                type={"bar"}
+                                                option={trackPopularityEachYear} />
+                                        </CardBody>
+                                    </Card>
+
+                                    {/* Table */}
                                     <Card
                                         className='w-full col-span-5 rounded-[5px] border-1 border-gray-300 shadow-none'
                                     >
-                                        <CardBody>
+                                        <CardBody className='h-[300px]'>
                                             <Tabs
                                                 defaultActiveKey="1"
                                                 items={tabsItems}
@@ -238,20 +391,9 @@ export default function Page() {
                                         </CardBody>
                                     </Card>
                                 </section>
-                                {/* <div className="gap-4 grid grid-cols-3 mt-4">
-                                    <div className='bg-white border rounded p-2'>
-                                        <BarChart height={250} type={"bar"} option={optionQ} />
-                                    </div>
-                                    <div className='bg-white border rounded p-2'>
-                                        <BarChart height={250} type={"bar"} option={optionA} />
-                                    </div>
-                                    <div className='bg-white border rounded p-2'>
-                                        <BarChart height={250} type={"bar"} option={optionC} />
-                                    </div>
-                                </div> */}
                             </section>
                 }
-            </ContentWrap>
+            </ContentWrap >
         </>
     )
 }
