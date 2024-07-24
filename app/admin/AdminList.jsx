@@ -13,6 +13,7 @@ import { HiOutlineRectangleGroup } from "react-icons/hi2";
 import { LuUngroup } from "react-icons/lu";
 import { RiBookletLine } from 'react-icons/ri';
 import { TbCheckupList } from "react-icons/tb";
+import { AiFillPieChart } from "react-icons/ai";
 
 const AdminList = () => {
      const { data: session } = useSession();
@@ -45,7 +46,7 @@ const AdminList = () => {
                     { href: "/admin/track", lable: "ข้อมูลแทรค", icon: HiOutlineUserGroup },
                     { href: "/admin/track-selection", lable: "คัดเลือกแทรค", icon: AiOutlineEdit },
                     { href: "/admin/trackstudent", lable: "รายชื่อนักศึกษาภายในแทรค", icon: BsPerson },
-                    { href: "/admin/track-dashboard", lable: "สรุปผลการคัดเลือกแทร็ก", icon: GrPieChart },
+                    { href: "/admin/track-dashboard", lable: "สรุปผลการคัดเลือกแทร็ก", icon: AiFillPieChart },
                ]
           },
           {
@@ -68,10 +69,10 @@ const AdminList = () => {
           return (
                <li key={index}>
                     <Link className='block group' href={link.href}>
-                         <div className='bg-[#ebecee] p-3 h-36 flex justify-center items-center'>
-                              <Icon style={masker} className='w-24 h-24 group-hover:scale-110 transition-transform text-[#333333]' />
+                         <div className='bg-[#2C2F31] p-3 h-36 flex justify-center items-center'>
+                              <Icon style={masker} className='w-24 h-24 group-hover:scale-110 transition-transform text-[#ebecee]' />
                          </div>
-                         <p className='text-[#2C2F31] mt-1.5'>{link.lable}</p>
+                         <p className='text-[#2C2F31]  mt-1.5'>{link.lable}</p>
                     </Link>
                </li>
           );

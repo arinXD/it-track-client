@@ -27,7 +27,7 @@ const Questions = ({ setQuestions, allQuestions, next }) => {
                                              placement="right-start"
                                              showArrow={true}>
                                              <PopoverTrigger>
-                                                  <p className="text-xs underline cursor-pointer">คำอธิบายเพิ่มเติม</p>
+                                                  <p className="text-xs text-default-500 underline cursor-pointer">คำอธิบาย</p>
                                              </PopoverTrigger>
                                              <PopoverContent className="rounded-[5px]">
                                                   <div className="px-1 py-2">

@@ -72,7 +72,7 @@ const SummaryResult = ({ data, prompt }) => {
      const optionA = useMemo(() => (getChartOption("assessmentScore", "แบบประเมิน")), [trackSummaries])
      const optionC = useMemo(() => (getChartOption("careerScore", "ความชอบ")), [trackSummaries])
      const optionAll = useMemo(() => {
-          const defOption = getChartOption("totalScore", "ทั้งหมด", true)
+          const defOption = getChartOption("totalScore", "ผลแบบทดสอบกลุ่มความเชี่ยวชาญ", true)
           defOption.options.chart.stacked = true
           defOption.options.stroke = {
                width: 1,
@@ -116,6 +116,12 @@ const SummaryResult = ({ data, prompt }) => {
      const optionPieAll = useMemo(() => ({
           series: trackSummaries.map((ts) => ts["totalScore"]),
           options: {
+               // title: {
+               //      text: "อัตราส่วนคะแนนในแต่ละแทร็ก",
+               //      style: {
+               //           ...prompt.style
+               //      }
+               // },
                chart: {
                     width: 380,
                     type: 'pie',
@@ -226,22 +232,22 @@ const SummaryResult = ({ data, prompt }) => {
                                    ))}
                               </div>
                               <div className="gap-4 grid grid-cols-3 mt-4">
-                                   <div className='bg-white border rounded p-1'>
+                                   <div className='bg-white border rounded p-2'>
                                         <BarChart height={250} type={"bar"} option={optionQ} />
                                    </div>
-                                   <div className='bg-white border rounded p-1'>
+                                   <div className='bg-white border rounded p-2'>
                                         <BarChart height={250} type={"bar"} option={optionA} />
                                    </div>
-                                   <div className='bg-white border rounded p-1'>
+                                   <div className='bg-white border rounded p-2'>
                                         <BarChart height={250} type={"bar"} option={optionC} />
                                    </div>
                               </div>
                               <div className='flex gap-4 mt-4'>
-                                   <div className='w-[50%] bg-white border rounded p-1'>
+                                   <div className='w-[50%] bg-white border rounded p-2'>
                                         <BarChart height={280} type={"bar"} option={optionAll} />
                                    </div>
-                                   <div className='w-[50%] bg-white border rounded p-1'>
-                                        <div className='mt-6'></div>
+                                   <div className='w-[50%] bg-white border rounded p-2'>
+                                        <p className='text-sm mb-[23.5px] ms-2 mt-0.5'> อัตราส่วนคะแนนในแต่ละแทร็ก  </p>
                                         <BarChart height={280} type={"pie"} option={optionPieAll} />
                                    </div>
                               </div>

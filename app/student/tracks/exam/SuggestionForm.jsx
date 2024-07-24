@@ -127,7 +127,7 @@ const SuggestionForm = ({ form }) => {
                             current={current}
                             onChange={setCurrent}
                             items={items} />
-                        {JSON.stringify(Object.keys(summarizeData).length === 0)}
+                        {/* {JSON.stringify(Object.keys(summarizeData).length === 0)} */}
                         {
                             Object.keys(summarizeData).length === 0
                                 ?

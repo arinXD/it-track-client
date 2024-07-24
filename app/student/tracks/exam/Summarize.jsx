@@ -86,16 +86,6 @@ const Summarize = ({ prev, setCurrent, summarize, summarizing }) => {
                               <span className="text-base">ความชอบ</span>
                          </div>
                     </div>
-                    <div
-
-                         className="cursor-pointer flex flex-row items-center gap-4 opacity-60 hover:opacity-100 transition-all rounded-none p-4"
-                    >
-                         <div className="flex flex-col">
-                              <span className="text-sm text-default-400">Final</span>
-                              <span className="text-base">สรุปผล</span>
-                         </div>
-                         <MdKeyboardArrowRight className="w-5 h-5" />
-                    </div>
                </div>
           </section>
      )
