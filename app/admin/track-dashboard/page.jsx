@@ -8,7 +8,7 @@ import { fetchDataObj } from '../action';
 import Select from 'react-select';
 import dynamic from 'next/dynamic';
 import { Card, CardBody } from "@nextui-org/card";
-import { Tabs } from 'antd';
+import { Alert, Spin, Tabs } from 'antd';
 const BarChart = dynamic(() => import('@/app/components/charts/ApexBarChart'), { ssr: false });
 import localFont from 'next/font/local'
 import StudentTable from './StudentTable';
