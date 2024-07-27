@@ -55,7 +55,9 @@ const StudentTable = ({ studentsData }) => {
      ]), [])
 
      return (
-          <Table columns={columns} dataSource={studentsData} />
+          <section className='h-[300px]' >
+               <Table columns={columns} dataSource={studentsData} />
+          </section>
      )
 }
 

@@ -23,6 +23,7 @@ const Summarize = ({ prev, setCurrent, summarize, summarizing }) => {
                          isSummarize &&
                          [
                               <Button
+                                   key={"summarizingButton"}
                                    type="submit"
                                    className="rounded-[5px]"
                                    color="primary"

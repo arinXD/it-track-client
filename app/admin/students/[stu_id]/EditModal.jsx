@@ -53,7 +53,7 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
         let bool = true;
         const updatedInvalid = {};
         Object.keys(formData).forEach(key => {
-            if (!formData[key]) {
+            if (!formData[key] && key !== "acadyear_desc") {
                 updatedInvalid[key] = true;
                 bool = false;
             } else {
@@ -195,7 +195,12 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
             const res = await axios(options)
             const { ok, message } = res.data
             showToastMessage(ok, message)
-            getStudentData()
+            const url = new URL(window.location.href)
+            url.search = ""
+            setTimeout(() => {
+                window.location.href = url
+            }, 1500)
+            // getStudentData()
         } catch (error) {
             console.error(error);
             const { ok, message } = error?.response?.data
