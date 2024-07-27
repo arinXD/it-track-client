@@ -21,26 +21,35 @@ import { utils, writeFile } from "xlsx";
 import { tableClass } from '@/src/util/ComponentClass'
 import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useKbd, Spinner, Tooltip } from '@nextui-org/react'
 import { Loading } from '@/app/components';
-import InsertSubjectModal from './InsertSubjectModal';
 import { Empty, message } from 'antd';
+import InsertSubjectModal from './InsertSubjectModal';
+import InsertConditionModal from './InsertConditionModal';
 
 const Page = ({ params }) => {
      const [loading, setLoading] = useState(true)
      const [verifySelect, setVerifySelect] = useState({})
 
      const [program, setProgram] = useState([])
-     const [ids, setId] = useState([])
+     const [ids, setId] = useState(null)
+     var idss;
+     // var ids;
 
      const [groupData, setGroupData] = useState([]);
      const [subgroupData, setSubgroupData] = useState([]);
      const [semisubgroupData, setSemiSubgroupData] = useState([]);
 
      const [isInsertModalOpen, setInsertModalOpen] = useState(false);
+     const [isInsertConditionModalOpen, setInsertConditionModalOpen] = useState(false);
 
      const [category, setCategories] = useState([])
+     const [group, setGroups] = useState([])
+     // const [groupinsub, setGroupInSubs] = useState([])
      const [categoryverify, setCategoryVerifies] = useState([])
 
      const [highestIndex, setHighestIndex] = useState(0);
+
+     const [conditions, setConditions] = useState([]);
+
 
      const showToastMessage = useCallback((ok, message) => {
           toast[ok ? 'success' : 'warning'](message, {
@@ -55,12 +64,23 @@ const Page = ({ params }) => {
           });
      }, []);
 
+     const { id } = params
+
+     const initID = useCallback(async function (id) {
+          const result = await fetchDataObj(`/api/verify/${id}`)
+          setId(result.id)
+          idss = result.id;
+     }, [])
+
+     // console.log("idS",ids)
+     // console.log("idSS",idss)
+
      const initVerify = useCallback(async function (id) {
+          // console.log(id);
           try {
                const result = await fetchDataObj(`/api/verify/${id}`)
-               console.log(result);
+               // console.log(result);
                setVerifySelect(result)
-               setId(result.id)
                setProgram(result?.Program)
 
                const categoryverifies = result.CategoryVerifies?.map(categoryVerify => categoryVerify.Categorie);
@@ -87,12 +107,12 @@ const Page = ({ params }) => {
                });
                setSemiSubgroupData(semisubgroupData);
 
+               // console.log(semisubgroupData);
+
           } catch (err) {
                console.error("Error on init func:", err);
           }
      }, [])
-
-     const { id } = params
 
      const groupedSubjectsByCategory = useMemo(() => {
           const groupedSubjects = {};
@@ -141,9 +161,12 @@ const Page = ({ params }) => {
                     }
                });
           });
+          // console.log(semisubgroupData);
 
           return groupedSubjects;
      }, [subgroupData, groupData, semisubgroupData]);
+
+     console.log(groupedSubjectsByCategory);
 
      useEffect(() => {
           const categoryData = Object.keys(groupedSubjectsByCategory).map(categoryId => {
@@ -155,10 +178,105 @@ const Page = ({ params }) => {
      }, [groupedSubjectsByCategory]);
 
      useEffect(() => {
+          const groupData = Object.keys(groupedSubjectsByCategory).flatMap(categoryId => {
+               const category = groupedSubjectsByCategory[categoryId];
+               const groups = category.groups;
+               return Object.keys(groups).map(groupId => {
+                    const group = groups[groupId];
+                    return {
+                         id: group.id,
+                         group_title: group.group_title,
+                    };
+               });
+          });
+
+          const groupinsubData = Object.keys(groupedSubjectsByCategory).flatMap(categoryId => {
+               const category = groupedSubjectsByCategory[categoryId];
+               const subgroups = category.subgroups;
+
+               // console.log(category);
+
+               const uniqueGroups = new Map();
+
+               Object.keys(subgroups).forEach(subgroupId => {
+                    const subgroup = subgroups[subgroupId];
+                    const group = subgroup.Group;
+
+                    if (!uniqueGroups.has(group.id)) {
+                         uniqueGroups.set(group.id, {
+                              id: group.id,
+                              group_title: group.group_title,
+                              sub_group_titles: []  // Array to hold subgroup objects
+                         });
+                    }
+
+                    const groupEntry = uniqueGroups.get(group.id);
+                    groupEntry.sub_group_titles.push({
+                         value: subgroup.id,
+                         label: subgroup.sub_group_title
+                    });
+               });
+
+               return Array.from(uniqueGroups.values());
+          });
+
+          const semiData = Object.keys(groupedSubjectsByCategory).flatMap(categoryId => {
+               const category = groupedSubjectsByCategory[categoryId];
+               const semisubgroups = category.semisubgroups;
+
+               const uniqueGroupsss = new Map();
+
+               Object.keys(semisubgroups).forEach(semisubgroupId => {
+                    const semisubgroup = semisubgroups[semisubgroupId];
+                    const subgroup = semisubgroup.SubGroup;
+                    const group = subgroup.Group;
+
+                    if (!uniqueGroupsss.has(group.id)) {
+                         uniqueGroupsss.set(group.id, {
+                              id: group.id,
+                              group_title: group.group_title,
+                              sub_group_titles: []
+                         });
+                    }
+
+                    const groupEntry = uniqueGroupsss.get(group.id);
+
+                    let subgroupEntry = groupEntry.sub_group_titles.find(sg => sg.value === subgroup.id);
+                    if (!subgroupEntry) {
+                         subgroupEntry = {
+                              value: subgroup.id,
+                              label: subgroup.sub_group_title,
+                              semi_sub_group_titles: []
+                         };
+                         groupEntry.sub_group_titles.push(subgroupEntry);
+                    }
+
+                    subgroupEntry.semi_sub_group_titles.push({
+                         value: semisubgroup.id,
+                         label: semisubgroup.semi_sub_group_title
+                    });
+               });
+
+               return Array.from(uniqueGroupsss.values());
+          });
+
+          // console.log(groupData);
+          // console.log(groupinsubData);
+          // console.log(semiData);
+
+          const groupss = groupData.concat(groupinsubData).concat(semiData);
+          setGroups(groupss);
+
+     }, [groupedSubjectsByCategory]);
+
+     console.log(group);
+     // console.log(groupedSubjectsByCategory);
+
+     useEffect(() => {
           setLoading(false)
+          initID(id);
           initVerify(id);
      }, [])
-
 
      const handleInsertModalOpen = () => {
           setInsertModalOpen(true);
@@ -166,6 +284,14 @@ const Page = ({ params }) => {
 
      const handleInsertModalClose = () => {
           setInsertModalOpen(false);
+     };
+
+     const handleInsertConditionModalOpen = () => {
+          setInsertConditionModalOpen(true);
+     };
+
+     const handleInsertConditionModalClose = () => {
+          setInsertConditionModalOpen(false);
      };
 
      const handleDataInserted = async () => {
@@ -178,14 +304,28 @@ const Page = ({ params }) => {
                showToastMessage(false, "Error adding Subject Verify")
           }
      };
+     // console.log(ids);
+
+     const handleDataConditionInserted = async () => {
+          try {
+               await initVerify(id);
+
+          } catch (error) {
+               console.error('Error inserting data:', error);
+               showToastMessage(false, "Error adding Condition Verify")
+          }
+     };
 
      ///////////////////////////////////////////////////////////
 
      const handleDeleteGroupSubject = async (gs) => {
           // console.log(`Deleting GroupSubject with id: ${gs}`);
+          // console.log("IDF: ",ids)
 
-          const url = `/api/verify/group/${gs}`
+          const url = `/api/verify/group/${gs}/${ids}`
+          // console.log(url)
           const options = await getOptions(url, 'DELETE')
+          // console.log(id);
           axios(options)
                .then(async result => {
                     const { ok, message } = result.data
@@ -200,8 +340,9 @@ const Page = ({ params }) => {
 
      const handleDeleteSubGroupSubjectAndTrack = async (sgt) => {
           // console.log(`Deleting SubGroupSubjectAndTrack with id: ${sgt}`);
+          console.log("IDF: ", idss)
 
-          const url = `/api/verify/subgroup/${sgt}`
+          const url = `/api/verify/subgroup/${sgt}/${idss}`
           const options = await getOptions(url, 'DELETE')
           axios(options)
                .then(async result => {
@@ -214,10 +355,12 @@ const Page = ({ params }) => {
                })
      };
 
-     const handleDeleteSemi = async (sgt) => {
+     const handleDeleteSemi = async (sgt, idtest) => {
+          console.log(idss);
           // console.log(`Deleting SubGroupSubjectAndTrack with id: ${sgt}`);
+          // alert(ids)
 
-          const url = `/api/verify/semisubgroup/${sgt}`
+          const url = `/api/verify/semisubgroup/${sgt}/${idss}`
           const options = await getOptions(url, 'DELETE')
           axios(options)
                .then(async result => {
@@ -250,6 +393,7 @@ const Page = ({ params }) => {
      ///////////////////////////////////////////////////////////
 
      const getSubTrack = useCallback((subgroup, subgroupIndex) => {
+          // console.log(subgroup);
           if (subgroup?.subjects?.every(subject => subject?.SemiSubgroupSubjects?.some(e => e?.SemiSubGroup))) {
                const subjects = subgroup.subjects || [];
                const SemiSubjects = {};
@@ -264,6 +408,7 @@ const Page = ({ params }) => {
                          SemiSubjects[name].push(subject);
                     }
                });
+
                return (
                     <div key={subgroupIndex}>
                          <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
@@ -299,7 +444,7 @@ const Page = ({ params }) => {
                                                             <div className='relative flex items-center gap-2'>
                                                                  <Tooltip color="danger" content="ลบ">
                                                                       <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                                           <DeleteIcon2 onClick={() => handleDeleteSemi(subject.subject_id)} />
+                                                                           <DeleteIcon2 onClick={() => handleDeleteSemi(subject.subject_id, ids)} />
                                                                            {/* {subject.subject_id} */}
                                                                       </span>
                                                                  </Tooltip>
@@ -352,7 +497,7 @@ const Page = ({ params }) => {
                                         </TableHeader>
                                         <TableBody>
                                              {trackSubjects[track].map((subject, subjectIndex) => (
-                                                  <TableRow key={subjectIndex}>
+                                                  <TableRow key={subjectIndex} className={subject.track !== null ? 'bg-green-50' : ''}>
                                                        {/* <TableCell className=''>{subject.subject_id}</TableCell> */}
                                                        <TableCell className=''>{subject.subject_code}</TableCell>
                                                        <TableCell className="w-1/3">{subject.title_en}</TableCell>
@@ -377,10 +522,7 @@ const Page = ({ params }) => {
                     </div>
                );
           } else {
-               ////// Subgroup ไม่มีแทรค
-               console.log(subgroup?.subjects?.map(e => {
-                    console.log(e)
-               }));
+
                return (
                     <div key={subgroupIndex}>
                          <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
@@ -400,7 +542,7 @@ const Page = ({ params }) => {
                               </TableHeader>
                               <TableBody>
                                    {subgroup.subjects && subgroup.subjects.map((subject, subjectIndex) => (
-                                        <TableRow key={subjectIndex}>
+                                        <TableRow key={subjectIndex} className={subject.track == null ? 'bg-red-50' : ''}>
                                              <TableCell className=''>{subject.subject_code}</TableCell>
                                              <TableCell className="w-1/3">{subject.title_en}</TableCell>
                                              <TableCell className="w-1/3">{subject.title_th}</TableCell>
@@ -424,11 +566,12 @@ const Page = ({ params }) => {
           }
      }, [])
 
-     const getSubg = useCallback((subgroups, semisubgroups) => {
-          if (!subgroups) return undefined
-          if (Object.values(subgroups).length == 0) return undefined
+     const getSubg = (subgroups, semisubgroups) => {
+          if (!subgroups || !semisubgroups) return undefined;
+          if (Object.values(subgroups).length === 0 && Object.values(semisubgroups).length === 0) return undefined;
+
           const groupedSubgroups = {};
-          
+
           Object.values(subgroups).forEach((subgroup) => {
                const groupTitle = subgroup?.Group?.group_title;
                if (!groupedSubgroups[groupTitle]) {
@@ -437,7 +580,8 @@ const Page = ({ params }) => {
                groupedSubgroups[groupTitle].push(subgroup);
           });
 
-          Object.values(semisubgroups).forEach((semisubgroup) => {
+
+          Object.values(semisubgroups).forEach(semisubgroup => {
                const groupTitle = semisubgroup?.SubGroup?.Group?.group_title;
                if (!groupedSubgroups[groupTitle]) {
                     groupedSubgroups[groupTitle] = [];
@@ -445,7 +589,7 @@ const Page = ({ params }) => {
                semisubgroup.SubGroup.subjects = semisubgroup.subjects
                groupedSubgroups[groupTitle].push(semisubgroup?.SubGroup);
           });
-          // console.log(groupedSubgroups);
+
           return (
                <>
                     {Object.keys(groupedSubgroups).map((groupTitle, groupIndex) => {
@@ -465,7 +609,7 @@ const Page = ({ params }) => {
                     })}
                </>
           );
-     }, [])
+     }
 
 
      return (
@@ -492,11 +636,22 @@ const Page = ({ params }) => {
                                                   <h1 className='text-3xl leading-relaxed'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br></br>หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{program.title_th}<br></br>(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
                                                   <h2 className='mt-6'>ขอยื่นแบบฟอร์มแสดงรายละเอียดการศึกษารายวิชาที่ได้เรียนมาทั้งหมด อย่างน้อย <span className='font-bold'>{verifySelect.main_at_least}</span> หน่วยกิต ต่องานทะเบียนและประมวลผลการศึกษา ดังต่อไปนี้คือ.—</h2>
                                              </div>
-                                             <div className='bg-gray-100 border-gray-200 border-1 p-2 justify-between items-center rounded-md mb-4 grid  grid-cols-4'>
-                                                  <div className="flex items-center w-[100%] text-base col-span-3 max-lg:col-span-4">
+                                             <div className='bg-gray-100 border-gray-200 border-1 p-2 items-center rounded-md mb-4 flex flex-wrap justify-between'>
+                                                  <div className="text-base">
                                                        <h1 className='py-2 p-2 px-1'><span className='font-bold'>{verifySelect.verify}</span> {verifySelect.title} สาขาวิชา{program.title_th} (ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
                                                   </div>
-                                                  <div className='grid gap-2 col-span-1 justify-end p-2 px-1 max-lg:col-span-4 max-lg:w-full max-lg:justify-start max-lg:pt-3 max-lg:pb-2 max-lg:border-t-2'>
+                                                  <div className='flex gap-2 p-2 px-1 max-lg:col-span-4'>
+                                                       <div className="">
+                                                            <Button
+                                                                 radius="sm"
+                                                                 size='sm'
+                                                                 onPress={handleInsertConditionModalOpen}
+                                                                 className='bg-gray-300'
+                                                                 color="default"
+                                                                 startContent={<PlusIcon className="w-5 h-5" />}>
+                                                                 เพิ่มเงื่อนไข
+                                                            </Button>
+                                                       </div>
                                                        <div className="">
                                                             <Button
                                                                  radius="sm"
@@ -555,7 +710,7 @@ const Page = ({ params }) => {
                                                                                                          <div className='relative flex items-center gap-2'>
                                                                                                               <Tooltip color="danger" content="ลบ">
                                                                                                                    <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                                                                                        <DeleteIcon2 onClick={() => handleDeleteGroupSubject(z.id)} />
+                                                                                                                        <DeleteIcon2 onClick={() => handleDeleteGroupSubject(z.id, ids)} />
                                                                                                                         {/* {z.id} */}
                                                                                                                    </span>
                                                                                                               </Tooltip>
@@ -599,7 +754,6 @@ const Page = ({ params }) => {
                                                        <p className='text-center mt-10'>ไม่มีวิชาภายในแบบฟอร์ม</p>
                                                   </>
                                              )}
-
                                         </div>
                                         :
                                         <>
@@ -608,12 +762,20 @@ const Page = ({ params }) => {
                               }
                          </div>
                     }
+
                     <InsertSubjectModal
                          isOpen={isInsertModalOpen}
                          onClose={handleInsertModalClose}
                          onDataInserted={handleDataInserted}
                          verify_id={ids}
                          category_page={category}
+                    />
+                    <InsertConditionModal
+                         isOpen={isInsertConditionModalOpen}
+                         onClose={handleInsertConditionModalClose}
+                         onDataInserted={handleDataConditionInserted}
+                         verify_id={ids}
+                         group={group}
                     />
 
                </ContentWrap >
