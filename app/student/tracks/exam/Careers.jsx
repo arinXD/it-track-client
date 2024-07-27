@@ -21,8 +21,8 @@ const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
                <p className="mt-4 mb-2">อาชีพที่คาดหวัง</p>
                <section className="grid grid-cols-4 gap-4 mb-4" >
                     {
-                         allCareers?.map(career => (
-                              <div className="relative group">
+                         allCareers?.map((career, index) => (
+                              <div key={index} className="relative group">
                                    {career.desc &&
                                         <Popover
                                              placement="right-start"

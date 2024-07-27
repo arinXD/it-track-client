@@ -49,7 +49,7 @@ export default function Page() {
     const handleSearch = useCallback((acadyear) => {
         getDashboardData(acadyear)
         getPopularTracks(acadyear)
-    }, [])
+    }, [getDashboardData, getPopularTracks])
 
     const getChartOption = useCallback((
         series, categories, title = undefined, showXaxis = true, colors = ['#F4538A', '#FAA300', "#7EA1FF", "#2CD3E1"]
@@ -308,8 +308,9 @@ export default function Page() {
                                         </CardBody>
                                     </Card>
                                     {
-                                        dashboardData.result.map(rs => (
+                                        dashboardData.result.map((rs, index) => (
                                             <Card
+                                                key={index}
                                                 className='w-full rounded-[5px] border-1 border-gray-300 shadow-none'
                                             >
                                                 <CardBody>
@@ -352,8 +353,10 @@ export default function Page() {
                                     </section>
                                     <section className='col-span-1 grid grid-cols-1 gap-6'>
                                         {
-                                            dashboardData.result.map(rs => (
-                                                <Card className='w-full rounded-[5px] border-1 border-gray-300 shadow-none' >
+                                            dashboardData.result.map((rs, index) => (
+                                                <Card
+                                                    key={index}
+                                                    className='w-full rounded-[5px] border-1 border-gray-300 shadow-none' >
                                                     <CardBody>
                                                         <section className='p-2 flex flex-col gap-3'>
                                                             <p className='text-xs text-default-500 text-center'>เกรดเฉลี่ยรวมแทร็ก {rs.track?.split(" ")[0]}</p>
