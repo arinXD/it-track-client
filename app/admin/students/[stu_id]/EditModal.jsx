@@ -15,6 +15,7 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
     const [program, setProgram] = useState("");
     const [courses_type, setCourseType] = useState("");
     const [status_code, setStatusCode] = useState("");
+    const [desc, setDesc] = useState(null);
     const [editing, setEditing] = useState(false)
 
     useEffect(() => {
@@ -26,6 +27,7 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
         setAcadyear(student.acadyear);
         setCourseType(student.courses_type)
         setStatusCode(student.status_code)
+        setDesc(student.acadyear_desc)
     }, [student])
 
     const [invalid, setInvalid] = useState({
@@ -79,24 +81,35 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
     // Acadyear
     const AutoCompleteAcadyear = useMemo(() => {
         return (
-            <Autocomplete
-                label="ปีการศึกษา"
-                variant="bordered"
-                defaultItems={acadyears}
-                placeholder="เลือกปีการศึกษา"
-                className="max-w-xs"
-                labelPlacement='outside'
-                defaultSelectedKey={String(student.acadyear)}
-                onSelectionChange={setAcadyear}
-                scrollShadowProps={{
-                    isEnabled: false
-                }}
-                isInvalid={invalid.acadyear}
-            >
-                {(item) => <AutocompleteItem key={item.acadyear}>{item.acadyear}</AutocompleteItem>}
-            </Autocomplete>
+            <section className='flex flex-col w-full'>
+                <Autocomplete
+                    label="ปีการศึกษา"
+                    variant="bordered"
+                    defaultItems={acadyears}
+                    placeholder="เลือกปีการศึกษา"
+                    className="max-w-xs"
+                    labelPlacement='outside'
+                    defaultSelectedKey={String(student.acadyear)}
+                    onSelectionChange={setAcadyear}
+                    scrollShadowProps={{
+                        isEnabled: false
+                    }}
+                    isInvalid={invalid.acadyear}
+                >
+                    {(item) => <AutocompleteItem key={item.acadyear}>{item.acadyear}</AutocompleteItem>}
+                </Autocomplete>
+                <div className='ms-1 flex text-xs mt-2 gap-2'>
+                    <label htmlFor="">หมายเหตุ</label>
+                    <input
+                        className='border-b-black border-b focus:outline-none w-[81%]'
+                        type="text"
+                        name="desc"
+                        value={desc}
+                        onChange={(e) => setDesc(e.target.value)} />
+                </div>
+            </section>
         );
-    }, [student, invalid]);
+    }, [student, invalid, desc]);
 
     // Program
     const AutoCompleteProgram = useMemo(() => {
@@ -157,7 +170,8 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
             courses_type,
             program,
             acadyear,
-            status_code
+            status_code,
+            acadyear_desc: desc
         }
         if (!validInput(formData)) {
             setEditing(false)
@@ -183,8 +197,8 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
             showToastMessage(ok, message)
             getStudentData()
         } catch (error) {
-            console.log(error);
-            const { ok, message } = error.response.data
+            console.error(error);
+            const { ok, message } = error?.response?.data
             showToastMessage(ok, message)
         } finally {
             setEditing(false)

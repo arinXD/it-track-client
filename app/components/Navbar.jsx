@@ -17,6 +17,9 @@ import "../style/hamburgers.css"
 import { useToggleSideBarStore } from '@/src/store';
 import NextTopLoader from 'nextjs-toploader';
 import { Icon } from '@iconify/react';
+import { FaUser } from "react-icons/fa6";
+import { IoIosHelpCircle } from "react-icons/io";
+import { BiSolidExit } from "react-icons/bi";
 
 const Navbar = () => {
     const { data: session, status } = useSession();
@@ -95,14 +98,18 @@ const Navbar = () => {
                             <Image
                                 id='user-profile'
                                 className='rounded-full active:scale-90 cursor-pointer'
-                                src={session?.user?.image || "/image/user.png"}
+                                src={session?.user?.image}
                                 width={40} height={40}
                                 alt="user image"
+                                onError={({ currentTarget }) => {
+                                    currentTarget.onerror = null;
+                                    currentTarget.src = "/image/admin.png";
+                                }}
                             />
                         </DropdownTrigger>
                         <DropdownMenu
                             aria-label="Profile Menu"
-                            disabledKeys={["profile"]}
+                            disabledKeys={[]}
                             className="p-2"
                             variant="flat"
                             itemClasses={{
@@ -121,6 +128,7 @@ const Navbar = () => {
                         >
                             <DropdownSection aria-label="Profile & Actions" showDivider>
                                 <DropdownItem
+                                    href='/profile'
                                     isReadOnly
                                     key="profile"
                                     className="h-14 gap-2 opacity-100"
@@ -140,9 +148,27 @@ const Navbar = () => {
                                 </DropdownItem>
                             </DropdownSection>
                             <DropdownSection aria-label="Help & Feedback" className="mb-0">
+                                <DropdownItem href='/profile' key="profile">
+                                    <div className='flex gap-3 items-center'>
+                                        <div className='w-5 h-5 flex items-center justify-center'>
+                                            <FaUser className='w-4 h-4' />
+                                        </div>
+                                        <span>ข้อมูลของฉัน</span>
+                                    </div>
+                                </DropdownItem>
+                                <DropdownItem href='/help-feedback' key="help_and_feedback">
+                                    <div className='flex gap-3 items-center'>
+                                        <div className='w-5 h-5 flex items-center justify-center'>
+                                            <IoIosHelpCircle className='w-5 h-5' />
+                                        </div>
+                                        <span>Help & Feedback</span>
+                                    </div>
+                                </DropdownItem>
                                 <DropdownItem key="logout" onClick={() => signOut()}>
                                     <div className='flex gap-3 items-center'>
-                                        <MdOutlineLogout className='w-5 h-5' />
+                                        <div className='w-5 h-5 flex items-center justify-center'>
+                                            <BiSolidExit className='w-5 h-5' />
+                                        </div>
                                         <span>ออกจากระบบ</span>
                                     </div>
                                 </DropdownItem>
@@ -183,7 +209,7 @@ const Navbar = () => {
                 showSpinner={false}
                 crawl={true}
             />
-            <div className="px-2 md:px-2 z-50 relative bg-white/60 backdrop-blur-md shadow-sm">
+            <div className="px-2 z-50 relative bg-white/60 backdrop-blur-md shadow-sm">
                 <div className="relative flex h-16 items-center justify-between p-2">
                     <div className="flex flex-1 items-center justify-center md:justify-start gap-0">
                         <div

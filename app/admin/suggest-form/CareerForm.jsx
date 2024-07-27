@@ -10,7 +10,7 @@ import InsertCareer from "./InsertCareer";
 import CareerInventory from "./CareerInventory";
 import { IoCloseOutline } from "react-icons/io5";
 
-const CareerForm = ({ prev, formStyle, tracks, formId, setCareers, creating }) => {
+const CareerForm = ({ prev, formStyle, tracks, formId, setCareers, creating, setCreateTrigger }) => {
      const { isOpen, onOpen, onClose } = useDisclosure();
      const { isOpen: isOpenInventory, onOpen: onOpenInventory, onClose: onCloseInventory } = useDisclosure();
      const [fetching, setFetching] = useState(false);
@@ -85,7 +85,6 @@ const CareerForm = ({ prev, formStyle, tracks, formId, setCareers, creating }) =
                setSelectedCareers(prevCareers => prevCareers.filter(career => career.id !== id));
           } else {
                const careerToMove = existCareers.find(career => career.id === id);
-
                if (careerToMove) {
                     setExistCareers(prevCareers => prevCareers.filter(career => career.id !== id));
                     setDefaultCareer(prevCareers => [...prevCareers, careerToMove]);
@@ -196,7 +195,10 @@ const CareerForm = ({ prev, formStyle, tracks, formId, setCareers, creating }) =
                          type="submit"
                          color="primary"
                          className="rounded-[5px]"
-                         onClick={() => setCareers(filterCareer?.flatMap(career => career.careers.map(c => c.id)))}>
+                         onClick={() => {
+                              setCreateTrigger(true)
+                              setCareers(filterCareer?.flatMap(career => career.careers.map(c => c.id)))
+                         }}>
                          Done
                     </Button>
                </div>

@@ -31,7 +31,7 @@ const Page = () => {
     }, [])
 
     useEffect(() => {
-        if (session?.user?.stu_id != undefined) {
+        if (session?.user?.stu_id != undefined && Object.keys(userData)?.length === 0) {
             fetchStudentData(session?.user?.stu_id)
         }
     }, [session])

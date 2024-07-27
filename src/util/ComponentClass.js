@@ -76,13 +76,24 @@ const thinInputClass = {
 const insertColor = {
     bg: "bg-[#edf8f7]",
     font: "text-[#46bcaa]",
-    color: "bg-[#edf8f7] text-[#46bcaa]"
+    color: "bg-[#edf8f7] text-[#46bcaa]",
+    onlyColor: "#46bcaa"
 }
 
 const restoreColor = {
     bg: "bg-[#edf0ff]",
     font: "text-[#4d69fa]",
-    color: "bg-[#edf0ff] text-[#4d69fa]"
+    color: "bg-[#edf0ff] text-[#4d69fa]",
+    onlyColor: "#4d69fa"
+}
+
+const warningColor = {
+    onlyColor: "#fff5dc",
+    border: "#ffcf52"
+}
+
+const bgGrayColor = {
+    bg: "#F5F5F5"
 }
 
 const deleteColor = {
@@ -96,5 +107,7 @@ module.exports = {
     insertColor,
     minimalTableClass,
     thinInputClass,
-    deleteColor
+    deleteColor,
+    warningColor,
+    bgGrayColor,
 }

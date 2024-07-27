@@ -1,0 +1,20 @@
+.ant-steps-item-container{
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.ant-steps-item-title{
+    padding-right: 0 !important;
+}
+.ant-steps-item-icon{
+    margin-right: 0 !important;
+}
+.ant-steps-item:nth-of-type(1){
+    padding-right: 1em !important;
+}
+:where(.css-dev-only-do-not-override-usln0u).ant-steps .ant-steps-item-title::after {
+    margin-left: 16px;
+    top: -15px !important;
+}
