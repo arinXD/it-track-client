@@ -10,7 +10,7 @@ const InsertSubject = ({subjects ,catIndex, categorie, highestIndex}) => {
     const [searchSubj, setSearchSubj] = useState("");
     const [filterSubj, setFilterSubj] = useState([]);
 
-    console.log(highestIndex);
+    // console.log(highestIndex);
     useEffect(() => setFilterSubj(subjects), [subjects])
 
     useEffect(() => {
