@@ -5,7 +5,6 @@ import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } 
 import { GoHome, GoHomeFill } from "react-icons/go";
 import { MdAdminPanelSettings, MdOutlineAdminPanelSettings, MdOutlineQuiz, MdQuiz } from "react-icons/md";
 import { useSession } from "next-auth/react"
-import { Icon } from '@iconify/react';
 import { AiFillEdit, AiOutlineEdit } from 'react-icons/ai';
 import { useToggleSideBarStore } from '@/src/store';
 import { Tooltip } from 'antd';
@@ -43,13 +42,6 @@ const Sidebar = () => {
             label:  session?.user?.role === "admin" ? "Admin Panel" : "Teacher Panel",
             condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
         },
-        // {
-        //     href: "/dashboard",
-        //     activeIcon: <Icon icon="mingcute:chart-pie-2-fill" className="w-5 h-5 text-white" />,
-        //     icon: <Icon icon="mingcute:chart-pie-2-line" className="w-5 h-5" />,
-        //     label: "Dashboard",
-        //     condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
-        // },
         {
             href: "/tracks",
             activeIcon: <HiUserGroup className="w-5 h-5" />,

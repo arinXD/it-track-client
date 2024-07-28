@@ -214,7 +214,7 @@ const Navbar = () => {
                     <div className="flex flex-1 items-center justify-center md:justify-start gap-0">
                         <div
                             onClick={setToggle}
-                            className={`hidden md:block rounded-full ${toggleSideBar ? "p-3" : "p-3"} cursor-pointer hover:bg-gray-200 active:bg-gray-300`}>
+                            className={`hidden md:block rounded-full p-3 cursor-pointer hover:bg-gray-200 active:bg-gray-300`}>
                             <RxHamburgerMenu
                                 className='w-5 h-5' />
                         </div>
