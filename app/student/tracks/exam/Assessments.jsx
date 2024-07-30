@@ -2,6 +2,8 @@
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdOutlineQuestionMark } from "react-icons/md";
 import "./assessment.css"
 import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
+import dynamic from "next/dynamic";
+const IoInformationCircle = dynamic(() => import('react-icons/io5').then(mod => mod.IoInformationCircle), { ssr: false });
 
 const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }) => {
      const handleAnswerChange = (assId, index) => {
@@ -28,9 +30,29 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
                          key={ass.id}
                          className="my-12">
                          <div className='mx-auto max-w-7xl my-12'>
-                              <p className='flex justify-center gap-4 items-center'>
-                                   <span className="text-gray-600 text-4xl text-center">{ass.question}</span>
-                              </p>
+                              <div className='flex justify-center gap-1 items-top'>
+                                   <span className="text-gray-600 text-4xl text-center">
+                                        {ass.question}
+                                   </span>
+                                   {ass.desc &&
+                                        <Popover
+                                             key={`assDesc${index}`}
+                                             placement="bottom"
+                                             showArrow={true}>
+                                             <PopoverTrigger className="h-fit">
+                                                  <p className="flex justify-center items-center">
+                                                       <IoInformationCircle className="w-4.5 h-4.5 cursor-pointer" />
+                                                  </p>
+                                             </PopoverTrigger>
+                                             <PopoverContent className="rounded-[5px]">
+                                                  <div className="px-1 py-2">
+                                                       <div className="text-small font-bold mb-1">คำอธิบายเพิ่มเติม</div>
+                                                       <div className="text-tiny">{ass.desc}</div>
+                                                  </div>
+                                             </PopoverContent>
+                                        </Popover>
+                                   }
+                              </div>
                               <div className='flex justify-center items-center gap-16 text-2xl'>
                                    <h2 className='text-[#32A474] w-[20%] text-[.85em] text-center'>ฉันเห็นด้วย</h2>
                                    <div className='flex justify-center items-center gap-16 my-20 w-[50%]'>
@@ -63,22 +85,6 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
                                    </div>
                                    <h2 className='text-[#886199] w-[20%] text-[.85em] text-center'>ฉันไม่เห็นด้วย</h2>
                               </div>
-                              {ass.desc &&
-                                   <Popover
-                                        key={`assDesc${index}`}
-                                        placement="right-start"
-                                        showArrow={true}>
-                                        <PopoverTrigger>
-                                             <p className="text-end text-xs underline cursor-pointer">คำอธิบายเพิ่มเติม</p>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="rounded-[5px]">
-                                             <div className="px-1 py-2">
-                                                  <div className="text-small font-bold mb-1">คำอธิบายเพิ่มเติม</div>
-                                                  <div className="text-tiny">{ass.desc}</div>
-                                             </div>
-                                        </PopoverContent>
-                                   </Popover>
-                              }
                               {index !== assessments?.length - 1 && <hr className='border-1' />}
                          </div>
                     </div>

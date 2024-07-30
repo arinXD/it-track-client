@@ -4,20 +4,19 @@ import { signOut } from "next-auth/react"
 import Image from 'next/image'
 import Link from 'next/link';
 import { useSession } from "next-auth/react"
-import { MdAdminPanelSettings, MdOutlineAdminPanelSettings, MdOutlineLogout } from "react-icons/md";
+import { MdAdminPanelSettings, MdEditDocument, MdOutlineAdminPanelSettings, MdOutlineLogout } from "react-icons/md";
 import { Skeleton } from "@nextui-org/react";
 import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoHome, GoHomeFill } from "react-icons/go";
 import { MdOutlineQuiz, MdQuiz } from "react-icons/md";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem } from "@nextui-org/react";
-import { AiFillEdit, AiOutlineEdit } from 'react-icons/ai';
+import { AiFillEdit, AiFillNotification, AiOutlineEdit } from 'react-icons/ai';
 import { RxHamburgerMenu } from "react-icons/rx";
 import "../style/sidebar-drawer.css"
 import NextTopLoader from 'nextjs-toploader';
 import { Icon } from '@iconify/react';
 import { FaUser } from "react-icons/fa6";
-import { IoIosHelpCircle } from "react-icons/io";
 import { BiSolidExit } from "react-icons/bi";
 import { Drawer } from 'antd';
 
@@ -220,12 +219,20 @@ const SidebarDrawer = () => {
                                                   <span>ข้อมูลของฉัน</span>
                                              </div>
                                         </DropdownItem>
+                                        <DropdownItem href='/petition/request' key="help_and_feedback">
+                                             <div className='flex gap-3 items-center'>
+                                                  <div className='w-5 h-5 flex items-center justify-center'>
+                                                       <MdEditDocument className='w-5 h-5' />
+                                                  </div>
+                                                  <span>ยื่นคำร้องย้ายแทร็ก</span>
+                                             </div>
+                                        </DropdownItem>
                                         <DropdownItem href='/help-feedback' key="help_and_feedback">
                                              <div className='flex gap-3 items-center'>
                                                   <div className='w-5 h-5 flex items-center justify-center'>
-                                                       <IoIosHelpCircle className='w-5 h-5' />
+                                                       <AiFillNotification className='w-5 h-5' />
                                                   </div>
-                                                  <span>Help & Feedback</span>
+                                                  <span>แจ้งปัญหา</span>
                                              </div>
                                         </DropdownItem>
                                         <DropdownItem key="logout" onClick={() => signOut()}>

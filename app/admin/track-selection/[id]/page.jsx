@@ -22,6 +22,7 @@ import { FiDownload } from "react-icons/fi";
 import { calGrade, floorGpa, isNumber } from '@/src/util/grade';
 import { utils, writeFile } from "xlsx";
 import { Empty, message } from 'antd';
+import { RiMailSendLine } from "react-icons/ri";
 
 const Page = ({ params }) => {
     const swal = useCallback(Swal.mixin({
@@ -80,6 +81,7 @@ const Page = ({ params }) => {
     const [title, setTitle] = useState("")
     const [startAt, setStartAt] = useState("")
     const [expiredAt, setExpiredAt] = useState("")
+    const [announcementDate, setAnnouncementDate] = useState("")
     const [hasFinished, setHasFinished] = useState("")
     const [valueChange, setValueChange] = useState(false)
 
@@ -138,6 +140,8 @@ const Page = ({ params }) => {
             setTitle(trackSelect.title)
             setStartAt(format(new Date(trackSelect?.startAt), 'yyyy-MM-dd HH:mm'))
             setExpiredAt(format(new Date(trackSelect?.expiredAt), 'yyyy-MM-dd HH:mm'))
+            const announcement = trackSelect?.announcementDate ? format(new Date(trackSelect?.announcementDate), 'yyyy-MM-dd HH:mm') : null
+            setAnnouncementDate(announcement)
             setHasFinished(trackSelect.has_finished)
 
             const stuBit = trackSelect?.Selections?.filter(select => select.result == "BIT")
@@ -157,7 +161,7 @@ const Page = ({ params }) => {
     const handleUpdate = useCallback(async function () {
         swal.fire({
             text: `ต้องการแก้ไขข้อมูลการคัดแทร็กปีการศึกษา ${trackSelect.acadyear} หรือไม่`,
-            icon: "warning",
+            icon: "question",
             showCancelButton: true,
             confirmButtonText: "ตกลง",
             cancelButtonText: "ยกเลิก",
@@ -170,6 +174,7 @@ const Page = ({ params }) => {
                     title,
                     startAt,
                     expiredAt,
+                    announcementDate,
                     has_finished: hasFinished,
                 }
                 const options = await getOptions(url, "PUT", data)
@@ -192,6 +197,7 @@ const Page = ({ params }) => {
         title,
         startAt,
         expiredAt,
+        announcementDate,
         hasFinished,
     ])
 
@@ -236,6 +242,7 @@ const Page = ({ params }) => {
             title,
             startAt,
             expiredAt,
+            announcementDate,
             has_finished: hasFinished
         }
         const newState = { ...state, ...newValue }
@@ -251,13 +258,17 @@ const Page = ({ params }) => {
         title,
         startAt,
         expiredAt,
+        announcementDate,
         hasFinished,
     ])
 
-    const handleUnsave = useCallback(function handleUnsave() {
+    const handleUnsave = useCallback(function () {
         setTitle(trackSelect.title)
-        setStartAt(trackSelect.startAt)
-        setExpiredAt(trackSelect.expiredAt)
+        setStartAt(format(new Date(trackSelect.startAt), 'yyyy-MM-dd HH:mm'))
+        setExpiredAt(format(new Date(trackSelect.expiredAt), 'yyyy-MM-dd HH:mm'))
+        const announcement = trackSelect.announcementDate ? format(new Date(trackSelect.announcementDate), 'yyyy-MM-dd HH:mm') : null
+        setAnnouncementDate(announcement)
+        document.querySelector("#announcementDate").value = null
         setHasFinished(trackSelect.has_finished)
         setValueChange(false)
     }, [trackSelect])
@@ -577,17 +588,29 @@ const Page = ({ params }) => {
     }, [trackSubj])
 
     const handleSendingEmail = useCallback(async (acadyear) => {
-        const option = await getOptions(`/api/tracks/selects/${acadyear}/email/send`, "post")
-        try {
-            setSendingEmail(true)
-            await axios(option)
-            message.success("ส่งอีเมลแจ้งเตือนสำเร็จ")
-        } catch (error) {
-            console.log(error);
-            message.warning("ไม่สามารถส่งอีเมลแจ้งเตือนได้")
-        } finally {
-            setSendingEmail(false)
-        }
+        swal.fire({
+            text: `ต้องการส่งอีเมลแจ้งเตือนแทร็กหรือไม่`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const option = await getOptions(`/api/tracks/selects/${acadyear}/email/send`, "post")
+                try {
+                    setSendingEmail(true)
+                    await axios(option)
+                    message.success("ส่งอีเมลแจ้งเตือนสำเร็จ")
+                } catch (error) {
+                    console.log(error);
+                    message.warning("ไม่สามารถส่งอีเมลแจ้งเตือนได้")
+                } finally {
+                    setSendingEmail(false)
+                }
+            }
+        });
+
     }, [])
 
     return (
@@ -631,39 +654,64 @@ const Page = ({ params }) => {
                                                     classNames={inputClass}
                                                 />
                                             </div>
-                                            <div className='w-full flex justify-start items-center gap-4'>
-                                                <Input
-                                                    type='datetime-local'
-                                                    label="เริ่มต้น (ปี/เดือน/วัน)"
-                                                    variant="bordered"
-                                                    radius='sm'
-                                                    placeholder="เดือน/วัน/ปี"
-                                                    labelPlacement="outside"
-                                                    value={startAt}
-                                                    classNames={inputClass}
-                                                    onChange={(e) => {
-                                                        setStartAt(e.target.value)
-                                                        handleValueChange({ startAt: e.target.value })
-                                                    }}
-                                                    min={getCurrentDate()}
-                                                />
+                                            <div className='w-full flex gap-4 justify-between items-center'>
+                                                <div className='w-full flex justify-start items-center gap-4'>
+                                                    <Input
+                                                        type='datetime-local'
+                                                        label="เริ่มต้น"
+                                                        variant="bordered"
+                                                        radius='sm'
+                                                        placeholder="เดือน/วัน/ปี"
+                                                        labelPlacement="outside"
+                                                        value={startAt}
+                                                        classNames={inputClass}
+                                                        onChange={(e) => {
+                                                            setStartAt(e.target.value)
+                                                            handleValueChange({ startAt: e.target.value })
+                                                        }}
+                                                        min={getCurrentDate()}
+                                                    />
+                                                </div>
+                                                <div className='w-full flex justify-start items-center gap-4'>
+                                                    <Input
+                                                        type='datetime-local'
+                                                        label="สิ้นสุด"
+                                                        variant="bordered"
+                                                        radius='sm'
+                                                        placeholder="เดือน/วัน/ปี"
+                                                        labelPlacement="outside"
+                                                        value={expiredAt}
+                                                        classNames={inputClass}
+                                                        onChange={(e) => {
+                                                            setExpiredAt(e.target.value)
+                                                            handleValueChange({ expiredAt: e.target.value })
+                                                        }}
+                                                        min={startAt}
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className='w-full flex justify-start items-center gap-4'>
-                                                <Input
-                                                    type='datetime-local'
-                                                    label="สิ้นสุด (เดือน/วัน/ปี)"
-                                                    variant="bordered"
-                                                    radius='sm'
-                                                    placeholder="เดือน/วัน/ปี"
-                                                    labelPlacement="outside"
-                                                    value={expiredAt}
-                                                    classNames={inputClass}
-                                                    onChange={(e) => {
-                                                        setExpiredAt(e.target.value)
-                                                        handleValueChange({ expiredAt: e.target.value })
-                                                    }}
-                                                    min={startAt}
-                                                />
+                                            <div className='w-full flex gap-4 justify-between items-center'>
+                                                <div className='w-full flex justify-start items-center'>
+                                                    <Input
+                                                        id='announcementDate'
+                                                        type='datetime-local'
+                                                        label="วันประกาศผล"
+                                                        variant="bordered"
+                                                        radius='sm'
+                                                        placeholder="วันประกาศผล"
+                                                        labelPlacement="outside"
+                                                        value={announcementDate || null}
+                                                        classNames={inputClass}
+                                                        onChange={(e) => {
+                                                            setAnnouncementDate(e.target.value)
+                                                            handleValueChange({ startAt: e.target.value })
+                                                        }}
+                                                        min={expiredAt}
+                                                    />
+                                                </div>
+                                                <div className='w-full'>
+
+                                                </div>
                                             </div>
                                             <div className='w-full flex justify-start items-center gap-2'>
                                                 <span className='block text-sm'>สถานะ: </span>
@@ -749,7 +797,7 @@ const Page = ({ params }) => {
                                                     isLoading={sendingEmail}
                                                     onPress={() => handleSendingEmail(trackSelect?.acadyear)}
                                                     variant="solid"
-                                                    startContent={<DeleteIcon2 className="w-5 h-5" />}
+                                                    startContent={<RiMailSendLine className="w-4 h-4" />}
                                                     className='bg-gray-300'>
                                                     ส่งอีเมลแจ้งเตือน
                                                 </Button>

@@ -5,6 +5,9 @@ import { useCallback, useState } from "react";
 import { Tooltip } from "antd";
 import { MdOutlineQuestionMark } from "react-icons/md";
 import { Popover, PopoverTrigger, PopoverContent, Button } from "@nextui-org/react";
+import dynamic from "next/dynamic";
+
+const IoInformation = dynamic(() => import('react-icons/io5').then(mod => mod.IoInformation), { ssr: false });
 
 const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
      const handleSelectCareer = useCallback((careerId) => {
@@ -30,11 +33,11 @@ const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
                                              <PopoverTrigger>
                                                   <button
                                                        style={{
-                                                            padding: "5px"
+                                                            padding: "3px"
                                                        }}
                                                        className="z-50 group-active:scale-85 group-active:top-2.5 group-active:right-2.5 absolute top-2 right-2 rounded-full bg-black"
                                                        isIconOnly>
-                                                       <MdOutlineQuestionMark
+                                                       <IoInformation
                                                             className="w-3 h-3 text-white" />
                                                   </button>
                                              </PopoverTrigger>

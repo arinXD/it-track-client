@@ -32,6 +32,15 @@ export default function Page() {
         { value: "special", label: "โครงการพิเศษ" },
     ]), [])
     const [courseType, setCourseType] = useState(courseTypes[0]);
+    const [startYear, setStartYear] = useState({});
+    const [endYear, setEndYear] = useState({});
+
+    useEffect(() => {
+        setStartYear({
+            value: acadyear.value - 5, label: acadyear.value - 5
+        })
+        setEndYear(acadyear)
+    }, [acadyear])
 
     const getDashboardData = useCallback(async (acadyear) => {
         try {
@@ -43,10 +52,9 @@ export default function Page() {
         }
     }, []);
 
-
-    const getPopularTracks = useCallback(async (acadyear) => {
+    const getPopularTracks = useCallback(async (startYear, endYear) => {
         try {
-            const data = await fetchDataObj(`/api/tracks/selects/${acadyear}/popular`);
+            const data = await fetchDataObj(`/api/tracks/selects/popular/${startYear}/${endYear}`);
             setPopularity(data)
         } catch (err) {
             setError('Failed to fetch popularity data');
@@ -57,9 +65,9 @@ export default function Page() {
     const init = useCallback(async (acadyear) => {
         setIsLoading(true)
         await getDashboardData(acadyear)
-        await getPopularTracks(acadyear)
+        await getPopularTracks(startYear.value, endYear.value)
         setIsLoading(false)
-    }, [getDashboardData, getPopularTracks])
+    }, [startYear, endYear])
 
     const handleSearch = useCallback((acadyear) => {
         init(acadyear)
@@ -161,6 +169,7 @@ export default function Page() {
     }, [dashboardData, studentTableItems, courseType])
 
     const getFilteredData = useCallback((data, type) => {
+        if (!data) return []
         return data.find(item => item.type === type)?.data || [];
     }, [])
 
@@ -229,7 +238,7 @@ export default function Page() {
     }, [dashboardData, courseType])
 
     const selectedCount = useMemo(() => {
-        if (!dashboardData) return { selected: [], nonSelected: [] };
+        if ((dashboardData && Object.keys(dashboardData)?.length === 0) || !dashboardData) return { selected: [], nonSelected: [] };
         const result = {}
         Object.keys(dashboardData.selectedCount).map(key => {
             result[key] = dashboardData.selectedCount[key]?.filter(student => student.courseType === courseType.value || courseType.value === "all")
@@ -424,16 +433,56 @@ export default function Page() {
                                             </CardBody>
                                         </Card>
                                     </section>
-                                    <Card
-                                        className='col-span-5 rounded-[5px] border-1 border-gray-300 shadow-none'
-                                    >
-                                        <CardBody>
-                                            <BarChart
-                                                height={250}
-                                                type={"bar"}
-                                                option={trackPopularityEachYear} />
-                                        </CardBody>
-                                    </Card>
+                                    <div className='bg-white col-span-5 grid grid-cols-5 rounded-[5px] border-1 border-gray-300'>
+                                        <div className=' col-span-5 flex gap-4 items-end py-4 px-4'>
+                                            <div className='w-full'>
+                                                <label className='text-[12px] text-default-500'>เริ่มต้น</label>
+                                                <Select
+                                                    className='w-full'
+                                                    id="acadyear"
+                                                    value={startYear}
+                                                    options={acadyears}
+                                                    onChange={(selectedOption) => setStartYear(selectedOption)}
+                                                    placeholder='เลือกปีการศึกษา'
+                                                />
+                                            </div>
+                                            <div className='w-full'>
+                                                <label className='text-[12px] text-default-500'>สิ้นสุด</label>
+                                                <Select
+                                                    className='w-full'
+                                                    id="acadyear"
+                                                    value={endYear}
+                                                    options={acadyears}
+                                                    onChange={(selectedOption) => setEndYear(selectedOption)}
+                                                    placeholder='เลือกปีการศึกษา'
+                                                />
+                                            </div>
+                                            <Button
+                                                onClick={async () => {
+                                                    await getPopularTracks(startYear.value, endYear.value)
+                                                }}
+                                                size="md"
+                                                color='primary'
+                                                className="rounded-[5px]"
+                                                isLoading={searching}
+                                                isDisabled={searching}
+                                                startContent={<SearchIcon className="w-5 h-5" />}
+                                            >
+                                                ค้นหา
+                                            </Button>
+                                        </div>
+                                        <Card
+                                            className='col-span-5 shadow-none'
+                                        >
+                                            <CardBody>
+                                                <BarChart
+                                                    height={250}
+                                                    type={"bar"}
+                                                    option={trackPopularityEachYear} />
+                                            </CardBody>
+                                        </Card>
+                                    </div>
+
 
                                     {/* Table */}
                                     <Card

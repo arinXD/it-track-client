@@ -15,6 +15,20 @@ const months = {
      "11": 'พฤศจิกายน',
      "12": 'ธันวาคม',
 }
+const monthsY = {
+     "01": 'ม.ค.',
+     "02": 'ก.พ.',
+     '03': 'มี.ค.',
+     "04": 'เม.ย.',
+     "05": 'พ.ค.',
+     "06": 'มิ.ย.',
+     "07": 'ก.ค.',
+     '08': 'ส.ค.',
+     "09": 'ก.ย.',
+     "10": 'ต.ค.',
+     "11": 'พ.ย.',
+     "12": 'ธ.ค.',
+}
 
 function getDateProperty(date) {
      const parsedDate = new Date(date);
@@ -22,6 +36,8 @@ function getDateProperty(date) {
      const day = format(parsedDate, 'dd');
      const month = format(parsedDate, 'MM');
      const thaiMonth = months[month];
+     const thaiMonthY = monthsY[month];
+     const defYear = parsedDate.getFullYear()
      const year = parsedDate.getFullYear() + 543;
      const hours = format(parsedDate, 'HH');
      const minutes = format(parsedDate, 'mm');
@@ -30,6 +46,8 @@ function getDateProperty(date) {
           day,
           month,
           thaiMonth,
+          thaiMonthY,
+          defYear,
           year,
           hours,
           minutes,
@@ -43,4 +61,12 @@ export function simpleDMYHM(date) {
 export function simpleDMY(date) {
      const { day, thaiMonth, year } = getDateProperty(date)
      return `${day} ${thaiMonth} ${year}`;
+}
+export function simpleDM(date) {
+     const { day, thaiMonth } = getDateProperty(date)
+     return `${day} ${thaiMonth}`;
+}
+export function simpleDmyhm(date) {
+     const { day, thaiMonthY, defYear, hours, minutes } = getDateProperty(date)
+     return `${day} ${thaiMonthY} ${defYear} ${hours}:${minutes}`;
 }

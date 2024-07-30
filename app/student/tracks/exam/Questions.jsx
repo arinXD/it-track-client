@@ -1,7 +1,9 @@
 "use client"
 import { Radio, Space } from "antd"
-import { MdKeyboardArrowRight, MdOutlineQuestionMark } from "react-icons/md";
+import { MdKeyboardArrowRight } from "react-icons/md";
 import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
+import dynamic from "next/dynamic";
+const IoInformationCircle = dynamic(() => import('react-icons/io5').then(mod => mod.IoInformationCircle), { ssr: false });
 
 const Questions = ({ setQuestions, allQuestions, next }) => {
      const handleAnswerChange = (questionId, answerId) => {
@@ -25,9 +27,11 @@ const Questions = ({ setQuestions, allQuestions, next }) => {
                                         <Popover
                                              key={`qDesc${index}`}
                                              placement="right-start"
-                                             showArrow={true}>
+                                             showArrow={false}>
                                              <PopoverTrigger>
-                                                  <p className="text-xs text-default-500 underline cursor-pointer">คำอธิบาย</p>
+                                                  <p className="flex justify-center items-center">
+                                                       <IoInformationCircle className="w-4 h-4 cursor-pointer" />
+                                                  </p>
                                              </PopoverTrigger>
                                              <PopoverContent className="rounded-[5px]">
                                                   <div className="px-1 py-2">

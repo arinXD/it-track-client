@@ -8,8 +8,7 @@ const Page = async () => {
                 <Navbar />
             </header>
             <Sidebar />
-            <ContentWrap>
-                <BreadCrumb />
+            <ContentWrap className={"!p-0"}>
                 <AdminList />
             </ContentWrap>
         </>
