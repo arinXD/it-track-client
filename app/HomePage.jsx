@@ -1,77 +1,129 @@
 "use client"
-import { useEffect } from 'react';
+import { useState } from 'react'
 import SidebarDrawer from './components/SidebarDrawer'
-import { motion, useAnimation } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+
+const tracks = [
+     { name: 'BIT', icon: '💼', description: 'Business Information Technology' },
+     { name: 'Web and Mobile', icon: '📱', description: 'Web and Mobile Development' },
+     { name: 'Network', icon: '🌐', description: 'Network Engineering' },
+]
+
 const HomePage = () => {
+     const [isMenuOpen, setIsMenuOpen] = useState(false)
+
      return (
-          <>
-               <SidebarDrawer />
-               <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100">
-                    {/* Hero Section */}
-                    <section className="relative h-screen flex items-center justify-center overflow-hidden">
-                         <div className="absolute inset-0 z-0">
-                              <img src="/image/bg/bg1.jpeg" alt="Hero Background" className="w-full h-full object-cover" />
+          <div className="min-h-screen bg-gray-50 ">
+               <SidebarDrawer
+               />
+               {/* Hero Section */}
+               <section className="bg-gradient-to-r pt-16 from-blue-600 to-indigo-700 text-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+                         <div className="text-center">
+                              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Shape Your Future in Tech</h1>
+                              <p className="mt-6 text-xl md:text-2xl max-w-3xl mx-auto">Discover your ideal track, assess your fit, and verify your graduation status</p>
+                              <div className="mt-10 space-x-4">
+                                   <a href="#tracks" className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50 transition duration-150 ease-in-out">
+                                        Explore Tracks
+                                   </a>
+                                   <a href="#assessment" className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 transition duration-150 ease-in-out">
+                                        Start Assessment
+                                   </a>
+                              </div>
                          </div>
-                         <div className="relative z-10 text-center">
-                              <h1 className="text-5xl font-bold text-white mb-4">Discover Your Perfect Career Path</h1>
-                              <p className="text-xl text-white mb-8">Find the job that suits you best</p>
-                              <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition duration-300">
-                                   Get Started
-                              </button>
-                         </div>
-                    </section>
+                    </div>
+               </section>
 
-                    {/* Job Discovery Section */}
-                    <div
-                         className="py-20 px-4 md:px-8 lg:px-16"
-                    >
-                         <div className="max-w-4xl mx-auto">
-                              <h2 className="text-3xl font-bold text-center mb-8">Discover Your Ideal Job</h2>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                   <div className="bg-white p-6 rounded-lg shadow-md">
-                                        <img src="/image/bg/bg2.jpeg" alt="Job Discovery" className="w-full h-48 object-cover rounded-md mb-4" />
-                                        <h3 className="text-xl font-semibold mb-2">Personalized Job Matching</h3>
-                                        <p className="text-gray-600">Our advanced algorithm analyzes your skills, interests, and personality to find the perfect job match for you.</p>
+               {/* Track Selection Section */}
+               <section id="tracks" className="py-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                         <div className="text-center">
+                              <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Choose Your Track</h2>
+                              <p className="mt-4 text-xl text-gray-600">Explore our specialized tracks and find the perfect fit for your career goals</p>
+                         </div>
+                         <div className="mt-20 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                              {tracks.map((track, index) => (
+                                   <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl">
+                                        <div className="p-6">
+                                             <div className="text-4xl mb-4">{track.icon}</div>
+                                             <h3 className="text-2xl font-semibold text-gray-900">{track.name}</h3>
+                                             <p className="mt-2 text-gray-600">{track.description}</p>
+                                             <a href="#" className="mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-500">
+                                                  Learn more
+                                                  <svg className="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                       <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                                  </svg>
+                                             </a>
+                                        </div>
                                    </div>
-                                   <div className="bg-white p-6 rounded-lg shadow-md">
-                                        <img src="/image/bg/bg12.jpeg" alt="Career Guidance" className="w-full h-48 object-cover rounded-md mb-4" />
-                                        <h3 className="text-xl font-semibold mb-2">Expert Career Guidance</h3>
-                                        <p className="text-gray-600">Get valuable insights and advice from industry professionals to help you make informed career decisions.</p>
+                              ))}
+                         </div>
+                    </div>
+               </section>
+
+
+               {/* Track Assessment Section */}
+               <section id="assessment" className="bg-gray-100 py-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                         <div className="bg-white rounded-lg shadow-xl overflow-hidden lg:grid lg:grid-cols-2 lg:gap-4">
+                              <div className="pt-10 pb-12 px-6 sm:pt-16 sm:px-16 lg:py-16 lg:pr-0 xl:py-20 xl:px-20">
+                                   <div className="lg:self-center">
+                                        <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                                             <span className="block">Find Your Ideal Track</span>
+                                        </h2>
+                                        <p className="mt-4 text-lg leading-6 text-gray-600">
+                                             Take our assessment to discover which track aligns best with your skills and interests.
+                                        </p>
+                                        <a href="#" className="mt-8 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                                             Start Assessment
+                                        </a>
                                    </div>
                               </div>
-                         </div>
-                    </div>
-
-                    {/* Track Selection Section */}
-                    <div
-                         className="py-20 px-4 md:px-8 lg:px-16 bg-gray-100"
-                    >
-                         <div className="max-w-4xl mx-auto">
-                              <h2 className="text-3xl font-bold text-center mb-8">Track Your Career Path</h2>
-                              <div className="bg-white p-6 rounded-lg shadow-md">
-                                   <img src="/image/bg/bg9.jpeg" alt="Track Selection" className="w-full h-64 object-cover rounded-md mb-4" />
-                                   <h3 className="text-xl font-semibold mb-2">Personalized Career Tracking</h3>
-                                   <p className="text-gray-600">Monitor your progress and stay on top of your chosen career path with our intuitive tracking system.</p>
+                              <div className="relative -mt-6 aspect-w-5 aspect-h-3 md:aspect-w-2 md:aspect-h-1">
+                                   <img className="transform translate-x-6 translate-y-6 rounded-md object-cover object-left-top sm:translate-x-16 lg:translate-y-20" src="/image/designer.jpg" alt="Track Assessment" />
                               </div>
                          </div>
                     </div>
-
-                    {/* Graduation Verification Section */}
-                    <div
-                         className="py-20 px-4 md:px-8 lg:px-16"
-                    >
-                         <div className="max-w-4xl mx-auto">
-                              <h2 className="text-3xl font-bold text-center mb-8">Verify Your Graduation</h2>
-                              <div className="bg-white p-6 rounded-lg shadow-md">
-                                   <img src="/image/bg/bg11.jpeg" alt="Graduation Verification" className="w-full h-64 object-cover rounded-md mb-4" />
-                                   <h3 className="text-xl font-semibold mb-2">Secure Graduation Verification</h3>
-                                   <p className="text-gray-600">Easily verify your graduation status and showcase your achievements to potential employers.</p>
+               </section>
+               
+               {/* Track Assessment Section */}
+               <section id="assessment" className="bg-gray-100 pb-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                         <div className="bg-white rounded-lg shadow-xl overflow-hidden lg:grid lg:grid-cols-2 lg:gap-4">
+                              <div className="pt-10 pb-12 px-6 sm:pt-16 sm:px-16 lg:py-16 lg:pr-0 xl:py-20 xl:px-20">
+                                   <div className="lg:self-center">
+                                        <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                                             <span className="block">Verify Your Graduation Status</span>
+                                        </h2>
+                                        <p className="mt-4 text-lg leading-6 text-gray-600">
+                                             Check your grades and confirm your eligibility for graduation.
+                                        </p>
+                                        <a href="#" className="mt-8 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                                             Verify Grades
+                                        </a>
+                                   </div>
+                              </div>
+                              <div className="relative -mt-6 aspect-w-5 aspect-h-3 md:aspect-w-2 md:aspect-h-1">
+                                   <img className="transform translate-x-6 translate-y-6 rounded-md object-cover object-left-top sm:translate-x-16 lg:translate-y-20" src="/image/diploma.jpg" alt="Track Assessment" />
                               </div>
                          </div>
                     </div>
-               </div>
-          </>
+               </section>
+
+               {/* Grade Verification Section */}
+               <section className="py-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                         <div className="text-center">
+                              <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Verify Your Graduation Status</h2>
+                              <p className="mt-4 text-xl text-gray-600">Check your grades and confirm your eligibility for graduation</p>
+                         </div>
+                         <div className="mt-10 flex justify-center">
+                              <a href="#" className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition duration-150 ease-in-out">
+                                   Verify Grades
+                              </a>
+                         </div>
+                    </div>
+               </section>
+          </div>
      )
 }
 
