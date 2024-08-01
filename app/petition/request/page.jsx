@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { getOptions } from "@/app/components/serverAction/TokenAction";
-import PetitionList from "../PetitionList";
+import PetitionList from "@/app/petition/PetitionList";
 import { message } from "antd";
 import { usePathname } from "next/navigation";
 

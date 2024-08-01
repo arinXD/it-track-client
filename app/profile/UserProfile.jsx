@@ -1,20 +1,20 @@
 "use client"
-import { insertColor, restoreColor, warningColor } from '@/src/util/ComponentClass';
+import { insertColor, restoreColor } from '@/src/util/ComponentClass';
 import { dmy } from '@/src/util/dateFormater';
 import { floorGpa } from '@/src/util/grade';
 import { capitalize } from '@/src/util/utils';
 import { Chip, Input, Tooltip } from '@nextui-org/react';
-import { Card, Typography, Table, Collapse, Tabs } from 'antd';
+import { Card, Table, Tabs } from 'antd';
 import Image from 'next/image';
 import { MailIcon } from '@/app/components/icons/MailIcon';
-const { Title, Text } = Typography;
-const { Panel } = Collapse;
 import { CiStar } from "react-icons/ci";
 import { BiSolidIdCard } from "react-icons/bi";
 import { MdOutlinePersonOutline } from "react-icons/md";
 import { useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 
 const UserProfile = ({ userData }) => {
+     const { data: session } = useSession();
      const { email, username, role, sign_in_type, createdAt, Student } = userData;
 
      const columns = [
@@ -89,14 +89,14 @@ const UserProfile = ({ userData }) => {
                                         </Chip>
                                    </Tooltip>
                               </div>
-                              <div>
+                              <div className='flex flex-col gap-6'>
                                    <div className='flex gap-6'>
                                         <Input
                                              classNames={{
                                                   inputWrapper: ["rounded-[5px]"]
                                              }}
                                              type="text"
-                                             label="Name"
+                                             label="Account Name"
                                              value={capitalize(username)}
                                              isReadOnly
                                              labelPlacement="outside"
@@ -118,7 +118,25 @@ const UserProfile = ({ userData }) => {
                                              }
                                         />
                                    </div>
-                                   <p className='mt-6 text-right text-sm text-default-400/70'>เข้าสู่ระบบ {dmy(createdAt)}</p>
+                                   {
+                                        session?.user?.teacherName &&
+                                        <div className='flex gap-6'>
+                                             <Input
+                                                  classNames={{
+                                                       inputWrapper: ["rounded-[5px]"]
+                                                  }}
+                                                  type="text"
+                                                  label="ชื่อวิชาการ"
+                                                  value={capitalize(session?.user?.teacherName || "-")}
+                                                  isReadOnly
+                                                  labelPlacement="outside"
+                                                  startContent={
+                                                       <BiSolidIdCard className="text-2xl text-default-400 pointer-events-none flex-shrink-0 me-1" />
+                                                  }
+                                             />
+                                        </div>
+                                   }
+                                   <p className='text-right text-sm text-default-400/70'>เข้าสู่ระบบ {dmy(createdAt)}</p>
                               </div>
                          </div>
                     </div>

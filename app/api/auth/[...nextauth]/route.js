@@ -11,7 +11,7 @@ const handler = NextAuth({
         maxAge: 3600 * 6,
     },
     providers: [
-        function VerifiedEmailProvider(){
+        function VerifiedEmailProvider() {
             return {
                 id: 'verifiedEmail',
                 name: 'Verified Email',
@@ -32,7 +32,7 @@ const handler = NextAuth({
                             email: credentials.email
                         },
                     };
-        
+
                     try {
                         const result = await axios(options)
                         if (result.data.userData) {
@@ -66,7 +66,7 @@ const handler = NextAuth({
                     withCredentials: true,
                     data: credentials
                 };
-                try{
+                try {
                     const res = await axios(options)
                     const data = res.data
                     if (data.ok && data) {
@@ -76,7 +76,7 @@ const handler = NextAuth({
                             ...userData
                         }
                     }
-                }catch(error){
+                } catch (error) {
                     throw new Error(error?.response?.data?.message || "ไม่สามารถเข้าสู่ระบบได้ ตรวจสอบชื่อผู้ใช้และรหัสผ่าน")
                 }
             }
@@ -100,7 +100,7 @@ const handler = NextAuth({
     callbacks: {
         async signIn({ user, account }) {
             if (account.provider === "google") {
-                const token = await signToken({ email: user.email })
+                const token = await signToken({ email: user.email, image: user.image })
                 const options = {
                     url: `${hostname}/api/auth/signin/google`,
                     method: 'POST',

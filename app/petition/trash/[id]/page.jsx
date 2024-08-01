@@ -1,6 +1,6 @@
 "use client"
 import { useCallback, useMemo } from "react";
-import PetitionDetail from "../../PetitionDetail";
+import PetitionDetail from "@/app/petition/PetitionDetail";
 import axios from "axios";
 import { getOptions } from "@/app/components/serverAction/TokenAction";
 import { usePathname } from "next/navigation";

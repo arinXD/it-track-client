@@ -1,9 +1,9 @@
 "use client"
 import { useCallback, useMemo } from "react";
-import PetitionDetail from "@/app/petition/PetitionDetail";
 import axios from "axios";
 import { getOptions } from "@/app/components/serverAction/TokenAction";
 import { usePathname } from "next/navigation";
+import PetitionDetail from "../../PetitionDetail";
 
 const Page = ({ params }) => {
      const { id } = params
@@ -25,9 +25,7 @@ const Page = ({ params }) => {
                <PetitionDetail
                     id={id}
                     current={current}
-                    handleDelete={handleDelete}
-                    isEditable={true}
-                    isDeletable={true} />
+                    isApprovable={true} />
           </section>
      )
 }
