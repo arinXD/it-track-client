@@ -15,6 +15,7 @@ import { Empty, message } from 'antd';
 import { IoIosCloseCircle } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
 import InsertSubject from './InsertSubject';
+import { RadioGroup, Radio } from "@nextui-org/radio";
 
 const Page = () => {
     const [loading, setLoading] = useState(true)
@@ -29,7 +30,8 @@ const Page = () => {
     const [categoryverify, setCategoryVerifies] = useState([])
     const [highestIndex, setHighestIndex] = useState(0);
 
-    const [ids, setId] = useState(null)
+    const [ids, setId] = useState(null);
+    const [status, setStatus] = useState(null);
 
     const [subjects, setSubjects] = useState([]);
 
@@ -48,6 +50,31 @@ const Page = () => {
 
     const [subjectTrack, setSubjectTrack] = useState([]);
 
+    ////////////////////////////////// useState to verify_selection//////////////////////////////////////////////////////////////
+
+    const [term, setTerm] = useState("")
+
+    const handleChange = (event) => {
+        setTerm(event.target.value);
+    };
+
+    const [cumlaude, setCumLaude] = useState("")
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    const showToastMessage = useCallback((ok, message) => {
+        toast[ok ? 'success' : 'warning'](message, {
+            position: toast.POSITION.TOP_RIGHT,
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    }, []);
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     const fetchEnrollment = useCallback(async function (stu_id) {
@@ -57,6 +84,7 @@ const Page = () => {
             const response = await axios(option)
             const data = response.data.data
             setUserData(data)
+            // console.log(data);
             if (data.Enrollments.length > 0) {
                 setEnrollment(data.Enrollments)
             } else {
@@ -68,6 +96,23 @@ const Page = () => {
         }
     }, [])
 
+
+    // const fetchstdverify = async function (ids) {
+    //     try {
+    //         const URL = `/api/verify/selects/teachers/${ids}`
+    //         const option = await getOptions(URL, "GET")
+    //         const response = await axios(option)
+    //         const data = response.data.data
+    //         console.log(data);
+    //         setStatus(data)
+
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
+
+    // console.log(status);
+
     useEffect(() => {
         if (session?.user?.stu_id != undefined) {
             fetchEnrollment(session?.user?.stu_id)
@@ -75,7 +120,6 @@ const Page = () => {
     }, [session])
 
     // console.log(subjects);
-    console.log(enrollments);
 
     const getEnrollmentGrade = (subjectCode) => {
         // ต้องการหา subjectCode ใน enrollments
@@ -87,13 +131,12 @@ const Page = () => {
     }
 
 
-
     ///////////////////////////////////อย่างน้อยของแบบฟอร์มใหญ่/////////////////////////////////////////////////////
 
 
     const enrolls = enrollments.map(prev => {
-        const grade = getEnrollmentGrade(prev.Subject.subject_code);
-        const credit = prev.Subject.credit;
+        const grade = getEnrollmentGrade(prev?.Subject?.subject_code);
+        const credit = prev?.Subject?.credit;
 
         // Check for invalid grades or low credits
         if (grade === "ไม่มีเกรด" ||
@@ -103,7 +146,7 @@ const Page = () => {
 
         // Return valid enrollments
         return {
-            subject_code: prev.Subject.subject_code,
+            subject_code: prev?.Subject?.subject_code,
             grade: grade,
             credit: credit
         };
@@ -111,7 +154,7 @@ const Page = () => {
 
     const totalenrolls = enrolls.reduce((sum, enroll) => sum += enroll.credit, 0);
 
-    console.log('Total Credits:', totalenrolls);
+    // console.log('Total Credits:', totalenrolls);
 
 
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -207,10 +250,32 @@ const Page = () => {
         }
     };
 
+    const fetchStatus = async (stu_id) => {
+        try {
+            const url = `/api/verify/selects/${stu_id}`;
+            const option = await getOptions(url, "GET");
+            try {
+                const res = await axios(option);
+                const setstatus = res.data.data;
+
+                setStatus(setstatus);
+            } catch (error) {
+                setStatus([]);
+                return;
+            }
+        } catch (error) {
+            console.error('Error fetching conditions:', error);
+        }
+    };
+
+    // console.log(status);
+
     useEffect(() => {
+        // fetchstdverify(ids);
         fetchConditions(ids);
         fetchConditionSubject(ids);
-    }, [ids]);
+        fetchStatus(userData?.stu_id);
+    }, [ids, userData?.stu_id]);
 
     // console.log(conditions);
     // console.log(conditionSubgroup);
@@ -259,8 +324,7 @@ const Page = () => {
                     groupedSubjects[category.id] = { category, groups: {}, subgroups: {}, semisubgroups: {} };
                 }
                 if (!groupedSubjects[category.id].subgroups[subgroup.id]) {
-                    groupedSubjects[category.id].subgroups[subgroup.id] = subgroup;
-                    groupedSubjects[category.id].subgroups[subgroup.id].subjects = [];
+                    groupedSubjects[category.id].subgroups[subgroup.id] = { ...subgroup, subjects: [] };
                 }
                 groupedSubjects[category.id].subgroups[subgroup.id].subjects.push(subject);
             });
@@ -273,8 +337,7 @@ const Page = () => {
                     groupedSubjects[category.id] = { category, groups: {}, subgroups: {}, semisubgroups: {} };
                 }
                 if (!groupedSubjects[category.id].groups[group.id]) {
-                    groupedSubjects[category.id].groups[group.id] = group;
-                    groupedSubjects[category.id].groups[group.id].subjects = [];
+                    groupedSubjects[category.id].groups[group.id] = { ...group, subjects: [] };
                 }
                 groupedSubjects[category.id].groups[group.id].subjects.push(subject);
             });
@@ -299,7 +362,7 @@ const Page = () => {
     }, [subgroupData, groupData, semisubgroupData]);
 
 
-    console.log(groupedSubjectsByCategory);
+    // console.log(groupedSubjectsByCategory);
 
     /////////////////////////////// เงือนไข //////////////////////////////////////////////
     useEffect(() => {
@@ -559,8 +622,104 @@ const Page = () => {
         setVerifySubj(data)
     }, [pickSubj])
 
+    /////////////////////////////////////////////////
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    const [insertData, setInsertData] = useState([]);
+
+    useEffect(() => {
+        const newInsertData = Object.keys(groupedSubjectsByCategory).reduce((acc, categoryId) => {
+            const categoryData = groupedSubjectsByCategory[categoryId];
+
+            const processSubjects = (subjects) => {
+                return subjects.map(subject => ({
+                    subject,
+                    grade: getEnrollmentGrade(subject.subject_code),
+                }));
+            };
+
+            // Process groups
+            Object.keys(categoryData.groups).forEach(groupId => {
+                const group = categoryData.groups[groupId];
+                acc.push({ type: 'group', subjects: processSubjects(group.subjects) });
+            });
+
+            // Process subgroups
+            Object.keys(categoryData.subgroups).forEach(subgroupId => {
+                const subgroup = categoryData.subgroups[subgroupId];
+                acc.push({ type: 'subgroup', subjects: processSubjects(subgroup.subjects) });
+            });
+
+            // Process semisubgroups
+            Object.keys(categoryData.semisubgroups).forEach(semisubgroupId => {
+                const semisubgroup = categoryData.semisubgroups[semisubgroupId];
+                acc.push({ type: 'semisubgroup', subjects: processSubjects(semisubgroup.subjects) });
+            });
+
+            return acc;
+        }, []);
+
+        setInsertData(newInsertData);
+    }, [groupedSubjectsByCategory, enrollments]);
+
+
+    useEffect(() => {
+        if (insertData.length === 0 || enrollments.length === 0) return;
+
+        setInsertData((prev) =>
+            prev.map((typeData) => {
+                const updatedSubjects = typeData.subjects.map((subject) => {
+                    const enrollment = enrollments.find(e => e?.Subject?.subject_code === subject.subject_code);
+                    const grade = enrollment ? enrollment.grade : "ไม่มีเกรด";
+                    return { ...subject, grade };
+                });
+                return { ...typeData, subjects: updatedSubjects };
+            })
+        );
+    }, [enrollments]);
+
+    // console.log(insertData);
+
+
+    /////////////////////////////////////////sent to verify_selection////////////////////////////////////////////////////////////////
+
+
+    const handleSubmit = useCallback(async function () {
+        try {
+            const url = `/api/verify/selects/${ids}/${userData.stu_id}`;
+
+            const filteredData = insertData.map(subj => ({
+                ...subj,
+                subjects: subj.subjects.filter(subject => subject.grade !== null && subject.grade !== "ไม่มีเกรด")
+            })).filter(subj => subj.subjects.length > 0);
+
+            // console.log(insertData);
+            // console.log(filteredData);
+            const formData = {
+                verify_id: ids,
+                stu_id: userData.stu_id,
+                term: term,
+                cum_laude: cumlaude,
+                acadyear: userData.acadyear + 4,
+                status: 1,
+                subjects: filteredData
+            };
+
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+
+            // showToastMessage(ok, message);
+            fetchData()
+            fetchConditions(ids);
+            fetchConditionSubject(ids);
+            fetchStatus(userData?.stu_id);
+            message.success(msg)
+        } catch (error) {
+            console.log(error);
+            // const message = error?.response?.data?.message || error.message;
+            // showToastMessage(false, message);
+        }
+    }, [ids, term, cumlaude, userData.stu_id, insertData]);
 
 
 
@@ -580,7 +739,6 @@ const Page = () => {
         )
     }
     // console.log(enrollments);
-    // console.log(userData);
     // console.log(verifySelect);
     // console.log(verifySubjects);
     // console.log(subgroupData);
@@ -833,310 +991,337 @@ const Page = () => {
                             </p>
                         </>
                         :
-                        <>
-                            <div className='my-[30px] 2xl:px-44 xl:px-20'>
-                                <div className=' text-xl text-black mb-5 px-5'>
-                                    <h1 className='text-3xl text-center  leading-relaxed'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br /> หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{program.title_th} <br />(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
-                                    <div className='text-center mt-6'>
-                                        <p>ข้าพเจ้า {userData.first_name} {userData.last_name} รหัสประจำตัว {userData.stu_id}</p>
-                                        <div className='flex justify-center items-center'>
-                                            <p>คาดว่าจะได้รับปริญญาวิทยาศาสตรบัณฑิต  สาขาวิชา{program.title_th} เกียรตินิยมอันดับ</p>
-                                            <div className="relative ml-2 w-[70px]">
-                                                <input
-                                                    className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
-                                                    placeholder=" "
-                                                    type="text"
-                                                />
-                                                <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-fit w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[4.1] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                                                    อันดับ
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className='flex flex-wrap justify-center items-center'>
-                                            <p>ภาคการศึกษา</p>
-                                            <Checkbox className='ml-2'>ต้น</Checkbox>
-                                            <Checkbox className='ml-2'>ปลาย</Checkbox>
-                                            <Checkbox className='mx-2'>ฤดูร้อน</Checkbox>
-                                            <p>ปีการศึกษา {userData.acadyear + 4}</p>
-                                        </div>
-                                    </div>
-                                    {(() => {
-                                        const creditClassName = verifySelect.main_at_least < totalenrolls ? '' : 'text-red-400';
-                                        // `font-bold ${verifySelect.main_at_least < totalenrolls ? 'text-red-500' : ''}
-
-                                        return <h2 className='mt-6 text-center '>ขอยื่นแบบฟอร์มแสดงรายละเอียดการศึกษารายวิชาที่ได้เรียนมาทั้งหมด อย่างน้อย <span className={`font-bold ${creditClassName}`}>{verifySelect.main_at_least}</span> หน่วยกิต ต่องานทะเบียนและประมวลผลการศึกษา ดังต่อไปนี้คือ.—</h2>
-                                    })()}
-
-
-                                </div>
-                                {Object.keys(groupedSubjectsByCategory).map((categoryId, index) => {
-                                    const { category, groups, subgroups, semisubgroups } = groupedSubjectsByCategory[categoryId];
-                                    if (index > highestIndex) {
-                                        setHighestIndex(index);
-                                    }
-                                    // console.log(conditions);
-
-                                    return (
-                                        <div key={index} className='mb-5'>
-                                            <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
-                                                <h2 className='text-lg text-default-800'>{index + 1}. {category?.category_title}</h2>
-                                                {/* <h2 className='text-sm text-default-800'>จำนวน {creditgroup} หน่วยกิต</h2> */}
-                                            </div>
-                                            {Object.keys(groups).map((groupId, groupIndex) => {
-                                                const group = groups[groupId];
-
-                                                return (
-                                                    <div key={groupIndex} >
-                                                        <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
-                                                            <h3 className='text-lg text-default-800 px-4'><li>{group?.group_title}</li></h3>
-                                                        </div>
-                                                        <Table
-                                                            classNames={tableClass}
-                                                            removeWrapper
-                                                            onRowAction={() => { }}
-                                                            aria-label="subjects table">
-                                                            <TableHeader>
-                                                                <TableColumn>รหัสวิชา</TableColumn>
-                                                                <TableColumn>ชื่อวิชา EN</TableColumn>
-                                                                <TableColumn>ชื่อวิชา TH</TableColumn>
-                                                                <TableColumn>หน่วยกิต</TableColumn>
-                                                                <TableColumn>เกรด</TableColumn>
-                                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                            </TableHeader>
-                                                            <TableBody>
-                                                                {group.subjects && group.subjects.map((subject, subjectIndex) => (
-                                                                    <TableRow key={subjectIndex}>
-                                                                        <TableCell className=''>{subject.subject_code}</TableCell>
-                                                                        <TableCell className="w-1/3">{subject.title_en}</TableCell>
-                                                                        <TableCell className="w-1/3">{subject.title_th}</TableCell>
-                                                                        <TableCell>{subject.credit}</TableCell>
-                                                                        <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
-                                                                        <TableCell>
-                                                                            {(() => {
-                                                                                const grade = calGrade(getEnrollmentGrade(subject.subject_code));
-                                                                                const credit = subject.credit;
-                                                                                if (grade == null) {
-                                                                                    return "-";
-                                                                                } else if (isNumber(grade)) {
-                                                                                    return String(grade * credit);
-                                                                                } else {
-                                                                                    return grade;
-                                                                                }
-                                                                            })()}
-                                                                        </TableCell>
-                                                                    </TableRow>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </div>
-                                                );
-                                            })}
-                                            {
-                                                getSubg(subgroups, semisubgroups)
-                                            }
-                                        </div>
-                                    );
-                                })}
-
-                                {userData.program === "IT" && (
-                                    <>
-                                        <h2 className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center mt-5 rounded-t-md text-lg text-default-800'>วิชาเลือก 3 กลุ่ม</h2>
-                                        <div className='flex flex-row gap-3'>
-                                            <div className='w-1/2 flex flex-col'>
-                                                <p>วิชาที่ต้องการจะเพิ่ม {pickSubj.length == 0 ? undefined : <>({pickSubj.length} วิชา)</>}</p>
-                                                <ul className='h-[210px] overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
-                                                    {pickSubj.length > 0 ?
-                                                        pickSubj.map((sbj, index) => (
-                                                            <li key={index} className='bg-gray-100 rounded-md relative p-1 gap-2 border-1 border-b-gray-300'>
-                                                                <input
-                                                                    readOnly
-                                                                    className='bg-gray-100 block focus:outline-none font-bold'
-                                                                    type="text"
-                                                                    name="pickSubj[]"
-                                                                    value={sbj.subject_code} />
-                                                                <p className='flex flex-col text-sm'>
-                                                                    <span>{sbj.title_th}</span>
-                                                                </p>
-                                                                <IoIosCloseCircle onClick={() => delSubj(sbj.subject_code)} className="absolute top-1 right-1 w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
-                                                            </li>
-                                                        ))
-                                                        :
-                                                        <li className='flex justify-center items-center h-full'>
-                                                            <Empty />
-                                                        </li>}
-                                                </ul>
-                                            </div>
-                                            <div className='w-1/2'>
-                                                <p>ค้นหาวิชาที่ต้องการ</p>
-                                                <div className='flex flex-col'>
-                                                    <div className='flex flex-row relative'>
-                                                        <IoSearchOutline className='absolute left-3.5 top-[25%]' />
+                        (status?.status === 1 && status?.status !== null) ?
+                            <>
+                                <p>status 1</p>
+                            </>
+                            :
+                            (status?.status === 2 && status?.status !== null) ?
+                                <>
+                                    <p>status 2</p>
+                                </>
+                                :
+                                <>
+                                    <div className='my-[30px] 2xl:px-44 xl:px-20'>
+                                        <div className=' text-xl text-black mb-5 px-5'>
+                                            <h1 className='text-3xl text-center  leading-relaxed'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br /> หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{program.title_th} <br />(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
+                                            <div className='text-center mt-6'>
+                                                <p>ข้าพเจ้า {userData.first_name} {userData.last_name} รหัสประจำตัว {userData.stu_id}</p>
+                                                <div className='flex justify-center items-center'>
+                                                    <p>คาดว่าจะได้รับปริญญาวิทยาศาสตรบัณฑิต  สาขาวิชา{program.title_th} เกียรตินิยมอันดับ</p>
+                                                    <div className="relative ml-2 w-[70px]">
                                                         <input
-                                                            className='ps-10 py-1 rounded-md border-1 w-full px-2 focus:outline-none mb-1 focus:border-blue-500'
-                                                            type="search"
-                                                            value={searchSubj}
-                                                            onChange={(e) => setSearchSubj(e.target.value)}
-                                                            placeholder='รหัสวิชา ชื่อวิชา' />
+                                                            className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                                                            placeholder=" "
+                                                            type="text"
+                                                            value={cumlaude}
+                                                            onChange={(e) => setCumLaude(e.target.value)}
+                                                        />
+                                                        <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-fit w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[4.1] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                                            อันดับ
+                                                        </label>
                                                     </div>
-                                                    <ul className='rounded-md border-1 h-[180px] overflow-y-auto p-2 flex flex-col gap-1'>
-                                                        {filterSubj.map((subject, index) => (
-                                                            !(pickSubj.map(z => z.subject_code).includes(subject.subject_code)) &&
-                                                            <li onClick={() => addSubj(subject)} key={index} className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border-1 border-b-gray-300 cursor-pointer'>
-                                                                <strong className='block'>{subject.subject_code}</strong>
-                                                                <p className='flex flex-col text-sm'>
-                                                                    <span>{subject.title_en}</span>
-                                                                    <span>{subject.title_th}</span>
-                                                                </p>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
+                                                </div>
+                                                <div className='flex flex-wrap justify-center items-center'>
+                                                    <p>ภาคการศึกษา</p>
+                                                    <RadioGroup
+                                                        value={term}
+                                                        onChange={handleChange}
+                                                        orientation="horizontal"
+                                                    >
+                                                        <Radio value="ต้น" className='ml-2'>ต้น</Radio>
+                                                        <Radio value="ปลาย" className='ml-2' >ปลาย</Radio>
+                                                        <Radio value="ฤดูร้อน" className='mx-2' >ฤดูร้อน</Radio>
+                                                    </RadioGroup>
+                                                    <p>ปีการศึกษา {userData.acadyear + 4}</p>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </>
-                                )}
-
-                                {categoryverify && categoryverify.map((categorie, catIndex) => (
-                                    <InsertSubject
-                                        key={catIndex}
-                                        catIndex={catIndex}
-                                        categorie={categorie}
-                                        subjects={subjects}
-                                        highestIndex={highestIndex}
-                                    />
-                                ))}
-                                {Object.keys(groupedSubjectsByCategory).length === 0 && (
-                                    <>
-                                        <p className='text-center mt-10'>ไม่มีวิชาภายในแบบฟอร์ม</p>
-                                    </>
-                                )}
-
-                                <div className='text-2xl max-lg:text-xl max-md:text-xl mt-4 flex justify-between'>
-                                    <div>
-                                        เงื่อนไขตรวจสอบสำเร็จการศึกษา
-                                    </div>
-                                    <div>
-                                        หน่วยกิตที่ลงทะเบียน <span className='text-red-600'>{totalenrolls}</span>
-                                    </div>
-                                </div>
-
-                                <Table
-                                    classNames={tableClass}
-                                    removeWrapper
-                                    onRowAction={() => { }}
-                                    aria-label="program table"
-                                    className='mt-5'
-                                >
-                                    <TableHeader>
-                                        <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                        <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                        <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                        <TableColumn>ค่าคะแนน</TableColumn>
-                                        <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                    </TableHeader>
-                                    {conditions.length > 0 ? (
-                                        <TableBody>
-                                            {conditions.map((condition, index) => {
-                                                const groupData = subjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
-                                                const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = groupData;
-
-                                                const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
-
-                                                return (
-                                                    <TableRow key={index}>
-                                                        <TableCell>{condition?.Group?.group_title}</TableCell>
-                                                        <TableCell>{condition.credit}</TableCell>
-                                                        <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                        <TableCell>{totalGrades}</TableCell>
-                                                        <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                    </TableRow>
-                                                );
-
-                                            })}
-                                        </TableBody>
-                                    ) : (
-                                        <TableBody emptyContent={"ไม่มีเงื่อนไข"}>{[]}</TableBody>
-                                    )}
-                                </Table>
-                                {userData.program === "IT" && (
-                                    <Table
-                                        classNames={tableClass}
-                                        removeWrapper
-                                        onRowAction={() => { }}
-                                        aria-label="program table"
-                                        className='mt-5'
-                                    >
-                                        <TableHeader>
-                                            <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                            <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                            <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                            <TableColumn>ค่าคะแนน</TableColumn>
-                                            <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                        </TableHeader>
-
-                                        <TableBody>
                                             {(() => {
+                                                const creditClassName = verifySelect.main_at_least < totalenrolls ? '' : 'text-red-400';
+                                                // `font-bold ${verifySelect.main_at_least < totalenrolls ? 'text-red-500' : ''}
 
-                                                const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrack);
-
-                                                const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
-
-                                                return (
-                                                    <TableRow>
-                                                        <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
-                                                        <TableCell>21</TableCell>
-                                                        <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                        <TableCell>{totalGrades}</TableCell>
-                                                        <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                    </TableRow>
-                                                );
+                                                return <h2 className='mt-6 text-center '>ขอยื่นแบบฟอร์มแสดงรายละเอียดการศึกษารายวิชาที่ได้เรียนมาทั้งหมด อย่างน้อย <span className={`font-bold ${creditClassName}`}>{verifySelect.main_at_least}</span> หน่วยกิต ต่องานทะเบียนและประมวลผลการศึกษา ดังต่อไปนี้คือ.—</h2>
                                             })()}
-                                        </TableBody>
 
-                                    </Table>
-                                )}
 
-                                <Table
-                                    classNames={tableClass}
-                                    removeWrapper
-                                    onRowAction={() => { }}
-                                    aria-label="program table"
-                                    className='mt-5'
-                                >
-                                    <TableHeader>
-                                        <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                        <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                        <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                        <TableColumn>ค่าคะแนน</TableColumn>
-                                        <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                    </TableHeader>
-                                    {conditionSubgroup.length > 0 ? (
-                                        <TableBody>
-                                            {conditionSubgroup.map((condition, index) => {
-                                                const subgroupData = subjectCodesBySubgroup.find(subgroup => subgroup.id === condition.SubGroup.id) || {};
-                                                const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = subgroupData;
+                                        </div>
+                                        {Object.keys(groupedSubjectsByCategory).map((categoryId, index) => {
+                                            const { category, groups, subgroups, semisubgroups } = groupedSubjectsByCategory[categoryId];
+                                            if (index > highestIndex) {
+                                                setHighestIndex(index);
+                                            }
+                                            // console.log(conditions);
 
-                                                const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
+                                            return (
+                                                <div key={index} className='mb-5'>
+                                                    <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
+                                                        <h2 className='text-lg text-default-800'>{index + 1}. {category?.category_title}</h2>
+                                                        {/* <h2 className='text-sm text-default-800'>จำนวน {creditgroup} หน่วยกิต</h2> */}
+                                                    </div>
+                                                    {Object.keys(groups).map((groupId, groupIndex) => {
+                                                        const group = groups[groupId];
 
-                                                return (
-                                                    <TableRow key={index}>
-                                                        <TableCell>{condition?.SubGroup?.sub_group_title}</TableCell>
-                                                        <TableCell>{condition.credit}</TableCell>
-                                                        <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                        <TableCell>{totalGrades}</TableCell>
-                                                        <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                    </TableRow>
-                                                );
-                                            })}
-                                        </TableBody>
-                                    ) : (
-                                        <TableBody emptyContent={"ไม่มีเงื่อนไข"}>{[]}</TableBody>
-                                    )}
-                                </Table>
+                                                        return (
+                                                            <div key={groupIndex} >
+                                                                <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
+                                                                    <h3 className='text-lg text-default-800 px-4'><li>{group?.group_title}</li></h3>
+                                                                </div>
+                                                                <Table
+                                                                    classNames={tableClass}
+                                                                    removeWrapper
+                                                                    onRowAction={() => { }}
+                                                                    aria-label="subjects table">
+                                                                    <TableHeader>
+                                                                        <TableColumn>รหัสวิชา</TableColumn>
+                                                                        <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                                        <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                                        <TableColumn>หน่วยกิต</TableColumn>
+                                                                        <TableColumn>เกรด</TableColumn>
+                                                                        <TableColumn>ค่าคะแนน</TableColumn>
+                                                                    </TableHeader>
+                                                                    <TableBody>
+                                                                        {group.subjects && group.subjects.map((subject, subjectIndex) => (
+                                                                            <TableRow key={subjectIndex}>
+                                                                                <TableCell className=''>{subject.subject_code}</TableCell>
+                                                                                <TableCell className="w-1/3">{subject.title_en}</TableCell>
+                                                                                <TableCell className="w-1/3">{subject.title_th}</TableCell>
+                                                                                <TableCell>{subject.credit}</TableCell>
+                                                                                <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
+                                                                                <TableCell>
+                                                                                    {(() => {
+                                                                                        const grade = calGrade(getEnrollmentGrade(subject.subject_code));
+                                                                                        const credit = subject.credit;
+                                                                                        if (grade == null) {
+                                                                                            return "-";
+                                                                                        } else if (isNumber(grade)) {
+                                                                                            return String(grade * credit);
+                                                                                        } else {
+                                                                                            return grade;
+                                                                                        }
+                                                                                    })()}
+                                                                                </TableCell>
+                                                                            </TableRow>
+                                                                        ))}
+                                                                    </TableBody>
+                                                                </Table>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                    {
+                                                        getSubg(subgroups, semisubgroups)
+                                                    }
+                                                </div>
+                                            );
+                                        })}
 
-                            </div>
-                        </>
+                                        {userData.program === "IT" && (
+                                            <>
+                                                <h2 className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center mt-5 rounded-t-md text-lg text-default-800'>วิชาเลือก 3 กลุ่ม</h2>
+                                                <div className='flex flex-row gap-3'>
+                                                    <div className='w-1/2 flex flex-col'>
+                                                        <p>วิชาที่ต้องการจะเพิ่ม {pickSubj.length == 0 ? undefined : <>({pickSubj.length} วิชา)</>}</p>
+                                                        <ul className='h-[210px] overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
+                                                            {pickSubj.length > 0 ?
+                                                                pickSubj.map((sbj, index) => (
+                                                                    <li key={index} className='bg-gray-100 rounded-md relative p-1 gap-2 border-1 border-b-gray-300'>
+                                                                        <input
+                                                                            readOnly
+                                                                            className='bg-gray-100 block focus:outline-none font-bold'
+                                                                            type="text"
+                                                                            name="pickSubj[]"
+                                                                            value={sbj.subject_code} />
+                                                                        <p className='flex flex-col text-sm'>
+                                                                            <span>{sbj.title_th}</span>
+                                                                        </p>
+                                                                        <IoIosCloseCircle onClick={() => delSubj(sbj.subject_code)} className="absolute top-1 right-1 w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
+                                                                    </li>
+                                                                ))
+                                                                :
+                                                                <li className='flex justify-center items-center h-full'>
+                                                                    <Empty />
+                                                                </li>}
+                                                        </ul>
+                                                    </div>
+                                                    <div className='w-1/2'>
+                                                        <p>ค้นหาวิชาที่ต้องการ</p>
+                                                        <div className='flex flex-col'>
+                                                            <div className='flex flex-row relative'>
+                                                                <IoSearchOutline className='absolute left-3.5 top-[25%]' />
+                                                                <input
+                                                                    className='ps-10 py-1 rounded-md border-1 w-full px-2 focus:outline-none mb-1 focus:border-blue-500'
+                                                                    type="search"
+                                                                    value={searchSubj}
+                                                                    onChange={(e) => setSearchSubj(e.target.value)}
+                                                                    placeholder='รหัสวิชา ชื่อวิชา' />
+                                                            </div>
+                                                            <ul className='rounded-md border-1 h-[180px] overflow-y-auto p-2 flex flex-col gap-1'>
+                                                                {filterSubj.map((subject, index) => (
+                                                                    !(pickSubj.map(z => z.subject_code).includes(subject.subject_code)) &&
+                                                                    <li onClick={() => addSubj(subject)} key={index} className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border-1 border-b-gray-300 cursor-pointer'>
+                                                                        <strong className='block'>{subject.subject_code}</strong>
+                                                                        <p className='flex flex-col text-sm'>
+                                                                            <span>{subject.title_en}</span>
+                                                                            <span>{subject.title_th}</span>
+                                                                        </p>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {categoryverify && categoryverify.map((categorie, catIndex) => (
+                                            <InsertSubject
+                                                key={catIndex}
+                                                catIndex={catIndex}
+                                                categorie={categorie}
+                                                subjects={subjects}
+                                                highestIndex={highestIndex}
+                                            />
+                                        ))}
+                                        {Object.keys(groupedSubjectsByCategory).length === 0 && (
+                                            <>
+                                                <p className='text-center mt-10'>ไม่มีวิชาภายในแบบฟอร์ม</p>
+                                            </>
+                                        )}
+
+                                        <div className='text-2xl max-lg:text-xl max-md:text-xl mt-4 flex justify-between'>
+                                            <div>
+                                                เงื่อนไขตรวจสอบสำเร็จการศึกษา
+                                            </div>
+                                            <div>
+                                                หน่วยกิตที่ลงทะเบียน <span className='text-red-600'>{totalenrolls}</span>
+                                            </div>
+                                        </div>
+
+                                        <Table
+                                            classNames={tableClass}
+                                            removeWrapper
+                                            onRowAction={() => { }}
+                                            aria-label="program table"
+                                            className='mt-5'
+                                        >
+                                            <TableHeader>
+                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                            </TableHeader>
+                                            {conditions.length > 0 ? (
+                                                <TableBody>
+                                                    {conditions.map((condition, index) => {
+                                                        const groupData = subjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
+                                                        const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = groupData;
+
+                                                        const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
+
+                                                        return (
+                                                            <TableRow key={index}>
+                                                                <TableCell>{condition?.Group?.group_title}</TableCell>
+                                                                <TableCell>{condition.credit}</TableCell>
+                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                <TableCell>{totalGrades}</TableCell>
+                                                                <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
+                                                            </TableRow>
+                                                        );
+
+                                                    })}
+                                                </TableBody>
+                                            ) : (
+                                                <TableBody emptyContent={"ไม่มีเงื่อนไข"}>{[]}</TableBody>
+                                            )}
+                                        </Table>
+                                        {userData.program === "IT" && (
+                                            <Table
+                                                classNames={tableClass}
+                                                removeWrapper
+                                                onRowAction={() => { }}
+                                                aria-label="program table"
+                                                className='mt-5'
+                                            >
+                                                <TableHeader>
+                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                </TableHeader>
+
+                                                <TableBody>
+                                                    {(() => {
+
+                                                        const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrack);
+
+                                                        const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
+
+                                                        return (
+                                                            <TableRow>
+                                                                <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
+                                                                <TableCell>21</TableCell>
+                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                <TableCell>{totalGrades}</TableCell>
+                                                                <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })()}
+                                                </TableBody>
+
+                                            </Table>
+                                        )}
+
+                                        {conditionSubgroup.length > 0 && (
+                                            <Table
+                                                classNames={tableClass}
+                                                removeWrapper
+                                                onRowAction={() => { }}
+                                                aria-label="program table"
+                                                className='mt-5'
+                                            >
+                                                <TableHeader>
+                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                </TableHeader>
+                                                {conditionSubgroup.length > 0 ? (
+                                                    <TableBody>
+                                                        {conditionSubgroup.map((condition, index) => {
+                                                            const subgroupData = subjectCodesBySubgroup.find(subgroup => subgroup.id === condition.SubGroup.id) || {};
+                                                            const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = subgroupData;
+
+                                                            const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
+
+                                                            return (
+                                                                <TableRow key={index}>
+                                                                    <TableCell>{condition?.SubGroup?.sub_group_title}</TableCell>
+                                                                    <TableCell>{condition.credit}</TableCell>
+                                                                    <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                    <TableCell>{totalGrades}</TableCell>
+                                                                    <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
+                                                                </TableRow>
+                                                            );
+                                                        })}
+                                                    </TableBody>
+                                                ) : (
+                                                    <TableBody emptyContent={"ไม่มีเงื่อนไข"}>{[]}</TableBody>
+                                                )}
+                                            </Table>
+                                        )}
+                                        <Button type='submit' onClick={() => handleSubmit()} className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid'>
+                                            บันทึก
+                                        </Button>
+
+                                    </div>
+
+                                </>
+
+
                 }
+
             </ContentWrap>
         </>
     );
