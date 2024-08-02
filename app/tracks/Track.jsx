@@ -4,7 +4,6 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Empty } from 'antd';
 import { Card, CardFooter, Image } from "@nextui-org/react";
-import { useRouter } from 'next/navigation'
 import Link from 'next/link';
 
 const Track = ({ tracks }) => {

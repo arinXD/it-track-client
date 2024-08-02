@@ -1,0 +1,9 @@
+.ant-drawer-body{
+     padding: 0 !important;
+}
+
+@media only screen and (max-width: 768px){
+	.ant-drawer{
+          display: none !important;
+     }
+}

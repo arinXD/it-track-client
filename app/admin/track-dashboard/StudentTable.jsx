@@ -45,9 +45,9 @@ const StudentTable = ({ studentsData }) => {
                     <setion className="w-full flex justify-center">
                          <Chip
                               className=''
-                              color={`${text.toLowerCase() == "bit" ? "primary" : text.toLowerCase() == "network" ? "secondary" : "success"}`}
+                              color={`${text?.toLowerCase() == "bit" ? "primary" : text?.toLowerCase() == "network" ? "secondary" : "success"}`}
                               variant="flat">
-                              {text?.split(" ")[0]}
+                              {text?.split(" ")[0] || '?'}
                          </Chip>
                     </setion>
                ),
@@ -55,7 +55,9 @@ const StudentTable = ({ studentsData }) => {
      ]), [])
 
      return (
-          <Table columns={columns} dataSource={studentsData} />
+          <section className='h-[300px]' >
+               <Table columns={columns} dataSource={studentsData} />
+          </section>
      )
 }
 

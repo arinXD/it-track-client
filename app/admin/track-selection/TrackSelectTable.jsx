@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
+import { Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Spinner } from "@nextui-org/react";
 import { PlusIcon, CheckIcon, DeleteIcon2, SearchIcon } from "@/app/components/icons";
 import { Icon } from '@iconify/react';
 import { Loading } from '@/app/components';
 import axios from 'axios';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import { simpleDMYHM } from '@/src/util/simpleDateFormatter';
+import { Empty } from 'antd';
 
 const TrackSelectTable = ({ loading, trackSelection, handleOpen,
     handleDelete, handleStartSelect, swal, callTrackSelection, showToastMessage }) => {
@@ -153,61 +154,71 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
                             <TableColumn>เริ่มต้น</TableColumn>
                             <TableColumn>สิ้นสุด</TableColumn>
                         </TableHeader>
-                        {filteredData.length > 0 ?
-                            <TableBody>
-                                {filteredData.map((e, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>
-                                            {!(e.has_finished) ?
-                                                <Button
-                                                    size='sm'
-                                                    onPress={() => handleStartSelect({ id: e.id, hasFinished: e.has_finished })}
-                                                    color="warning" variant="solid" className='bg-amber-400'>
-                                                    ปิดการคัดเลือก
-                                                </Button>
-                                                :
-                                                <Button
-                                                    size='sm'
-                                                    onPress={() => handleStartSelect({ id: e.id, hasFinished: e.has_finished })}
-                                                    color="primary" variant="solid" className=''>
-                                                    เปิดการคัดเลือก
-                                                </Button>
-                                            }
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="relative flex items-center gap-4">
-                                                <Tooltip color="danger" content="ลบ">
-                                                    <span onClick={() => handleDelete(e.acadyear)} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                        <DeleteIcon2 />
-                                                    </span>
-                                                </Tooltip>
-                                            </div>
-                                        </TableCell>
+                        <TableBody
+                            isLoading={loading}
+                            loadingContent={<Spinner />}
+                            emptyContent={
+                                <Empty
+                                    className='my-4 w-1/'
+                                    description={
+                                        <span className='text-gray-300'>ไม่มีข้อมูลคัดเลือกแทร็ก</span>
+                                    }
+                                />
+                            }
+                            items={filteredData}
+                        >
+                            {(item, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>
+                                        {!(item.has_finished) ?
+                                            <Button
+                                                size='sm'
+                                                onPress={() => handleStartSelect({ id: item.id, hasFinished: item.has_finished })}
+                                                color="warning" variant="solid" className='bg-amber-400'>
+                                                ปิดการคัดเลือก
+                                            </Button>
+                                            :
+                                            <Button
+                                                size='sm'
+                                                onPress={() => handleStartSelect({ id: item.id, hasFinished: item.has_finished })}
+                                                color="primary" variant="solid" className=''>
+                                                เปิดการคัดเลือก
+                                            </Button>
+                                        }
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="relative flex items-center gap-4">
+                                            <Tooltip color="danger" content="ลบ">
+                                                <span onClick={() => handleDelete(item.acadyear)} className="text-lg text-danger cursor-pointer active:opacity-50">
+                                                    <DeleteIcon2 />
+                                                </span>
+                                            </Tooltip>
+                                        </div>
+                                    </TableCell>
 
-                                        <TableCell>{e.acadyear}</TableCell>
+                                    <TableCell>{item.acadyear}</TableCell>
 
-                                        <TableCell className="w-1/3">
-                                            <Link
-                                                href={`/admin/track-selection/${e.acadyear}`}
-                                                className='text-blue-500'
-                                            >{e.title}
-                                            </Link>
-                                        </TableCell>
+                                    <TableCell className="w-1/3">
+                                        <Link
+                                            href={`/admin/track-selection/${item.acadyear}`}
+                                            className='text-blue-500'
+                                        >{item.title}
+                                        </Link>
+                                    </TableCell>
 
-                                        <TableCell>
-                                            {e.has_finished ?
-                                                <Chip startContent={<CheckIcon size={18} />} color="success" variant="flat">เสร็จสิ้น</Chip>
-                                                :
-                                                <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">กำลังดำเนินการ</Chip>
-                                            }
-                                        </TableCell>
+                                    <TableCell>
+                                        {item.has_finished ?
+                                            <Chip startContent={<CheckIcon size={18} />} color="success" variant="flat">เสร็จสิ้น</Chip>
+                                            :
+                                            <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">กำลังดำเนินการ</Chip>
+                                        }
+                                    </TableCell>
 
-                                        <TableCell>{simpleDMYHM(e.startAt)}</TableCell>
-                                        <TableCell>{simpleDMYHM(e.expiredAt)}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody> :
-                            <TableBody emptyContent={"ไม่มีข้อมูลคัดเลือกแทร็ก"}>{[]}</TableBody>}
+                                    <TableCell>{simpleDMYHM(item.startAt)}</TableCell>
+                                    <TableCell>{simpleDMYHM(item.expiredAt)}</TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
                     </Table>
             }
         </div >

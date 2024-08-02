@@ -1,14 +1,8 @@
 "use server"
 import axios from "axios"
-import {
-    hostname
-} from "@/app/api/hostname"
-import {
-    getToken
-} from '@/app/components/serverAction/TokenAction'
-import {
-    revalidatePath
-} from "next/cache"
+import { hostname } from "@/app/api/hostname"
+import { getToken } from '@/app/components/serverAction/TokenAction'
+import { revalidatePath } from "next/cache"
 
 export async function createAcadYear(formData) {
     const token = await getToken()

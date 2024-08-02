@@ -50,6 +50,7 @@ const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => 
           setPreviewImage("")
           setNameTh("")
           setNameEn("")
+          setDesc("")
           setUploadProgress(0)
           onClose()
      }, [])

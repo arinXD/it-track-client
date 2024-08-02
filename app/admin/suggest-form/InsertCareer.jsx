@@ -17,6 +17,7 @@ const InsertCareer = ({ isOpen, onClose, src = "", getCareers, tracks }) => {
      const [previewImage, setPreviewImage] = useState(src)
      const [nameTh, setNameTh] = useState("");
      const [nameEn, setNameEn] = useState("");
+     const [desc, setDesc] = useState(null);
      const [uploadProgress, setUploadProgress] = useState(0);
      const [inserting, setInserting] = useState(false);
 
@@ -50,6 +51,7 @@ const InsertCareer = ({ isOpen, onClose, src = "", getCareers, tracks }) => {
           setPreviewImage("")
           setNameTh("")
           setNameEn("")
+          setDesc("")
           setUploadProgress(0)
           onClose()
      }, [])
@@ -133,7 +135,7 @@ const InsertCareer = ({ isOpen, onClose, src = "", getCareers, tracks }) => {
                                                        radius='sm'
                                                        label="อาชีพ (TH)"
                                                        labelPlacement="outside"
-                                                       placeholder=""
+                                                       placeholder="ชื่ออาชีพภาษาไทย"
                                                        value={nameTh}
                                                        onValueChange={setNameTh}
                                                        classNames={inputClass}
@@ -147,7 +149,7 @@ const InsertCareer = ({ isOpen, onClose, src = "", getCareers, tracks }) => {
                                                        radius='sm'
                                                        label="อาชีพ (EN)"
                                                        labelPlacement="outside"
-                                                       placeholder=""
+                                                       placeholder="ชื่ออาชีพภาษาอังกฤษ"
                                                        value={nameEn}
                                                        onValueChange={setNameEn}
                                                        classNames={inputClass}
@@ -174,6 +176,19 @@ const InsertCareer = ({ isOpen, onClose, src = "", getCareers, tracks }) => {
                                                             </SelectItem>
                                                        ))}
                                                   </Select>
+                                                  <Input
+                                                       name='desc'
+                                                       type="text"
+                                                       variant="bordered"
+                                                       radius='sm'
+                                                       label="คำอธิบายอาชีพ"
+                                                       labelPlacement="outside"
+                                                       placeholder="กรอกคำอธิบายอาชีพ"
+                                                       value={desc}
+                                                       onValueChange={setDesc}
+                                                       classNames={inputClass}
+                                                       className='mb-4'
+                                                  />
                                                   <div className='flex flex-col justify-center items-start'>
                                                        <span className="text-sm mb-2">อัพโหลดไฟล์รูปภาพ [ jpeg, jpg, png ]</span>
                                                        <label className="w-fit hover:border-blue-500 hover:text-blue-500 transition duration-75 cursor-pointer border-1 border-default-300 rounded-md px-3.5 py-1 text-default-700">
