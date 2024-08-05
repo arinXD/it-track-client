@@ -18,8 +18,19 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
     const [title, setTitle] = useState("")
     const [acadValue, setAcadValue] = useState("")
     const [startValue, setStartValue] = useState(format(currentDateTime, 'yyyy-MM-dd\'T\'HH:mm'));
-    const [expiredValue, setExpiredValue] = useState(format(currentDateTime, 'yyyy-MM-dd\'T\'HH:mm'))
+    const [expiredValue, setExpiredValue] = useState("")
+    const [announcementDate, setAnnouncementDate] = useState("");
     const [trackSubj, setTrackSubj] = useState([])
+
+    useEffect(() => {
+        const nextWeek = new Date(currentDateTime);
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        setExpiredValue(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
+
+        const twoWeeksLater = new Date(currentDateTime);
+        twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+        setAnnouncementDate(format(twoWeeksLater, 'yyyy-MM-dd\'T\'HH:mm'));
+    }, [currentDateTime]);
 
     const [searchSubj, setSearchSubj] = useState("")
     const [filterSubj, setFilterSubj] = useState([])
@@ -108,6 +119,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
             title: title,
             startAt: startValue,
             expiredAt: expiredValue,
+            announcementDate,
             trackSubj: trackSubj.map((sbj) => sbj.subject_code),
         }
         handleSubmit(formData)
@@ -117,6 +129,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
         startValue,
         expiredValue,
         trackSubj,
+        announcementDate
     ])
 
     return (
@@ -195,6 +208,19 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                                 setExpiredValue(e.target.value)
                                             }}
                                             min={startValue}
+                                        />
+                                        <Input
+                                            id='announcementDate'
+                                            type='datetime-local'
+                                            label="วันประกาศผล"
+                                            radius='sm'
+                                            placeholder="วันประกาศผล"
+                                            labelPlacement="outside"
+                                            value={announcementDate || null}
+                                            onChange={(e) => {
+                                                setAnnouncementDate(e.target.value)
+                                            }}
+                                            min={expiredValue}
                                         />
                                     </div>
                                 </div>

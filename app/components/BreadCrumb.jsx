@@ -34,6 +34,7 @@ const BreadCrumb = () => {
         "insert-track": "เพิ่มแทร็ก",
         "suggest-form": "แบบฟอร์มแนะนำแทร็ก",
         "create": "เพิ่มข้อมูล",
+        "news": "จัดการข่าวสาร"
     }
     const url = usePathname();
     const urls = useMemo(() => (url.split("/").filter(e => e)), [url])
