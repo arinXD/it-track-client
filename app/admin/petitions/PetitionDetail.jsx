@@ -63,7 +63,7 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                          window.location.href = "/admin/petitions/" + current
                     } catch (error) {
                          message.error(`มีบางอย่างผิดพลาด ไม่สามารถ${msg}คำร้องได้`)
-                    }finally{
+                    } finally {
                          setIsApproving(false)
                          setIsRejecting(false)
                     }

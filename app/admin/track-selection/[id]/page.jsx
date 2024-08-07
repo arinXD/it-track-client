@@ -108,6 +108,11 @@ const Page = ({ params }) => {
         }
     }, [])
 
+    const cb = useCallback(async (acadyear) => {
+        await initTrackSelect(acadyear)
+        await getStudentNonSelect(acadyear)
+    }, [])
+
     const getTracks = useCallback(async function () {
         let tracks = await fetchData(`/api/tracks/all`)
         if (tracks?.length) {
@@ -329,7 +334,10 @@ const Page = ({ params }) => {
         const data = selecteData[selectedTrack] || undefined
         if (!data) return
         return (
-            <StudentTrackTable trackSubj={trackSubj} studentData={data.studentData} track={data.track} />
+            <StudentTrackTable
+                trackSubj={trackSubj}
+                studentData={data.studentData}
+                track={data.track} />
         )
     }, [
         selectedTrack,
@@ -945,7 +953,15 @@ const Page = ({ params }) => {
                                                     >
                                                         <div>
                                                             <p className='text-default-900 text-small my-4'>รายชื่อนักศึกษาที่เข้ารับการคัดเลือก ทั้งหมด {studentsSelect?.students?.length} คน</p>
-                                                            <StudentTrackTable trackSubj={trackSubj} studentData={studentsSelect} title={false} track={"กำลังคัดเลือก"} />
+                                                            <StudentTrackTable
+                                                                cb={cb}
+                                                                acadyear={trackSelect.acadyear}
+                                                                isManagable={true}
+                                                                trackSubj={trackSubj}
+                                                                studentData={studentsSelect}
+                                                                title={false}
+                                                                tracks={tracks}
+                                                                track={"กำลังคัดเลือก"} />
                                                         </div>
                                                     </Tab>
                                                     <Tab

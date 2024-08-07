@@ -300,7 +300,7 @@ const SidebarDrawer = () => {
                                              onClick={closeDrawer}
                                              href="/"
                                              className="cursor-pointer flex items-center p-2 md:ps-0 text-gray-900 rounded-lg active:scale-95">
-                                             <img className="h-6 mb-[0.4rem] w-auto ml-[10px]" src="/new_logo.svg" alt="it kku" />
+                                             <img className="h-6 mb-[0.4rem] w-auto ml-[10px]" src="/logo.svg" alt="it kku" />
                                         </p>
                                    </div>
                               </div>

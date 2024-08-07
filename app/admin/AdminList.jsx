@@ -82,7 +82,7 @@ const AdminList = () => {
 
           return (
                <div key={index} className="mb-10">
-                    <h2 className="mb-5 text-2xl font-bold text-gray-800 border-b pb-2">{category.title}</h2>
+                    <h2 className="mb-5 text-2xl font-bold text-gray-800 border-b border-b-gray-300 pb-2">{category.title}</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
                          {visibleLinks.map(renderMenuItem)}
                     </div>

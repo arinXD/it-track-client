@@ -17,7 +17,7 @@ const Page = () => {
      const [sending, setSending] = useState(false);
 
      const getOldTrack = useCallback(async () => {
-          const option = await getOptions(`/api/selections/${session?.user?.stu_id}`, 'get')
+          const option = await getOptions(`/api/selections/stu-id/${session?.user?.stu_id}`, 'get')
           try {
                const { result } = (await axios(option)).data.data
                setOldTrack(result)

@@ -8,7 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchData } from '../action'
 import axios from 'axios';
-import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+import { getOptions } from '@/app/components/serverAction/TokenAction'
 import { useDisclosure } from "@nextui-org/react";
 import { getAcadyears } from '@/src/util/academicYear';
 
@@ -99,7 +99,7 @@ const Page = () => {
     const handleDelete = useCallback(async function (acadyear) {
         swal.fire({
             text: `ต้องการลบการคัดแทร็กปีการศึกษา ${acadyear} หรือไม่ ?`,
-            icon: "warning",
+            icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
@@ -127,7 +127,7 @@ const Page = () => {
     const handleStartSelect = useCallback(async function ({ id, hasFinished }) {
         swal.fire({
             text: `ต้องการ${hasFinished ? "เปลี่ยนสถานะการคัดเลือก" : "เริ่มคัดเลือก"}หรือไม่?`,
-            icon: "warning",
+            icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",

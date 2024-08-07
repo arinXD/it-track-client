@@ -27,7 +27,7 @@ const TrackSubjectTable = ({ trackSubj }) => {
                                     <TableCell className=''>{subj.subject_code}</TableCell>
                                     <TableCell className="w-1/3">{subj.title_en}</TableCell>
                                     <TableCell className="w-1/3">{subj.title_th}</TableCell>
-                                    <TableCell>{subj.credit}</TableCell>
+                                    <TableCell className='text-center'>{subj.credit}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody> :

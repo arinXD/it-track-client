@@ -1,17 +1,29 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Input, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from "@nextui-org/react";
-import { SearchIcon } from "@/app/components/icons";
-import { minimalTableClass, tableClass, thinInputClass } from '@/src/util/ComponentClass';
+import { Input, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, useDisclosure } from "@nextui-org/react";
+import { DeleteIcon2, EditIcon2, PlusIcon, SearchIcon } from "@/app/components/icons";
+import { deleteColor, insertColor, minimalTableClass, SELECT_STYLE, tableClass, thinInputClass } from '@/src/util/ComponentClass';
 import { calGrade, floorGpa } from '@/src/util/grade';
 import { isNumber } from '../../../../src/util/grade';
-import { Empty } from 'antd';
+import { Empty, message } from 'antd';
+import axios from 'axios';
+import { getOptions } from '@/app/components/serverAction/TokenAction';
+import { swal } from '@/src/util/sweetyAlert';
+import InsertModal from './InsertModal';
+import EditModal from './EditModal';
 
-const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
+const StudentTrackTable = ({
+    cb = async () => { }, acadyear = 0, tracks = [], isManagable = false,
+    studentData, track, title = true, trackSubj
+}) => {
     const displayNull = useCallback(function (string) {
         return string ? string === "Web and Mobile" ? "Web" : string : "-"
     }, [])
     const initColumns = useMemo(() => [
+        {
+            name: "Actions",
+            uid: "actions",
+        },
         {
             name: "รหัสนักศึกษา",
             uid: "stuId",
@@ -53,24 +65,34 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
             sortable: true
         },
     ], [])
+
     const subjects = trackSubj.map(subj => {
         return {
             name: subj.subject_code,
             uid: subj.subject_code,
         }
     })
-    const columns = [...initColumns.slice(0, 3), ...subjects, ...initColumns.slice(3, initColumns.length)];
-    const students = studentData?.students
-    const [filterValue, setFilterValue] = useState("");
-    const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-    const [visibleColumns, setVisibleColumns] = useState(new Set(columns.map(column => column.uid)));
-    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortDescriptor, setSortDescriptor] = useState({
         column: "coursesType",
         direction: "ascending",
     });
-    const [page, setPage] = useState(1);
+    const columns = [...initColumns.slice(0, 3), ...subjects, ...initColumns.slice(3, initColumns.length)];
+    const students = studentData?.students
+    const [filterValue, setFilterValue] = useState("");
+    const [visibleColumns, setVisibleColumns] = useState(new Set(columns.map(column => column.uid)));
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
+    const [disableSelectDelete, setDisableSelectDelete] = useState(true);
+    const [selectedKeys, setSelectedKeys] = useState(new Set([]));
+    const [selectedRecords, setSelectedRecords] = useState([]);
+    const [deleting, setDeleting] = useState(false);
+
+    const [selectionId, setSelectionId] = useState(null);
+
+    const { isOpen: isInsertOpen, onOpen: onInsertOpen, onClose: onInsertClose } = useDisclosure();
+    const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
+
+    const [page, setPage] = useState(1);
     const hasSearchFilter = Boolean(filterValue);
 
     const headerColumns = useMemo(() => {
@@ -94,7 +116,8 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                 });
                 const score = floorGpa(totalScore / 12)
                 return {
-                    action: student.stu_id,
+                    id: student?.id,
+                    action: student.id,
                     stuId: student.stu_id,
                     fullName: `${student?.Student?.first_name} ${student?.Student?.last_name}`,
                     coursesType: student?.Student?.courses_type,
@@ -153,19 +176,6 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
         }
     }, [filteredItems, rowsPerPage])
 
-
-    const onNextPage = useCallback(() => {
-        if (page < pages) {
-            setPage(page + 1);
-        }
-    }, [page, pages]);
-
-    const onPreviousPage = useCallback(() => {
-        if (page > 1) {
-            setPage(page - 1);
-        }
-    }, [page]);
-
     const onRowsPerPageChange = useCallback((e) => {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
@@ -190,7 +200,7 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
             return null
         }
         return (
-            <div className="py-2 flex justify-between items-center">
+            <div className="py-2 flex justify-center items-center">
                 <Pagination
                     isCompact
                     showControls
@@ -203,53 +213,150 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     boundaries={3}
                     onChange={setPage}
                 />
-                <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
-                        Previous
-                    </Button>
-                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
-                        Next
-                    </Button>
-                </div>
             </div>
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
+    useEffect(() => {
+        let sl
+        if (selectedKeys == "all") {
+            sl = sortedItems.map(e => parseInt(e.id))
+            setDisableSelectDelete(false)
+        } else {
+            sl = [...selectedKeys.values()].map(id => id)
+            sl = sortedItems.map(item => {
+                if (sl.includes(item.stuId)) return item.id
+            }).filter(e => e)
+            if (sl.length === 0) {
+                setDisableSelectDelete(true)
+            } else {
+                setDisableSelectDelete(false)
+            }
+        }
+        setSelectedRecords(sl)
+    }, [selectedKeys])
+
+    const handleDeleted = useCallback((ids) => {
+        swal.fire({
+            text: `ต้องการลบข้อมูลหรือไม่ ?`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก",
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                setDeleting(true)
+                const options = await getOptions("/api/selections/multiple", 'DELETE', ids)
+                axios(options)
+                    .then(async result => {
+                        const { message: msg } = result.data
+                        message.success(msg)
+                        setSelectedKeys([])
+                        await cb(acadyear)
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        setDeleting(false)
+                    })
+            }
+        });
+    }, [cb, acadyear])
+
+    const handleEdit = useCallback((id) => {
+        setSelectionId(id)
+        onEditOpen()
+    }, [])
+
     return (
         <div>
+            {isManagable &&
+                <>
+                    <InsertModal
+                        acadyear={acadyear}
+                        cb={cb}
+                        isOpen={isInsertOpen}
+                        onClose={onInsertClose}
+                        tracks={tracks}
+                    />
+
+                    <EditModal
+                        cb={cb}
+                        id={selectionId}
+                        isOpen={isEditOpen}
+                        onClose={onEditClose}
+                        tracks={tracks}
+                    />
+                </>
+            }
             <h2 id={`${track.toLowerCase()}-students`} className='my-4 text-default-900 text-small'>
                 {title && <> รายชื่อนักศึกษาแทร็ก {track} จำนวน {studentData?.students?.length} คน </>}
-                {studentData?.normal > 0 && <>โครงการปกติ {studentData?.normal} คน</>}
-                {studentData?.vip > 0 && <>โครงการพิเศษ {studentData?.vip} คน</>}
             </h2>
-            <div className="flex flex-col gap-4 mb-4">
-                <div className="flex flex-col gap-2 md:gap-0 md:flex-row justify-between items-end">
-                    <Input
-                        isClearable
-                        className="w-[50%] h-fit"
-                        classNames={thinInputClass}
-                        placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, ชื่อ, โครงการ, แทร็ก)"
-                        size="sm"
-                        radius='sm'
-                        startContent={<SearchIcon />}
-                        value={filterValue}
-                        onClear={() => onClear()}
-                        onValueChange={onSearchChange}
-                    />
-                    <label className="flex items-center text-default-400 text-small">
-                        Rows per page:
-                        <select
-                            className="border border-gray-500 rounded-md outline-none ms-3 px-1 text-default-400 text-small"
-                            onChange={onRowsPerPageChange}
-                        >
-                            <option value="10">10</option>
-                            <option value="30">30</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value={studentData?.students?.length || 150}>ทั้งหมด</option>
-                        </select>
-                    </label>
+            <div className="flex justify-between items-center mb-4">
+                <span className="text-default-400 text-small">
+                    {studentData?.normal > 0 && <>โครงการปกติ {studentData?.normal} คน</>}
+                    {studentData?.vip > 0 && <>โครงการพิเศษ {studentData?.vip} คน</>}
+                </span>
+                <div className="flex items-center text-default-400 text-small">
+                    Rows per page:
+                    <select
+                        style={{
+                            ...SELECT_STYLE,
+                            height: "32px",
+                            backgroundPositionY: "2px",
+                        }}
+                        className="ms-2 px-2 pe-3 py-1 border-1 rounded-lg text-sm"
+                        onChange={onRowsPerPageChange}
+                    >
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="150">150</option>
+                        <option value={studentData?.students?.length}>ทั้งหมด</option>
+                    </select>
                 </div>
+            </div>
+            <div className='flex gap-4'>
+                <Input
+                    isClearable
+                    className="w-full h-fit mb-4"
+                    classNames={thinInputClass}
+                    placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, ชื่อ, โครงการ, แทร็ก)"
+                    size="sm"
+                    radius='sm'
+                    startContent={<SearchIcon />}
+                    value={filterValue}
+                    onClear={() => onClear()}
+                    onValueChange={onSearchChange}
+                />
+                {isManagable &&
+                    <div className="flex gap-4">
+                        <Button
+                            size="sm"
+                            className={insertColor.color}
+                            radius="sm"
+                            onClick={onInsertOpen}
+                            startContent={<PlusIcon className="w-5 h-5" />}>
+                            เพิ่มข้อมูล
+                        </Button>
+                        <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
+                            <Button
+                                radius="sm"
+                                size="sm"
+                                isLoading={deleting}
+                                isDisabled={disableSelectDelete}
+                                onPress={() => handleDeleted(selectedRecords)}
+                                color="danger"
+                                className={deleteColor.color}
+                                startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                                ลบรายการที่เลือก
+                            </Button>
+                        </div>
+                    </div>
+                }
             </div>
             <Table
                 aria-label={`Student Track Table`}
@@ -258,21 +365,21 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                 bottomContent={bottomContent}
                 bottomContentPlacement="outside"
 
-                // selectionMode="multiple"
+                selectionMode={isManagable ? "multiple" : "none"}
                 classNames={{
                     ...minimalTableClass,
-                    wrapper: "w-full",
-                    td: [
-                        "border-b"
-                    ]
+                    wrapper: "w-full overflow-x-auto",
                 }}
-                // onSelectionChange={setSelectedKeys}
+                isStriped
+                selectedKeys={selectedKeys}
+                onSelectionChange={setSelectedKeys}
                 onSortChange={setSortDescriptor}
                 sortDescriptor={sortDescriptor}
                 onRowAction={() => { }}>
                 <TableHeader columns={headerColumns}>
                     {(column) => (
                         <TableColumn
+                            className={(column.uid === 'actions' && !isManagable) && "hidden"}
                             key={column.uid}
                             allowsSorting={column.sortable}
                         >
@@ -293,6 +400,19 @@ const StudentTrackTable = ({ studentData, track, title = true, trackSubj }) => {
                     items={sortedItems}>
                     {(item) => (
                         <TableRow key={item.stuId}>
+                            <TableCell className={`w-1/6 text-center ${!isManagable && "hidden"}`}>
+                                <Button
+                                    size='sm'
+                                    color='warning'
+                                    isIconOnly
+                                    aria-label="แก้ไข"
+                                    className='p-2'
+                                    isDisabled={!isManagable}
+                                    onClick={() => handleEdit(item?.id)}
+                                >
+                                    <EditIcon2 className="w-5 h-5 text-yellow-600" />
+                                </Button>
+                            </TableCell>
                             <TableCell className='w-1/6'>{item?.stuId}</TableCell>
                             <TableCell className='w-1/6'>{item?.fullName}</TableCell>
                             <TableCell>{item?.coursesType}</TableCell>
