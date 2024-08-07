@@ -1,7 +1,7 @@
 "use client"
 import { simpleDMY } from "@/src/util/simpleDateFormatter"
 import { Empty } from "antd"
-import { sanitize } from "dompurify"
+import { sanitize } from "isomorphic-dompurify";
 import Image from "next/image"
 import Link from "next/link"
 
