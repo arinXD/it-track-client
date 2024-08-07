@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { IoArrowBack, IoArrowForward } from "react-icons/io5";
-import { message } from "antd";
+import { Empty, message } from "antd";
 import { swal } from "@/src/util/sweetyAlert";
 import { RiDeleteBin6Line, RiPencilLine } from "react-icons/ri";
 
