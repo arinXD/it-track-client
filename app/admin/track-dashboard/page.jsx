@@ -255,7 +255,7 @@ export default function Page() {
     const trackPopularityEachYear = useMemo(() => {
         const allTracks = Array.from(new Set(popularity.flatMap(year =>
             year.result.flatMap(type =>
-                type.data.map(item => item.track || 'ไม่ระบุ')
+                type.data.map(item => item.track || 'ไม่เข้าคัดเลือก')
             )
         )));
 

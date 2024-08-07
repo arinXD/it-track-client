@@ -23,7 +23,7 @@ const TeacherList = ({ teachers }) => {
                     </div>
                     :
                     <>
-                        <div className="flex flex-wrap justify-center items-center gap-4 w-full my-9 max-2xl:px-0">
+                        <div className="flex flex-wrap justify-center items-center gap-10 w-full my-9 max-2xl:px-0">
                             {teachers.length > 0 && teachers?.map((teacher, index) => (
                                 <div
                                     data-aos="fade-up"

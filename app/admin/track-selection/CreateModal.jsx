@@ -5,6 +5,7 @@ import { Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button
 import { Textarea, Select, SelectItem } from "@nextui-org/react";
 import { Icon } from '@iconify/react';
 import { getCurrentDate } from '@/src/util/dateFormater';
+import { thinInputClass } from '@/src/util/ComponentClass';
 
 export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, onClose }) {
     const defaultSubj = useMemo(() => ["SC361002", "SC361003", "SC361004", "SC361005"], [])
@@ -18,8 +19,19 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
     const [title, setTitle] = useState("")
     const [acadValue, setAcadValue] = useState("")
     const [startValue, setStartValue] = useState(format(currentDateTime, 'yyyy-MM-dd\'T\'HH:mm'));
-    const [expiredValue, setExpiredValue] = useState(format(currentDateTime, 'yyyy-MM-dd\'T\'HH:mm'))
+    const [expiredValue, setExpiredValue] = useState("")
+    const [announcementDate, setAnnouncementDate] = useState("");
     const [trackSubj, setTrackSubj] = useState([])
+
+    useEffect(() => {
+        const nextWeek = new Date(currentDateTime);
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        setExpiredValue(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
+
+        const twoWeeksLater = new Date(currentDateTime);
+        twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+        setAnnouncementDate(format(twoWeeksLater, 'yyyy-MM-dd\'T\'HH:mm'));
+    }, [currentDateTime]);
 
     const [searchSubj, setSearchSubj] = useState("")
     const [filterSubj, setFilterSubj] = useState([])
@@ -108,6 +120,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
             title: title,
             startAt: startValue,
             expiredAt: expiredValue,
+            announcementDate,
             trackSubj: trackSubj.map((sbj) => sbj.subject_code),
         }
         handleSubmit(formData)
@@ -117,6 +130,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
         startValue,
         expiredValue,
         trackSubj,
+        announcementDate
     ])
 
     return (
@@ -133,7 +147,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                         <form onSubmit={createAcad}>
                             <ModalHeader className="flex flex-col gap-1">เพิ่มการคัดเลือกแทร็ก</ModalHeader>
                             <ModalBody>
-                                <div className='grid grid-cols-2 gap-3'>
+                                <div className='grid grid-cols-2 gap-6'>
                                     <div className='flex flex-col gap-3'>
                                         <Select
                                             isRequired
@@ -141,7 +155,9 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                             labelPlacement="outside"
                                             placeholder="เลือกปีการศึกษา"
                                             selectedKeys={[acadValue]}
-                                            radius={"sm"}
+                                            radius='sm'
+                                            variant='bordered'
+                                            classNames={thinInputClass}
                                             name={"acadyear"}
                                             disabledKeys={[""]}
                                             scrollShadowProps={{
@@ -161,12 +177,14 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                         <Textarea
                                             isRequired
                                             radius={"sm"}
-                                            label="title"
+                                            label="หัวเรื่อง"
                                             labelPlacement="outside"
                                             placeholder=""
                                             name="title"
                                             onChange={(e) => setTitle(e.target.value)}
                                             value={title}
+                                            variant='bordered'
+                                            classNames={thinInputClass}
                                         />
                                     </div>
                                     <div className='flex flex-col gap-3'>
@@ -182,6 +200,8 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                                 setStartValue(e.target.value)
                                             }}
                                             min={getCurrentDate()}
+                                            variant='bordered'
+                                            classNames={thinInputClass}
                                         />
                                         <Input
                                             type='datetime-local'
@@ -195,52 +215,81 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                                 setExpiredValue(e.target.value)
                                             }}
                                             min={startValue}
+                                            variant='bordered'
+                                            classNames={thinInputClass}
+                                        />
+                                        <Input
+                                            id='announcementDate'
+                                            type='datetime-local'
+                                            label="วันประกาศผล"
+                                            radius='sm'
+                                            placeholder="วันประกาศผล"
+                                            labelPlacement="outside"
+                                            value={announcementDate || null}
+                                            onChange={(e) => {
+                                                setAnnouncementDate(e.target.value)
+                                            }}
+                                            min={expiredValue}
+                                            variant='bordered'
+                                            classNames={thinInputClass}
                                         />
                                     </div>
                                 </div>
-                                <div className='flex flex-row gap-3 mt-3'>
-                                    <div className='w-1/2 flex flex-col'>
-                                        <p>วิชาที่ใช้ในการคัดเลือก</p>
-                                        <ul className='h-[210px] overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
-                                            {trackSubj.length > 0 ?
-                                                trackSubj.map((sbj, index) => (
-                                                    <li key={index} className='bg-gray-100 rounded-md relative p-1 gap-2 border-1 border-b-gray-300'>
-                                                        <input
-                                                            readOnly
-                                                            className='bg-gray-100 block focus:outline-none font-bold'
-                                                            type="text"
-                                                            name="trackSubj[]"
-                                                            value={sbj.subject_code} />
-                                                        <p className='flex flex-col text-sm'>
-                                                            <span>{sbj.title_th}</span>
-                                                        </p>
-                                                        <Icon onClick={() => delSubj(sbj.subject_code)} icon="lets-icons:dell-duotone" className="absolute top-1 right-1 w-6 h-6 cursor-pointer active:scale-95 hover:opacity-80" />
-                                                    </li>
-                                                ))
-                                                :
-                                                <li>ยังไม่มีวิชาในการคัดเลือก</li>}
-                                        </ul>
+                                <div className="flex flex-col md:flex-row gap-6 mt-2">
+                                    <div className="w-full md:w-1/2">
+                                        <h3 className="text-normal font-semibold mb-2">วิชาที่ใช้ในการคัดเลือก {trackSubj.length} วิชา</h3>
+                                        <div className="h-[234px] overflow-y-auto border border-gray-200 rounded-lg shadow-sm">
+                                            {trackSubj.length > 0 ? (
+                                                <ul className="divide-y divide-gray-200">
+                                                    {trackSubj.map((sbj, index) => (
+                                                        <li key={index} className="p-3 hover:bg-gray-50 transition-colors duration-150 ease-in-out">
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <p className="font-medium text-gray-900">{sbj.subject_code}</p>
+                                                                    <p className="text-sm text-gray-600">{sbj.title_th}</p>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => delSubj(sbj.subject_code)}
+                                                                    className="text-red-500 hover:text-red-700 focus:outline-none"
+                                                                >
+                                                                    <Icon icon="heroicons-outline:trash" className="w-5 h-5" />
+                                                                </button>
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <p className="text-center text-gray-500 py-4">ยังไม่มีวิชาในการคัดเลือก</p>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className='w-1/2'>
-                                        <p>ค้นหาวิชาเพื่อเพิ่ม</p>
-                                        <div className='flex flex-col'>
+
+                                    <div className="w-full md:w-1/2">
+                                        <h3 className="text-normal font-semibold mb-2">ค้นหาวิชาเพื่อเพิ่ม</h3>
+                                        <div className="mb-3">
                                             <input
-                                                className='rounded-md border-1 w-full px-2 focus:outline-none mb-1'
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                                                 type="search"
                                                 value={searchSubj}
                                                 onChange={(e) => setSearchSubj(e.target.value)}
-                                                placeholder='ค้นหาวิชา' />
-
-                                            <ul className='rounded-md border-1 h-[180px] overflow-y-auto p-2 flex flex-col gap-1'>
+                                                placeholder="ค้นหาวิชา"
+                                            />
+                                        </div>
+                                        <div className="h-[180px] overflow-y-auto border border-gray-200 rounded-lg shadow-sm">
+                                            <ul className="divide-y divide-gray-200">
                                                 {filterSubj.map((subject, index) => (
-                                                    !(trackSubj.map(z => z.subject_code).includes(subject.subject_code)) &&
-                                                    <li onClick={() => addSubj(subject)} key={index} className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border-1 border-b-gray-300 cursor-pointer'>
-                                                        <strong className='block'>{subject.subject_code}</strong>
-                                                        <p className='flex flex-col text-sm'>
-                                                            <span>{subject.title_en}</span>
-                                                            <span>{subject.title_th}</span>
-                                                        </p>
-                                                    </li>
+                                                    !trackSubj.map(z => z.subject_code).includes(subject.subject_code) && (
+                                                        <li
+                                                            key={index}
+                                                            onClick={() => addSubj(subject)}
+                                                            className="p-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 ease-in-out"
+                                                        >
+                                                            <p className="font-medium text-gray-900">{subject.subject_code}</p>
+                                                            <p className="text-sm text-gray-600">{subject.title_en}</p>
+                                                            <p className="text-sm text-gray-500">{subject.title_th}</p>
+                                                        </li>
+                                                    )
                                                 ))}
                                             </ul>
                                         </div>

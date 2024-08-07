@@ -108,6 +108,11 @@ const Page = ({ params }) => {
         }
     }, [])
 
+    const cb = useCallback(async (acadyear) => {
+        await initTrackSelect(acadyear)
+        await getStudentNonSelect(acadyear)
+    }, [])
+
     const getTracks = useCallback(async function () {
         let tracks = await fetchData(`/api/tracks/all`)
         if (tracks?.length) {
@@ -329,7 +334,10 @@ const Page = ({ params }) => {
         const data = selecteData[selectedTrack] || undefined
         if (!data) return
         return (
-            <StudentTrackTable trackSubj={trackSubj} studentData={data.studentData} track={data.track} />
+            <StudentTrackTable
+                trackSubj={trackSubj}
+                studentData={data.studentData}
+                track={data.track} />
         )
     }, [
         selectedTrack,
@@ -510,13 +518,13 @@ const Page = ({ params }) => {
 
         // all
         const sorceKey = ["No.", "stuid", "email", "name", "program", "Score", "GPA", "Result"]
-        const studentGpa = await fetchData(`/api/students/enrollments/${trackSelect.acadyear}/gpa`)
+        const studentGpa = await fetchData(`/api/students/enrollments/${trackSelect.acadyear}/gpa/all`)
         const all = [...regData, ...speData].map(row => {
             const targerData = {}
             for (const key of Object.keys(row)) {
                 if (sorceKey.includes(key)) {
                     if (key == "Result") {
-                        targerData.GPA = floorGpa(studentGpa.filter(stuGpa => stuGpa.stuid == row.stuid)[0].gpa)
+                        targerData.GPA = floorGpa(studentGpa.filter(stuGpa => stuGpa.stuid == row.stuid)[0]?.gpa || 0.00)
                         targerData[key] = row[key]
                     } else if (key == "program") {
                         targerData[key] = row[key] == "โครงการปกติ" ? "Regular" : "Special"
@@ -667,6 +675,13 @@ const Page = ({ params }) => {
                                                         classNames={inputClass}
                                                         onChange={(e) => {
                                                             setStartAt(e.target.value)
+                                                            const nextWeek = new Date(e.target.value);
+                                                            nextWeek.setDate(nextWeek.getDate() + 7);
+                                                            setExpiredAt(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
+
+                                                            nextWeek.setDate(nextWeek.getDate() + 7);
+                                                            setAnnouncementDate(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
+
                                                             handleValueChange({ startAt: e.target.value })
                                                         }}
                                                         min={getCurrentDate()}
@@ -684,6 +699,9 @@ const Page = ({ params }) => {
                                                         classNames={inputClass}
                                                         onChange={(e) => {
                                                             setExpiredAt(e.target.value)
+                                                            const nextWeek = new Date(e.target.value);
+                                                            nextWeek.setDate(nextWeek.getDate() + 7);
+                                                            setAnnouncementDate(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
                                                             handleValueChange({ expiredAt: e.target.value })
                                                         }}
                                                         min={startAt}
@@ -935,7 +953,15 @@ const Page = ({ params }) => {
                                                     >
                                                         <div>
                                                             <p className='text-default-900 text-small my-4'>รายชื่อนักศึกษาที่เข้ารับการคัดเลือก ทั้งหมด {studentsSelect?.students?.length} คน</p>
-                                                            <StudentTrackTable trackSubj={trackSubj} studentData={studentsSelect} title={false} track={"กำลังคัดเลือก"} />
+                                                            <StudentTrackTable
+                                                                cb={cb}
+                                                                acadyear={trackSelect.acadyear}
+                                                                isManagable={true}
+                                                                trackSubj={trackSubj}
+                                                                studentData={studentsSelect}
+                                                                title={false}
+                                                                tracks={tracks}
+                                                                track={"กำลังคัดเลือก"} />
                                                         </div>
                                                     </Tab>
                                                     <Tab

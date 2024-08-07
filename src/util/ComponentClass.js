@@ -99,7 +99,17 @@ const bgGrayColor = {
 const deleteColor = {
     color: "bg-red-400"
 }
-
+const SELECT_STYLE = {
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    background: 'white',
+    backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPositionX: '99%',
+    backgroundPositionY: '8px',
+    border: '1px solid #dfdfdf',
+    paddingRight: '1.7rem'
+}
 module.exports = {
     tableClass,
     inputClass,
@@ -110,4 +120,5 @@ module.exports = {
     deleteColor,
     warningColor,
     bgGrayColor,
+    SELECT_STYLE
 }

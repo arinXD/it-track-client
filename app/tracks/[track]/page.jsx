@@ -38,11 +38,20 @@ const getSubjects = async (track) => {
     }
 }
 
+const getCareers = async (track) => {
+    try {
+        const URL = `/api/careers/tracks/${track}`
+        const option = await getOptions(URL, "GET")
+        const response = await axios(option)
+        return response.data.data
+    } catch (error) {
+        return []
+    }
+}
+
 const Page = async ({ params }) => {
     const { track } = params
-    const trackData = await getTrack(track)
-    const teachers = await getTeachers(track)
-    const subjects = await getSubjects(track)
+    const [trackData, teachers, subjects, careers] = await Promise.all([getTrack(track), getTeachers(track), getSubjects(track), getCareers(track)])
     return (
         <>
             <header>
@@ -58,15 +67,9 @@ const Page = async ({ params }) => {
                             <TeacherList teachers={teachers} />
                             <SubjectList
                                 track={trackData}
-                                subjects={subjects} />
+                                subjects={subjects}
+                                careers={careers} />
                         </TrackSection>
-                        {/* <section className='p-4 md:p-6 md:ml-[240px]'>
-                            <BreadCrumb />
-                            <TeacherList teachers={teachers} />
-                            <SubjectList
-                                track={trackData}
-                                subjects={subjects} />
-                        </section> */}
                     </>
                     :
                     <div className='mt-16 md:ml-[240px] pt-10 flex items-center justify-center'>
