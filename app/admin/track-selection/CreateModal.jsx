@@ -6,6 +6,7 @@ import { Textarea, Select, SelectItem } from "@nextui-org/react";
 import { Icon } from '@iconify/react';
 import { getCurrentDate } from '@/src/util/dateFormater';
 import { thinInputClass } from '@/src/util/ComponentClass';
+import { Empty } from 'antd';
 
 export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, onClose }) {
     const defaultSubj = useMemo(() => ["SC361002", "SC361003", "SC361004", "SC361005"], [])
@@ -260,7 +261,13 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                                     ))}
                                                 </ul>
                                             ) : (
-                                                <p className="text-center text-gray-500 py-4">ยังไม่มีวิชาในการคัดเลือก</p>
+                                                <div className="flex items-center justify-center h-full">
+                                                    <Empty
+                                                        description={
+                                                            <span className='text-default-300'>ยังไม่มีวิชาที่เลือก</span>
+                                                        }
+                                                    />
+                                                </div>
                                             )}
                                         </div>
                                     </div>

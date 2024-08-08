@@ -383,7 +383,7 @@ const Page = () => {
                          )}
                     </TableHeader>
                     <TableBody
-                         isLoading={fetching}
+                         isLoading={fetching || deleting}
                          loadingContent={<Spinner />}
                          emptyContent={
                               <Empty

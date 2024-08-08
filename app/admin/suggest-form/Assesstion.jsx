@@ -3,10 +3,10 @@ import { getOptions } from "@/app/components/serverAction/TokenAction";
 import axios from "axios";
 import { createRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MdOutlineInventory2 } from "react-icons/md";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spinner } from "@nextui-org/react"
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spinner, Chip } from "@nextui-org/react"
 import { Checkbox, Empty } from 'antd';
 import { PlusIcon, SearchIcon } from "@/app/components/icons";
-import { thinInputClass } from "@/src/util/ComponentClass";
+import { SELECT_STYLE, thinInputClass } from "@/src/util/ComponentClass";
 import { FaRegTrashAlt } from "react-icons/fa";
 
 const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAssesstion }) => {
@@ -16,6 +16,7 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
     const [fetching, setFetching] = useState(false);
     const [defaultQuestionBank, setDefaultQuestionBank] = useState([]);
     const [questionsBank, setQuestionsBank] = useState([]);
+    const [searchTrack, setSearchTrack] = useState("all");
 
     const getQuestions = useCallback(async (formId) => {
         if (!formId) {
@@ -69,15 +70,22 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
     }, [])
 
     const filteredItems = useMemo(() => {
-        let filterData = [...questionsBank]
+        let filterData = [...questionsBank];
+
+        if (searchTrack !== "all") {
+            filterData = filterData.filter((q) =>
+                q.track.toLowerCase().includes(searchTrack.toLowerCase())
+            );
+        }
 
         if (filterValue) {
             filterData = filterData.filter((q) =>
                 q.question.toLowerCase().includes(filterValue.toLowerCase())
-            )
+            );
         }
-        return filterData
-    }, [filterValue, questionsBank])
+
+        return filterData;
+    }, [filterValue, questionsBank, searchTrack]);
 
     const createQuestion = useCallback(() => {
         setAssesstion((prevQuestions) => {
@@ -175,36 +183,62 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                     <ModalContent>
                         {(onClose) => (
                             <>
-                                <ModalHeader className="flex flex-col gap-1 border-b-1">
-                                    <p className="mb-1">คลังคำถาม</p>
-                                    <Input
-                                        isClearable
-                                        className="w-full h-fit rounded-[5px]"
-                                        placeholder="ค้นหาคำถาม"
-                                        size="sm"
-                                        classNames={thinInputClass}
-                                        startContent={<SearchIcon />}
-                                        value={filterValue}
-                                        onValueChange={onSearchChange}
-                                    />
+                                <ModalHeader className="flex items-end gap-1">
+                                    <div className="w-full flex flex-col gap-1">
+                                        <p className="mb-1">คลังคำถามแบบประเมิน</p>
+                                        <Input
+                                            isClearable
+                                            className="w-full h-fit rounded-[5px]"
+                                            placeholder="ค้นหาคำถาม"
+                                            size="sm"
+                                            classNames={thinInputClass}
+                                            startContent={<SearchIcon />}
+                                            value={filterValue}
+                                            onValueChange={onSearchChange}
+                                        />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] mb-0 text-gray-800 h-fit">แทร็ก</p>
+                                        <select
+                                            className="border-1 !text-xs !font-normal border-gray-200 rounded-[8px] p-2"
+                                            style={{
+                                                ...SELECT_STYLE,
+                                                height: "32px",
+                                                backgroundPositionY: "3px",
+                                            }}
+                                            onChange={(e) => setSearchTrack(e.target.value)}
+                                            value={searchTrack}>
+                                            <option value="all">ทั้งหมด</option>
+                                            {tracks?.map((track, tIndex) => (
+                                                <option key={tIndex} value={track.track}>{track.track}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </ModalHeader>
-                                <ModalBody className="py-4">
+                                <ModalBody className="my-0 border-y py-0 px-6">
                                     <section className="!h-[350px] overflow-y-auto flex flex-col gap-2">
                                         {
                                             filteredItems?.length > 0 ?
                                                 filteredItems.map((q, index) => (
-                                                    <Checkbox
-                                                        onChange={(e) => selectQuestion(e, q.id)}
-                                                        key={index}
-                                                        className="w-full cursor-pointer flex gap-2 border p-4 rounded-[5px]"
-                                                        name={`questionBank[]`}
-                                                    >
-                                                        <div className="w-full flex flex-col gap-2">
-                                                            <p>
-                                                                {q.question}
-                                                            </p>
-                                                        </div>
-                                                    </Checkbox>
+                                                    <div className="first-of-type:mt-4 last-of-type:mb-4 my-2">
+                                                        <Checkbox
+                                                            onChange={(e) => selectQuestion(e, q.id)}
+                                                            key={index}
+                                                            className="w-full relative cursor-pointer flex gap-2 border p-4 rounded-[5px]"
+                                                            name={`questionBank[]`}
+                                                        >
+                                                            <Chip
+                                                                className="!absolute !p-1 !text-xs top-2 right-2"
+                                                                color={q?.track?.split(" ")[0]?.toLowerCase() === "bit" ? "secondary" : q?.track?.split(" ")[0]?.toLowerCase() === "network" ? "primary" : "success"} variant="flat">
+                                                                {q?.track?.split(" ")[0]}
+                                                            </Chip>
+                                                            <div className="w-full flex flex-col gap-2">
+                                                                <p>
+                                                                    {q.question}
+                                                                </p>
+                                                            </div>
+                                                        </Checkbox>
+                                                    </div>
                                                 ))
                                                 :
                                                 <Empty
@@ -244,19 +278,19 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                         :
                         <>
                             <div className="flex justify-between">
-                                <h2>คำถามประเมินตนเองภายในแบบฟอร์ม</h2>
+                                <h2 className="text-black">คำถามประเมินตนเองภายในแบบฟอร์ม</h2>
                                 <div className="flex justify-end gap-4">
                                     <Button
                                         isIconOnly
                                         radius="full"
-                                        color="default"
+                                        className={`text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
                                         onClick={createQuestion}
                                         aria-label="create">
                                         <PlusIcon />
                                     </Button>
                                     <Button
+                                        className={`rounded-[5px] text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
                                         startContent={<MdOutlineInventory2 />}
-                                        className="rounded-[5px]"
                                         onClick={onOpen}
                                     >
                                         คลังคำถามประเมินตนเอง
@@ -272,11 +306,11 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                                                     <div
                                                         key={index}
                                                         ref={questionRefs.current[index]}
-                                                        className="w-full bg-white border-1 p-4 flex flex-col rounded-[5px] justify-between items-center">
+                                                        className="w-full bg-white border-1 p-4 flex flex-col rounded-lg shadow-md justify-between items-center">
                                                         <div className="w-full flex items-center justify-between gap-4">
                                                             <input readOnly type="hidden" name="assesstion_ID[]" defaultValue={q.id} />
                                                             <input
-                                                                className="text-black p-2 border-b-black border-b bg-gray-100 w-[80%] outline-none focus:border-b-blue-500 focus:border-b-2"
+                                                                className="text-black p-2 border-b-black border-b bg-blue-50 w-[80%] outline-none focus:border-b-blue-500 focus:border-b-2"
                                                                 type="text"
                                                                 name={`assesstion_title_${q.id}`}
                                                                 value={q.question}
@@ -289,7 +323,9 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                                                             <select
                                                                 className="border-1 border-gray-200 rounded-[5px] p-2"
                                                                 name={`trackOf_${q.id}`}
-                                                                id=""
+                                                                style={{
+                                                                    ...SELECT_STYLE
+                                                                }}
                                                                 onChange={(e) => {
                                                                     const updatedAssesstion = [...assesstion];
                                                                     updatedAssesstion[index].track = e.target.value;
@@ -370,17 +406,17 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                 <Button
                     type="button"
                     variant="bordered"
-                    className="rounded-[5px] border-blue-500 text-blue-500 border-1 hover:bg-blue-500 hover:text-white"
+                    className="rounded-[5px] border-white text-black border-1 hover:border-blue-500 hover:text-blue-500"
                     onClick={() => prev()}
                 >
-                    Previous
+                    ย้อนกลับ
                 </Button>
                 <Button
                     type="button"
                     color="primary"
                     className="rounded-[5px]"
                     onClick={() => next()}>
-                    Next
+                    ต่อไป
                 </Button>
             </div>
         </>

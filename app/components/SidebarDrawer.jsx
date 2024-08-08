@@ -72,7 +72,7 @@ const SidebarDrawer = () => {
                activeIcon: <AiFillEdit className="w-5 h-5" />,
                icon: <AiOutlineEdit className="w-5 h-5" />,
                label: "คัดเลือกแทร็ก",
-               condition: true
+               condition: session?.user?.role === "student"
           },
           {
                href: "/student/tracks/exam",
@@ -86,7 +86,7 @@ const SidebarDrawer = () => {
                activeIcon: <HiAcademicCap className="w-5 h-5" />,
                icon: <HiOutlineAcademicCap className="w-5 h-5" />,
                label: "ตรวจสอบสำเร็จการศึกษา",
-               condition: true
+               condition: session?.user?.role === "student"
           }
      ]), [session])
 
@@ -106,13 +106,6 @@ const SidebarDrawer = () => {
                condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
           },
           {
-               href: "/dashboard",
-               activeIcon: <Icon icon="mingcute:chart-pie-2-fill" className="w-5 h-5 text-white" />,
-               icon: <Icon icon="mingcute:chart-pie-2-line" className="w-5 h-5" />,
-               label: "Dashboard",
-               condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
-          },
-          {
                href: "/tracks",
                activeIcon: <HiUserGroup className="w-5 h-5" />,
                icon: <HiOutlineUserGroup className="w-5 h-5" />,
@@ -123,8 +116,8 @@ const SidebarDrawer = () => {
                href: "/student/tracks",
                activeIcon: <AiFillEdit className="w-5 h-5" />,
                icon: <AiOutlineEdit className="w-5 h-5" />,
-               label: "คัดเลือกแทร็ก",
-               condition: true
+               label: "คัดเลือกแทร็ก " + String(session?.user?.role),
+               condition: session?.user?.role === "student"
           },
           {
                href: "/student/tracks/exam",

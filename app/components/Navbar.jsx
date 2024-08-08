@@ -58,7 +58,7 @@ const Navbar = () => {
             activeIcon: <AiFillEdit className="w-5 h-5" />,
             icon: <AiOutlineEdit className="w-5 h-5" />,
             label: "คัดเลือกแทร็ก",
-            condition: true
+            condition: session?.user?.role === "student" 
         },
         {
             href: "/student/tracks/exam",
@@ -153,7 +153,7 @@ const Navbar = () => {
                                         <span>ข้อมูลของฉัน</span>
                                     </div>
                                 </DropdownItem>
-                                <DropdownItem href='/petition/request' key="help_and_feedback">
+                                <DropdownItem href='/petition/request' key="write_petition">
                                     <div className='flex gap-3 items-center'>
                                         <div className='w-5 h-5 flex items-center justify-center'>
                                             <MdEditDocument className='w-5 h-5' />

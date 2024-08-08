@@ -122,35 +122,38 @@ const CareerInventory = ({ isOpen, onClose, defaultCareer, selectedCareers, setS
                                    />
                               </ModalHeader>
                               <ModalBody className="px-6 py-4 gap-0 block w-full h-full overflow-auto">
-                                   {
-                                        filteredItems?.length > 0 ?
-                                             <section className={`w-full border-1 rounded-[5px] grid grid-cols-${filteredItems?.length >= 3 ? 3 : filteredItems?.length} gap-4 bg-gray-100 p-4`}>
+                                   <section className="w-full">
+                                        {filteredItems?.length > 0 ? (
+                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-100 rounded-lg p-4">
                                                   {filteredItems.map((track, index) => (
-                                                       <section
+                                                       <div
                                                             key={index}
-                                                            className="w-full shadow-sm relative bg-white border-1 p-4 rounded-[5px]">
-                                                            <div className="flex justify-between">
-                                                                 <p className="w-1/2 overflow-hidden text-ellipsis whitespace-nowrap">
+                                                            className="bg-white rounded-lg shadow-md p-4 relative"
+                                                       >
+                                                            <div className="flex justify-between items-center mb-2">
+                                                                 <p className="text-gray-800 font-medium truncate w-full">
                                                                       {track.track}
                                                                  </p>
                                                                  <button
                                                                       onClick={() => selectAllInTrack(track)}
-                                                                      className="px-2 text-[10px] border-1 rounded-[5px] bg-gray-100 active:scale-95"
+                                                                      className="w-28 px-2 py-1 text-xs rounded-md bg-gray-200 active:scale-95 hover:bg-gray-300 transition-colors"
                                                                  >
-                                                                      {track.careers.every(career => checkedItems[career.id]) ? 'ลบทั้งหมด' : 'เลือกทั้งหมด'}
+                                                                      {track.careers.every(career => checkedItems[career.id])
+                                                                           ? 'ลบทั้งหมด'
+                                                                           : 'เลือกทั้งหมด'}
                                                                  </button>
                                                             </div>
-                                                            <ul className="flex mt-2 flex-col gap-2 !h-[150px] overflow-y-auto">
+                                                            <ul className="flex flex-col gap-2 max-h-[150px] overflow-y-auto">
                                                                  {track?.careers?.map((career, indexJ) => (
-                                                                      <li
-                                                                           className="w-full h-fit"
-                                                                           key={indexJ}>
+                                                                      <li key={indexJ}>
                                                                            <Checkbox
                                                                                 id={`career-${career.id}`}
                                                                                 value={career.id}
                                                                                 checked={checkedItems[career.id] || false}
-                                                                                onChange={(e) => handleCheckboxChange(e, career.id, career)}
-                                                                                className="w-full cursor-pointer flex gap-2 border p-4 rounded-[5px] hover:border-blue-500 hover:border-2"
+                                                                                onChange={(e) =>
+                                                                                     handleCheckboxChange(e, career.id, career)
+                                                                                }
+                                                                                className="w-full cursor-pointer flex items-center gap-2 bg-white rounded-lg border border-gray-300 p-3 hover:border-blue-500 hover:border-2 transition-colors"
                                                                                 name={career.id}
                                                                            >
                                                                                 {career?.name_en}
@@ -158,17 +161,13 @@ const CareerInventory = ({ isOpen, onClose, defaultCareer, selectedCareers, setS
                                                                       </li>
                                                                  ))}
                                                             </ul>
-                                                       </section>
+                                                       </div>
                                                   ))}
-                                             </section>
-                                             :
-                                             <Empty
-                                                  className='mt-8'
-                                                  description={
-                                                       <span className='text-gray-300'>ไม่มีข้อมูล</span>
-                                                  }
-                                             />
-                                   }
+                                             </div>
+                                        ) : (
+                                             <div className="mt-8 text-gray-400">ไม่มีข้อมูล</div>
+                                        )}
+                                   </section>
                               </ModalBody>
                               <ModalFooter>
                                    <Button

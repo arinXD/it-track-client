@@ -14,7 +14,7 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
           );
      };
 
-     const buttonSizes = [14, 12, 10, 12, 14];
+     const buttonSizes = [5, 5, 5, 5, 5];
      const buttonColors = [
           { bgColor: '#32A474' },
           { bgColor: '#32A474' },
@@ -25,13 +25,21 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
 
      return (
           <div>
+               <div className="flex justify-end">
+                    <div className="w-1/2 flex justify-between gap-2 px-10 mb-4">
+                         <h2 className='text-black w-[20%] text-[.85em] text-center'>มากที่สุด</h2>
+                         <h2 className='text-black w-[20%] text-[.85em] text-center'>ปานกลาง</h2>
+                         <h2 className='text-black w-[20%] text-[.85em] text-center'>น้อยที่สุด</h2>
+                    </div>
+
+               </div>
                {allAssessments?.map((ass, index) => (
                     <div
                          key={ass.id}
-                         className="my-12">
-                         <div className='mx-auto max-w-7xl my-12'>
-                              <div className='flex justify-center gap-1 items-top'>
-                                   <span className="text-gray-600 text-4xl text-center">
+                         className="my-0">
+                         <div className='flex mx-auto max-w-7xl mb-8'>
+                              <div className='w-1/2 flex justify-center gap-1 items-top'>
+                                   <span className="text-gray-600 text-sm text-start">
                                         {ass.question}
                                    </span>
                                    {ass.desc &&
@@ -53,9 +61,8 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
                                         </Popover>
                                    }
                               </div>
-                              <div className='flex justify-center items-center gap-16 text-2xl'>
-                                   <h2 className='text-[#32A474] w-[20%] text-[.85em] text-center'>ฉันเห็นด้วย</h2>
-                                   <div className='flex justify-center items-center gap-16 my-20 w-[50%]'>
+                              <div className='w-1/2 flex justify-center items-start gap-16 text-2xl'>
+                                   <div className='flex justify-center items-center gap-10 '>
                                         {[0, 1, 2, 3, 4].map(number => {
                                              const currentAssessment = assessments.find(assessment => assessment.assId === ass.id);
                                              const isSelected = currentAssessment?.index === number;
@@ -83,16 +90,15 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
                                              );
                                         })}
                                    </div>
-                                   <h2 className='text-[#886199] w-[20%] text-[.85em] text-center'>ฉันไม่เห็นด้วย</h2>
                               </div>
                               {index !== assessments?.length - 1 && <hr className='border-1' />}
                          </div>
                     </div>
                ))}
-               <div className="w-full flex justify-between">
+               <div className="w-full flex justify-between mt-8">
                     <div
                          onClick={prev}
-                         className="cursor-pointer flex flex-row items-center gap-4 opacity-60 hover:opacity-100 transition-all rounded-none p-4"
+                         className="ps-0 cursor-pointer flex flex-row items-center gap-4 opacity-60 hover:opacity-100 transition-all rounded-none p-4"
                     >
                          <MdKeyboardArrowLeft className="w-5 h-5" />
                          <div className="flex flex-col">
@@ -102,7 +108,7 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
                     </div>
                     <div
                          onClick={next}
-                         className="cursor-pointer flex flex-row items-center gap-4 opacity-60 hover:opacity-100 transition-all rounded-none p-4"
+                         className="pe-0 cursor-pointer flex flex-row items-center gap-4 opacity-60 hover:opacity-100 transition-all rounded-none p-4"
                     >
                          <div className="flex flex-col">
                               <span className="text-sm text-default-400">Step 3</span>

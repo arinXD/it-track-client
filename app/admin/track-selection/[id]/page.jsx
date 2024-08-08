@@ -2,7 +2,7 @@
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData, fetchDataObj } from '../../action'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { Button, Tab, Tabs, useDisclosure, Input, Spinner, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
+import { Button, Tab, Tabs, Input, Spinner, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useDisclosure } from "@nextui-org/react";
 import { format } from 'date-fns';
 import Swal from 'sweetalert2'
 import axios from 'axios';
@@ -10,7 +10,7 @@ import { getOptions } from '@/app/components/serverAction/TokenAction';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StudentTrackTable from './StudentTrackTable';
-import { inputClass } from '@/src/util/ComponentClass';
+import { inputClass, minimalTableClass } from '@/src/util/ComponentClass';
 import { getCurrentDate } from '@/src/util/dateFormater';
 import { DeleteIcon2 } from '@/app/components/icons';
 import { FaPlay } from "react-icons/fa";
@@ -23,6 +23,7 @@ import { calGrade, floorGpa, isNumber } from '@/src/util/grade';
 import { utils, writeFile } from "xlsx";
 import { Empty, message } from 'antd';
 import { RiMailSendLine } from "react-icons/ri";
+import InsertSubjectModal from './InsertSubjectModal';
 
 const Page = ({ params }) => {
     const swal = useCallback(Swal.mixin({
@@ -61,8 +62,8 @@ const Page = ({ params }) => {
 
     const { id } = params
     const [loading, setLoading] = useState(true)
-
     const { isOpen, onOpen, onClose } = useDisclosure();
+
     const [trackSubj, setTrackSubj] = useState([])
     const [trackSelect, setTrackSelect] = useState({})
     const [studentsBit, setStudentsBit] = useState({})
@@ -84,6 +85,7 @@ const Page = ({ params }) => {
     const [announcementDate, setAnnouncementDate] = useState("")
     const [hasFinished, setHasFinished] = useState("")
     const [valueChange, setValueChange] = useState(false)
+    const [rendering, setRendering] = useState(false);
 
     const initTrackSelect = useCallback(async function (id) {
         try {
@@ -917,104 +919,117 @@ const Page = ({ params }) => {
                                                 </div>
                                             </div>
                                     }
+                                    <InsertSubjectModal
+                                        cb={cb}
+                                        setRendering={setRendering}
+                                        acadyear={trackSelect.acadyear}
+                                        trackId={trackSelect?.id}
+                                        defaultTrackSubj={trackSubj}
+                                        isOpen={isOpen}
+                                        onClose={onClose} />
                                     <TrackSubjectTable
-                                        callBack={initTrackSelect}
-                                        swal={swal}
-                                        showToastMessage={showToastMessage}
-                                        trackSubj={trackSubj}
+                                        cb={cb}
+                                        setRendering={setRendering}
+                                        acadyear={trackSelect.acadyear}
                                         onOpen={onOpen}
+                                        trackSubj={trackSubj}
                                         trackId={trackSelect?.id}
                                     />
                                     {
                                         studentsSelect?.students?.length > 0 ?
-                                            <div className="border p-4 rounded-[10px] w-full flex flex-col mb-4">
-                                                <Tabs
-                                                    aria-label="selection options"
-                                                    selectedKey={selectedTrack}
-                                                    onSelectionChange={setSelectedTrack}
-                                                    color="primary"
-                                                    variant="underlined"
-                                                    disabledKeys={["download"]}
-                                                    classNames={{
-                                                        tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider !text-[1px]",
-                                                        cursor: "w-full",
-                                                        tab: "max-w-fit h-10",
-                                                        tabContent: "group-data-[selected=true]:text-black group-data-[selected=true]:font-bold"
-                                                    }}
-                                                >
-                                                    <Tab
-                                                        className='p-0'
-                                                        key="all"
-                                                        title={
-                                                            <div className="flex items-center space-x-2">
-                                                                <span>นักศึกษาที่เข้าคัดแทร็ก</span>
-                                                            </div>
-                                                        }
+                                            rendering ? <div>Loading...</div>
+                                                :
+                                                <div className="border p-4 rounded-[10px] w-full flex flex-col mb-4">
+                                                    <Tabs
+                                                        aria-label="selection options"
+                                                        selectedKey={selectedTrack}
+                                                        onSelectionChange={setSelectedTrack}
+                                                        color="primary"
+                                                        variant="underlined"
+                                                        disabledKeys={["download"]}
+                                                        classNames={{
+                                                            tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider !text-[1px]",
+                                                            cursor: "w-full",
+                                                            tab: "max-w-fit h-10",
+                                                            tabContent: "group-data-[selected=true]:text-black group-data-[selected=true]:font-bold"
+                                                        }}
                                                     >
-                                                        <div>
-                                                            <p className='text-default-900 text-small my-4'>รายชื่อนักศึกษาที่เข้ารับการคัดเลือก ทั้งหมด {studentsSelect?.students?.length} คน</p>
-                                                            <StudentTrackTable
-                                                                cb={cb}
-                                                                acadyear={trackSelect.acadyear}
-                                                                isManagable={true}
-                                                                trackSubj={trackSubj}
-                                                                studentData={studentsSelect}
-                                                                title={false}
-                                                                tracks={tracks}
-                                                                track={"กำลังคัดเลือก"} />
-                                                        </div>
-                                                    </Tab>
-                                                    <Tab
-                                                        className='p-0'
-                                                        key="nonSelect"
-                                                        title={
-                                                            <div className="flex items-center space-x-2">
-                                                                <span>นักศึกษาที่ไม่ได้เข้าคัดแทร็ก</span>
+                                                        <Tab
+                                                            className='p-0'
+                                                            key="all"
+                                                            title={
+                                                                <div className="flex items-center space-x-2">
+                                                                    <span>นักศึกษาที่เข้าคัดแทร็ก</span>
+                                                                </div>
+                                                            }
+                                                        >
+                                                            <div>
+                                                                <p className='text-default-900 text-small my-4'>รายชื่อนักศึกษาที่เข้ารับการคัดเลือก ทั้งหมด {studentsSelect?.students?.length} คน</p>
+                                                                <StudentTrackTable
+                                                                    cb={cb}
+                                                                    acadyear={trackSelect.acadyear}
+                                                                    isManagable={true}
+                                                                    trackSubj={trackSubj}
+                                                                    studentData={studentsSelect}
+                                                                    title={false}
+                                                                    tracks={tracks}
+                                                                    track={"กำลังคัดเลือก"} />
                                                             </div>
-                                                        }
-                                                    >
-                                                        <div>
-                                                            <p className='text-default-900 text-small my-4'>รายชื่อนักศึกษาที่ไม่ได้เข้ารับการคัดเลือก ทั้งหมด {nonSelectStudent?.length} คน</p>
-                                                            <p className='text-default-900 text-small mb-2'>
-                                                                โครงการปกติ {nonSelectStudent?.filter(student => student.courses_type == "โครงการปกติ")?.length} คน
-                                                                โครงการพิเศษ {nonSelectStudent?.filter(student => student.courses_type == "โครงการพิเศษ")?.length} คน
-                                                            </p>
-                                                            <Table
-                                                                isStriped
-                                                                isHeaderSticky
-                                                                classNames={{
-                                                                    wrapper: "max-h-[400px]",
-                                                                }}
-                                                                aria-label="Non select data">
-                                                                <TableHeader>
-                                                                    <TableColumn>รหัสนักศึกษา</TableColumn>
-                                                                    <TableColumn>ชื่อ - สกุล</TableColumn>
-                                                                    <TableColumn>ประเภทโครงการ</TableColumn>
-                                                                </TableHeader>
-                                                                <TableBody
-                                                                    items={nonSelectStudent}
-                                                                    emptyContent={
-                                                                        <Empty
-                                                                            className='my-4'
-                                                                            description={
-                                                                                <span className='text-gray-300'>นักศึกษาเลือกแทร็กทุกคนแล้ว</span>
-                                                                            }
-                                                                        />
-                                                                    }
-                                                                >
-                                                                    {(item) => (
-                                                                        <TableRow key={item.stu_id}>
-                                                                            <TableCell>{item?.stu_id}</TableCell>
-                                                                            <TableCell>{item?.fullname}</TableCell>
-                                                                            <TableCell>{item?.courses_type}</TableCell>
-                                                                        </TableRow>
-                                                                    )}
-                                                                </TableBody>
-                                                            </Table>
-                                                        </div>
-                                                    </Tab>
-                                                </Tabs>
-                                            </div>
+                                                        </Tab>
+                                                        <Tab
+                                                            className='p-0'
+                                                            key="nonSelect"
+                                                            title={
+                                                                <div className="flex items-center space-x-2">
+                                                                    <span>นักศึกษาที่ไม่ได้เข้าคัดแทร็ก</span>
+                                                                </div>
+                                                            }
+                                                        >
+                                                            <div>
+                                                                <p className='text-default-900 text-small my-4'>รายชื่อนักศึกษาที่ไม่ได้เข้ารับการคัดเลือก ทั้งหมด {nonSelectStudent?.length} คน</p>
+                                                                <p className='text-default-900 text-small mb-2'>
+                                                                    โครงการปกติ {nonSelectStudent?.filter(student => student.courses_type == "โครงการปกติ")?.length} คน
+                                                                    โครงการพิเศษ {nonSelectStudent?.filter(student => student.courses_type == "โครงการพิเศษ")?.length} คน
+                                                                </p>
+                                                                <Table
+                                                                    removeWrapper
+                                                                    className='overflow-x-auto max-h-[400px] rounded-md'
+                                                                    isStriped
+                                                                    isHeaderSticky
+                                                                    classNames={{
+                                                                        ...minimalTableClass,
+                                                                        wrapper: "max-h-[400px]",
+                                                                    }}
+                                                                    aria-label="Non select data">
+                                                                    <TableHeader>
+                                                                        <TableColumn>รหัสนักศึกษา</TableColumn>
+                                                                        <TableColumn>ชื่อ - สกุล</TableColumn>
+                                                                        <TableColumn>ประเภทโครงการ</TableColumn>
+                                                                    </TableHeader>
+                                                                    <TableBody
+                                                                        items={nonSelectStudent}
+                                                                        emptyContent={
+                                                                            <Empty
+                                                                                className='my-4'
+                                                                                description={
+                                                                                    <span className='text-gray-300'>นักศึกษาเลือกแทร็กทุกคนแล้ว</span>
+                                                                                }
+                                                                            />
+                                                                        }
+                                                                    >
+                                                                        {(item) => (
+                                                                            <TableRow key={item.stu_id}>
+                                                                                <TableCell>{item?.stu_id}</TableCell>
+                                                                                <TableCell>{item?.fullname}</TableCell>
+                                                                                <TableCell>{item?.courses_type}</TableCell>
+                                                                            </TableRow>
+                                                                        )}
+                                                                    </TableBody>
+                                                                </Table>
+                                                            </div>
+                                                        </Tab>
+                                                    </Tabs>
+                                                </div>
                                             : (studentsBit?.students?.length == 0 &&
                                                 studentsNetwork?.students?.length == 0 &&
                                                 studentsWeb?.students?.length == 0) ?

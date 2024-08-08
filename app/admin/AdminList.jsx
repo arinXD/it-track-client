@@ -47,7 +47,7 @@ const AdminList = () => {
           {
                title: "แนะนำแทร็ก",
                links: [
-                    { href: "/admin/suggest-form", label: "จัดการแบบฟอร์มแนะนำแทร็ก", icon: IoMdCheckboxOutline },
+                    { href: "/admin/suggest-form", label: "จัดการแบบฟอร์มแนะนำแทร็ก", icon: LuTextSelect },
                ]
           },
           {
@@ -66,7 +66,7 @@ const AdminList = () => {
           if (!isVisible) return null;
 
           return (
-               <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-white to-gray-100 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+               <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
                     <Icon className="w-10 h-10 mb-3 text-blue-600" />
                     <span className="text-center text-gray-800 font-medium">{item.label}</span>
                </Link>
