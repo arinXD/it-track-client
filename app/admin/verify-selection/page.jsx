@@ -17,11 +17,14 @@ import { Icon } from '@iconify/react';
 import { Loading } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
+import { Tabs, Tab, Card, CardBody, Switch } from "@nextui-org/react";
+
 
 const Page = () => {
 
     const [verify, setVerify] = useState([]);
     const [loading, setLoading] = useState(true)
+    const [isVertical, setIsVertical] = useState(true);
 
     const showToastMessage = useCallback((ok, message) => {
         toast[ok ? 'success' : 'warning'](message, {
@@ -38,7 +41,7 @@ const Page = () => {
 
     const callVerify = useCallback(async () => {
         try {
-            const URL = `/api/verify/selects/teachers`
+            const URL = `/api/verifies/approve`
             const option = await getOptions(URL, "GET")
             const response = await axios(option)
             const data = response.data.data
@@ -75,7 +78,6 @@ const Page = () => {
                             </div>
                             :
                             <>
-                                {/* {JSON.stringify(verify)} */}
                                 <Table
                                     removeWrapper
                                     selectionMode="multiple"
@@ -113,13 +115,34 @@ const Page = () => {
                                                 <TableCell>{verifies.acadyear}</TableCell>
                                                 {["createdAt"].map(column => (
                                                     <TableCell key={column}>
-                                                        <span>{column === "createdAt"? dmy(verifies[column]) : verifies[column]}</span>
+                                                        <span>{column === "createdAt" ? dmy(verifies[column]) : verifies[column]}</span>
                                                     </TableCell>
                                                 ))}
                                             </TableRow>
                                         ))}
                                     </TableBody>
                                 </Table>
+
+
+                                <div className="flex w-full flex-col">
+                                    <Tabs aria-label="Options" color="primary" size="lg">
+                                        <Tab key="photos" title="คำร้องใหม่">
+                                            <Card>
+                                                <CardBody>
+                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                                </CardBody>
+                                            </Card>
+                                        </Tab>
+                                        <Tab key="music" title="คำร้องที่อนุมัติ">
+                                            <Card>
+                                                <CardBody>
+                                                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                                </CardBody>
+                                            </Card>
+                                        </Tab>
+                                    </Tabs>
+                                </div>
+
                             </>
                     }
 

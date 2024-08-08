@@ -48,9 +48,6 @@ const Page = ({ params }) => {
 
      const [highestIndex, setHighestIndex] = useState(0);
 
-     const [conditions, setConditions] = useState([]);
-
-
      const showToastMessage = useCallback((ok, message) => {
           toast[ok ? 'success' : 'warning'](message, {
                position: toast.POSITION.TOP_RIGHT,
@@ -166,7 +163,7 @@ const Page = ({ params }) => {
           return groupedSubjects;
      }, [subgroupData, groupData, semisubgroupData]);
 
-     console.log(groupedSubjectsByCategory);
+     // console.log(groupedSubjectsByCategory);
 
      useEffect(() => {
           const categoryData = Object.keys(groupedSubjectsByCategory).map(categoryId => {
@@ -269,7 +266,7 @@ const Page = ({ params }) => {
 
      }, [groupedSubjectsByCategory]);
 
-     console.log(group);
+     // console.log(group);
      // console.log(groupedSubjectsByCategory);
 
      useEffect(() => {

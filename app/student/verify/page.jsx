@@ -60,6 +60,20 @@ const Page = () => {
 
     const [cumlaude, setCumLaude] = useState("")
 
+    //////////////////////////////////////useState to studentcategoryverifies/////////////////////////////////////////////////////////
+
+    const [studentcategory, setStudentCategory] = useState([]);
+
+    const handleVerifySubjChange = (catIndex, category_id, verifySubj) => {
+        setStudentCategory(prevCategories => {
+            const updatedCategories = [...prevCategories];
+            updatedCategories[catIndex] = { ...updatedCategories[catIndex], category_id, verifySubj };
+            return updatedCategories;
+        });
+    };
+
+    // console.log(studentcategory);
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     const showToastMessage = useCallback((ok, message) => {
@@ -96,23 +110,6 @@ const Page = () => {
         }
     }, [])
 
-
-    // const fetchstdverify = async function (ids) {
-    //     try {
-    //         const URL = `/api/verify/selects/teachers/${ids}`
-    //         const option = await getOptions(URL, "GET")
-    //         const response = await axios(option)
-    //         const data = response.data.data
-    //         console.log(data);
-    //         setStatus(data)
-
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
-
-    // console.log(status);
-
     useEffect(() => {
         if (session?.user?.stu_id != undefined) {
             fetchEnrollment(session?.user?.stu_id)
@@ -129,7 +126,6 @@ const Page = () => {
         }
         return "ไม่มีเกรด";
     }
-
 
     ///////////////////////////////////อย่างน้อยของแบบฟอร์มใหญ่/////////////////////////////////////////////////////
 
@@ -192,7 +188,7 @@ const Page = () => {
 
                 const semisubgroupData = data.SubjectVerifies.map(subjectVerify => {
                     const subject = subjectVerify.Subject;
-                    const semisubgroups = subject.SemiSubgroupSubjects?.map(semisubgroupSubject => semisubgroupSubject.SemiSubGroup);
+                    const semisubgroups = subject.SemiSubgroupSubjects.map(semisubgroupSubject => semisubgroupSubject.SemiSubGroup);
                     return { subject, semisubgroups };
                 });
                 setSemiSubgroupData(semisubgroupData);
@@ -264,7 +260,7 @@ const Page = () => {
                 return;
             }
         } catch (error) {
-            console.error('Error fetching conditions:', error);
+            console.error('Error fetching Status:', error);
         }
     };
 
@@ -289,26 +285,36 @@ const Page = () => {
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
-    useEffect(() => {
-        const fetchSubjects = async () => {
+    const fetchSubjects = async () => {
+        try {
+            const url = `/api/subjects/student`
+            const option = await getOptions(url, "GET")
             try {
-                const url = `/api/subjects/student`
-                const option = await getOptions(url, "GET")
-                try {
-                    const res = await axios(option)
-                    const filterSubjects = res.data.data
-                    const filteredSubjects = filterSubjects.filter(subject => subject.track !== null && subject.track !== '');
+                const res = await axios(option)
+                const filterSubjects = res.data.data
 
-                    setSubjectTrack(filteredSubjects)
-                    setSubjects(filterSubjects)
-                } catch (error) {
-                    setSubjects([])
-                    return
-                }
+                const filteredSubjects = filterSubjects.filter(subject => subject.track !== null && subject.track !== '');
+                // const subjectsWithGrades = filteredSubjects.filter(subject => {
+                //     const grade = getEnrollmentGrade(subject.subject_code);
+                //     return grade !== "ไม่มีเกรด";
+                // });
+                console.log(filteredSubjects);
+                
+
+                setSubjectTrack(filteredSubjects)
+                setSubjects(filterSubjects)
             } catch (error) {
-                console.error('Error fetching subjects:', error);
+                setSubjects([])
+                // setSubjectTrack([])
+                return
             }
-        };
+        } catch (error) {
+            console.error('Error fetching subjects:', error);
+        }
+    };
+
+
+    useEffect(() => {
         fetchSubjects();
     }, [])
 
@@ -527,17 +533,23 @@ const Page = () => {
         };
     }).filter(subgroup => subgroup.subjects.length > 0);
 
+    // console.log(subjectCodesByGroup);
+    // console.log(subjectCodesBySubgroup);
+    
+
 
     const subData = pickSubj.map(subject => {
         const grade = getEnrollmentGrade(subject.subject_code);
         const credit = subject.credit;
 
         return {
+            subject_id: subject.subject_id,
             subject_code: subject.subject_code,
             grade,
             credit
         };
     });
+
 
 
     const getCalculatedValues = (subjectTrack) => {
@@ -682,7 +694,6 @@ const Page = () => {
 
     /////////////////////////////////////////sent to verify_selection////////////////////////////////////////////////////////////////
 
-
     const handleSubmit = useCallback(async function () {
         try {
             const url = `/api/verify/selects/${ids}/${userData.stu_id}`;
@@ -691,6 +702,11 @@ const Page = () => {
                 ...subj,
                 subjects: subj.subjects.filter(subject => subject.grade !== null && subject.grade !== "ไม่มีเกรด")
             })).filter(subj => subj.subjects.length > 0);
+
+            const filteredstudentcategory = studentcategory.map(category => ({
+                ...category,
+                verifySubj: category.verifySubj.filter(subject => subject.grade && subject.grade !== "ไม่มีเกรด")
+            }));
 
             // console.log(insertData);
             // console.log(filteredData);
@@ -701,8 +717,13 @@ const Page = () => {
                 cum_laude: cumlaude,
                 acadyear: userData.acadyear + 4,
                 status: 1,
-                subjects: filteredData
+                subjects: filteredData,
+                tracksubject: subData,
+                studentcategory: filteredstudentcategory
             };
+
+            console.log(formData);
+
 
             const options = await getOptions(url, "POST", formData);
             const result = await axios(options);
@@ -719,7 +740,7 @@ const Page = () => {
             // const message = error?.response?.data?.message || error.message;
             // showToastMessage(false, message);
         }
-    }, [ids, term, cumlaude, userData.stu_id, insertData]);
+    }, [ids, term, cumlaude, userData.stu_id, insertData, subData]);
 
 
 
@@ -1177,10 +1198,14 @@ const Page = () => {
                                                 key={catIndex}
                                                 catIndex={catIndex}
                                                 categorie={categorie}
+                                                category_id={categorie.category_id}
                                                 subjects={subjects}
                                                 highestIndex={highestIndex}
+                                                enrollments={enrollments}
+                                                onVerifySubjChange={(verifySubj) => handleVerifySubjChange(catIndex, categorie.id, verifySubj)}
                                             />
                                         ))}
+
                                         {Object.keys(groupedSubjectsByCategory).length === 0 && (
                                             <>
                                                 <p className='text-center mt-10'>ไม่มีวิชาภายในแบบฟอร์ม</p>
@@ -1234,43 +1259,6 @@ const Page = () => {
                                                 <TableBody emptyContent={"ไม่มีเงื่อนไข"}>{[]}</TableBody>
                                             )}
                                         </Table>
-                                        {userData.program === "IT" && (
-                                            <Table
-                                                classNames={tableClass}
-                                                removeWrapper
-                                                onRowAction={() => { }}
-                                                aria-label="program table"
-                                                className='mt-5'
-                                            >
-                                                <TableHeader>
-                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                    <TableColumn>ค่าคะแนน</TableColumn>
-                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                </TableHeader>
-
-                                                <TableBody>
-                                                    {(() => {
-
-                                                        const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrack);
-
-                                                        const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
-
-                                                        return (
-                                                            <TableRow>
-                                                                <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
-                                                                <TableCell>21</TableCell>
-                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                                <TableCell>{totalGrades}</TableCell>
-                                                                <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                            </TableRow>
-                                                        );
-                                                    })()}
-                                                </TableBody>
-
-                                            </Table>
-                                        )}
 
                                         {conditionSubgroup.length > 0 && (
                                             <Table
@@ -1311,15 +1299,48 @@ const Page = () => {
                                                 )}
                                             </Table>
                                         )}
+                                        {userData.program === "IT" && (
+                                            <Table
+                                                classNames={tableClass}
+                                                removeWrapper
+                                                onRowAction={() => { }}
+                                                aria-label="program table"
+                                                className='mt-5'
+                                            >
+                                                <TableHeader>
+                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                </TableHeader>
+
+                                                <TableBody>
+                                                    {(() => {
+
+                                                        const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrack);
+
+                                                        const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
+
+                                                        return (
+                                                            <TableRow>
+                                                                <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
+                                                                <TableCell>21</TableCell>
+                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                <TableCell>{totalGrades}</TableCell>
+                                                                <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })()}
+                                                </TableBody>
+
+                                            </Table>
+                                        )}
                                         <Button type='submit' onClick={() => handleSubmit()} className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid'>
                                             บันทึก
                                         </Button>
-
                                     </div>
-
                                 </>
-
-
                 }
 
             </ContentWrap>

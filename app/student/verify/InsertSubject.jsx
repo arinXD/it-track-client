@@ -5,13 +5,14 @@ import { Empty, message } from 'antd';
 import { IoIosCloseCircle } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
 
-const InsertSubject = ({subjects ,catIndex, categorie, highestIndex}) => {
+const InsertSubject = ({ subjects, catIndex, categorie, highestIndex, onVerifySubjChange, enrollments }) => {
     const [verifySubj, setVerifySubj] = useState([]);
     const [searchSubj, setSearchSubj] = useState("");
     const [filterSubj, setFilterSubj] = useState([]);
 
-    // console.log(highestIndex);
-    useEffect(() => setFilterSubj(subjects), [subjects])
+    useEffect(() => {
+        setFilterSubj(subjects)
+    }, [subjects])
 
     useEffect(() => {
         if (searchSubj) {
@@ -28,6 +29,19 @@ const InsertSubject = ({subjects ,catIndex, categorie, highestIndex}) => {
         setFilterSubj(subjects)
     }, [searchSubj])
 
+    useEffect(() => {
+        onVerifySubjChange(verifySubj);
+    }, [verifySubj]);
+
+    const getEnrollmentGrade = (subjectCode) => {
+        // ต้องการหา subjectCode ใน enrollments
+        const enrollment = enrollments.find(e => e?.Subject?.subject_code === subjectCode);
+        if (enrollment) {
+            return enrollment.grade;
+        }
+        return "ไม่มีเกรด";
+    }
+
     const addSubj = useCallback(function (subj) {
         setVerifySubj((prevState) => {
             const data = [...prevState];
@@ -39,11 +53,14 @@ const InsertSubject = ({subjects ,catIndex, categorie, highestIndex}) => {
                 }
             }
             if (!status) {
+                const grade = getEnrollmentGrade(subj.subject_code);
                 let result = {
                     subject_id: subj.subject_id,
                     subject_code: subj.subject_code,
                     title_th: subj.title_th,
-                    title_en: subj.title_en
+                    title_en: subj.title_en,
+                    credit: subj.credit,
+                    grade: grade
                 }
                 data.push(result)
             }
