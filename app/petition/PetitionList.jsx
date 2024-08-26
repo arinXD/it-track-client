@@ -132,7 +132,7 @@ const PetitionList = ({
                                         <li className="text-center py-8 text-gray-500">{emptyContent}</li>
                                    ) : (
                                         petitions.map((petition, key) => (
-                                             <li key={key} className="hover:bg-gray-50 transition-colors border-b">
+                                             <li key={key} className="hover:bg-gray-50 transition-colors ">
                                                   <div className="flex items-center px-4 py-4">
                                                        <Checkbox
                                                             checked={checkList.find(item => item.id === petition.id)?.checked || false}
@@ -148,7 +148,7 @@ const PetitionList = ({
                                                             <span className="w-full col-span-4 text-gray-500 truncate overflow-hidden">
                                                                  {petition.detail}
                                                             </span>
-                                                            <span className="w-full col-span-1 justify-center flex text-gray-500 truncate text-center">
+                                                            <span className="w-full col-span-1 justify-start flex text-gray-500 truncate text-center">
                                                                  <div className="flex items-center gap-1">
                                                                       <div className={`rounded-full w-2 h-2 ${petition?.status == 0 ? "bg-yellow-600" : petition?.status == 1 ? "bg-green-600" : "bg-red-600"}`}></div>
                                                                       <p className="text-xs">

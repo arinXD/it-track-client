@@ -153,7 +153,7 @@ const CareerInventory = ({ isOpen, onClose, defaultCareer, selectedCareers, setS
                                                                                 onChange={(e) =>
                                                                                      handleCheckboxChange(e, career.id, career)
                                                                                 }
-                                                                                className="w-full cursor-pointer flex items-center gap-2 bg-white rounded-lg border border-gray-300 p-3 hover:border-blue-500 hover:border-2 transition-colors"
+                                                                                className="w-full cursor-pointer flex items-center gap-2 bg-white rounded-lg border border-gray-300 p-3 hover:border-blue-500 hover:border-1 transition-colors"
                                                                                 name={career.id}
                                                                            >
                                                                                 {career?.name_en}

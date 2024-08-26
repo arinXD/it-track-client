@@ -226,8 +226,8 @@ const CareerTable = ({ track }) => {
                     <div className="py-2 px-2 flex justify-between items-center">
                          <span className="w-[30%] text-small text-default-400">
                               {selectedKeys === "all"
-                                   ? "All items selected"
-                                   : `${selectedKeys?.size || 0} of ${filteredItems?.length || 0} selected`}
+                                   ? "เลือกทั้งหมด"
+                                   : `เลือก ${selectedKeys?.size || 0} ใน ${filteredItems?.length || 0}`}
                          </span>
                          <Pagination
                               isCompact
@@ -288,7 +288,7 @@ const CareerTable = ({ track }) => {
                     <Input
                          isClearable
                          className="w-full h-fit"
-                         placeholder="ค้นหาแทร็ก"
+                         placeholder="ค้นหาอาชีพ"
                          size="sm"
                          classNames={inputClass}
                          startContent={<SearchIcon />}

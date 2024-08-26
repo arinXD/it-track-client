@@ -229,7 +229,7 @@ const Page = () => {
      useEffect(() => {
           let students
           if (selectedKeys == "all") {
-               students = sortedItems.map(e => e.id)
+               students = items.map(e => e.id)
                setDisableDeleteBtn(false)
           } else {
                students = [...selectedKeys.values()]

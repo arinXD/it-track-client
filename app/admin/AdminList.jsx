@@ -17,8 +17,8 @@ const AdminList = () => {
      const { data: session } = useSession();
 
      const teacherList = useMemo(() => ([
-          "รายชื่อนักศึกษา", "ข้อมูลแทรค", "คัดเลือกแทรค",
-          "รายชื่อนักศึกษาภายในแทรค", "อนุมัติจบการศึกษา", "สรุปผลการคัดเลือก"
+          "รายชื่อนักศึกษา", "ข้อมูลแทร็ก", "คัดเลือกแทร็ก",
+          "รายชื่อนักศึกษาภายในแทร็ก", "อนุมัติจบการศึกษา", "สรุปผลการคัดเลือก"
      ]), []);
 
      const categories = useMemo(() => ([
@@ -37,9 +37,9 @@ const AdminList = () => {
           {
                title: "แทร็ก",
                links: [
-                    { href: "/admin/track", label: "ข้อมูลแทรค", icon: HiOutlineUserGroup },
-                    { href: "/admin/track-selection", label: "คัดเลือกแทรค", icon: LuTextSelect },
-                    { href: "/admin/trackstudent", label: "รายชื่อนักศึกษาภายในแทรค", icon: BsPerson },
+                    { href: "/admin/track", label: "ข้อมูลแทร็ก", icon: HiOutlineUserGroup },
+                    { href: "/admin/track-selection", label: "คัดเลือกแทร็ก", icon: LuTextSelect },
+                    { href: "/admin/trackstudent", label: "รายชื่อนักศึกษาภายในแทร็ก", icon: BsPerson },
                     { href: "/admin/track-dashboard", label: "สรุปผลการคัดเลือกแทร็ก", icon: IoBarChartOutline },
                     { href: "/admin/petitions/all", label: "จัดการคำร้องย้ายแทร็ก", icon: IoDocumentTextOutline },
                ]

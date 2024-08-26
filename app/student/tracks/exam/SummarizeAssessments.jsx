@@ -103,7 +103,7 @@ const SummarizeAssessments = ({ next, prev, data, prompt }) => {
                         <section className='p-6 bg-blue-50 rounded-lg '>
                             <h2 className="text-2xl font-semibold text-blue-800 mb-4">แบบประเมินทั้งหมด
                             </h2>
-                            <div className="bg-white shadow overflow-hidden rounded-lg">
+                            <div className="bg-white shadow overflow-auto rounded-lg">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                         <tr>

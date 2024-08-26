@@ -38,7 +38,7 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
                          key={ass.id}
                          className="my-0">
                          <div className='flex mx-auto max-w-7xl mb-8'>
-                              <div className='w-1/2 flex justify-center gap-1 items-top'>
+                              <div className='w-1/2 flex justify-start gap-1 items-top'>
                                    <span className="text-gray-600 text-sm text-start">
                                         {ass.question}
                                    </span>

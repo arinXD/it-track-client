@@ -401,7 +401,7 @@ export default function Page() {
                                                 </p>
                                                 <p className='text-xs text-default-600 flex justify-between px-6'>
                                                     <span>เกรดเฉลี่ยรวม</span>
-                                                    <span>{rs.gpaAvg.toFixed(2)}</span>
+                                                    <span>{rs?.gpaAvg?.toFixed(2)}</span>
                                                 </p>
                                             </CardBody>
                                         </Card>

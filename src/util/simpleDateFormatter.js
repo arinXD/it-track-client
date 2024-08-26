@@ -31,30 +31,44 @@ const monthsY = {
 }
 
 function getDateProperty(date) {
-     const parsedDate = new Date(date);
+     try {
+          const parsedDate = new Date(date);
 
-     const day = format(parsedDate, 'dd');
-     const month = format(parsedDate, 'MM');
-     const thaiMonth = months[month];
-     const thaiMonthY = monthsY[month];
-     const defYear = parsedDate.getFullYear()
-     const year = parsedDate.getFullYear() + 543;
-     const hours = format(parsedDate, 'HH');
-     const minutes = format(parsedDate, 'mm');
+          const day = format(parsedDate, 'dd');
+          const month = format(parsedDate, 'MM');
+          const thaiMonth = months[month];
+          const thaiMonthY = monthsY[month];
+          const defYear = parsedDate.getFullYear()
+          const year = parsedDate.getFullYear() + 543;
+          const hours = format(parsedDate, 'HH');
+          const minutes = format(parsedDate, 'mm');
 
-     return {
-          day,
-          month,
-          thaiMonth,
-          thaiMonthY,
-          defYear,
-          year,
-          hours,
-          minutes,
+          return {
+               day,
+               month,
+               thaiMonth,
+               thaiMonthY,
+               defYear,
+               year,
+               hours,
+               minutes,
+          }
+     } catch {
+          return {
+               day: "",
+               month: "",
+               thaiMonth: "",
+               thaiMonthY: "",
+               defYear: "",
+               year: "",
+               hours: "",
+               minutes: "",
+          }
      }
 }
 
 export function simpleDMYHM(date) {
+     if(!date) return ""
      const { day, thaiMonth, year, hours, minutes } = getDateProperty(date)
      return `${day} ${thaiMonth} ${year} ${hours}:${minutes} น.`;
 }
