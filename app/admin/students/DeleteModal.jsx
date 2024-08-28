@@ -4,7 +4,7 @@ import { Button, Modal, ModalContent, ModalFooter, ModalHeader } from '@nextui-o
 import axios from 'axios'
 import React, { useCallback, useState } from 'react'
 
-const DeleteModal = ({ showToastMessage, callData, delIsOpen, delOnClose, stuId }) => {
+const DeleteModal = ({ callData, delIsOpen, delOnClose, stuId }) => {
     const [deleting, setDeleting] = useState(false)
 
     const handleDelete = useCallback(async function () {
@@ -12,14 +12,14 @@ const DeleteModal = ({ showToastMessage, callData, delIsOpen, delOnClose, stuId 
         try {
             const option = await getOptions(`/api/students/${stuId}`, "DELETE")
             const res = await axios(option)
-            const { ok, message } = res.data
+            const { message: msg } = res.data
             await callData()
-            await showToastMessage(ok, message)
+            message.success(msg)
             delOnClose()
         } catch (error) {
             console.log(error);
-            const { ok, message } = error.response.data
-            showToastMessage(ok, message)
+            const { message: msg } = error.response.data
+            message.warning(msg)
         } finally {
             setDeleting(false)
         }

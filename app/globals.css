@@ -5,3 +5,13 @@
 html {
   scroll-behavior: smooth !important;
 }
+
+@font-face {
+  font-family: "Sarabun";
+  font-weight: normal;
+  src: url('../public/fonts/saraban.woff2') format('woff2');
+}
+
+* {
+  font-family: "Sarabun", sans-serif !important;
+}

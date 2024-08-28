@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useMemo, useState } from 'react'
-import SidebarDrawer from './components/SidebarDrawer'
+import SidebarDrawer from './components/NavbarDrawer'
 import './homepage.css';
 import Footer from './components/Footer';
 import Link from 'next/link';

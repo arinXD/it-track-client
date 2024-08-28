@@ -7,7 +7,7 @@ import { MdEditDocument, MdOutlineQuiz, MdQuiz, MdAdminPanelSettings, MdOutlineA
 import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoHome, GoHomeFill } from "react-icons/go";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem, Skeleton } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem, Skeleton, Badge } from "@nextui-org/react";
 import { AiFillEdit, AiOutlineEdit, AiFillNotification } from 'react-icons/ai';
 import { RxHamburgerMenu } from "react-icons/rx";
 import "../style/hamburgers.css"
@@ -17,6 +17,9 @@ import { Icon } from '@iconify/react';
 import { FaUser } from "react-icons/fa6";
 import { IoIosHelpCircle } from "react-icons/io";
 import { BiSolidExit } from "react-icons/bi";
+import { IoNotifications } from 'react-icons/io5';
+import PetitionNotification from './PetitionNotification';
+import { DROPDOWN_MENU_CLASS } from '@/src/util/ComponentClass';
 
 const Navbar = () => {
     const { data: session, status } = useSession();
@@ -58,7 +61,7 @@ const Navbar = () => {
             activeIcon: <AiFillEdit className="w-5 h-5" />,
             icon: <AiOutlineEdit className="w-5 h-5" />,
             label: "คัดเลือกแทร็ก",
-            condition: session?.user?.role === "student" 
+            condition: session?.user?.role === "student"
         },
         {
             href: "/student/tracks/exam",
@@ -109,19 +112,7 @@ const Navbar = () => {
                             disabledKeys={[]}
                             className="p-2"
                             variant="flat"
-                            itemClasses={{
-                                base: [
-                                    "rounded-md",
-                                    "text-default-500",
-                                    "transition-opacity",
-                                    "data-[hover=true]:text-foreground",
-                                    "data-[hover=true]:bg-default-100",
-                                    "dark:data-[hover=true]:bg-default-50",
-                                    "data-[selectable=true]:focus:bg-default-50",
-                                    "data-[pressed=true]:opacity-70",
-                                    "data-[focus-visible=true]:ring-default-500",
-                                ],
-                            }}
+                            itemClasses={DROPDOWN_MENU_CLASS}
                         >
                             <DropdownSection aria-label="Profile & Actions" showDivider>
                                 <DropdownItem
@@ -214,7 +205,7 @@ const Navbar = () => {
                 showSpinner={false}
                 crawl={true}
             />
-            <div className="px-2 z-50 relative bg-white/60 backdrop-blur-md shadow-sm">
+            <div className="px-2 z-50 relative bg-white/80 backdrop-blur-md shadow-sm">
                 <div className="relative flex h-16 items-center justify-between p-2">
                     <div className="flex flex-1 items-center justify-center md:justify-start gap-0">
                         <div
@@ -242,6 +233,7 @@ const Navbar = () => {
                         </button>
                     </div>
                     <div className="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
+                        <PetitionNotification />
                         <div className="relative ml-3 flex flex-row gap-3">
                             {renderUserProfile()}
                         </div >
