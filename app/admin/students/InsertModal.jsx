@@ -1,21 +1,37 @@
 "use client"
 import React, { useCallback, useEffect, useState } from 'react'
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Autocomplete, AutocompleteItem, RadioGroup, Radio } from "@nextui-org/react";
+import { Button, Input, Autocomplete, AutocompleteItem, RadioGroup, Radio } from "@nextui-org/react";
 import { getAcadyears } from '@/src/util/academicYear';
 import axios from 'axios';
-import { hostname } from '@/app/api/hostname';
-import { getOptions, getToken } from '@/app/components/serverAction/TokenAction';
+import { getOptions } from '@/app/components/serverAction/TokenAction';
+import { message } from 'antd';
+import { thinInputClass } from '@/src/util/ComponentClass';
 
-const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose }) => {
-    const [stu_id, setStuId] = useState(null)
-    const [email, setEmail] = useState(null)
-    const [first_name, setFname] = useState(null)
-    const [last_name, setLname] = useState(null)
+const InsertModal = ({ }) => {
+    const [programs, setPrograms] = useState([])
+    const [stu_id, setStuId] = useState("")
+    const [email, setEmail] = useState("")
+    const [first_name, setFname] = useState("")
+    const [last_name, setLname] = useState("")
     const [acadyears, setAcadyears] = useState([])
     const [acadyear, setAcadyear] = useState(null);
     const [program, setProgram] = useState(null);
     const [courses_type, setCourseType] = useState(null);
     const [inserting, setInserting] = useState(false)
+
+    const getPrograms = useCallback(async function () {
+        try {
+            const option = await getOptions("/api/programs", "get")
+            const programs = (await axios(option)).data.data
+            setPrograms(programs)
+        } catch (error) {
+            setPrograms([])
+        }
+    }, [])
+
+    useEffect(() => {
+        getPrograms()
+    }, [])
 
     const [invalid, setInvalid] = useState({
         stu_id: false,
@@ -84,13 +100,12 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
         try {
             const option = await getOptions("/api/students", "POST", formData)
             const res = await axios(option)
-            const { ok, message } = res.data
-            showToastMessage(ok, message)
-            getStudents()
+            const { message: msg } = res.data
+            message.success(msg)
             closeForm()
         } catch (error) {
-            const { ok, message } = error.response.data
-            showToastMessage(ok, message)
+            const { message: msg } = error.response.data
+            message.success(msg)
         } finally {
             setInserting(false)
         }
@@ -106,150 +121,147 @@ const InsertModal = ({ showToastMessage, getStudents, programs, isOpen, onClose 
             program: false,
             courses_type: false,
         })
-        setStuId(null)
-        setEmail(null)
-        setFname(null)
-        setLname(null)
+        setStuId("")
+        setEmail("")
+        setFname("")
+        setLname("")
         setAcadyear(null)
         setProgram(null)
-        setCourseType(null)
-        onClose()
+        setCourseType("")
     }, [])
 
     return (
-        <>
-            <Modal
-                isDismissable={false}
-                isKeyboardDismissDisabled={true}
-                size={"2xl"}
-                isOpen={isOpen}
-                onClose={closeForm}
-                classNames={{
-                    body: "py-6",
-                    backdrop: "bg-[#292f46]/50 backdrop-opacity-10",
-                    base: "border-gray-300",
-                    header: "border-b-[1.5px] border-gray-300",
-                    footer: "border-t-[1.5px] border-gray-300",
-                    closeButton: "hover:bg-white/5 active:bg-white/10",
-                }}
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <form onSubmit={insertStudent} className=''>
-                                <ModalHeader className="flex flex-col gap-1">
-                                    <h2>เพิ่มรายชื่อนักศึกษา</h2>
-                                    <span className='text-base font-normal'>แบบฟอร์มเพิ่มรายชื่อนักศึกษา</span>
-                                </ModalHeader>
-                                <ModalBody>
-                                    <div className='flex flex-row gap-4 mt-0'>
-                                        <Input
-                                            type="text"
-                                            variant="bordered"
-                                            radius='sm'
-                                            label="รหัสนักศึกษา (มีขีด)"
-                                            placeholder="660000000-0"
-                                            labelPlacement="outside"
-                                            value={stu_id}
-                                            onValueChange={setStuId}
-                                            isInvalid={invalid.stu_id}
-                                        />
-                                        <Input
-                                            type="email"
-                                            variant="bordered"
-                                            radius='sm'
-                                            label="อีเมล"
-                                            labelPlacement="outside"
-                                            placeholder="กรอกอีเมล"
-                                            value={email}
-                                            onValueChange={setEmail}
-                                            isInvalid={invalid.email}
-                                        />
-                                    </div>
-                                    <div className='flex flex-row gap-4'>
-                                        <Input
-                                            type="text"
-                                            radius='sm'
-                                            variant="bordered"
-                                            label="ชื่อ"
-                                            labelPlacement="outside"
-                                            placeholder="กรอกชื่อ"
-                                            value={first_name}
-                                            onValueChange={setFname}
-                                            isInvalid={invalid.first_name}
-                                        />
-                                        <Input
-                                            type="text"
-                                            variant="bordered"
-                                            radius='sm'
-                                            label="นามสกุล"
-                                            placeholder="กรอกนามสกุล"
-                                            labelPlacement="outside"
-                                            value={last_name}
-                                            onValueChange={setLname}
-                                            isInvalid={invalid.last_name}
-                                        />
-                                    </div>
-                                    <div className='flex flex-row gap-4'>
-                                        <Autocomplete
-                                            label="ปีการศึกษา"
-                                            variant="bordered"
-                                            defaultItems={acadyears}
-                                            placeholder="เลือกปีการศึกษา"
-                                            className="max-w-xs"
-                                            labelPlacement='outside'
-                                            onSelectionChange={setAcadyear}
-                                            scrollShadowProps={{
-                                                isEnabled: false
-                                            }}
-                                            isInvalid={invalid.acadyear}
-                                        >
-                                            {(item) => <AutocompleteItem key={item.acadyear}>{item.acadyear}</AutocompleteItem>}
-                                        </Autocomplete>
-                                        <Autocomplete
-                                            label="หลักสูตร"
-                                            variant="bordered"
-                                            defaultItems={programs}
-                                            placeholder="เลือกหลักสูตร"
-                                            className="max-w-xs"
-                                            labelPlacement='outside'
-                                            onSelectionChange={setProgram}
-                                            scrollShadowProps={{
-                                                isEnabled: false
-                                            }}
-                                            isInvalid={invalid.program}
-                                        >
-                                            {(item) => <AutocompleteItem key={item.program}>{item.program}</AutocompleteItem>}
-                                        </Autocomplete>
-                                    </div>
-                                    <div>
-                                        <p className='text-sm mb-2'>เลือกโครงการ</p>
-                                        <RadioGroup
-                                            isInvalid={invalid.courses_type}
-                                            className='flex flex-col'
-                                            orientation="horizontal"
-                                            value={courses_type}
-                                            onValueChange={setCourseType}
-                                        >
-                                            <Radio value="โครงการปกติ">โครงการปกติ</Radio>
-                                            <Radio className='ms-3' value="โครงการพิเศษ">โครงการพิเศษ</Radio>
-                                        </RadioGroup>
-                                    </div>
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button type='button' className='border-1 h-[16px] py-4' radius='sm' color="primary" variant='bordered' onPress={closeForm}>
-                                        ยกเลิก
-                                    </Button>
-                                    <Button disabled={inserting} isLoading={inserting} type='submit' className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid'>
-                                        เพิ่ม
-                                    </Button>
-                                </ModalFooter>
-                            </form>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-        </>
+        <section className='max-w-2xl mx-auto bg-white'>
+            <form onSubmit={insertStudent} className='flex flex-col space-y-4 mt-6 border p-6 rounded-lg shadow'>
+                <div className='flex flex-col gap-4'>
+                    <div className='flex flex-row gap-4 mt-0'>
+                        <Input
+                            type="text"
+                            variant="bordered"
+                            radius='sm'
+                            label="รหัสนักศึกษา (มีขีด)"
+                            placeholder="660000000-0"
+                            labelPlacement="outside"
+                            value={stu_id}
+                            classNames={thinInputClass}
+                            onValueChange={setStuId}
+                            isInvalid={invalid.stu_id}
+                        />
+                        <Input
+                            type="email"
+                            variant="bordered"
+                            radius='sm'
+                            label="อีเมล"
+                            labelPlacement="outside"
+                            placeholder="กรอกอีเมล"
+                            value={email}
+                            onValueChange={setEmail}
+                            isInvalid={invalid.email}
+                            classNames={thinInputClass}
+                        />
+                    </div>
+                    <div className='flex flex-row gap-4'>
+                        <Input
+                            type="text"
+                            radius='sm'
+                            variant="bordered"
+                            label="ชื่อ"
+                            labelPlacement="outside"
+                            placeholder="กรอกชื่อ"
+                            value={first_name}
+                            onValueChange={setFname}
+                            isInvalid={invalid.first_name}
+                            classNames={thinInputClass}
+                        />
+                        <Input
+                            type="text"
+                            variant="bordered"
+                            radius='sm'
+                            label="นามสกุล"
+                            placeholder="กรอกนามสกุล"
+                            labelPlacement="outside"
+                            value={last_name}
+                            onValueChange={setLname}
+                            isInvalid={invalid.last_name}
+                            classNames={thinInputClass}
+                        />
+                    </div>
+                    <div className='w-full flex flex-row gap-4'>
+                        <Autocomplete
+                            inputProps={{
+                                classNames: {
+                                    inputWrapper: "border-1",
+                                },
+                            }}
+                            id='acadyear'
+                            radius='sm'
+                            label="ปีการศึกษา"
+                            variant="bordered"
+                            defaultItems={acadyears}
+                            placeholder="เลือกปีการศึกษา"
+                            className="w-full"
+                            labelPlacement='outside'
+                            selectedKey={acadyear}
+                            onSelectionChange={(value) => setAcadyear(value)}
+                            scrollShadowProps={{
+                                isEnabled: false
+                            }}
+                            isInvalid={invalid.acadyear}
+                        >
+                            {(item) => <AutocompleteItem key={item.acadyear}>{item.acadyear}</AutocompleteItem>}
+                        </Autocomplete>
+                        <Autocomplete
+                            inputProps={{
+                                classNames: {
+                                    inputWrapper: "border-1",
+                                },
+                            }}
+                            id='program'
+                            radius='sm'
+                            label="หลักสูตร"
+                            variant="bordered"
+                            defaultItems={programs}
+                            selectedKey={program}
+                            onSelectionChange={(value) => setProgram(value)}
+                            placeholder="เลือกหลักสูตร"
+                            className="w-full"
+                            labelPlacement='outside'
+                            scrollShadowProps={{
+                                isEnabled: false
+                            }}
+                            isInvalid={invalid.program}
+                        >
+                            {(item) => <AutocompleteItem key={item.program}>{item.program}</AutocompleteItem>}
+                        </Autocomplete>
+                    </div>
+                    <div className='w-full'>
+                        <p className='text-sm mb-2'>เลือกโครงการ</p>
+                        <RadioGroup
+                            isInvalid={invalid.courses_type}
+                            className='flex flex-col'
+                            orientation="horizontal"
+                            value={courses_type}
+                            onValueChange={setCourseType}
+                        >
+                            <Radio value="โครงการปกติ">
+                                <span className='text-sm'>โครงการปกติ</span>
+                            </Radio>
+                            <Radio className='ms-3' value="โครงการพิเศษ">
+                                <span className='text-sm'>โครงการพิเศษ</span>
+                            </Radio>
+                        </RadioGroup>
+                    </div>
+                </div>
+                <div className='flex justify-end'>
+                    <Button type='button' className='border-1 h-[16px] py-4 rounded-[5px]' color="primary" variant='bordered' onPress={closeForm}>
+                        ยกเลิก
+                    </Button>
+                    <Button disabled={inserting} isLoading={inserting} type='submit' className='h-[16px] py-4 ms-4 rounded-[5px]' color="primary" variant='solid'>
+                        เพิ่ม
+                    </Button>
+                </div>
+            </form>
+        </section>
     )
 }
 

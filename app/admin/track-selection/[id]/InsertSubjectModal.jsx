@@ -4,8 +4,11 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from
 import { Icon } from '@iconify/react';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import axios from 'axios';
+import { Empty, message } from 'antd';
 
-export default function InsertSubjectModal({ defaultTrackSubj, isOpen, onClose, trackId, showToastMessage, callBack }) {
+export default function InsertSubjectModal({
+     defaultTrackSubj, isOpen, onClose, trackId, cb, acadyear, setRendering
+}) {
      const [subjects, setSubjects] = useState([]);
      const [trackSubj, setTrackSubj] = useState([])
      const [searchSubj, setSearchSubj] = useState("")
@@ -82,22 +85,22 @@ export default function InsertSubjectModal({ defaultTrackSubj, isOpen, onClose, 
      const handleSubmit = useCallback(async (trackSubj) => {
           if (trackSubj.length == 0) return
           const formData = trackSubj.map(subject => subject.subject_id)
-          console.log(formData);
           const url = `/api/tracks/subjects/${trackId}`
           const option = await getOptions(url, "POST", formData)
           try {
                setInserting(true)
-               const res = await axios(option)
-               const { ok, message } = res.data
-               showToastMessage(ok, message)
-               callBack()
+               setRendering(true)
+               await axios(option)
+               await cb(acadyear)
+               setTrackSubj([])
                onClose()
           } catch (error) {
                console.log(error);
-               const message = error.response.data.message
-               showToastMessage(false, message)
-          }finally{
+               const msg = error?.response?.data?.message
+               message.error(msg)
+          } finally {
                setInserting(false)
+               setRendering(false)
           }
      }, [trackId])
 
@@ -115,49 +118,67 @@ export default function InsertSubjectModal({ defaultTrackSubj, isOpen, onClose, 
                          <>
                               <ModalHeader className="flex flex-col gap-1">เพิ่มการคัดเลือกแทร็ก</ModalHeader>
                               <ModalBody>
-                                   <div className='flex flex-row gap-3'>
-                                        <div className='w-1/2 flex flex-col'>
-                                             <p>วิชาที่ใช้ในการคัดเลือก</p>
-                                             <ul className='h-[210px] overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
-                                                  {trackSubj.length > 0 ?
-                                                       trackSubj.map((sbj, index) => (
-                                                            <li key={index} className='bg-gray-100 rounded-md relative p-1 gap-2 border-1 border-b-gray-300'>
-                                                                 <input
-                                                                      readOnly
-                                                                      className='bg-gray-100 block focus:outline-none font-bold'
-                                                                      type="text"
-                                                                      name="trackSubj[]"
-                                                                      value={sbj.subject_code} />
-                                                                 <p className='flex flex-col text-sm'>
-                                                                      <span>{sbj.title_th}</span>
-                                                                 </p>
-                                                                 <Icon onClick={() => delSubj(sbj.subject_code)} icon="lets-icons:dell-duotone" className="absolute top-1 right-1 w-6 h-6 cursor-pointer active:scale-95 hover:opacity-80" />
-                                                            </li>
-                                                       ))
-                                                       :
-                                                       <li>ยังไม่มีวิชาในการคัดเลือก</li>}
-                                             </ul>
+                                   <div className="flex flex-col md:flex-row gap-6 mt-2">
+                                        <div className="w-full md:w-1/2">
+                                             <h3 className="text-normal font-semibold mb-2">วิชาที่ใช้ในการคัดเลือก {trackSubj.length} วิชา</h3>
+                                             <div className="h-[234px] overflow-y-auto border border-gray-200 rounded-lg shadow-sm">
+                                                  {trackSubj.length > 0 ? (
+                                                       <ul className="divide-y divide-gray-200">
+                                                            {trackSubj.map((sbj, index) => (
+                                                                 <li key={index} className="p-3 hover:bg-gray-50 transition-colors duration-150 ease-in-out">
+                                                                      <div className="flex items-center justify-between">
+                                                                           <div>
+                                                                                <p className="font-medium text-gray-900">{sbj.subject_code}</p>
+                                                                                <p className="text-sm text-gray-600">{sbj.title_th}</p>
+                                                                           </div>
+                                                                           <button
+                                                                                type="button"
+                                                                                onClick={() => delSubj(sbj.subject_code)}
+                                                                                className="text-red-500 hover:text-red-700 focus:outline-none"
+                                                                           >
+                                                                                <Icon icon="heroicons-outline:trash" className="w-5 h-5" />
+                                                                           </button>
+                                                                      </div>
+                                                                 </li>
+                                                            ))}
+                                                       </ul>
+                                                  ) : (
+                                                       <div className="flex items-center justify-center h-full">
+                                                            <Empty
+                                                                 description={
+                                                                      <span className='text-default-300'>ยังไม่มีวิชาที่เลือก</span>
+                                                                 }
+                                                            />
+                                                       </div>
+                                                  )}
+                                             </div>
                                         </div>
-                                        <div className='w-1/2'>
-                                             <p>ค้นหาวิชาเพื่อเพิ่ม</p>
-                                             <div className='flex flex-col'>
+
+                                        <div className="w-full md:w-1/2">
+                                             <h3 className="text-normal font-semibold mb-2">ค้นหาวิชาเพื่อเพิ่ม</h3>
+                                             <div className="mb-3">
                                                   <input
-                                                       className='rounded-md border-1 w-full px-2 focus:outline-none mb-1'
+                                                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                                                        type="search"
                                                        value={searchSubj}
                                                        onChange={(e) => setSearchSubj(e.target.value)}
-                                                       placeholder='ค้นหาวิชา' />
-
-                                                  <ul className='rounded-md border-1 h-[180px] overflow-y-auto p-2 flex flex-col gap-1'>
+                                                       placeholder="ค้นหาวิชา"
+                                                  />
+                                             </div>
+                                             <div className="h-[180px] overflow-y-auto border border-gray-200 rounded-lg shadow-sm">
+                                                  <ul className="divide-y divide-gray-200">
                                                        {filterSubj.map((subject, index) => (
-                                                            !(trackSubj.map(z => z.subject_code).includes(subject.subject_code)) &&
-                                                            <li onClick={() => addSubj(subject)} key={index} className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border-1 border-b-gray-300 cursor-pointer'>
-                                                                 <strong className='block'>{subject.subject_code}</strong>
-                                                                 <p className='flex flex-col text-sm'>
-                                                                      <span>{subject.title_en}</span>
-                                                                      <span>{subject.title_th}</span>
-                                                                 </p>
-                                                            </li>
+                                                            !trackSubj.map(z => z.subject_code).includes(subject.subject_code) && (
+                                                                 <li
+                                                                      key={index}
+                                                                      onClick={() => addSubj(subject)}
+                                                                      className="p-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 ease-in-out"
+                                                                 >
+                                                                      <p className="font-medium text-gray-900">{subject.subject_code}</p>
+                                                                      <p className="text-sm text-gray-600">{subject.title_en}</p>
+                                                                      <p className="text-sm text-gray-500">{subject.title_th}</p>
+                                                                 </li>
+                                                            )
                                                        ))}
                                                   </ul>
                                              </div>

@@ -51,7 +51,7 @@ const SuggestForm = ({ formId, formStyle, next, suggestForm, setSuggestForm, fet
                          color="primary"
                          className="rounded-[5px]"
                          onClick={next}>
-                         Next
+                         ต่อไป
                     </Button>
                </div>
           </>

@@ -1,54 +1,21 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Link, useDisclosure, Tooltip } from "@nextui-org/react";
-import { PlusIcon, VerticalDotsIcon, SearchIcon, ChevronDownIcon, DeleteIcon2, DeleteIcon, EditIcon2, EyeIcon } from "@/app/components/icons";
+import { PlusIcon, SearchIcon, ChevronDownIcon, DeleteIcon2, DeleteIcon, EditIcon2 } from "@/app/components/icons";
 import { capitalize } from "@/src/util/utils";
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData } from '../action'
 import { getAcadyears } from "@/src/util/academicYear";
-import InsertModal from "./InsertModal";
 import DeleteModal from "./DeleteModal";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { TbRestore } from "react-icons/tb";
 import DeleteSelectModal from "./DeleteSelectModal";
 import { deleteColor, insertColor, minimalTableClass, restoreColor, thinInputClass } from "@/src/util/ComponentClass";
 import { RiFileExcel2Fill } from "react-icons/ri";
 import { SiGoogleforms } from "react-icons/si";
-import InsertExcelModal from "../../components/InsertExcelModal";
-import { getToken } from "@/app/components/serverAction/TokenAction";
-import { hostname } from "@/app/api/hostname";
-import InsertEnrollmentForm from "./InsertEnrollmentForm";
 import { Empty } from "antd";
 import { IoMdEye } from "react-icons/io";
 
 const Page = () => {
-
-    const showToastMessage = useCallback(function (ok, message) {
-        if (ok) {
-            toast.success(message, {
-                position: toast.POSITION.TOP_RIGHT,
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        } else {
-            toast.warning(message, {
-                position: toast.POSITION.TOP_RIGHT,
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        }
-    }, [])
 
     const INITIAL_VISIBLE_COLUMNS = useMemo(() => (
         ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"]
@@ -356,58 +323,6 @@ const Page = () => {
         setSelectedStudents(students)
     }, [selectedKeys])
 
-    const insertStudentExcel = useCallback(async function (formattedData) {
-        // add required column
-        if (formattedData.every(row =>
-            row.stu_id != null &&
-            row.email != null &&
-            row.first_name != null &&
-            row.last_name != null &&
-            row.program != null
-        )) {
-
-            const token = await getToken()
-            const options = {
-                url: `${hostname}/api/students/excel`,
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json;charset=UTF-8',
-                    "authorization": `${token}`,
-                },
-            };
-
-            return { status: true, options }
-        } else {
-            return { status: false, options: {} }
-        }
-    }, [])
-
-    const insertEnrollmentExcel = useCallback(async function (formattedData) {
-        // add required column
-        if (formattedData.every(row =>
-            row.stu_id != null &&
-            row.subject_code != null &&
-            row.enroll_year != null
-        )) {
-
-            const token = await getToken()
-            const options = {
-                url: `${hostname}/api/students/enrollments/excel`,
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json;charset=UTF-8',
-                    "authorization": `${token}`,
-                },
-            };
-
-            return { status: true, options }
-        } else {
-            return { status: false, options: {} }
-        }
-    }, [])
-
     const removeStatusFilter = useCallback((id) => {
         setStatusFilter((prev) => {
             const newStatusFilter = [...prev]
@@ -518,14 +433,15 @@ const Page = () => {
                             <DropdownMenu
                                 variant="faded"
                                 aria-label="Dropdown menu"
-                                onAction={(key) => {
-                                    if (key == "add-student") onOpen()
-                                    else if (key == "add-students-excel") studentExcelOnOpen()
-                                    else if (key == "add-enrollment-excel") enrollExcelOnOpen()
-                                    else if (key == "add-enrollment") onOpenEnroll()
-                                }}
+                            // onAction={(key) => {
+                            //     if (key == "add-student") onOpen()
+                            //     else if (key == "add-students-excel") studentExcelOnOpen()
+                            //     else if (key == "add-enrollment-excel") enrollExcelOnOpen()
+                            //     else if (key == "add-enrollment") onOpenEnroll()
+                            // }}
                             >
                                 <DropdownItem
+                                    href="students/create?tab=student-form"
                                     key="add-student"
                                     description="เพิ่มรายชื่อนักศึกษาผ่านแบบฟอร์ม"
                                     startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
@@ -533,6 +449,7 @@ const Page = () => {
                                     เพิ่มรายชื่อนักศึกษา
                                 </DropdownItem>
                                 <DropdownItem
+                                    href="students/create?tab=enroll-form"
                                     key="add-enrollment"
                                     description="เพิ่มรายวิชาที่ลงทะเบียนผ่านแบบฟอร์ม"
                                     startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
@@ -540,6 +457,7 @@ const Page = () => {
                                     เพิ่มรายวิชาที่ลงทะเบียน
                                 </DropdownItem>
                                 <DropdownItem
+                                    href="students/create?tab=student-sheet"
                                     key="add-students-excel"
                                     description="เพิ่มรายชื่อนักศึกษาผ่านไฟล์ excel"
                                     startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
@@ -547,6 +465,7 @@ const Page = () => {
                                     เพิ่มรายชื่อนักศึกษา
                                 </DropdownItem>
                                 <DropdownItem
+                                    href="students/create?tab=enroll-sheet"
                                     key="add-enrollment-excel"
                                     description="เพิ่มรายวิชาที่ลงทะเบียนผ่านไฟล์ excel"
                                     startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
@@ -632,20 +551,7 @@ const Page = () => {
             <ContentWrap>
                 <BreadCrumb />
 
-                <InsertModal
-                    showToastMessage={showToastMessage}
-                    getStudents={getStudents}
-                    programs={programs}
-                    isOpen={isOpen}
-                    onClose={onClose} />
-
-                <InsertEnrollmentForm
-                    showToastMessage={showToastMessage}
-                    isOpen={isOpenEnroll}
-                    onClose={onCloseEnroll} />
-
                 <DeleteModal
-                    showToastMessage={showToastMessage}
                     callData={getStudents}
                     delIsOpen={delIsOpen}
                     delOnClose={delOnClose}
@@ -654,50 +560,12 @@ const Page = () => {
                     setSelectedKeys={setSelectedKeys}
                     setDisableSelectDelete={setDisableSelectDelete}
                     setSelectedStudents={setSelectedStudents}
-                    showToastMessage={showToastMessage}
                     getStudents={getStudents}
                     delIsOpen={delsIsOpen}
                     delOnClose={delsOnClose}
                     stuIdList={selectedStudents} />
 
-                {/* students data */}
-                <InsertExcelModal
-                    title={"เพิ่มรายชื่อนักศึกษาผ่านไฟล์ Exel"}
-                    templateFileName={"students_template"}
-                    headers={[
-                        { required: true, label: "stu_id" },
-                        { required: true, label: "email" },
-                        { required: true, label: "first_name" },
-                        { required: true, label: "last_name" },
-                        { required: true, label: "program" },
-                        { label: "acadyear" },
-                        { label: "courses_type" },
-                        { label: "status_code" },
-                    ]}
-                    hook={insertStudentExcel}
-                    callData={initData}
-                    studentExcelIsOpen={studentExcelIsOpen}
-                    studentExcelOnClose={studentExcelOnClose}
-                />
-
-                {/* enrollments data */}
-                <InsertExcelModal
-                    title={"เพิ่มการลงทะเบียนของนักศึกษาผ่านไฟล์ Exel"}
-                    templateFileName={"enrollments_template"}
-                    headers={[
-                        { required: true, label: "stu_id" },
-                        { required: true, label: "subject_code" },
-                        { required: true, label: "enroll_year" },
-                        { label: "grade" },
-                    ]}
-                    hook={insertEnrollmentExcel}
-                    callData={() => { }}
-                    studentExcelIsOpen={enrollExcelIsOpen}
-                    studentExcelOnClose={enrollExcelOnClose}
-                />
-
                 <div>
-                    <ToastContainer />
                     <>
                         <div className='border p-4 rounded-[10px] w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-4 flex-wrap'>
                             <div className="flex gap-4 flex-wrap">

@@ -39,7 +39,7 @@ const Sidebar = () => {
             href: "/admin",
             activeIcon: <MdAdminPanelSettings className="w-5 h-5 text-white" />,
             icon: <MdOutlineAdminPanelSettings className="w-5 h-5" />,
-            label:  session?.user?.role === "admin" ? "Admin Panel" : "Teacher Panel",
+            label: session?.user?.role === "admin" ? "Admin Panel" : "Teacher Panel",
             condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
         },
         {
@@ -54,7 +54,7 @@ const Sidebar = () => {
             activeIcon: <AiFillEdit className="w-5 h-5" />,
             icon: <AiOutlineEdit className="w-5 h-5" />,
             label: "คัดเลือกแทร็ก",
-            condition: true
+            condition: session?.user?.role === "student"
         },
         {
             href: "/student/tracks/exam",
@@ -68,7 +68,7 @@ const Sidebar = () => {
             activeIcon: <HiAcademicCap className="w-5 h-5" />,
             icon: <HiOutlineAcademicCap className="w-5 h-5" />,
             label: "ตรวจสอบสำเร็จการศึกษา",
-            condition: true
+            condition: session?.user?.role === "student"
         }
     ]), [session])
 

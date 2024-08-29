@@ -229,7 +229,7 @@ const Page = () => {
      useEffect(() => {
           let students
           if (selectedKeys == "all") {
-               students = sortedItems.map(e => e.id)
+               students = items.map(e => e.id)
                setDisableDeleteBtn(false)
           } else {
                students = [...selectedKeys.values()]
@@ -383,7 +383,7 @@ const Page = () => {
                          )}
                     </TableHeader>
                     <TableBody
-                         isLoading={fetching}
+                         isLoading={fetching || deleting}
                          loadingContent={<Spinner />}
                          emptyContent={
                               <Empty

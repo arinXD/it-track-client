@@ -76,7 +76,7 @@ const StudentTrackTable = ({
         column: "coursesType",
         direction: "ascending",
     });
-    const columns = [...initColumns.slice(0, 3), ...subjects, ...initColumns.slice(3, initColumns.length)];
+    const columns = [...initColumns.slice(0, 4), ...subjects, ...initColumns.slice(4, initColumns.length)];
     const students = studentData?.students
     const [filterValue, setFilterValue] = useState("");
     const [visibleColumns, setVisibleColumns] = useState(new Set(columns.map(column => column.uid)));
@@ -359,17 +359,14 @@ const StudentTrackTable = ({
                 }
             </div>
             <Table
-                aria-label={`Student Track Table`}
-                removeWrapper
-
-                bottomContent={bottomContent}
-                bottomContentPlacement="outside"
-
                 selectionMode={isManagable ? "multiple" : "none"}
                 classNames={{
                     ...minimalTableClass,
                     wrapper: "w-full overflow-x-auto",
                 }}
+                aria-label={`Student Track Table`}
+                removeWrapper
+                className='overflow-x-auto'
                 isStriped
                 selectedKeys={selectedKeys}
                 onSelectionChange={setSelectedKeys}
@@ -419,7 +416,7 @@ const StudentTrackTable = ({
                             {
                                 item.grade.map((g, index) => (
                                     <TableCell key={index}>
-                                        {g[subjects[index].uid] || "-"}
+                                        {g[subjects[index]?.uid] || "-"}
                                     </TableCell>
                                 ))
                             }
@@ -432,6 +429,7 @@ const StudentTrackTable = ({
                     )}
                 </TableBody>
             </Table>
+            {bottomContent}
         </div>
     )
 }

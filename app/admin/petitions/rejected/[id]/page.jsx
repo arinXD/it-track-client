@@ -21,7 +21,7 @@ const Page = ({ params }) => {
      }, [id])
 
      return (
-          <section>
+          <section className="w-full !mr-[240px]">
                <PetitionDetail
                     id={id}
                     current={current}

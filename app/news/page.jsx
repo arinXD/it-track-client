@@ -1,6 +1,6 @@
 "use client"
 
-import SidebarDrawer from "../components/SidebarDrawer"
+import SidebarDrawer from "../components/NavbarDrawer"
 
 const Page = () => {
      return (

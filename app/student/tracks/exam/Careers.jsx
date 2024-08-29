@@ -21,7 +21,7 @@ const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
      }, [])
      return (
           <section className="flex flex-col flex-wrap gap-4">
-               <p className="mt-4 mb-2">อาชีพที่คาดหวัง</p>
+               <p className="mt-4 mb-2">อาชีพชอบและคาดหวัง</p>
                <section className="grid grid-cols-4 gap-4 mb-4" >
                     {
                          allCareers?.map((career, index) => (
@@ -51,7 +51,7 @@ const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
                                    <div
                                         key={career.id}
                                         onClick={() => handleSelectCareer(career.id)}
-                                        className={`relative flex flex-col justify-center items-center ${careers.includes(career.id) && "!border-blue-700"} text-center border-2 p-4 rounded-[5px] cursor-pointer hover:border-blue-500/50 focus:scale-95 active:scale-95`}
+                                        className={`relative flex flex-col justify-center items-center ${careers.includes(career.id) && "!border-blue-700"} text-center h-full border-2 p-4 rounded-[5px] cursor-pointer hover:border-blue-500/50 focus:scale-95 active:scale-95`}
                                    >
                                         <Image
                                              src={career.image}

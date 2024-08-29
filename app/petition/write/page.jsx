@@ -93,7 +93,7 @@ const Page = () => {
                     </div>
 
                     <div className="space-y-2">
-                         <label htmlFor="detail" className="block text-sm font-medium text-gray-700">รายละเอียด</label>
+                         <label htmlFor="detail" className="block text-sm font-medium text-gray-700">เหตุผล</label>
                          <textarea
                               id="detail"
                               name="detail"

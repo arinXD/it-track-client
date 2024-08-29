@@ -19,6 +19,8 @@ import { Icon } from '@iconify/react';
 import { FaUser } from "react-icons/fa6";
 import { BiSolidExit } from "react-icons/bi";
 import { Drawer } from 'antd';
+import PetitionNotification from './PetitionNotification';
+import { DROPDOWN_MENU_CLASS } from '@/src/util/ComponentClass';
 
 const SidebarLink = ({ href, activeIcon, icon, label, isActive, closeDrawer }) => (
      <Link
@@ -72,7 +74,7 @@ const SidebarDrawer = () => {
                activeIcon: <AiFillEdit className="w-5 h-5" />,
                icon: <AiOutlineEdit className="w-5 h-5" />,
                label: "คัดเลือกแทร็ก",
-               condition: true
+               condition: session?.user?.role === "student"
           },
           {
                href: "/student/tracks/exam",
@@ -86,7 +88,7 @@ const SidebarDrawer = () => {
                activeIcon: <HiAcademicCap className="w-5 h-5" />,
                icon: <HiOutlineAcademicCap className="w-5 h-5" />,
                label: "ตรวจสอบสำเร็จการศึกษา",
-               condition: true
+               condition: session?.user?.role === "student"
           }
      ]), [session])
 
@@ -106,13 +108,6 @@ const SidebarDrawer = () => {
                condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
           },
           {
-               href: "/dashboard",
-               activeIcon: <Icon icon="mingcute:chart-pie-2-fill" className="w-5 h-5 text-white" />,
-               icon: <Icon icon="mingcute:chart-pie-2-line" className="w-5 h-5" />,
-               label: "Dashboard",
-               condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
-          },
-          {
                href: "/tracks",
                activeIcon: <HiUserGroup className="w-5 h-5" />,
                icon: <HiOutlineUserGroup className="w-5 h-5" />,
@@ -123,8 +118,8 @@ const SidebarDrawer = () => {
                href: "/student/tracks",
                activeIcon: <AiFillEdit className="w-5 h-5" />,
                icon: <AiOutlineEdit className="w-5 h-5" />,
-               label: "คัดเลือกแทร็ก",
-               condition: true
+               label: "คัดเลือกแทร็ก " + String(session?.user?.role),
+               condition: session?.user?.role === "student"
           },
           {
                href: "/student/tracks/exam",
@@ -175,19 +170,7 @@ const SidebarDrawer = () => {
                                    disabledKeys={[]}
                                    className="p-2"
                                    variant="flat"
-                                   itemClasses={{
-                                        base: [
-                                             "rounded-md",
-                                             "text-default-500",
-                                             "transition-opacity",
-                                             "data-[hover=true]:text-foreground",
-                                             "data-[hover=true]:bg-default-100",
-                                             "dark:data-[hover=true]:bg-default-50",
-                                             "data-[selectable=true]:focus:bg-default-50",
-                                             "data-[pressed=true]:opacity-70",
-                                             "data-[focus-visible=true]:ring-default-500",
-                                        ],
-                                   }}
+                                   itemClasses={DROPDOWN_MENU_CLASS}
                               >
                                    <DropdownSection aria-label="Profile & Actions" showDivider>
                                         <DropdownItem
@@ -325,7 +308,7 @@ const SidebarDrawer = () => {
                          })}
                     </ul>
                </Drawer>
-               <div className="px-2 z-50 relative bg-white/60 backdrop-blur-md shadow-sm">
+               <div className="px-2 z-50 relative bg-white/80 backdrop-blur-md shadow-sm">
                     <div className="relative flex h-16 items-center justify-between p-2">
                          <div className="flex flex-1 items-center justify-center md:justify-start gap-0">
                               <div
@@ -353,6 +336,7 @@ const SidebarDrawer = () => {
                               </button>
                          </div>
                          <div className="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
+                              <PetitionNotification />
                               <div className="relative ml-3 flex flex-row gap-3">
                                    {renderUserProfile()}
                               </div >

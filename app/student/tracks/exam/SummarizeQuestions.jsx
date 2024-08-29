@@ -101,13 +101,13 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
                         <section className='p-6 bg-blue-50 rounded-lg '>
                             <h2 className="text-2xl font-semibold text-blue-800 mb-4">แบบทดสอบทั้งหมด
                             </h2>
-                            <div className="bg-white shadow overflow-hidden rounded-lg">
+                            <div className="bg-white shadow overflow-auto rounded-lg">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">คำถาม</th>
                                             <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">คะแนน</th>
-                                            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ความถูกต้อง</th>
+                                            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
@@ -117,7 +117,7 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-center text-sm">{qs.score}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${qs.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                        {qs.isCorrect ? 'Yes' : 'No'}
+                                                        {qs.isCorrect ? 'ถูก' : 'ผิด'}
                                                     </span>
                                                 </td>
                                             </tr>

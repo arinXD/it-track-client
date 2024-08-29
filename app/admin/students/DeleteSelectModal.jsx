@@ -1,10 +1,11 @@
 "use client"
 import { getOptions } from '@/app/components/serverAction/TokenAction'
 import { Button, Modal, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react'
+import { message } from 'antd'
 import axios from 'axios'
 import React, { useCallback, useState } from 'react'
 
-const DeleteSelectModal = ({ setSelectedKeys, setDisableSelectDelete, setSelectedStudents, showToastMessage, getStudents, delIsOpen, delOnClose, stuIdList }) => {
+const DeleteSelectModal = ({ setSelectedKeys, setDisableSelectDelete, setSelectedStudents, getStudents, delIsOpen, delOnClose, stuIdList }) => {
     const [deleting, setDeleting] = useState(false)
 
     const handleDelete = useCallback(async function () {
@@ -14,17 +15,17 @@ const DeleteSelectModal = ({ setSelectedKeys, setDisableSelectDelete, setSelecte
                 students: stuIdList
             })
             const res = await axios(option)
-            const { ok, message } = res.data
+            const { message: msg } = res.data
             await getStudents()
-            await showToastMessage(ok, message)
+            message.success(msg)
             setSelectedStudents([])
             setDisableSelectDelete(true)
             setSelectedKeys([])
             delOnClose()
         } catch (error) {
             console.log(error);
-            const { ok, message } = error.response.data
-            showToastMessage(ok, message)
+            const { message: msg } = error.response.data
+            message.warning(msg)
         } finally {
             setDeleting(false)
         }

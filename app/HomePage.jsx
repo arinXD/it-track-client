@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useMemo, useState } from 'react'
-import SidebarDrawer from './components/SidebarDrawer'
+import SidebarDrawer from './components/NavbarDrawer'
 import './homepage.css';
 import Footer from './components/Footer';
 import Link from 'next/link';
@@ -78,67 +78,58 @@ const HomePage = ({ news = mockNews }) => {
                          <div className="text-center">
                               <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Welcome to KKU IT</h1>
                               <p className="mt-6 text-xl md:text-2xl max-w-3xl mx-auto">ค้นพบความเชี่ยวชาญหลักสูตรไอทีล่าสุด! ยกระดับทักษะของคุณด้วยความเชี่ยวชาญที่ล้ำสมัย นำทางไปสู่อนาคตของความสำเร็จทางเทคโนโลยี</p>
-                              {/* <div className="mt-10 space-x-4">
-                                   <a href="#tracks" className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50 transition duration-150 ease-in-out">
-                                        สำรวจแทร็ก
-                                   </a>
-                                   <a href="#assessment" className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 transition duration-150 ease-in-out">
-                                        Start Assessment
-                                   </a>
-                              </div> */}
                          </div>
                     </div>
                </section>
-
-               <section id="news" className="py-20 bg-white">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                         <div className="text-center mb-12">
-                              <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">ข่าวสารประชาสัมพันธ์</h2>
-                              <p className="mt-4 text-xl text-gray-600">อัปเดตข่าวสารประชาสัมพันธ์</p>
-                         </div>
-                         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                              {news?.length > 0 ? news.map((newsItem, index) => (
-                                   <Link
-                                        key={newsItem.id}
-                                        href={`/news/${newsItem.id}`}
-                                        className="block group"
-                                   >
-                                        <div
-                                             style={{
-                                                  backgroundImage: `linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) -10%, rgba(0,0,0,0) 80%), url(${newsItem.image})`,
-                                                  backgroundPosition: "center",
-                                                  backgroundRepeat: "no-repeat",
-                                                  backgroundSize: "cover",
-                                             }}
-                                             className="relative flex flex-col justify-end h-[300px] overflow-hidden transition duration-300 ease-in-out transform group-hover:scale-105 group-hover:shadow-xl"
+               {news?.length > 0 ?
+                    <section id="news" className="py-20 bg-white">
+                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                              <div className="text-center mb-12">
+                                   <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">ข่าวสารประชาสัมพันธ์</h2>
+                                   <p className="mt-4 text-xl text-gray-600">อัปเดตข่าวสารประชาสัมพันธ์</p>
+                              </div>
+                              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                                   {news.map((newsItem, index) => (
+                                        <Link
+                                             key={newsItem.id}
+                                             href={`/news/${newsItem.id}`}
+                                             className="block group"
                                         >
-                                             {index === 0 &&
-                                                  <div className='absolute top-0 left-0 text-white px-6 py-2 bg-[#FF005B]'>
-                                                       ล่าสุด
+                                             <div
+                                                  style={{
+                                                       backgroundImage: `linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) -10%, rgba(0,0,0,0) 80%), url(${newsItem.image})`,
+                                                       backgroundPosition: "center",
+                                                       backgroundRepeat: "no-repeat",
+                                                       backgroundSize: "cover",
+                                                  }}
+                                                  className="relative flex flex-col justify-end h-[300px] overflow-hidden transition duration-300 ease-in-out transform group-hover:scale-105 group-hover:shadow-xl"
+                                             >
+                                                  {index === 0 &&
+                                                       <div className='absolute top-0 left-0 text-white px-6 py-2 bg-[#FF005B]'>
+                                                            ล่าสุด
+                                                       </div>
+                                                  }
+                                                  <div className="p-6 text-white">
+                                                       <p className="font-semibold text-lg mb-2 line-clamp-2">{newsItem.title}</p>
+                                                       <p className="text-sm line-clamp-2 mb-4">{newsItem.desc}</p>
+                                                       <span className="text-sm font-medium text-blue-300 group-hover:text-blue-200 transition-colors duration-300">ข้อมูลเพิ่มเติม →</span>
                                                   </div>
-                                             }
-                                             <div className="p-6 text-white">
-                                                  <p className="font-semibold text-lg mb-2 line-clamp-2">{newsItem.title}</p>
-                                                  <p className="text-sm line-clamp-2 mb-4">{newsItem.desc}</p>
-                                                  <span className="text-sm font-medium text-blue-300 group-hover:text-blue-200 transition-colors duration-300">ข้อมูลเพิ่มเติม →</span>
                                              </div>
-                                        </div>
-                                   </Link>
-                              )) : (
-                                   Array.from({ length: 4 }).map((_, index) => (
-                                        <div key={index} className="animate-pulse bg-gray-300 h-[300px] rounded-lg"></div>
-                                   ))
-                              )}
+                                        </Link>
+                                   ))}
+                              </div>
                          </div>
-                    </div>
-               </section>
+                    </section>
+                    : (
+                         undefined
+                    )}
 
                {/* Track */}
                <section section id="tracks" className="py-20 bg-gradient-to-r pt-16 from-blue-600 to-indigo-700" >
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                          <div className="text-center">
                               <h2 className="text-3xl font-extrabold text-white sm:text-4xl"> <code>Choose Your Track!</code></h2>
-                              <p className="mt-4 text-xl text-white">สำรวจความเชี่ยวชาญและค้นหาความเชี่ยวชาญที่ลงตัวกับเป้าหมายทางอาชีพของคุณ</p>
+                              <p className="mt-4 text-xl text-white">สำรวจและค้นหาความเชี่ยวชาญที่ตรงกับเป้าหมายทางอาชีพของคุณ</p>
                          </div>
                          <div className="mt-20 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                               {tracks.map((track, index) => (

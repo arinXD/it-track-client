@@ -40,12 +40,12 @@ const columns = [{
      sortable: true
 },
 {
-     name: "Score",
+     name: "เกรดที่ใช้ในการคัดเลือก",
      uid: "score",
      sortable: true
 },
 {
-     name: "GPA",
+     name: "เกรดรวม",
      uid: "gpa",
      sortable: true
 },

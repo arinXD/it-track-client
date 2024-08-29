@@ -110,6 +110,19 @@ const SELECT_STYLE = {
     border: '1px solid #dfdfdf',
     paddingRight: '1.7rem'
 }
+const DROPDOWN_MENU_CLASS = {
+    base: [
+        "rounded-md",
+        "text-default-500",
+        "transition-opacity",
+        "data-[hover=true]:text-foreground",
+        "data-[hover=true]:bg-default-100",
+        "dark:data-[hover=true]:bg-default-50",
+        "data-[selectable=true]:focus:bg-default-50",
+        "data-[pressed=true]:opacity-70",
+        "data-[focus-visible=true]:ring-default-500",
+    ],
+}
 module.exports = {
     tableClass,
     inputClass,
@@ -120,5 +133,6 @@ module.exports = {
     deleteColor,
     warningColor,
     bgGrayColor,
-    SELECT_STYLE
+    SELECT_STYLE,
+    DROPDOWN_MENU_CLASS
 }

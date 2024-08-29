@@ -117,67 +117,72 @@ const CareerForm = ({ prev, formStyle, tracks, formId, setCareers, creating, set
                               :
                               <>
                                    <div className="flex justify-between">
-                                        <h2>อาชีพภายในแบบฟอร์ม</h2>
+                                        <h2 className="text-black">อาชีพภายในแบบฟอร์ม</h2>
                                         <div className="flex justify-end gap-4">
                                              <Button
                                                   isIconOnly
                                                   radius="full"
-                                                  color="default"
+                                                  className={`text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
                                                   onClick={onOpen}
                                                   aria-label="create">
                                                   <PlusIcon />
                                              </Button>
                                              <Button
+                                                  className={`rounded-[5px] text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
                                                   startContent={<MdOutlineInventory2 />}
-                                                  className="rounded-[5px]"
                                                   onClick={onOpenInventory}
                                              >
                                                   คลังอาชีพ
                                              </Button>
                                         </div>
                                    </div>
-                                   <section className={`w-full grid grid-cols-${filterCareer?.length > 0 ? "3" : "1"} gap-4 mt-4`}>
-                                        {
-                                             filterCareer?.length > 0 ?
-                                                  filterCareer.map((track, index) => (
-                                                       <section
-                                                            key={index}
-                                                            className="w-full shadow-sm relative bg-white border-1 p-4 rounded-[5px]">
-                                                            <div className="flex justify-between">
-                                                                 <p className="w-1/2 overflow-hidden text-ellipsis whitespace-nowrap text-black">
-                                                                      {track.track}
-                                                                 </p>
-                                                            </div>
-                                                            <ul className="flex flex-col mt-2 gap-2 !h-[150px] overflow-y-auto">
-                                                                 {track?.careers?.map((career, indexJ) => (
-                                                                      <li
-                                                                           className="flex justify-between items-center w-full border-1 h-fit rounded-[5px] p-2"
-                                                                           key={indexJ}>
-                                                                           <input readOnly type="hidden" name="careers[]" defaultValue={career?.id} />
-                                                                           <p className="w-[80%] overflow-hidden text-ellipsis whitespace-nowrap"> {career?.name_en} </p>
-                                                                           <Button
-                                                                                isIconOnly
-                                                                                variant="light"
-                                                                                radius="full"
-                                                                                color="default"
-                                                                                onClick={() => removeSelectedCareer(career?.id)}
-                                                                                aria-label="remove">
-                                                                                <IoCloseOutline className="w-7 h-7" />
-                                                                           </Button>
-                                                                      </li>
-                                                                 ))}
-                                                            </ul>
-                                                       </section>
-                                                  ))
-                                                  :
+                                   {filterCareer?.length > 0 ?
+                                        <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                             {filterCareer.map((track, index) => (
+                                                  <div
+                                                       key={index}
+                                                       className="w-full border bg-white rounded-lg shadow-md p-4 relative"
+                                                  >
+                                                       <div className="flex justify-between items-center mb-2">
+                                                            <p className="text-gray-800 font-medium truncate w-3/4">
+                                                                 {track.track}
+                                                            </p>
+                                                       </div>
+                                                       <ul className="flex flex-col mt-2 gap-2 max-h-[150px] overflow-y-auto">
+                                                            {track?.careers?.map((career, indexJ) => (
+                                                                 <li
+                                                                      key={indexJ}
+                                                                      className="flex justify-between items-center w-full bg-gray-100 rounded-lg p-2"
+                                                                 >
+                                                                      <input
+                                                                           readOnly
+                                                                           type="hidden"
+                                                                           name="careers[]"
+                                                                           defaultValue={career?.id}
+                                                                      />
+                                                                      <p className="text-gray-700 truncate w-3/4">
+                                                                           {career?.name_en}
+                                                                      </p>
+                                                                      <button
+                                                                           className="bg-white rounded-full p-1 hover:bg-gray-200 transition-colors"
+                                                                           onClick={() => removeSelectedCareer(career?.id)}
+                                                                           aria-label="remove"
+                                                                      >
+                                                                           <IoCloseOutline className="w-5 h-5 text-gray-500" />
+                                                                      </button>
+                                                                 </li>
+                                                            ))}
+                                                       </ul>
+                                                  </div>
+                                             ))}
+                                        </section> : (
+                                             <div className="flex justify-center items-center">
                                                   <Empty
-                                                       className='my-6'
-                                                       description={
-                                                            <span className='text-gray-300'>ไม่มีข้อมูล</span>
-                                                       }
+                                                       description={<span className="text-default-300">ไม่มีข้อมูล</span>}
                                                   />
-                                        }
-                                   </section>
+                                             </div>
+                                        )
+                                   }
                               </>
                     }
                </section>
@@ -185,10 +190,10 @@ const CareerForm = ({ prev, formStyle, tracks, formId, setCareers, creating, set
                     <Button
                          type="button"
                          variant="bordered"
-                         className="rounded-[5px] border-blue-500 text-blue-500 border-1 hover:bg-blue-500 hover:text-white"
+                         className="rounded-[5px] border-white text-black border-1 hover:border-blue-500 hover:text-blue-500"
                          onClick={() => prev()}
                     >
-                         Previous
+                         ย้อนกลับ
                     </Button>
                     <Button
                          isLoading={creating}
@@ -199,7 +204,7 @@ const CareerForm = ({ prev, formStyle, tracks, formId, setCareers, creating, set
                               setCreateTrigger(true)
                               setCareers(filterCareer?.flatMap(career => career.careers.map(c => c.id)))
                          }}>
-                         Done
+                         บันทึก
                     </Button>
                </div>
           </>
