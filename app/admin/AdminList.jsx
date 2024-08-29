@@ -12,6 +12,7 @@ import { TbCheckupList } from "react-icons/tb";
 import { IoBookOutline, IoBarChartOutline, IoDocumentTextOutline } from 'react-icons/io5';
 import { LuTextSelect } from "react-icons/lu";
 import { IoNewspaperOutline } from "react-icons/io5";
+import { BiCheckbox } from "react-icons/bi";
 
 const AdminList = () => {
      const { data: session } = useSession();
@@ -30,6 +31,7 @@ const AdminList = () => {
                     { href: "/admin/category", label: "หมวดหมู่วิชา", icon: BiCategory },
                     { href: "/admin/group", label: "กลุ่มวิชา", icon: HiOutlineRectangleGroup },
                     { href: "/admin/subgroup", label: "กลุ่มย่อยวิชา", icon: LuUngroup },
+                    { href: "/admin/semisubgroup", label: "กลุ่มรองวิชา", icon: BiCheckbox },
                     { href: "/admin/subject", label: "วิชา", icon: RiBookletLine },
                     { href: "/admin/students", label: "รายชื่อนักศึกษา", icon: BsPerson },
                     { href: "/admin/news", label: "จัดการข่าวสาร", icon: IoNewspaperOutline },

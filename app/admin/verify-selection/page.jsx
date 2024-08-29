@@ -10,7 +10,7 @@ import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
 import { useDisclosure } from "@nextui-org/react";
 import { getAcadyears } from '@/src/util/academicYear';
 import Link from 'next/link'
-import { dmy } from '@/src/util/dateFormater'
+import { dmy, dmyt } from '@/src/util/dateFormater'
 import { Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import { Icon } from '@iconify/react';
@@ -18,26 +18,14 @@ import { Loading } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import { Tabs, Tab, Card, CardBody, Switch } from "@nextui-org/react";
+import { VscArchive, VscCheckAll } from "react-icons/vsc";
+import Image from 'next/image';
 
 
 const Page = () => {
 
     const [verify, setVerify] = useState([]);
     const [loading, setLoading] = useState(true)
-    const [isVertical, setIsVertical] = useState(true);
-
-    const showToastMessage = useCallback((ok, message) => {
-        toast[ok ? 'success' : 'warning'](message, {
-            position: toast.POSITION.TOP_RIGHT,
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    }, [])
 
     const callVerify = useCallback(async () => {
         try {
@@ -63,93 +51,112 @@ const Page = () => {
             <header>
                 <Navbar />
             </header>
-            <header>
-                <Navbar />
-            </header>
             <Sidebar />
             <ContentWrap>
                 <BreadCrumb />
                 <ToastContainer />
                 <div className='my-[30px]'>
-                    {
-                        loading ?
-                            <div className='w-fit mx-auto mt-14'>
-                                <Loading />
-                            </div>
-                            :
-                            <>
-                                <Table
-                                    removeWrapper
-                                    selectionMode="multiple"
-                                    onRowAction={() => { }}
-                                    aria-label="programcode table">
-                                    <TableHeader>
-                                        <TableColumn></TableColumn>
-                                        {/* <TableColumn>ปีการศึกษา</TableColumn> */}
-                                        <TableColumn>รหัสนักศึกษา</TableColumn>
-                                        {/* <TableColumn>หลักสูตร</TableColumn> */}
-                                        <TableColumn>ปีการศึกษา</TableColumn>
-                                        <TableColumn>วันที่ส่งการอนุมัติ</TableColumn>
-                                    </TableHeader>
-                                    <TableBody emptyContent={"ไม่มีข้อมูลอนุมัติแบบฟอร์มตรวจสอบจบ"}>
-                                        {verify?.map(verifies => (
-                                            <TableRow key={verifies.id}>
-                                                <TableCell>
-                                                    <div className='relative flex items-center gap-2'>
-                                                        <Tooltip color="danger" content="ลบ">
-                                                            <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                                <DeleteIcon2 />
-                                                            </span>
-                                                        </Tooltip>
+                    {loading ? (
+                        <div className='w-fit mx-auto mt-14'>
+                            <Loading />
+                        </div>
+                    ) : (
+                        <Tabs aria-label="Options" color="primary" size="md">
+                            <Tab
+                                key="sd"
+                                title={
+                                    <div className="flex items-center space-x-2">
+                                        <VscArchive />
+                                        <span>คำร้องใหม่</span>
+                                    </div>
+                                }
+                            >
+                                <div className='border border-gray-300 rounded-md p-5 shadow-sm'>
+                                    <h1 className='text-2xl font-semibold'>คำร้องอนุมัติจบการศึกษา</h1>
+                                    <div className='border-t mt-5 border-gray-300'></div>
+                                    {verify.map((verifies) => (
+                                        verifies.status === 1 && (
+                                            <div key={verifies.id}>
+                                                <Link
+                                                    href={`/admin/verify-selection/${verifies.stu_id}`}
+                                                    className='block text-black hover:text-sky-700'
+                                                >
+                                                    <div className='flex justify-between items-center my-5'>
+                                                        <div>
+                                                            <div className='flex items-center'>
+                                                                <p className='font-semibold text-lg'>
+                                                                    {verifies.Student.first_name} {verifies.Student.last_name}
+                                                                </p>
+                                                                <span className='text-sm ml-3'>
+                                                                    {verifies.Student.email}
+                                                                </span>
+                                                            </div>
+                                                            <p className='text-sm mt-2'>
+                                                                {dmyt(verifies.createdAt)}
+                                                            </p>
+                                                        </div>
+                                                        <div className='inline-flex items-center bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-orange-900 dark:text-orange-300'>
+                                                            <span className='w-3 h-3 inline-block bg-yellow-500 rounded-full mr-2'></span>
+                                                            รอการยืนยัน
+                                                        </div>
                                                     </div>
-                                                </TableCell>
-                                                {/* <TableCell>{verifies.term}</TableCell> */}
-                                                <TableCell className="w-1/3">
-                                                    <Link
-                                                        href={`/admin/verify-selection/${verifies.stu_id}`}
-                                                        className='text-blue-500'
-                                                    >{verifies.stu_id}
-                                                    </Link>
-                                                </TableCell>
-                                                {/* <TableCell>{verifies.program}</TableCell> */}
-                                                <TableCell>{verifies.acadyear}</TableCell>
-                                                {["createdAt"].map(column => (
-                                                    <TableCell key={column}>
-                                                        <span>{column === "createdAt" ? dmy(verifies[column]) : verifies[column]}</span>
-                                                    </TableCell>
-                                                ))}
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-
-
-                                <div className="flex w-full flex-col">
-                                    <Tabs aria-label="Options" color="primary" size="lg">
-                                        <Tab key="photos" title="คำร้องใหม่">
-                                            <Card>
-                                                <CardBody>
-                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                                                </CardBody>
-                                            </Card>
-                                        </Tab>
-                                        <Tab key="music" title="คำร้องที่อนุมัติ">
-                                            <Card>
-                                                <CardBody>
-                                                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                                                </CardBody>
-                                            </Card>
-                                        </Tab>
-                                    </Tabs>
+                                                    <div className='border-t mt-5 border-gray-300'></div>
+                                                </Link>
+                                            </div>
+                                        )
+                                    ))}
                                 </div>
-
-                            </>
-                    }
-
+                            </Tab>
+                            <Tab
+                                key="approved"
+                                title={
+                                    <div className="flex items-center space-x-2">
+                                        <VscCheckAll />
+                                        <span>คำร้องที่อนุมัติ</span>
+                                    </div>
+                                }
+                            >
+                                <div className='border border-gray-300 rounded-md p-5 shadow-sm'>
+                                    <h1 className='text-2xl font-semibold'>คำร้องที่อนุมัติจบการศึกษา</h1>
+                                    <div className='border-t mt-5 border-gray-300'></div>
+                                    {verify.map((verifies) => (
+                                        verifies.status === 2 && (
+                                            <div key={verifies.id}>
+                                                <Link
+                                                    href={`/admin/verify-selection/${verifies.stu_id}`}
+                                                    className='text-black hover:text-sky-700'
+                                                >
+                                                    <div className='flex justify-between items-center my-5'>
+                                                        <div>
+                                                            <div className='flex items-center'>
+                                                                <p className='font-semibold text-lg'>
+                                                                    {verifies.Student.first_name} {verifies.Student.last_name}
+                                                                </p>
+                                                                <span className='text-sm ml-3'>
+                                                                    {verifies.Student.email}
+                                                                </span>
+                                                            </div>
+                                                            <p className='text-sm mt-2'>
+                                                                {dmyt(verifies.createdAt)}
+                                                            </p>
+                                                        </div>
+                                                        <div className='inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300'>
+                                                            <span class="w-3 h-3 inline-block bg-green-500 rounded-full mr-2"></span>อนุมัติ
+                                                        </div>
+                                                    </div>
+                                                    <div className='border-t mt-5 border-gray-300'></div>
+                                                </Link>
+                                            </div>
+                                        )
+                                    ))}
+                                </div>
+                            </Tab>
+                        </Tabs>
+                    )}
                 </div>
             </ContentWrap>
         </>
-    )
+    );
 }
 
 export default Page

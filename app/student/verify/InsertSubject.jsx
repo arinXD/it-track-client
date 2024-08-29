@@ -29,8 +29,10 @@ const InsertSubject = ({ subjects, catIndex, categorie, highestIndex, onVerifySu
         setFilterSubj(subjects)
     }, [searchSubj])
 
+
+
     useEffect(() => {
-        onVerifySubjChange(verifySubj);
+        onVerifySubjChange(verifySubj, categorie.category_title);
     }, [verifySubj]);
 
     const getEnrollmentGrade = (subjectCode) => {
@@ -78,7 +80,7 @@ const InsertSubject = ({ subjects, catIndex, categorie, highestIndex, onVerifySu
             <h2 className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center mt-5 rounded-t-md text-lg text-default-800'>{catIndex + highestIndex + 2}. {categorie.category_title}</h2>
             <div className='flex flex-row gap-3'>
                 <div className='w-1/2 flex flex-col'>
-                    <p>วิชาที่ต้องการจะเพิ่ม {verifySubj.length == 0 ? undefined : <>({verifySubj.length} วิชา)</>}</p>
+                    <p className='my-3'>วิชาที่ต้องการจะเพิ่ม {verifySubj.length == 0 ? undefined : <>({verifySubj.length} วิชา)</>}</p>
                     <ul className='h-[210px] overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
                         {verifySubj.length > 0 ?
                             verifySubj.map((sbj, index) => (
@@ -102,7 +104,7 @@ const InsertSubject = ({ subjects, catIndex, categorie, highestIndex, onVerifySu
                     </ul>
                 </div>
                 <div className='w-1/2'>
-                    <p>ค้นหาวิชาที่ต้องการ</p>
+                    <p className='my-3'>ค้นหาวิชาที่ต้องการ</p>
                     <div className='flex flex-col'>
                         <div className='flex flex-row relative'>
                             <IoSearchOutline className='absolute left-3.5 top-[25%]' />

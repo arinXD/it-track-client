@@ -35,8 +35,12 @@ const Page = ({ params }) => {
     const [subgroupData, setSubgroupData] = useState([]);
     const [semisubgroupData, setSemiSubgroupData] = useState([]);
     const [userData, setUserData] = useState({})
+    const [userDatas, setUserDatas] = useState({})
+    const [enrollments, setEnrollment] = useState([])
 
-    const [category, setCategories] = useState([])
+    const [cateData, setCategoryData] = useState([]);
+
+    const [groupfirst, setGroupFirst] = useState([])
     const [group, setGroups] = useState([])
 
     const [highestIndex, setHighestIndex] = useState(0);
@@ -47,8 +51,43 @@ const Page = ({ params }) => {
 
     const [conditions, setConditions] = useState([]);
     const [conditionSubgroup, setConditionSubgroup] = useState([]);
+    const [conditionCategory, setConditionCategory] = useState([]);
 
     const [subjectTrack, setSubjectTrack] = useState([]);
+
+    const fetchEnrollment = useCallback(async function (stu_id) {
+        try {
+            const URL = `/api/students/enrollments/${stu_id}`
+            const option = await getOptions(URL, "GET")
+            const response = await axios(option)
+            const data = response.data.data
+            setUserDatas(data)
+            // console.log(data);
+            if (data.Enrollments.length > 0) {
+                setEnrollment(data.Enrollments)
+            } else {
+                setEnrollment([])
+            }
+        } catch (error) {
+            setUserDatas({})
+            setEnrollment([])
+        }
+    }, [])
+
+    useEffect(() => {
+        fetchEnrollment(id);
+    }, [id])
+
+    // console.log(subjects);
+
+    const getEnrollmentGrade = (subjectCode) => {
+        // ต้องการหา subjectCode ใน enrollments
+        const enrollment = enrollments.find(e => e?.Subject?.subject_code === subjectCode);
+        if (enrollment) {
+            return enrollment.grade;
+        }
+        return "ไม่มีเกรด";
+    }
 
 
     const initVerify = useCallback(async function (id) {
@@ -75,7 +114,7 @@ const Page = ({ params }) => {
 
             setSubjectTrack(filteredSubjectsWithGrades);
 
-            console.log(filteredSubjectsWithGrades);
+            // console.log(filteredSubjectsWithGrades);
 
 
             // Set category verifies
@@ -87,6 +126,41 @@ const Page = ({ params }) => {
                 return { category, subjectDetails };
             });
             setCategoryVerifies(categoryVerifies);
+
+            const subjectsByCategory = result.Verify.SubjectVerifies.reduce((acc, subjectVerify) => {
+                const subject = subjectVerify.Subject;
+                const categories = [
+                    ...subject.SubgroupSubjects.map(subgroup => subgroup.SubGroup.Group.Categorie),
+                    ...subject.GroupSubjects.map(group => group.Group.Categorie),
+                    ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SubGroup.Group.Categorie)
+                ];
+
+                categories.forEach(categorie => {
+                    if (!acc[categorie.id]) {
+                        acc[categorie.id] = {
+                            category: categorie,
+                            subjects: []
+                        };
+                    }
+                    acc[categorie.id].subjects.push({
+                        ...subject,
+                        grade: result.StudentVerifyDetails.find(detail =>
+                            detail.subject_id === subject.subject_id &&
+                            detail.StudentCategoryVerify?.CategoryVerify?.Categorie?.id === categorie.id
+                        )?.grade || null
+                    });
+                });
+
+                return acc;
+            }, {});
+
+            const categoryData = Object.values(subjectsByCategory);
+
+            setCategoryData(categoryData);
+
+            console.log(categoryVerifies);
+            console.log(categoryData);
+
 
 
             // Map subject verifies and include grade information
@@ -127,13 +201,12 @@ const Page = ({ params }) => {
         }
     }, []);
 
-    console.log(userData);
-
-
     const initItGrade = useCallback(async function (id) {
         const result = await fetchDataObj(`/api/verifies/approve/it/${id}`)
         setItGrade(result)
     }, [])
+
+    // console.log(conditionCategory);
 
     const fetchConditions = useCallback(async (verifyId) => {
 
@@ -166,6 +239,25 @@ const Page = ({ params }) => {
                 setConditionSubgroup(filterConditions);
             } catch (error) {
                 setConditionSubgroup([]);
+                return;
+            }
+        } catch (error) {
+            console.error('Error fetching conditions:', error);
+        }
+    }, []);
+
+    const fetchConditionCategory = useCallback(async (verifyId) => {
+
+        try {
+            const url = `/api/condition/category/${verifyId}`;
+            const option = await getOptions(url, "GET");
+            try {
+                const res = await axios(option);
+                // console.log(res);
+                const filterConditions = res.data.data;
+                setConditionCategory(filterConditions);
+            } catch (error) {
+                setConditionCategory([]);
                 return;
             }
         } catch (error) {
@@ -227,6 +319,23 @@ const Page = ({ params }) => {
     }, [subgroupData, groupData, semisubgroupData]);
 
     useEffect(() => {
+        const groupDatatest = [];
+
+        Object.keys(groupedSubjectsByCategory).forEach(categoryId => {
+            const category = groupedSubjectsByCategory[categoryId];
+            const groups = category.groups;
+
+            Object.keys(groups).forEach(groupId => {
+                const group = groups[groupId];
+                groupDatatest.push({ group });
+            });
+        });
+
+        setGroupFirst(groupDatatest)
+    }, [groupedSubjectsByCategory]);
+
+
+    useEffect(() => {
         const groupData = [];
         const groupinsubData = [];
 
@@ -264,6 +373,10 @@ const Page = ({ params }) => {
     // console.log(group);
     // console.log(go);
 
+    const filteredGofirst = groupfirst.filter(group => {
+        return condition.some(cond => cond.id === group?.group?.id);
+    }).map(group => group);
+
     const filteredGo = go.filter(subgroup => {
         return condition.some(cond => cond.id === subgroup?.Group?.id);
     }).map(subgroup => subgroup);
@@ -271,6 +384,14 @@ const Page = ({ params }) => {
     const filteredGoSub = go.filter(subgroup => {
         return conditionsubgroups.some(cond => cond.id === subgroup?.id);
     }).map(subgroup => subgroup);
+
+    const combinedGroupfirst = [];
+
+    filteredGofirst.map(group => {
+        if (group.group) {
+            combinedGroupfirst.push(group.group);
+        }
+    });
 
     const combinedGroups = filteredGo.reduce((acc, curr) => {
         const groupId = curr.Group.id;
@@ -301,6 +422,43 @@ const Page = ({ params }) => {
     // console.log(combinedGroups);
     // console.log(combinedSubgroup);
 
+    const subjectCodesByGroupFirst = combinedGroupfirst.map(group => {
+        const subjectsWithGrades = group.subjects
+            .map(subject => {
+                const grade = subject.grade;
+                const credit = subject.credit;
+
+                // Check for invalid grades or low credits
+                if (grade === "ไม่มีเกรด" ||
+                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                    return null;
+                }
+
+                const calculatedGrade = calGrade(grade);
+
+                return {
+                    subject_code: subject.subject_code,
+                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                    credit: credit,
+                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null // Store numeric grade if valid
+                };
+            })
+            .filter(subject => subject !== null);
+
+        // Calculate total credits and grades
+        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject.credit, 0);
+        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
+        const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
+
+        return {
+            id: group.id,
+            group_title: group.group_title,
+            subjects: subjectsWithGrades,
+            totalCredits: totalCredits,
+            totalGrades: totalGrades,
+            averageGrade: averageGrade
+        };
+    }).filter(group => group.subjects.length > 0);    
 
     const subjectCodesByGroup = combinedGroups.map(group => {
         const subjectsWithGrades = group.subjects
@@ -338,6 +496,8 @@ const Page = ({ params }) => {
             averageGrade: averageGrade
         };
     }).filter(group => group.subjects.length > 0);
+
+    const combinedsubjectCodesByGroup = subjectCodesByGroupFirst.concat(subjectCodesByGroup);
 
     const subjectCodesBySubgroup = combinedSubgroup.map(subgroup => {
         const subjectsWithGrades = subgroup.subjects
@@ -420,6 +580,97 @@ const Page = ({ params }) => {
         return { totalCredits, totalGrades, averageGrade };
     };
 
+    // console.log(userData);
+    // console.log(categoryverify);
+
+    ///////////////// เงื่อนไข Category ## เสรี /////////////////
+
+    const subjectCategorytest = cateData.map(({ category, subjects }) => {
+        // Ensure 'subjects' is an array before mapping over it
+        const subjectsWithGrades = Array.isArray(subjects) ? subjects
+            .map(subject => {
+                const grade = getEnrollmentGrade(subject.subject_code);
+                const credit = subject.credit;
+
+                // Check for invalid grades or low credits
+                if (grade === "ไม่มีเกรด" ||
+                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                    return null;
+                }
+
+                const calculatedGrade = calGrade(grade);
+
+                return {
+                    subject_code: subject.subject_code,
+                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                    credit: credit,
+                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
+                };
+            })
+            .filter(subject => subject !== null)
+            : []; // Return an empty array if 'subjects' is not an array
+
+        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject.credit, 0);
+        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
+        const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
+
+        return {
+            id: category.id,
+            category_title: category.category_title,
+            subjects: subjectsWithGrades,
+            totalCredits: totalCredits,
+            totalGrades: totalGrades,
+            averageGrade: averageGrade
+        };
+    }).filter(category => category.subjects.length > 0);
+
+    console.log(subjectCategorytest);
+
+
+    const subjectCategory = categoryverify.map(category => {
+        // console.log(category);
+        const subjectsWithGrades = category.subjectDetails
+            .map(subject => {
+                const grade = subject.grade;
+                const credit = subject.Subject.credit;
+
+                console.log(subject);
+
+                // Check for invalid grades or low credits
+                if (grade === "ไม่มีเกรด" ||
+                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                    return null;
+                }
+
+                const calculatedGrade = calGrade(grade);
+
+                return {
+                    subject_code: subject.Subject.subject_code,
+                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                    credit: credit,
+                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
+                };
+            })
+            .filter(subject => subject !== null);
+
+        // Calculate total credits and grades
+        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject.credit, 0);
+        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
+        const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
+
+        return {
+            id: category.category.id,
+            category_title: category.category.category_title,
+            subjects: subjectsWithGrades,
+            totalCredits: totalCredits,
+            totalGrades: totalGrades,
+            averageGrade: averageGrade
+        };
+    }).filter(category => category.subjects.length > 0);
+
+    const combinedSubjectCategories = subjectCategorytest.concat(subjectCategory);
+
+
     const handleSubmit = useCallback(async function (stu_id) {
         try {
 
@@ -453,7 +704,8 @@ const Page = ({ params }) => {
         initItGrade(id)
         if (verify.id) fetchConditions(verify.id)
         if (verify.id) fetchConditionSubgroups(verify.id)
-    }, [verify.id, fetchConditions, fetchConditionSubgroups])
+        if (verify.id) fetchConditionCategory(verify.id)
+    }, [verify.id, fetchConditions, fetchConditionSubgroups, fetchConditionCategory])
 
     const getSubTrack = useCallback((subgroup, subgroupIndex) => {
         // console.log(subgroup);
@@ -906,7 +1158,7 @@ const Page = ({ params }) => {
                                             {conditions.length > 0 ? (
                                                 <TableBody>
                                                     {conditions.map((condition, index) => {
-                                                        const groupData = subjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
+                                                        const groupData = combinedsubjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
                                                         const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = groupData;
 
                                                         const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
@@ -967,6 +1219,44 @@ const Page = ({ params }) => {
                                                 )}
                                             </Table>
                                         )}
+                                        <Table
+                                            classNames={tableClass}
+                                            removeWrapper
+                                            onRowAction={() => { }}
+                                            aria-label="condition category"
+                                            className='mt-5'
+                                        >
+                                            <TableHeader>
+                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                            </TableHeader>
+                                            {conditionCategory.length > 0 ? (
+                                                <TableBody>
+                                                    {conditionCategory.map((conditionCategory, index) => {
+                                                        const categoryDatas = combinedSubjectCategories.find(category => category.id === conditionCategory.Categorie.id) || {};
+                                                        const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = categoryDatas;
+
+                                                        const creditClassName = totalCredits < conditionCategory.credit ? 'bg-red-200' : '';
+
+                                                        return (
+                                                            <TableRow key={index}>
+                                                                <TableCell>{conditionCategory?.Categorie?.category_title}</TableCell>
+                                                                <TableCell>{conditionCategory.credit}</TableCell>
+                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                <TableCell>{totalGrades}</TableCell>
+                                                                <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
+                                                            </TableRow>
+                                                        );
+
+                                                    })}
+                                                </TableBody>
+                                            ) : (
+                                                <TableBody emptyContent={"ไม่มีเงื่อนไข"}>{[]}</TableBody>
+                                            )}
+                                        </Table>
                                         {userData.program === "IT" && (
                                             <Table
                                                 classNames={tableClass}

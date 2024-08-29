@@ -299,7 +299,7 @@ export default function Category() {
                                     onPress={handleModalOpen}
                                     color="primary"
                                     endContent={<PlusIcon width={16} height={16} />}>
-                                    เพิ่มรหัสหลักสูตร
+                                    เพิ่มหมวดหมู่วิชา
                                 </Button>
                                 <Button
                                     radius="sm"
