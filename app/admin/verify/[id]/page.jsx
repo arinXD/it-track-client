@@ -174,6 +174,9 @@ const Page = ({ params }) => {
           setCategories(categoryData);
      }, [groupedSubjectsByCategory]);
 
+     // console.log(category);
+     
+
      useEffect(() => {
           const groupData = Object.keys(groupedSubjectsByCategory).flatMap(categoryId => {
                const category = groupedSubjectsByCategory[categoryId];

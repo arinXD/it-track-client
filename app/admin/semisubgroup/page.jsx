@@ -158,7 +158,7 @@ export default function SemiSubGroup() {
                                 ))}
                             </TableBody>
                         ) : (
-                            <TableBody emptyContent={"ไม่มีข้อมูลกลุ่มย่อยๆวิชา"}>{[]}</TableBody>
+                            <TableBody emptyContent={"ไม่มีข้อมูลกลุ่มรองวิชา"}>{[]}</TableBody>
                         )}
                     </Table>
                 </div>

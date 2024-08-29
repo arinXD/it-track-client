@@ -16,6 +16,7 @@ const BreadCrumb = () => {
         "category": "หมวดหมู่วิชา",
         "group": "กลุ่มวิชา",
         "subgroup": "กลุ่มย่อยวิชา",
+        "semisubgroup": "กลุ่มรองวิชา",
         "subject": "วิชา",
         "track": "ข้อมูลแทร็ก",
         "track-selection": "คัดเลือกแทร็ก",

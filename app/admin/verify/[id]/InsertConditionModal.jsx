@@ -16,12 +16,18 @@ import { IoSearchOutline } from "react-icons/io5";
 import { Checkbox } from "@nextui-org/checkbox";
 import { tableClass } from '@/src/util/ComponentClass'
 
+
 export default function InsertConditionModal({ isOpen, onClose, verify_id, onDataInserted, group }) {
 
     const [conditions, setConditions] = useState([]);
     const [conditionSubgroup, setConditionSubgroup] = useState([]);
-    const [selectedGroup, setSelectedGroup] = useState(null);
+    const [conditionCategory, setConditionCategory] = useState([]);
+
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+
     const [groups, setGroups] = useState([]);
+    const [selectedGroup, setSelectedGroup] = useState(null);
 
     const [subgroups, setSubgroups] = useState([]);
     const [selectedSubgroup, setSelectedSubgroup] = useState(null);
@@ -41,6 +47,28 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
             progress: undefined,
         });
     }, []);
+
+    const fetchCategory = useCallback(async (verifyId) => {
+        // console.log(verifyId);
+        try {
+            const url = `/api/condition/category/${verifyId}`;
+            const option = await getOptions(url, "GET");
+            try {
+                const res = await axios(option);
+                // console.log(res);
+                const filterConditions = res.data.data;
+                setConditionCategory(filterConditions);
+            } catch (error) {
+                setConditionCategory([]);
+                return;
+            }
+        } catch (error) {
+            console.error('Error fetching conditions:', error);
+        }
+    }, []);
+
+    console.log(conditionCategory);
+
 
     const fetchConditions = useCallback(async (verifyId) => {
         // console.log(verifyId);
@@ -80,36 +108,74 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
         }
     }, []);
 
+    const fetchCategories = async () => {
+        try {
+            const result = await fetchDataObj(`/api/categories`);
+
+            const categoriesOptions = result.map(category => ({
+                value: category.id,
+                label: category.category_title,
+            }));
+
+            // console.log(categoriesOptions);
+            setCategories(categoriesOptions);
+            // setDefaultCategories(categoriesOptions);
+
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
+    const handleCategoryChange = async selectedOption => {
+        setSelectedCategory(selectedOption);
+        setSelectedGroup(null);
+        setSelectedSubgroup(null);
+
+        try {
+            const result = await fetchDataObj(`/api/categories/${selectedOption?.value}/groups`);
+            const groupsOptions = result.map(group => ({
+                value: group.id,
+                label: group.group_title,
+                Group: group
+            }));
+            setGroups(groupsOptions);
+        } catch (error) {
+            console.error('Error fetching groups:', error);
+        }
+    };
+
+    const handleGroupChange = async selectedOption => {
+        setSelectedGroup(selectedOption);
+        setSelectedSubgroup(null);
+
+        try {
+            const result = await fetchDataObj(`/api/groups/${selectedOption?.value}/subgroups`);
+            const subgroupsOptions = result.map(subgroup => ({
+                value: subgroup.id,
+                label: subgroup.sub_group_title,
+            }));
+            setSubgroups(subgroupsOptions);
+        } catch (error) {
+            console.error('Error fetching subgroups:', error);
+        }
+    };
+
+    const handleSubGroupChange = async selectedOption => {
+        setSelectedSubgroup(selectedOption);
+    };
+
     useEffect(() => {
+        fetchCategories()
         if (verify_id) fetchConditions(verify_id);
         if (verify_id) fetchConditionSubgroups(verify_id);
-    }, [verify_id, fetchConditions, fetchConditionSubgroups]);
-
-    // console.log(conditionSubgroup);
-    useEffect(() => {
-        const page = group.map(groups => ({
-            value: groups.id,
-            label: groups.group_title,
-            subgroup: groups.sub_group_titles || []
-        }));
-        setGroups(page);
-    }, [group]);
-
-    useEffect(() => {
-        if (selectedGroup) {
-            const groupData = groups.find(g => g.value === selectedGroup.value);
-            if (groupData) {
-                setSubgroups(groupData.subgroup || []);
-            }
-        } else {
-            setSubgroups([]);
-        }
-    }, [selectedGroup, groups]);
+        if (verify_id) fetchCategory(verify_id);
+    }, [verify_id, fetchConditions, fetchConditionSubgroups, fetchCategory]);
 
     useEffect(() => {
         if (isOpen) {
             setSelectedGroup(null);
             setSelectedSubgroup(null);
+            setSelectedCategory(null);
             setCredit("");
             setDec("");
         }
@@ -118,8 +184,8 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
     const handleSubmit = useCallback(async function () {
         try {
 
-            if (!selectedGroup) {
-                showToastMessage(false, "โปรดเลือกกลุ่มวิชา");
+            if (!selectedCategory) {
+                showToastMessage(false, "โปรดเลือกหมวดหมู่วิชา");
                 return;
             }
 
@@ -129,7 +195,7 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
             }
 
             let formData;
-            let url = "/api/condition/group/:verify_id";
+            let url = "/api/condition/category/:verify_id";
 
             if (selectedSubgroup) {
                 formData = {
@@ -138,13 +204,20 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
                     dec: dec,
                     sub_group_id: selectedSubgroup.value
                 };
-            } else {
+            } else if (selectedGroup) {
                 formData = {
                     verify_id: verify_id,
                     credit: credit,
                     dec: dec,
                     group_id: selectedGroup.value
-                };
+                }
+            } else {
+                formData = {
+                    verify_id: verify_id,
+                    credit: credit,
+                    dec: dec,
+                    category_id: selectedCategory.value
+                }
             }
 
 
@@ -154,11 +227,17 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
                 formData.credit = credit;
                 formData.dec = dec;
                 formData.sub_group_id = selectedSubgroup.value;
-            } else {
+            } else if (selectedGroup) {
+                url = "/api/condition/group/:verify_id";
                 formData.verify_id = verify_id;
                 formData.credit = credit;
                 formData.dec = dec;
                 formData.group_id = selectedGroup.value;
+            } else {
+                formData.verify_id = verify_id;
+                formData.credit = credit;
+                formData.dec = dec;
+                formData.category_id = selectedCategory.value;
             }
 
             const options = await getOptions(url, "POST", formData);
@@ -169,8 +248,10 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
 
             fetchConditions(verify_id);
             fetchConditionSubgroups(verify_id);
-            // onDataInserted();
+            fetchCategory(verify_id);
+
             setSelectedGroup(null);
+            setSelectedCategory(null);
             setSelectedSubgroup(null);
             setCredit("")
             setDec("")
@@ -178,7 +259,7 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
             const message = error?.response?.data?.message;
             showToastMessage(false, message);
         }
-    }, [selectedGroup, selectedSubgroup, dec, credit]);
+    }, [selectedGroup, selectedSubgroup, selectedCategory, dec, credit]);
 
     ////////////////////////////////////////////////////////////////////////////////////
 
@@ -211,7 +292,22 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
             const message = error?.response?.data?.message || "An error occurred";
             showToastMessage(false, message);
         }
+    };
 
+    const delConditionCategory = async (gs) => {
+        // console.log(`Deleting GroupSubject with id: ${gs}`);
+        try {
+            const url = `/api/condition/category/${gs}`;
+            const options = await getOptions(url, 'DELETE');
+            const result = await axios(options);
+            const { ok, message } = result.data;
+
+            showToastMessage(ok, message);
+            fetchCategory(verify_id);
+        } catch (error) {
+            const message = error?.response?.data?.message || "An error occurred";
+            showToastMessage(false, message);
+        }
     };
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -239,79 +335,136 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
                             <span className='text-base font-normal'>เงื่อนไขแบบฟอร์มตรวจสอบจบ</span>
                         </ModalHeader>
                         <ModalBody>
-                            <div className='grid grid-cols-3 gap-6 max-md:grid-cols-1'>
-                                <ul className='col-span-1 h-full overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
+
+                            <div className='grid grid-cols-4 gap-6 max-sm:grid-cols-4'>
+                                <ul className='col-span-2 h-[210px] overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
+                                    <p className='py-1'>เงื่อนไขหมวดหมู่วิชา</p>
+                                    {conditionCategory.length > 0 ?
+                                        conditionCategory.map((sbj, index) => (
+                                            <li key={index} className='bg-gray-100 rounded-md p-1 gap-2 border-1 border-b-gray-300'>
+                                                <div className='flex flex-row justify-between'>
+                                                    <div className='bg-gray-100 focus:outline-none font-bold'>
+                                                        {sbj.Categorie.category_title}
+                                                    </div>
+                                                    <div>
+                                                        <IoIosCloseCircle onClick={() => delConditionCategory(sbj.id)} className="w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
+                                                    </div>
+                                                </div>
+                                                <p className='flex flex-row justify-between text-sm mt-3'>
+                                                    <span>หน่วยกิตอย่างน้อย {sbj.credit}</span>
+                                                    <span>{sbj.dec ? sbj.dec : "ไม่มีข้อมูล"}</span>
+                                                </p>
+                                            </li>
+                                        ))
+                                        :
+                                        <>
+                                            <Empty
+                                                description={"ไม่มีเงื่อนไขหมวดหมู่วิชา"}
+                                            />
+                                        </>
+                                    }
+                                </ul>
+
+                                <ul className='col-span-2 h-[210px] overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
                                     <p className='py-1'>เงื่อนไขกลุ่มวิชา</p>
                                     {conditions.length > 0 ?
                                         conditions.map((sbj, index) => (
-                                            <li key={index} className='bg-gray-100 rounded-md relative p-1 gap-2 border-1 border-b-gray-300'>
-                                                <input
-                                                    readOnly
-                                                    className='bg-gray-100 block focus:outline-none font-bold'
-                                                    type="text"
-                                                    value={sbj.Group.group_title} />
+                                            <li key={index} className='bg-gray-100 rounded-md p-1 gap-2 border-1 border-b-gray-300'>
+                                                <div className='flex flex-row justify-between'>
+                                                    <div className='bg-gray-100 focus:outline-none font-bold'>
+                                                        {sbj.Group.group_title}
+                                                    </div>
+                                                    <div>
+                                                        <IoIosCloseCircle onClick={() => delCondition(sbj.id)} className="w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
+                                                    </div>
+                                                </div>
                                                 <p className='flex flex-row justify-between text-sm mt-3'>
                                                     <span>หน่วยกิตอย่างน้อย {sbj.credit}</span>
                                                     <span>{sbj.dec ? sbj.dec : "ไม่มีข้อมูล"}</span>
                                                 </p>
-                                                <IoIosCloseCircle onClick={() => delCondition(sbj.id)} className="absolute top-1 right-1 w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
                                             </li>
-
                                         ))
                                         :
-                                        <li className='flex justify-center items-center h-full'>
-                                            <Empty />
-                                        </li>
+                                        <>
+                                            <Empty
+                                                description={"ไม่มีเงื่อนไขกลุ่มวิชา"}
+                                            />
+                                        </>
                                     }
                                 </ul>
 
-                                <ul className='col-span-1 h-full overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
+                                <ul className='col-span-2 h-full overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
                                     <p className='py-1'>เงื่อนไขกลุ่มย่อยวิชา</p>
                                     {conditionSubgroup.length > 0 ?
                                         conditionSubgroup.map((sbj, index) => (
-                                            <li key={index} className='bg-gray-100 rounded-md relative p-1 gap-2 border-1 border-b-gray-300'>
-                                                <input
-                                                    readOnly
-                                                    className='bg-gray-100 block focus:outline-none font-bold'
-                                                    type="text"
-                                                    value={sbj.SubGroup.sub_group_title} />
+                                            <li key={index} className='bg-gray-100 rounded-md  p-1 gap-2 border-1 border-b-gray-300'>
+                                                <div className='flex flex-row justify-between'>
+                                                    <div className='bg-gray-100 focus:outline-none font-bold'>
+                                                        {sbj.SubGroup.sub_group_title}
+                                                    </div>
+                                                    <div>
+                                                        <IoIosCloseCircle onClick={() => delConditionSubgroup(sbj.id)} className=" w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
+                                                    </div>
+                                                </div>
                                                 <p className='flex flex-row justify-between text-sm mt-3'>
                                                     <span>หน่วยกิตอย่างน้อย {sbj.credit}</span>
                                                     <span>{sbj.dec ? sbj.dec : "ไม่มีข้อมูล"}</span>
                                                 </p>
-                                                <IoIosCloseCircle onClick={() => delConditionSubgroup(sbj.id)} className="absolute top-1 right-1 w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
                                             </li>
-
                                         ))
                                         :
-                                        <li className='flex justify-center items-center h-full'>
-                                            <Empty />
-                                        </li>
+                                        <>
+                                            <Empty
+                                                description={"ไม่มีเงื่อนไขกลุ่มย่อยวิชา"}
+                                                className='my-auto pb-3'
+                                            />
+                                        </>
+
                                     }
                                 </ul>
-                                <div className='col-span-1'>
-                                    <label htmlFor="category" className='text-sm'>เลือกกลุ่มวิชา</label>
-                                    <Select
-                                        className="z-50 mt-2 mb-3"
-                                        id="group"
-                                        value={selectedGroup}
-                                        options={groups}
-                                        onChange={(selectedOption) => setSelectedGroup(selectedOption)}
-                                        isSearchable
-                                        isClearable
-                                    />
-                                    {subgroups.length > 0 && (
+                                <div className='col-span-2'>
+                                    <div className='col-span-4'>
+                                        <label htmlFor="categories" className='pb-1'>หมวดหมู่วิชา</label>
+                                        <Select
+                                            className='z-50 active:outline-black'
+                                            value={selectedCategory}
+                                            options={categories}
+                                            onChange={handleCategoryChange}
+                                            isSearchable
+                                            placeholder="เลือกหมวดหมู่วิชา"
+                                            isClearable
+                                        />
+                                    </div>
+                                    {selectedCategory && groups.length > 0 && (
                                         <>
-                                            <label htmlFor="subgroup" className='text-sm'>เลือกหมวดหมู่ย่อย</label>
-                                            <Select
-                                                className="z-40 mt-2"
-                                                id="subgroup"
-                                                value={selectedSubgroup}
-                                                options={subgroups}
-                                                onChange={(selectedOption) => setSelectedSubgroup(selectedOption)}
-                                                isSearchable
-                                                isClearable
-                                            />
+                                            <div className='col-span-4 my-4'>
+                                                <label htmlFor="group" className='pb-1'>กลุ่มวิชา</label>
+                                                <Select
+                                                    value={selectedGroup}
+                                                    className='z-40'
+                                                    options={groups}
+                                                    onChange={handleGroupChange}
+                                                    isSearchable
+                                                    placeholder="เลือกกลุ่มวิชา"
+                                                    isClearable
+                                                />
+                                            </div>
+                                            {selectedGroup && subgroups.length > 0 && (
+                                                <>
+                                                    <div className='col-span-4'>
+                                                        <label htmlFor="subgroup" className='pb-1'>กลุ่มรองวิชา</label>
+                                                        <Select
+                                                            className='z-30'
+                                                            value={selectedSubgroup}
+                                                            options={subgroups}
+                                                            onChange={handleSubGroupChange}
+                                                            isSearchable
+                                                            placeholder="เลือกกลุ่มรองวิชา"
+                                                            isClearable
+                                                        />
+                                                    </div>
+                                                </>
+                                            )}
                                         </>
                                     )}
                                     <Input

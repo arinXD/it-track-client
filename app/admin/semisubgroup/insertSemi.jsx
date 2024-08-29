@@ -90,7 +90,7 @@ export default function InsertSemi({ isOpen, onClose, onDataInserted }) {
 
 
         if (!semisubGroupTitle.trim()) {
-            showToastMessage(false, "กลุ่มย่อยๆต้องไม่เป็นค่าว่าง");
+            showToastMessage(false, "กลุ่มรองวิชาต้องไม่เป็นค่าว่าง");
             return;
         }
 
@@ -101,7 +101,7 @@ export default function InsertSemi({ isOpen, onClose, onDataInserted }) {
 
         const isDuplicate = await checkDuplicateSemi(semisubGroupTitle);
         if (isDuplicate) {
-            showToastMessage(false, 'กลุ่มย่อยๆนี้มีอยู่แล้ว');
+            showToastMessage(false, 'กลุ่มรองวิชานี้มีอยู่แล้ว');
             return;
         }
 
@@ -155,9 +155,9 @@ export default function InsertSemi({ isOpen, onClose, onDataInserted }) {
                                     type="text"
                                     radius='sm'
                                     variant="bordered"
-                                    label="กลุ่มย่อยๆวิชา"
+                                    label="กลุ่มรองวิชา"
                                     labelPlacement="outside"
-                                    placeholder="กรอกกลุ่มย่อยๆวิชา"
+                                    placeholder="กรอกกลุ่มรองวิชาวิชา"
                                     value={semisubGroupTitle}
                                     onChange={(e) => setSemiSubGroupTitle(e.target.value)}
                                 />
