@@ -7,7 +7,7 @@ import { BiCategory } from "react-icons/bi";
 import { BsPerson } from "react-icons/bs";
 import { HiOutlineAcademicCap, HiOutlineUserGroup, HiOutlineRectangleGroup } from "react-icons/hi2";
 import { LuUngroup } from "react-icons/lu";
-import { RiBookletLine } from 'react-icons/ri';
+import { RiBookletLine, RiUserSettingsLine } from 'react-icons/ri';
 import { TbCheckupList } from "react-icons/tb";
 import { IoBookOutline, IoBarChartOutline, IoDocumentTextOutline } from 'react-icons/io5';
 import { LuTextSelect } from "react-icons/lu";
@@ -25,6 +25,7 @@ const AdminList = () => {
           {
                title: "ทั่วไป",
                links: [
+                    { href: "/admin/users", label: "จัดการบัญชี", icon: RiUserSettingsLine },
                     { href: "/admin/program", label: "หลักสูตร", icon: IoBookOutline },
                     { href: "/admin/category", label: "หมวดหมู่วิชา", icon: BiCategory },
                     { href: "/admin/group", label: "กลุ่มวิชา", icon: HiOutlineRectangleGroup },

@@ -155,7 +155,6 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                             label="ปีการศึกษา"
                                             labelPlacement="outside"
                                             placeholder="เลือกปีการศึกษา"
-                                            selectedKeys={[acadValue]}
                                             radius='sm'
                                             variant='bordered'
                                             classNames={thinInputClass}
@@ -164,6 +163,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                             scrollShadowProps={{
                                                 isEnabled: false
                                             }}
+                                            selectedKeys={[acadValue]}
                                             onChange={handleSelectionChange}
                                         >
                                             <SelectItem key={""} value={""}>
