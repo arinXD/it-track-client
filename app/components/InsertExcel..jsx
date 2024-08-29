@@ -81,10 +81,15 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                                    headers.forEach((header, index) => {
                                         rowData[header] = row[index] || "";
                                    });
-                                   if (Object.values(rowData).filter(val => val).length === headers.length) {
-                                        return rowData;
+                                   if (isFileFromREG) {
+                                        if (Object.values(rowData).filter(val => val).length === headers.length) {
+                                             return rowData;
+                                        }else{
+                                             return {}
+                                        }
                                    } else {
-                                        return {}
+                                        return rowData;
+
                                    }
                               }));
 
@@ -110,6 +115,7 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
      };
 
      async function sendDataInBatches(formattedData, options) {
+
           const batchSize = 200;
           const numBatches = Math.ceil(formattedData.length / batchSize);
           const batchPromises = [];
@@ -118,10 +124,10 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                const start = i * batchSize;
                const end = Math.min((i + 1) * batchSize, formattedData.length);
                const chunk = formattedData.slice(start, end);
+               console.log(chunk);
                const requestOptions = { ...options, data: chunk };
                batchPromises.push(axios(requestOptions));
           }
-
           try {
                await Promise.all(batchPromises);
                return true
@@ -159,7 +165,8 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                          Object.entries(row).map(([key, value]) => [key.toLowerCase(), value])
                     );
                });
-               
+               console.log(formattedData);
+
                try {
                     const { status, options } = await hook(formattedData)
                     if (status) {
