@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { useCallback, useMemo } from "react";
 const BarChart = dynamic(() => import('@/app/components/charts/ApexBarChart'), { ssr: false });
 
-const SummaryResult = ({ data, prompt }) => {
+const SummaryResult = ({ data }) => {
      const { assessmentScores, careersScores, trackSummaries, totalQuestionScore, totalCorrectAnswers, totalQuestions, recommendation } = data;
      const getChartOption = useCallback((key, title = undefined, showXaxis = true) => ({
           series: [{
@@ -13,7 +13,7 @@ const SummaryResult = ({ data, prompt }) => {
                title: {
                     text: title,
                     style: {
-                         ...prompt.style
+
                     }
                },
                chart: {
@@ -50,7 +50,7 @@ const SummaryResult = ({ data, prompt }) => {
                          style: {
                               fontSize: '12px',
                               colors: ['#333'],
-                              ...prompt.style
+
                          },
                     },
                },
@@ -61,7 +61,7 @@ const SummaryResult = ({ data, prompt }) => {
                               paddingTop: "10px",
                               fontSize: '10px',
                               colors: ['#333'],
-                              ...prompt.style
+
                          }
                     },
                },
@@ -119,7 +119,7 @@ const SummaryResult = ({ data, prompt }) => {
                // title: {
                //      text: "อัตราส่วนคะแนนในแต่ละแทร็ก",
                //      style: {
-               //           ...prompt.style
+               //           
                //      }
                // },
                chart: {
@@ -259,7 +259,7 @@ const SummaryResult = ({ data, prompt }) => {
                                    {
                                         recommendation.map((rec, recKey) => (
                                              <li key={recKey} className='flex gap-4'>
-                                                  <p className='w-[10px]'>{`${recKey + 1})`}</p>
+                                                  <p className='w-[15px]'>{`${recKey + 1})`}</p>
                                                   <p className='flex flex-col'>
                                                        <span>{rec.recText}</span>
                                                        <span>{rec.descText}</span>

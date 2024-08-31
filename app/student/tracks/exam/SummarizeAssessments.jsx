@@ -4,7 +4,7 @@ import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md"
 import dynamic from 'next/dynamic';
 const BarChart = dynamic(() => import('@/app/components/charts/ApexBarChart'), { ssr: false });
 
-const SummarizeAssessments = ({ next, prev, data, prompt }) => {
+const SummarizeAssessments = ({ next, prev, data }) => {
     const scoreRate = {
         "5": "มากที่สุด",
         "4": "มาก",
@@ -48,7 +48,6 @@ const SummarizeAssessments = ({ next, prev, data, prompt }) => {
                     style: {
                         fontSize: '12px',
                         colors: ['#333'],
-                        ...prompt.style
                     },
                 },
                 title: {
@@ -57,7 +56,6 @@ const SummarizeAssessments = ({ next, prev, data, prompt }) => {
                         paddingTop: "10px",
                         fontSize: '10px',
                         colors: ['#333'],
-                        ...prompt.style
                     }
                 },
             },
@@ -68,7 +66,6 @@ const SummarizeAssessments = ({ next, prev, data, prompt }) => {
                         paddingTop: "10px",
                         fontSize: '10px',
                         colors: ['#333'],
-                        ...prompt.style
                     }
                 },
             },

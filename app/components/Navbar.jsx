@@ -7,7 +7,7 @@ import { MdEditDocument, MdOutlineQuiz, MdQuiz, MdAdminPanelSettings, MdOutlineA
 import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoHome, GoHomeFill } from "react-icons/go";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem, Skeleton, Badge } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem, Skeleton } from "@nextui-org/react";
 import { AiFillEdit, AiOutlineEdit, AiFillNotification } from 'react-icons/ai';
 import { RxHamburgerMenu } from "react-icons/rx";
 import "../style/hamburgers.css"
@@ -15,11 +15,10 @@ import { useToggleSideBarStore } from '@/src/store';
 import NextTopLoader from 'nextjs-toploader';
 import { Icon } from '@iconify/react';
 import { FaUser } from "react-icons/fa6";
-import { IoIosHelpCircle } from "react-icons/io";
 import { BiSolidExit } from "react-icons/bi";
-import { IoNotifications } from 'react-icons/io5';
 import PetitionNotification from './PetitionNotification';
 import { DROPDOWN_MENU_CLASS } from '@/src/util/ComponentClass';
+import { FaHistory } from 'react-icons/fa';
 
 const Navbar = () => {
     const { data: session, status } = useSession();
@@ -142,6 +141,14 @@ const Navbar = () => {
                                             <FaUser className='w-4 h-4' />
                                         </div>
                                         <span>ข้อมูลของฉัน</span>
+                                    </div>
+                                </DropdownItem>
+                                <DropdownItem href='/summary-history' key="summary-history">
+                                    <div className='flex gap-3 items-center'>
+                                        <div className='w-5 h-5 flex items-center justify-center'>
+                                            <FaHistory className='w-4 h-4' />
+                                        </div>
+                                        <span>ประวัติการแนะนำแทร็ก</span>
                                     </div>
                                 </DropdownItem>
                                 <DropdownItem href='/petition/request' key="write_petition">

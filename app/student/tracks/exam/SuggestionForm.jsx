@@ -13,8 +13,6 @@ import { Button } from "@nextui-org/react";
 import SummarizeQuestions from "./SummarizeQuestions";
 import SummarizeAssessments from "./SummarizeAssessments";
 import SummarizeCareers from "./SummarizeCareers";
-import localFont from 'next/font/local'
-const prompt = localFont({ src: '../../../../public/fonts/Prompt-Regular.woff2' })
 
 const SuggestionForm = ({ form, email }) => {
     const allQuestions = form?.Questions
@@ -114,7 +112,7 @@ const SuggestionForm = ({ form, email }) => {
     }, [current])
 
     return (
-        <div className={` px-12 pb-12 bg-[#F9F9F9]`}>
+        <div className={`px-12 pb-12 bg-[#F9F9F9]`}>
             {
                 Object.keys(form).length === 0 ?
                     <section className='text-center font-bold text-lg py-28'>
@@ -180,7 +178,6 @@ const SuggestionForm = ({ form, email }) => {
                                             <SummarizeQuestions
                                                 next={next}
                                                 data={summarizeData}
-                                                prompt={prompt}
                                             />
                                         </section>
                                         <section className={`w-full ${current === 1 ? "block" : "hidden"}`}>
@@ -188,7 +185,6 @@ const SuggestionForm = ({ form, email }) => {
                                                 next={next}
                                                 prev={prev}
                                                 data={summarizeData}
-                                                prompt={prompt}
                                             />
                                         </section>
                                         <section className={`w-full ${current === 2 ? "block" : "hidden"}`}>
@@ -196,13 +192,11 @@ const SuggestionForm = ({ form, email }) => {
                                                 next={next}
                                                 prev={prev}
                                                 data={summarizeData}
-                                                prompt={prompt}
                                             />
                                         </section>
                                         <section className={`w-full ${current === 3 ? "block" : "hidden"}`}>
                                             <SummaryResult
                                                 data={summarizeData}
-                                                prompt={prompt}
                                             />
                                         </section>
                                     </section>

@@ -4,7 +4,7 @@ import { MdKeyboardArrowRight } from 'react-icons/md'
 import dynamic from 'next/dynamic';
 const BarChart = dynamic(() => import('@/app/components/charts/ApexBarChart'), { ssr: false });
 
-const SummarizeQuestions = ({ next, data, prompt }) => {
+const SummarizeQuestions = ({ next, data }) => {
     const { questionScores, totalQuestionScore, totalCorrectAnswers, totalQuestions, overallCorrectPercentage, trackSummaries } = data;
     const option = useMemo(() => ({
         series: [{
@@ -41,7 +41,7 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
                     style: {
                         fontSize: '12px',
                         colors: ['#333'],
-                        ...prompt.style
+                        
                     },
                 },
                 title: {
@@ -50,7 +50,7 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
                         paddingTop: "10px",
                         fontSize: '10px',
                         colors: ['#333'],
-                        ...prompt.style
+                        
                     }
                 },
             },
@@ -61,7 +61,7 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
                         paddingTop: "10px",
                         fontSize: '10px',
                         colors: ['#333'],
-                        ...prompt.style
+                        
                     }
                 },
             },
