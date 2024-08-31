@@ -1,4 +1,4 @@
-import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '../components';
+import { Navbar, Sidebar, ContentWrap } from '../components';
 import AdminList from './AdminList';
 
 const Page = async () => {

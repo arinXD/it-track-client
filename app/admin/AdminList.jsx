@@ -14,27 +14,54 @@ import { LuTextSelect } from "react-icons/lu";
 import { IoNewspaperOutline } from "react-icons/io5";
 import { BiCheckbox } from "react-icons/bi";
 
-const AdminList = () => {
+const AdminList = ({ }) => {
      const { data: session } = useSession();
 
-     const teacherList = useMemo(() => ([
-          "รายชื่อนักศึกษา", "ข้อมูลแทร็ก", "คัดเลือกแทร็ก",
-          "รายชื่อนักศึกษาภายในแทร็ก", "อนุมัติจบการศึกษา", "สรุปผลการคัดเลือก"
-     ]), []);
+     const teacherCategories = [
+          {
+               title: "หลักสูตร",
+               links: [
+                    { href: "/admin/students", label: "รายชื่อนักศึกษาทั้งหมด", icon: BsPerson },
+                    { href: "/admin/students-advisor", label: "รายชื่อนักศึกษาในที่ปรึกษา", icon: BsPerson },
+               ]
+          },
+          {
+               title: "แทร็ก",
+               links: [
+                    { href: "/admin/track", label: "ข้อมูลแทร็ก", icon: HiOutlineUserGroup },
+                    { href: "/admin/track-selection", label: "คัดเลือกแทร็ก", icon: LuTextSelect },
+                    { href: "/admin/trackstudent", label: "รายชื่อนักศึกษาภายในแทร็ก", icon: BsPerson },
+                    { href: "/admin/track-dashboard", label: "สรุปผลการคัดเลือกแทร็ก", icon: IoBarChartOutline },
+                    { href: "/admin/petitions/all", label: "จัดการคำร้องย้ายแทร็ก", icon: IoDocumentTextOutline },
+               ]
+          },
+          {
+               title: "ตรวจสอบจบ",
+               links: [
+                    { href: "/admin/verify", label: "แบบฟอร์มตรวจสอบจบการศึกษา", icon: HiOutlineAcademicCap },
+                    { href: "/admin/verify-selection", label: "อนุมัติจบการศึกษา", icon: TbCheckupList },
+               ]
+          }
+     ]
 
-     const categories = useMemo(() => ([
+     const adminCategories = [
           {
                title: "ทั่วไป",
                links: [
                     { href: "/admin/users", label: "จัดการบัญชี", icon: RiUserSettingsLine },
+                    { href: "/admin/news", label: "จัดการข่าวสาร", icon: IoNewspaperOutline },
+               ]
+          },
+          {
+               title: "หลักสูตร",
+               links: [
                     { href: "/admin/program", label: "หลักสูตร", icon: IoBookOutline },
                     { href: "/admin/category", label: "หมวดหมู่วิชา", icon: BiCategory },
                     { href: "/admin/group", label: "กลุ่มวิชา", icon: HiOutlineRectangleGroup },
                     { href: "/admin/subgroup", label: "กลุ่มย่อยวิชา", icon: LuUngroup },
                     { href: "/admin/semisubgroup", label: "กลุ่มรองวิชา", icon: BiCheckbox },
                     { href: "/admin/subject", label: "วิชา", icon: RiBookletLine },
-                    { href: "/admin/students", label: "รายชื่อนักศึกษา", icon: BsPerson },
-                    { href: "/admin/news", label: "จัดการข่าวสาร", icon: IoNewspaperOutline },
+                    { href: "/admin/students", label: "รายชื่อนักศึกษาทั้งหมด", icon: BsPerson },
                ]
           },
           {
@@ -56,18 +83,22 @@ const AdminList = () => {
           {
                title: "ตรวจสอบจบ",
                links: [
-                    { href: "/admin/verify", label: "แบบฟอร์มตรวจสอบจบ", icon: HiOutlineAcademicCap },
+                    { href: "/admin/verify", label: "แบบฟอร์มตรวจสอบจบการศึกษา", icon: HiOutlineAcademicCap },
                     { href: "/admin/verify-selection", label: "อนุมัติจบการศึกษา", icon: TbCheckupList },
                ]
           }
-     ]), []);
+     ]
+
+     const categories = useMemo(() => {
+          const cat = {
+               "admin": adminCategories,
+               "teacher": teacherCategories
+          }
+          return cat[session?.user?.role] ?? teacherCategories
+     }, [session])
 
      const renderMenuItem = (item) => {
           const Icon = item.icon;
-          const isVisible = session?.user?.role === "admin" || teacherList.includes(item.label);
-
-          if (!isVisible) return null;
-
           return (
                <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
                     <Icon className="w-10 h-10 mb-3 text-blue-600" />
@@ -77,17 +108,11 @@ const AdminList = () => {
      };
 
      const renderCategory = (category, index) => {
-          const visibleLinks = category.links.filter(link =>
-               session?.user?.role === "admin" || teacherList.includes(link.label)
-          );
-
-          if (visibleLinks.length === 0) return null;
-
           return (
                <div key={index} className="mb-10">
                     <h2 className="mb-5 text-2xl font-bold text-gray-800 border-b border-b-gray-300 pb-2">{category.title}</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
-                         {visibleLinks.map(renderMenuItem)}
+                         {category.links.map(renderMenuItem)}
                     </div>
                </div>
           );

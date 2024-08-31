@@ -21,7 +21,7 @@ import { simpleDMY, simpleDMYHM } from '@/src/util/simpleDateFormatter'
 import { SearchOutlined } from '@ant-design/icons';
 import { Drawer } from 'antd';
 import { TbMessage2Exclamation } from "react-icons/tb";
-import Step from './step';
+import Step from './Step';
 
 const Page = () => {
     const [loading, setLoading] = useState(true)

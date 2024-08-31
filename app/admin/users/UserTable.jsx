@@ -7,8 +7,10 @@ import { thinInputClass } from '@/src/util/ComponentClass';
 import { DeleteIcon, EditIcon2, PlusIcon } from '@/app/components/icons';
 import { simpleDMY } from '@/src/util/simpleDateFormatter';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
+import { useSession } from 'next-auth/react';
+import { swal } from '@/src/util/sweetyAlert';
 
-const UserTable = ({ }) => {
+const UserTable = ({ email }) => {
      const [filteredUsers, setFilteredUsers] = useState([]);
      const [searchTerm, setSearchTerm] = useState('');
      const [roleFilter, setRoleFilter] = useState('all');
@@ -23,13 +25,13 @@ const UserTable = ({ }) => {
           const option = await getOptions("/api/users", "get")
           try {
                const users = (await axios(option)).data.data
-               setUsers(users)
+               setUsers(users.filter(user => user.email !== email))
           } catch (error) {
                setUsers([])
           } finally {
                setFetching(false)
           }
-     }, [])
+     }, [email])
 
      useEffect(() => {
           getAllUsers()
@@ -60,8 +62,9 @@ const UserTable = ({ }) => {
           });
      }, []);
 
-     const handleUpdateRole = useCallback(async (id, role) => {
-          const option = await getOptions(`/api/users/${id}/role/${role}`, "patch")
+     const handleUpdateRole = useCallback(async (id, role, userEmail) => {
+          const data = { role, email: userEmail }
+          const option = await getOptions(`/api/users/${id}/role`, "patch", data)
           try {
                await axios(option)
                setNewRole(prev => prev.filter(item => item.id !== id));
@@ -134,6 +137,26 @@ const UserTable = ({ }) => {
           return filteredUsers.slice(start, end);
      }, [page, filteredUsers, rowsPerPage]);
 
+     const handleDelete = useCallback(async (id) => {
+          swal.fire({
+               text: `ต้องการลบบัญชีผู้ใช้หรือไม่ ?`,
+               icon: "question",
+               showCancelButton: true,
+               confirmButtonColor: "#3085d6",
+               cancelButtonColor: "#d33",
+               confirmButtonText: "ตกลง",
+               cancelButtonText: "ยกเลิก",
+               reverseButtons: true
+          }).then(async (result) => {
+               if (result.isConfirmed) {
+                    const options = await getOptions(`/api/users/${id}`, 'DELETE')
+                    await axios(options)
+                    await getAllUsers()
+                    message.success("ลบบัญชีผู้ใช้เรียบร้อย")
+               }
+          });
+     }, [])
+
      return (
           <div className="space-y-4 p-4">
                {/* <div>
@@ -185,6 +208,7 @@ const UserTable = ({ }) => {
                          )}
                     </TableHeader>
                     <TableBody
+                         loadingState={fetching}
                          isLoading={fetching}
                          emptyContent={
                               <Empty
@@ -231,7 +255,7 @@ const UserTable = ({ }) => {
                                                   size="sm"
                                                   color="primary"
                                                   isDisabled={!user.newRole && user.newRole !== user.role}
-                                                  onClick={() => handleUpdateRole(user.id, user.newRole)}
+                                                  onClick={() => handleUpdateRole(user.id, user.newRole, user.email)}
                                              >
                                                   เปลี่ยนโรล
                                              </Button>
@@ -245,7 +269,7 @@ const UserTable = ({ }) => {
                                                   <EditIcon2 className="w-5 h-5 text-yellow-600" />
                                              </Button>
                                              <Button
-                                                  onClick={() => { }}
+                                                  onClick={() => handleDelete(user.id)}
                                                   size='sm'
                                                   color='danger'
                                                   isIconOnly
