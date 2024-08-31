@@ -1,6 +1,6 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Link, useDisclosure, Tooltip } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Link, useDisclosure, Tooltip, Spinner } from "@nextui-org/react";
 import { PlusIcon, SearchIcon, ChevronDownIcon, DeleteIcon2, DeleteIcon, EditIcon2 } from "@/app/components/icons";
 import { capitalize } from "@/src/util/utils";
 import { fetchData } from '../action'
@@ -96,7 +96,8 @@ const StudentTable = ({ email }) => {
      }, [])
 
      const getStudents = useCallback(async function (program = selectProgram, acadyear = selectAcadYear) {
-          localStorage.setItem("search-students", JSON.stringify({ program, acadyear }))
+          setFetching(true)
+          localStorage.setItem("search-students-advisor", JSON.stringify({ program, acadyear }))
           try {
                let students = await fetchData(`/api/students/programs/${program}/acadyear/${acadyear}/advisor/${email}`)
                students.sort((a, b) => {
@@ -110,6 +111,8 @@ const StudentTable = ({ email }) => {
                setStudents(students);
           } catch (error) {
                setStudents([]);
+          } finally {
+               setFetching(false)
           }
      }, [selectProgram, selectAcadYear, email])
 
@@ -126,7 +129,7 @@ const StudentTable = ({ email }) => {
           setFetching(true)
           await getPrograms()
           await getStudentStatuses()
-          const searchItem = localStorage.getItem("search-students")
+          const searchItem = localStorage.getItem("search-students-advisor")
           if (searchItem) {
                const { program, acadyear } = JSON.parse(searchItem)
                setSelectProgram(program)
@@ -333,7 +336,7 @@ const StudentTable = ({ email }) => {
 
      const topContent = useMemo(() => {
           return (
-               <div className="flex flex-col gap-2">
+               <div className="flex flex-col gap-2 mb-4">
                     {
                          students.length > 0 &&
                          <div className="flex flex-col text-small">
@@ -430,48 +433,18 @@ const StudentTable = ({ email }) => {
                                    <DropdownMenu
                                         variant="faded"
                                         aria-label="Dropdown menu"
-                                   // onAction={(key) => {
-                                   //     if (key == "add-student") onOpen()
-                                   //     else if (key == "add-students-excel") studentExcelOnOpen()
-                                   //     else if (key == "add-enrollment-excel") enrollExcelOnOpen()
-                                   //     else if (key == "add-enrollment") onOpenEnroll()
-                                   // }}
                                    >
                                         <DropdownItem
                                              href="students/create?tab=student-form"
                                              key="add-student"
-                                             description="เพิ่มรายชื่อนักศึกษาผ่านแบบฟอร์ม"
+                                             description="เพิ่มรายชื่อผ่านแบบฟอร์ม"
                                              startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
                                         >
-                                             เพิ่มรายชื่อนักศึกษา
-                                        </DropdownItem>
-                                        <DropdownItem
-                                             href="students/create?tab=enroll-form"
-                                             key="add-enrollment"
-                                             description="เพิ่มรายวิชาที่ลงทะเบียนผ่านแบบฟอร์ม"
-                                             startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
-                                        >
-                                             เพิ่มรายวิชาที่ลงทะเบียน
-                                        </DropdownItem>
-                                        <DropdownItem
-                                             href="students/create?tab=student-sheet"
-                                             key="add-students-excel"
-                                             description="เพิ่มรายชื่อนักศึกษาผ่านไฟล์ excel"
-                                             startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
-                                        >
-                                             เพิ่มรายชื่อนักศึกษา
-                                        </DropdownItem>
-                                        <DropdownItem
-                                             href="students/create?tab=enroll-sheet"
-                                             key="add-enrollment-excel"
-                                             description="เพิ่มรายวิชาที่ลงทะเบียนผ่านไฟล์ excel"
-                                             startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
-                                        >
-                                             เพิ่มรายวิชาที่ลงทะเบียน
+                                             เพิ่มรายชื่อนักศึกษาในที่ปรึกษา
                                         </DropdownItem>
                                    </DropdownMenu>
                               </Dropdown>
-                              <Link href="/admin/students/restore">
+                              <Link href="#">
                                    <Button
                                         size="sm"
                                         radius="sm"
@@ -666,56 +639,61 @@ const StudentTable = ({ email }) => {
                               </div>
                          </div>
                          <div className="border p-4 rounded-[10px] w-full">
-                              <Table
-                                   aria-label="Student Table"
-                                   checkboxesProps={{
-                                        classNames: {
-                                             wrapper: "after:bg-blue-500 after:text-background text-background",
-                                        },
-                                   }}
-                                   classNames={minimalTableClass}
+                              {topContent}
+                              {
+                                   !fetching ?
 
-                                   topContent={topContent}
-                                   topContentPlacement="outside"
+                                        <Table
+                                             aria-label="Student Table"
+                                             checkboxesProps={{
+                                                  classNames: {
+                                                       wrapper: "after:bg-blue-500 after:text-background text-background",
+                                                  },
+                                             }}
+                                             classNames={minimalTableClass}
+                                             bottomContent={bottomContent}
+                                             bottomContentPlacement="outside"
 
-                                   bottomContent={bottomContent}
-                                   bottomContentPlacement="outside"
-
-                                   isCompact
-                                   removeWrapper
-                                   selectionMode="multiple"
-                                   sortDescriptor={sortDescriptor}
-                                   onSortChange={setSortDescriptor}
-                                   selectedKeys={selectedKeys}
-                                   onSelectionChange={setSelectedKeys}
-                              >
-                                   <TableHeader columns={headerColumns}>
-                                        {(column) => (
-                                             <TableColumn
-                                                  key={column.uid}
-                                                  align={column.uid === "actions" ? "center" : "start"}
-                                                  allowsSorting={column.sortable}
-                                             >
-                                                  {column.name}
-                                             </TableColumn>
-                                        )}
-                                   </TableHeader>
-                                   <TableBody
-                                        emptyContent={
-                                             <Empty
-                                                  className='my-4'
-                                                  description={
-                                                       <span className='text-gray-300'>ไม่มีข้อมูลนักศึกษา</span>
-                                                  }
-                                             />}
-                                        items={sortedItems}>
-                                        {(item) => (
-                                             <TableRow key={item.id}>
-                                                  {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                                             </TableRow>
-                                        )}
-                                   </TableBody>
-                              </Table>
+                                             isCompact
+                                             removeWrapper
+                                             selectionMode="multiple"
+                                             sortDescriptor={sortDescriptor}
+                                             onSortChange={setSortDescriptor}
+                                             selectedKeys={selectedKeys}
+                                             onSelectionChange={setSelectedKeys}
+                                        >
+                                             <TableHeader columns={headerColumns}>
+                                                  {(column) => (
+                                                       <TableColumn
+                                                            key={column.uid}
+                                                            align={column.uid === "actions" ? "center" : "start"}
+                                                            allowsSorting={column.sortable}
+                                                       >
+                                                            {column.name}
+                                                       </TableColumn>
+                                                  )}
+                                             </TableHeader>
+                                             <TableBody
+                                                  emptyContent={
+                                                       <Empty
+                                                            className='my-4'
+                                                            description={
+                                                                 <span className='text-gray-300'>ไม่มีข้อมูลนักศึกษา</span>
+                                                            }
+                                                       />}
+                                                  items={sortedItems}>
+                                                  {(item) => (
+                                                       <TableRow key={item.id}>
+                                                            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                                                       </TableRow>
+                                                  )}
+                                             </TableBody>
+                                        </Table>
+                                        :
+                                        <div className="flex justify-center items-center mt-8 mb-4">
+                                             <Spinner />
+                                        </div>
+                              }
                          </div>
                     </>
                     {/* } */}

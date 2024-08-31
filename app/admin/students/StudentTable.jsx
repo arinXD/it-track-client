@@ -101,6 +101,7 @@ const StudentTable = () => {
      }, [])
 
      const getStudents = useCallback(async function (program = selectProgram, acadyear = selectAcadYear) {
+          setFetching(true)
           localStorage.setItem("search-students", JSON.stringify({ program, acadyear }))
           try {
                let students = await fetchData(`/api/students/programs/${program}/acadyear/${acadyear}`)
@@ -114,6 +115,8 @@ const StudentTable = () => {
                setStudents(students);
           } catch (error) {
                setStudents([]);
+          } finally {
+               setFetching(false)
           }
      }, [selectProgram, selectAcadYear])
 
@@ -336,7 +339,7 @@ const StudentTable = () => {
 
      const topContent = useMemo(() => {
           return (
-               <div className="flex flex-col gap-2">
+               <div className="flex flex-col gap-2 mb-4">
                     {
                          students.length > 0 &&
                          <div className="flex flex-col text-small">
@@ -660,68 +663,71 @@ const StudentTable = () => {
                     </div>
                </div>
                <div className="border p-4 rounded-[10px] w-full">
-                    {role ?
+                    <>
+                         {topContent}
+                         {
+                              !fetching && role ?
+                                   <Table
+                                        aria-label="Student Table"
+                                        checkboxesProps={{
+                                             classNames: {
+                                                  wrapper: "after:bg-blue-500 after:text-background text-background",
+                                             },
+                                        }}
+                                        classNames={minimalTableClass}
 
-                         <Table
-                              aria-label="Student Table"
-                              checkboxesProps={{
-                                   classNames: {
-                                        wrapper: "after:bg-blue-500 after:text-background text-background",
-                                   },
-                              }}
-                              classNames={minimalTableClass}
+                                        bottomContent={bottomContent}
+                                        bottomContentPlacement="outside"
 
-                              topContent={topContent}
-                              topContentPlacement="outside"
-
-                              bottomContent={bottomContent}
-                              bottomContentPlacement="outside"
-
-                              isCompact
-                              removeWrapper
-                              selectionMode="multiple"
-                              sortDescriptor={sortDescriptor}
-                              onSortChange={setSortDescriptor}
-                              selectedKeys={selectedKeys}
-                              onSelectionChange={setSelectedKeys}
-                         >
-                              <TableHeader columns={headerColumns}>
-                                   {(column) => (
-                                        <TableColumn
-                                             className={(column.uid === 'actions' && role !== "admin") && "hidden"}
-                                             key={column.uid}
-                                             align={column.uid === "actions" ? "center" : "start"}
-                                             allowsSorting={column.sortable}
-                                        >
-                                             {column.name}
-                                        </TableColumn>
-                                   )}
-                              </TableHeader>
-                              <TableBody
-                                   emptyContent={
-                                        <Empty
-                                             className='my-4'
-                                             description={
-                                                  <span className='text-gray-300'>ไม่มีข้อมูลนักศึกษา</span>
-                                             }
-                                        />}
-                                   items={sortedItems}>
-                                   {(item) => (
-                                        <TableRow key={item.id}>
-                                             {(columnKey) =>
-                                                  <TableCell
-                                                       className={`${role === "admin" || columnKey !== "actions" ? "" : "hidden"}
+                                        isCompact
+                                        removeWrapper
+                                        selectionMode="multiple"
+                                        sortDescriptor={sortDescriptor}
+                                        onSortChange={setSortDescriptor}
+                                        selectedKeys={selectedKeys}
+                                        onSelectionChange={setSelectedKeys}
+                                   >
+                                        <TableHeader columns={headerColumns}>
+                                             {(column) => (
+                                                  <TableColumn
+                                                       className={(column.uid === 'actions' && role !== "admin") && "hidden"}
+                                                       key={column.uid}
+                                                       align={column.uid === "actions" ? "center" : "start"}
+                                                       allowsSorting={column.sortable}
+                                                  >
+                                                       {column.name}
+                                                  </TableColumn>
+                                             )}
+                                        </TableHeader>
+                                        <TableBody
+                                             emptyContent={
+                                                  <Empty
+                                                       className='my-4'
+                                                       description={
+                                                            <span className='text-gray-300'>ไม่มีข้อมูลนักศึกษา</span>
+                                                       }
+                                                  />}
+                                             items={sortedItems}>
+                                             {(item) => (
+                                                  <TableRow key={item.id}>
+                                                       {(columnKey) =>
+                                                            <TableCell
+                                                                 className={`${role === "admin" || columnKey !== "actions" ? "" : "hidden"}
                                                   ${columnKey == "stu_id" && "w-1"}
                                                   `}
-                                                  >
-                                                       {renderCell(item, columnKey)}
-                                                  </TableCell>}
-                                        </TableRow>
-                                   )}
-                              </TableBody>
-                         </Table> :
-                         <div className="flex justify-center items-center"> <Spinner /></div>
-                    }
+                                                            >
+                                                                 {renderCell(item, columnKey)}
+                                                            </TableCell>}
+                                                  </TableRow>
+                                             )}
+                                        </TableBody>
+                                   </Table>
+                                   :
+                                   <div className="flex justify-center items-center mt-8 mb-4">
+                                        <Spinner />
+                                   </div>
+                         }
+                    </>
                </div>
           </section>
      )

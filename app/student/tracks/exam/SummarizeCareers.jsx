@@ -76,7 +76,7 @@ const SummarizeCareer = ({ next, prev, data, prompt }) => {
                     </header>
                     <div className="p-6 space-y-6">
                         <section className='p-6 bg-blue-50 rounded-lg '>
-                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">อาชีพทั้งหม {careersScores?.length} อาชีพ</h2>
+                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">อาชีพทั้งหมด {careersScores?.length} อาชีพ</h2>
                             <div className="bg-white shadow overflow-auto rounded-lg">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">

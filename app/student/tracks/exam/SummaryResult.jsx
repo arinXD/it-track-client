@@ -259,7 +259,7 @@ const SummaryResult = ({ data, prompt }) => {
                                    {
                                         recommendation.map((rec, recKey) => (
                                              <li key={recKey} className='flex gap-4'>
-                                                  <p className='w-[10px]'>{recKey + 1}) </p>
+                                                  <p className='w-[10px]'>{`${recKey + 1})`}</p>
                                                   <p className='flex flex-col'>
                                                        <span>{rec.recText}</span>
                                                        <span>{rec.descText}</span>

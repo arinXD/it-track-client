@@ -41,7 +41,7 @@ const Summarize = ({ prev, setCurrent, summarize, summarizing }) => {
                                         fontSize: 16,
                                    }}
                               >
-                                   The content you submitted has the following missing:
+                                   เนื้อหาที่คุณส่งมาไม่มีข้อมูลต่อไปนี้
                               </Text>
                          </Paragraph>
                          <Paragraph className="flex justify-start items-center gap-2.5">
@@ -51,8 +51,8 @@ const Summarize = ({ prev, setCurrent, summarize, summarizing }) => {
                                         :
                                         <CloseCircleOutlined className="text-red-500" />
                               }
-                              <span>Step 1) Answer all of questions. </span>
-                              {!summarize.questions && <a onClick={() => setCurrent(0)}>Go to questions.</a>}
+                              <span>Step 1) ตอบคำถามไม่ครบ </span>
+                              {!summarize.questions && <a onClick={() => setCurrent(0)}>ตอบคำถาม.</a>}
                          </Paragraph>
                          <Paragraph className="flex justify-start items-center gap-2.5">
                               {
@@ -61,8 +61,8 @@ const Summarize = ({ prev, setCurrent, summarize, summarizing }) => {
                                         :
                                         <CloseCircleOutlined className="text-red-500" />
                               }
-                              <span>Step 2) Answer all of assessments.</span>
-                              {!summarize.assessments && <a onClick={() => setCurrent(1)}>Go to assessments.</a>}
+                              <span>Step 2) ตอบแบบประเมินความชอบไม่ครบ</span>
+                              {!summarize.assessments && <a onClick={() => setCurrent(1)}>ตอบแบบประเมิน</a>}
                          </Paragraph>
                          <Paragraph className="flex justify-start items-center gap-2.5">
                               {
@@ -71,8 +71,8 @@ const Summarize = ({ prev, setCurrent, summarize, summarizing }) => {
                                         :
                                         <CloseCircleOutlined className="text-red-500" />
                               }
-                              <span>Step 3) Answer careers.</span>
-                              {!summarize.careers && <a onClick={() => setCurrent(2)}>Go to careers.</a>}
+                              <span>Step 3) ไม่เลือกอาชีพที่ชอบ</span>
+                              {!summarize.careers && <a onClick={() => setCurrent(2)}>เลือกอาชีพ</a>}
                          </Paragraph>
                     </Spin>
                </Result>
