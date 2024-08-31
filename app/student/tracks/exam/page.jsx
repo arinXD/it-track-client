@@ -5,6 +5,7 @@ import FormWrapper from './FormWrapper';
 import { Suspense } from 'react';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import axios from 'axios';
+import { getServerSession } from 'next-auth';
 
 async function getAllTracks() {
     const option = await getOptions("/api/tracks/all", "get")
@@ -29,6 +30,7 @@ async function getSuggestionForm() {
 }
 
 const Page = async () => {
+    const user = await getServerSession()
     const trackData = getAllTracks()
     const formData = getSuggestionForm()
     const [tracks, form] = await Promise.all([trackData, formData])
@@ -41,6 +43,7 @@ const Page = async () => {
 
             <Suspense fallback={<div>Loading...</div>}>
                 <FormWrapper
+                    email={user?.user?.email}
                     tracks={tracks}
                     form={form} />
             </Suspense>

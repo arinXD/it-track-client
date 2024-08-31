@@ -94,7 +94,7 @@ const AdminList = ({ }) => {
                "admin": adminCategories,
                "teacher": teacherCategories
           }
-          return cat[session?.user?.role] ?? teacherCategories
+          return cat[session?.user?.role] ?? []
      }, [session])
 
      const renderMenuItem = (item) => {

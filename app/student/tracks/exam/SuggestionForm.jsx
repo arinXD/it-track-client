@@ -16,7 +16,7 @@ import SummarizeCareers from "./SummarizeCareers";
 import localFont from 'next/font/local'
 const prompt = localFont({ src: '../../../../public/fonts/Prompt-Regular.woff2' })
 
-const SuggestionForm = ({ form }) => {
+const SuggestionForm = ({ form, email }) => {
     const allQuestions = form?.Questions
     const allAssessments = form?.Assessments
     const allCareers = form?.Careers
@@ -86,7 +86,7 @@ const SuggestionForm = ({ form }) => {
             assessments,
             careers,
         }
-        const option = await getOptions("/api/suggestion-forms/summarize", "post", formData)
+        const option = await getOptions(`/api/suggestion-forms/summarize/${email}`, "post", formData)
         try {
             setSummarizing(true)
             const res = await axios(option)
@@ -99,7 +99,7 @@ const SuggestionForm = ({ form }) => {
             setSummarizing(false)
             window.scrollTo(0, 750)
         }
-    }, [questions, assessments, careers])
+    }, [questions, assessments, careers, email])
 
     const resetForm = useCallback(() => {
         initForm()
