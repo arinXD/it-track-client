@@ -1,6 +1,6 @@
 "use client"
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, Select, SelectItem, Pagination } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, Select, SelectItem, Pagination, Spinner } from "@nextui-org/react";
 import { Empty, message } from 'antd';
 import axios from 'axios';
 import { thinInputClass } from '@/src/util/ComponentClass';
@@ -18,7 +18,7 @@ const UserTable = ({ email }) => {
      const [rowsPerPage, setRowsPerPage] = useState(10);
      const [newRole, setNewRole] = useState([]);
      const [users, setUsers] = useState([]);
-     const [fetching, setFetching] = useState(false);
+     const [fetching, setFetching] = useState(true);
 
      const getAllUsers = useCallback(async function () {
           setFetching(true)
@@ -208,7 +208,7 @@ const UserTable = ({ email }) => {
                          )}
                     </TableHeader>
                     <TableBody
-                         loadingState={fetching}
+                         loadingContent={<Spinner />}
                          isLoading={fetching}
                          emptyContent={
                               <Empty

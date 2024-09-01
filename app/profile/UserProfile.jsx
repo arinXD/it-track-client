@@ -78,12 +78,12 @@ const UserProfile = ({ userData }) => {
                          </div>
                          <div className='flex flex-col gap-4 w-full'>
                               <div className='flex gap-2 items-center'>
-                                   <Tooltip color="foreground" content="Sign in by" className='rounded-[5px]'>
+                                   <Tooltip color="foreground" content="ลงชื่อเข้าใช้โดย" className='rounded-[5px]'>
                                         <Chip size="sm" className={`${insertColor.color} border-1 border-[#46bcaa] cursor-pointer rounded-[5px]`}>
                                              {capitalize(sign_in_type)}
                                         </Chip>
                                    </Tooltip>
-                                   <Tooltip color="foreground" content="Role" className='rounded-[5px]'>
+                                   <Tooltip color="foreground" content="โรล" className='rounded-[5px]'>
                                         <Chip size="sm" className={`${restoreColor.color} border-1 border-[#4d69fa] cursor-pointer rounded-[5px]`}>
                                              {capitalize(role)}
                                         </Chip>

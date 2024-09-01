@@ -61,11 +61,6 @@ const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
                                              className="rounded-[2px] h-[100px] w-[120px] object-cover !select-none"
                                         />
                                         <div className="mt-4 w-full">
-                                             <Tooltip
-                                                  placement="top"
-                                                  title={career.name_en} >
-                                                  <p title={career.name_en} className="mb-1 w-full whitespace-nowrap overflow-hidden text-ellipsis">{career.name_en}</p>
-                                             </Tooltip>
                                              <p>{career.name_th}</p>
                                         </div>
                                    </div>

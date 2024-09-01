@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { signOut, useSession } from "next-auth/react"
 import Image from 'next/image'
 import Link from 'next/link';
@@ -143,22 +143,26 @@ const Navbar = () => {
                                         <span>ข้อมูลของฉัน</span>
                                     </div>
                                 </DropdownItem>
-                                <DropdownItem href='/summary-history' key="summary-history">
-                                    <div className='flex gap-3 items-center'>
-                                        <div className='w-5 h-5 flex items-center justify-center'>
-                                            <FaHistory className='w-4 h-4' />
+                                {session?.user?.role === "student" &&
+                                    <DropdownItem href='/summary-history' key="summary-history">
+                                        <div className='flex gap-3 items-center'>
+                                            <div className='w-5 h-5 flex items-center justify-center'>
+                                                <FaHistory className='w-4 h-4' />
+                                            </div>
+                                            <span>ประวัติการแนะนำแทร็ก</span>
                                         </div>
-                                        <span>ประวัติการแนะนำแทร็ก</span>
-                                    </div>
-                                </DropdownItem>
-                                <DropdownItem href='/petition/request' key="write_petition">
-                                    <div className='flex gap-3 items-center'>
-                                        <div className='w-5 h-5 flex items-center justify-center'>
-                                            <MdEditDocument className='w-5 h-5' />
+                                    </DropdownItem>
+                                }
+                                {session?.user?.role === "student" &&
+                                    <DropdownItem href='/petition/request' key="write_petition">
+                                        <div className='flex gap-3 items-center'>
+                                            <div className='w-5 h-5 flex items-center justify-center'>
+                                                <MdEditDocument className='w-5 h-5' />
+                                            </div>
+                                            <span>ยื่นคำร้องย้ายแทร็ก</span>
                                         </div>
-                                        <span>ยื่นคำร้องย้ายแทร็ก</span>
-                                    </div>
-                                </DropdownItem>
+                                    </DropdownItem>
+                                }
                                 <DropdownItem href='/help-feedback' key="help_and_feedback">
                                     <div className='flex gap-3 items-center'>
                                         <div className='w-5 h-5 flex items-center justify-center'>

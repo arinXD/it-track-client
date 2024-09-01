@@ -11,7 +11,7 @@ const Page = () => {
      const [fetching, setFetching] = useState(false);
      const [histories, setHistories] = useState([]);
      const email = useMemo(() => session?.user?.email, [session])
-     const getHistory = useCallback(async (email) => {
+     const getHistory = useCallback(async () => {
           const option = await getOptions(`/api/suggestion-forms/history/${email}`, "get")
           try {
                setFetching(true)
@@ -22,15 +22,18 @@ const Page = () => {
           } finally {
                setFetching(false)
           }
-     }, [])
+     }, [email])
 
      useEffect(() => {
-          if (email) getHistory(email)
+          if (email) getHistory()
      }, [email])
 
      return (
           <div className="p-4 md:p-8">
-               <SummaryHistory fetching={fetching} histories={histories} />
+               <SummaryHistory
+                    fn={getHistory}
+                    fetching={fetching}
+                    histories={histories} />
           </div>
      )
 }
