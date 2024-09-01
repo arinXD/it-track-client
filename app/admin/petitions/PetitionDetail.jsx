@@ -14,10 +14,11 @@ import { useSession } from "next-auth/react";
 const PetitionDetail = ({ id, current, isApprovable = false }) => {
      const { data: session } = useSession();
      const [petition, setPetition] = useState({});
-     const [fetching, setFetching] = useState(false);
+     const [fetching, setFetching] = useState(true);
      const [isApproving, setIsApproving] = useState(false);
      const [isRejecting, setIsRejecting] = useState(false);
      const [responseText, setResponseText] = useState("");
+     const [isApprovableState, setIsApprovableState] = useState(isApprovable);
 
      useEffect(() => {
           async function getPetitionById(id) {
@@ -25,6 +26,7 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                try {
                     const option = await getOptions(`/api/petitions/${id}`, "get")
                     const data = (await axios(option)).data?.data
+                    setIsApprovableState(data?.status == 0)
                     setPetition(data)
                } catch (errr) {
                     setPetition({})
@@ -154,11 +156,11 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                {/* parent */}
                <section className="col-span-3 border rounded-lg shadow flex flex-col">
                     <div className="flex p-2 border-b items-center h-[55px]">
-                         <h1 className="mx-4">{isApprovable ? "การอนุมัติ" : "สถานะการอนุมัติ"}</h1>
+                         <h1 className="mx-4">{isApprovableState ? "การอนุมัติ" : "สถานะการอนุมัติ"}</h1>
                     </div>
                     {/* child */}
                     <div className="px-6 py-4 flex flex-col justify-between h-full">
-                         {!isApprovable &&
+                         {!isApprovableState &&
                               <div className="flex flex-col gap-4 w-full h-full">
                                    <div>
                                         <h3 className="font-medium">ผู้อนุมัติ</h3>
@@ -182,7 +184,7 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                                    )}
                               </div>
                          }
-                         {isApprovable &&
+                         {isApprovableState &&
                               <>
                                    <div className="h-full flex flex-col mb-4">
                                         <p className="mb-1">ความคิดเห็น</p>

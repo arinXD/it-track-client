@@ -227,12 +227,24 @@ const PetitionDetail = ({
                                              <>
                                                   <div>
                                                        <h3 className="font-medium">ผู้อนุมัติ</h3>
-                                                       <p>{petition?.Approver?.Teacher?.prefix} {petition?.Approver?.Teacher?.teacherName}</p>
+                                                       <p className="mt-1">
+                                                            {petition?.Approver?.Teacher?.teacherName ?
+                                                                 <>{petition?.Approver?.Teacher?.prefix} {petition?.Approver?.Teacher?.teacherName}</>
+                                                                 :
+                                                                 <>{petition?.Approver?.email}</>
+                                                            }
+                                                       </p>
                                                   </div>
                                                   <div className="space-y-2">
                                                        <div className="flex justify-between text-sm">
                                                             <span className="text-gray-500">ลงนามโดย</span>
-                                                            <span>{petition?.Approver?.Teacher?.teacherName}</span>
+                                                            <span>
+                                                                 {petition?.Approver?.Teacher?.teacherName ?
+                                                                      <>{petition?.Approver?.Teacher?.teacherName}</>
+                                                                      :
+                                                                      <>{petition?.Approver?.email}</>
+                                                                 }
+                                                            </span>
                                                        </div>
                                                        <div className="flex justify-between text-sm">
                                                             <span className="text-gray-500">เวลา</span>

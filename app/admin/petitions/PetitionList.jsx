@@ -1,7 +1,7 @@
 "use client"
 import Petitionbar from "./Petitionbar"
 import { useEffect, useState } from "react"
-import { Button } from "@nextui-org/react"
+import { Button, Spinner } from "@nextui-org/react"
 import { simpleDM } from "@/src/util/simpleDateFormatter"
 import Link from "next/link"
 import { IoSearchOutline } from "react-icons/io5";
@@ -58,7 +58,7 @@ const PetitionList = ({ current, fetching, title, data, emptyContent }) => {
                          </div>
                          {fetching ? (
                               <div className="flex justify-center items-center h-64">
-                                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+                                   <Spinner />
                               </div>
                          ) : (
                               <ul className="divide-y divide-gray-200">

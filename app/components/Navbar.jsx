@@ -16,9 +16,9 @@ import NextTopLoader from 'nextjs-toploader';
 import { Icon } from '@iconify/react';
 import { FaUser } from "react-icons/fa6";
 import { BiSolidExit } from "react-icons/bi";
-import PetitionNotification from './PetitionNotification';
 import { DROPDOWN_MENU_CLASS } from '@/src/util/ComponentClass';
 import { FaHistory } from 'react-icons/fa';
+import Notification from './Notification';
 
 const Navbar = () => {
     const { data: session, status } = useSession();
@@ -240,13 +240,18 @@ const Navbar = () => {
                         </button>
                     </div>
                     <div className="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
-                        <PetitionNotification />
+
+                        {/* Noti */}
+                        <Notification email={session?.user?.email} />
+
+                        {/* User profile */}
                         <div className="relative ml-3 flex flex-row gap-3">
                             {renderUserProfile()}
-                        </div >
-                    </div >
-                </div >
-            </div >
+                        </div>
+
+                    </div>
+                </div>
+            </div>
             {
                 <div className={`md:hidden relative w-50`} id="mobile-menu">
                     <div className="h-fit absolute space-y-1 p-2 border-y-1 w-full border-y-gray-200" id='navstupid'
