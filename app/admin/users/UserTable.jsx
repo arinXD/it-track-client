@@ -9,6 +9,7 @@ import { simpleDMY } from '@/src/util/simpleDateFormatter';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import { useSession } from 'next-auth/react';
 import { swal } from '@/src/util/sweetyAlert';
+import Link from 'next/link';
 
 const UserTable = ({ email }) => {
      const [filteredUsers, setFilteredUsers] = useState([]);
@@ -191,11 +192,13 @@ const UserTable = ({ email }) => {
                               <SelectItem key="user">ผู้ใช้</SelectItem>
                          </Select>
                          <div>
-                              <Button
-                                   className='bg-[#edf8f7] text-[#46bcaa]'
-                                   startContent={<PlusIcon className="w-4 h-4" />}>
-                                   เพิ่มบัญชี
-                              </Button>
+                              <Link href={"/admin/users/create"}>
+                                   <Button
+                                        className='bg-[#edf8f7] text-[#46bcaa]'
+                                        startContent={<PlusIcon className="w-4 h-4" />}>
+                                        เพิ่มบัญชี
+                                   </Button>
+                              </Link>
                          </div>
                     </div>
                </div>

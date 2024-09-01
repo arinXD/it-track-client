@@ -4,7 +4,6 @@ import SidebarDrawer from './components/NavbarDrawer'
 import './homepage.css';
 import Footer from './components/Footer';
 import Link from 'next/link';
-import Image from 'next/image';
 
 const tracks = [
      { name: 'BIT', icon: '💼', description: 'เทคโนโลยีสารสนเทศทางธุรกิจ ' },

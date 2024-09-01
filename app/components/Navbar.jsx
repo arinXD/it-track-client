@@ -124,6 +124,10 @@ const Navbar = () => {
                                         <Image
                                             className='rounded-full'
                                             src={session?.user?.image}
+                                            onError={({ currentTarget }) => {
+                                                currentTarget.onerror = null;
+                                                currentTarget.src = "/image/admin.png";
+                                            }}
                                             width={40} height={40}
                                             alt="user image"
                                         />

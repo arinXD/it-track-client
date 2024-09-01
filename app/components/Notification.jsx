@@ -29,7 +29,7 @@ const Notification = ({ email = null }) => {
      }, [])
 
      useEffect(() => {
-          getNotificationByEmail(email)
+          if (email) getNotificationByEmail(email)
      }, [email])
 
      const updateNotiRead = useCallback(async (id, destination) => {

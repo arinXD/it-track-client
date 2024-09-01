@@ -77,6 +77,7 @@ const handler = NextAuth({
                         }
                     }
                 } catch (error) {
+                    console.log(error?.response?.data?.message);
                     throw new Error(error?.response?.data?.message || "ไม่สามารถเข้าสู่ระบบได้ ตรวจสอบชื่อผู้ใช้และรหัสผ่าน")
                 }
             }

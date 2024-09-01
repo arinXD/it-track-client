@@ -240,10 +240,7 @@ const TeacherTrack = ({ track }) => {
                                                     width={80}
                                                     height={80}
                                                     src={item.image}
-                                                    onError={({ currentTarget }) => {
-                                                        currentTarget.onerror = null
-                                                        currentTarget.src = "/image/user.png";
-                                                    }}
+                                                    fallback="/image/error_image.png"
                                                     className="rounded-full border border-gray-200"
                                                     alt={item.teacherName} />
                                             </div>
