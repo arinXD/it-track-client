@@ -1,7 +1,7 @@
 "use client"
 import { inputClass } from "@/src/util/ComponentClass";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from "@nextui-org/react";
-import { useCallback, useEffect, useState } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from "@nextui-org/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { BsFillImageFill } from "react-icons/bs";
 import { UploadOutlined } from '@ant-design/icons';
 import { GoPaperclip } from "react-icons/go";
@@ -11,12 +11,22 @@ import { Image, message } from "antd";
 import { getToken } from "@/app/components/serverAction/TokenAction";
 import { hostname } from "@/app/api/hostname";
 
-const InsertTeacherModal = ({ isOpen, onClose, src = "", track, getTeachers }) => {
+const InsertTeacherModal = ({ emptyTeachers = [], isOpen, onClose, src = "", track, fn }) => {
     const [uploadImageFile, setUploadImageFile] = useState({});
     const [previewImage, setPreviewImage] = useState(src)
-    const [teacherName, setTeacherName] = useState("");
     const [uploadProgress, setUploadProgress] = useState(0);
     const [inserting, setInserting] = useState(false);
+
+    const teachersArr = useMemo(() => {
+        if (emptyTeachers?.length === 0) {
+            return []
+        } else {
+            return emptyTeachers.map(t => ({
+                key: emptyTeachers.id,
+                name: `${t?.prefix || ""}${t?.name} ${t?.surname || ""}`,
+            }))
+        }
+    }, [emptyTeachers])
 
     const handleUpload = useCallback(e => {
         const file = e.target.files?.[0]
@@ -46,7 +56,6 @@ const InsertTeacherModal = ({ isOpen, onClose, src = "", track, getTeachers }) =
         document.querySelector("#image").value = ""
         setUploadImageFile({})
         setPreviewImage("")
-        setTeacherName("")
         setUploadProgress(0)
         onClose()
     }, [])
@@ -71,7 +80,7 @@ const InsertTeacherModal = ({ isOpen, onClose, src = "", track, getTeachers }) =
                         setUploadProgress(progressObj.progress * 100)
                     }
                 });
-                await getTeachers()
+                await fn()
                 closeForm()
                 message.success("เพิ่มข้อมูลสำเร็จ")
             } catch (error) {
@@ -122,21 +131,27 @@ const InsertTeacherModal = ({ isOpen, onClose, src = "", track, getTeachers }) =
                                             type="hidden"
                                             name="track"
                                             value={track} />
-                                        <Input
-                                            name='teacherName'
-                                            type="text"
-                                            variant="bordered"
-                                            radius='sm'
-                                            label="ชื่ออาจารย์"
-                                            labelPlacement="outside"
-                                            placeholder="กรอกชื่ออาจารย์"
-                                            value={teacherName}
-                                            onValueChange={setTeacherName}
-                                            classNames={inputClass}
-                                            className='mb-4'
-                                            isRequired
-                                        />
-                                        <div className='flex flex-col justify-center items-start'>
+                                        <div>
+                                            {/* teachersArr */}
+                                            <Select
+                                                name='teacherID'
+                                                variant='bordered'
+                                                classNames={{
+                                                    trigger: "border-1",
+                                                }}
+                                                labelPlacement='outside'
+                                                label="อาจารย์"
+                                                placeholder="เลือกอาจารย์"
+                                                onChange={(e) => { }}
+                                            >
+                                                {teachersArr.map((t) => (
+                                                    <SelectItem key={t.key} value={t.key}>
+                                                        {t.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                        <div className='flex flex-col justify-center items-start mt-4'>
                                             <span className="text-sm mb-2">อัพโหลดไฟล์รูปภาพ [ jpeg, jpg, png ]</span>
                                             <label className="w-fit hover:border-blue-500 hover:text-blue-500 transition duration-75 cursor-pointer border-1 border-default-300 rounded-md px-3.5 py-1 text-default-700">
                                                 <input

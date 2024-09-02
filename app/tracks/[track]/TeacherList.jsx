@@ -32,11 +32,15 @@ const TeacherList = ({ teachers }) => {
                                     <Image
                                         width={800}
                                         height={800}
-                                        src={teacher?.image}
-                                        alt={teacher?.teacherName}
+                                        src={teacher?.TeacherTrack?.Image || ""}
+                                        alt={teacher?.name}
                                         className="rounded-md w-[200px] h-[200px]"
+                                        onError={({ currentTarget }) => {
+                                            currentTarget.onerror = null;
+                                            currentTarget.src = "/image/error_image.png";
+                                        }}
                                     />
-                                    <p className="text-center">{teacher?.teacherName}</p>
+                                    <p className="text-center">{teacher.prefix}{teacher?.name || "N/A"} {teacher?.surname}</p>
                                 </div>
                             ))}
                         </div>

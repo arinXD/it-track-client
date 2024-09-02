@@ -66,7 +66,7 @@ const PetitionList = ({ current, fetching, title, data, emptyContent }) => {
                                         <li className="text-center py-8 text-gray-500">{emptyContent}</li>
                                    ) : (
                                         petitions.map((petition, key) => (
-                                             <li key={key} className="hover:bg-gray-50 transition-colors border-b">
+                                             <li key={key} className="hover:bg-gray-50 transition-colors">
                                                   <Link
                                                        className="w-full grid grid-cols-9 gap-4 items-center p-4"
                                                        href={`/admin/petitions/${current}/${petition.id}`}>

@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useMemo } from 'react';
-import { IoMdCheckboxOutline } from "react-icons/io";
 import { BiCategory } from "react-icons/bi";
 import { BsPerson } from "react-icons/bs";
 import { HiOutlineAcademicCap, HiOutlineUserGroup, HiOutlineRectangleGroup } from "react-icons/hi2";
@@ -13,6 +12,7 @@ import { IoBookOutline, IoBarChartOutline, IoDocumentTextOutline } from 'react-i
 import { LuTextSelect } from "react-icons/lu";
 import { IoNewspaperOutline } from "react-icons/io5";
 import { BiCheckbox } from "react-icons/bi";
+import { capitalize } from '@/src/util/utils';
 
 const AdminList = ({ }) => {
      const { data: session } = useSession();
@@ -32,7 +32,6 @@ const AdminList = ({ }) => {
                     { href: "/admin/track-selection", label: "คัดเลือกแทร็ก", icon: LuTextSelect },
                     { href: "/admin/trackstudent", label: "รายชื่อนักศึกษาภายในแทร็ก", icon: BsPerson },
                     { href: "/admin/track-dashboard", label: "สรุปผลการคัดเลือกแทร็ก", icon: IoBarChartOutline },
-                    { href: "/admin/petitions/all", label: "จัดการคำร้องย้ายแทร็ก", icon: IoDocumentTextOutline },
                ]
           },
           {
@@ -120,7 +119,7 @@ const AdminList = ({ }) => {
 
      return (
           <div className="p-8 min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
-               <h1 className="mb-8 text-3xl font-bold text-gray-900 ">Admin Panel</h1>
+               <h1 className="mb-8 text-3xl font-bold text-gray-900 ">{capitalize(session?.user?.role) || "Admin"} Panel</h1>
                {categories.map(renderCategory)}
           </div>
      );

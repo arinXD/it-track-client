@@ -19,6 +19,7 @@ const TeacherTrack = ({ track }) => {
     const [selectedTeachers, setSelectedTeachers] = useState([])
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isOpenEdit, onOpen: onOpenEdit, onClose: onCloseEdit } = useDisclosure();
+    const [emptyTeachers, setEmptyTeachers] = useState([]);
 
     // Paging
     const pages = useMemo(() => (Math.ceil(teachers.length / rowsPerPage)), [teachers, rowsPerPage]);
@@ -29,6 +30,16 @@ const TeacherTrack = ({ track }) => {
 
         return teachers.slice(start, end);
     }, [page, teachers, rowsPerPage]);
+
+    const getEmptyTeachers = useCallback(async () => {
+        const option = await getOptions("/api/teachers/tracks/empty/teachers", "get")
+        try {
+            const data = (await axios(option)).data?.data
+            setEmptyTeachers(data)
+        } catch (error) {
+            setEmptyTeachers([])
+        }
+    }, [])
 
     const getTeachers = useCallback(async () => {
         setFetching(true)
@@ -46,45 +57,12 @@ const TeacherTrack = ({ track }) => {
 
     }, [])
 
-    // Pagination handle
-    const onNextPage = useCallback(() => {
-        if (page < pages) {
-            setPage(page + 1);
-        }
-    }, [page, pages]);
-
-    const onPreviousPage = useCallback(() => {
-        if (page > 1) {
-            setPage(page - 1);
-        }
-    }, [page]);
-
-    const bottomContent = useMemo(() => {
-        return (
-            teachers?.length > 0 ?
-                <div className="w-full py-2 px-2 flex justify-between items-center">
-                    <span className="w-[30%] text-small text-default-400">
-                        {selectedKeys === "all"
-                            ? "เลือกทั้งหมด"
-                            : `เลือก ${selectedKeys.size || 0} ใน ${teachers.length}`}
-                    </span>
-                    <Pagination
-                        isCompact
-                        showControls
-                        showShadow
-                        color="primary"
-                        page={page}
-                        total={pages}
-                        onChange={setPage}
-                    />
-                </div>
-                :
-                undefined
-        );
-    }, [selectedKeys, teachers, page, pages]);
+    const initData = useCallback(async () => {
+        await Promise.all([getTeachers(), getEmptyTeachers()])
+    }, [])
 
     useEffect(() => {
-        getTeachers()
+        initData()
     }, [])
 
     // Multiple deleted
@@ -150,10 +128,35 @@ const TeacherTrack = ({ track }) => {
         onOpenEdit()
     }, [])
 
+    const bottomContent = useMemo(() => {
+        return (
+            teachers?.length > 0 ?
+                <div className="w-full py-2 px-2 flex justify-between items-center">
+                    <span className="w-[30%] text-small text-default-400">
+                        {selectedKeys === "all"
+                            ? "เลือกทั้งหมด"
+                            : `เลือก ${selectedKeys.size || 0} ใน ${teachers.length}`}
+                    </span>
+                    <Pagination
+                        isCompact
+                        showControls
+                        showShadow
+                        color="primary"
+                        page={page}
+                        total={pages}
+                        onChange={setPage}
+                    />
+                </div>
+                :
+                undefined
+        );
+    }, [selectedKeys, teachers, page, pages]);
+
     return (
         <div className="border-1 p-4 rounded-[10px] h-full w-full">
             <InsertTeacherModal
-                getTeachers={getTeachers}
+                emptyTeachers={emptyTeachers}
+                fn={initData}
                 track={track}
                 isOpen={isOpen}
                 onClose={onClose} />
@@ -239,13 +242,13 @@ const TeacherTrack = ({ track }) => {
                                                 <Image
                                                     width={80}
                                                     height={80}
-                                                    src={item.image}
+                                                    src={item?.TeacherTrack?.Image}
                                                     fallback="/image/error_image.png"
                                                     className="rounded-full border border-gray-200"
-                                                    alt={item.teacherName} />
+                                                    alt={item.name} />
                                             </div>
                                         </TableCell>
-                                        <TableCell>{item.teacherName}</TableCell>
+                                        <TableCell>{item.prefix}{item.name} {item.surname}</TableCell>
                                         <TableCell>
                                             <div className="flex justify-center items-center">
                                                 <Tooltip content="แก้ไข">
