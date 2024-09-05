@@ -42,10 +42,10 @@ const Page = () => {
                                 <TrackForm
                                     track={queryTrack} />
                                 <div className='w-full flex gap-6 flex-col lg:flex-row'>
-                                    <div className="w-full lg:w-[55%]">
+                                    <div className="w-full lg:w-[50%]">
                                         <TrackSubject track={queryTrack} />
                                     </div>
-                                    <div className="w-full lg:w-[45%]">
+                                    <div className="w-full lg:w-[50%]">
                                         <TeacherTrack track={queryTrack} />
                                     </div>
                                 </div>

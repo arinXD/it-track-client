@@ -32,7 +32,7 @@ const TeacherList = ({ teachers }) => {
                                     <Image
                                         width={800}
                                         height={800}
-                                        src={teacher?.TeacherTrack?.Image || ""}
+                                        src={teacher?.TeacherTrack?.image || ""}
                                         alt={teacher?.name}
                                         className="rounded-md w-[200px] h-[200px]"
                                         onError={({ currentTarget }) => {

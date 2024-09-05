@@ -21,6 +21,8 @@ const TeacherTrack = ({ track }) => {
     const { isOpen: isOpenEdit, onOpen: onOpenEdit, onClose: onCloseEdit } = useDisclosure();
     const [emptyTeachers, setEmptyTeachers] = useState([]);
 
+    const [teacherEditData, setTeacherEditData] = useState({});
+
     // Paging
     const pages = useMemo(() => (Math.ceil(teachers.length / rowsPerPage)), [teachers, rowsPerPage]);
 
@@ -69,7 +71,7 @@ const TeacherTrack = ({ track }) => {
     useEffect(() => {
         let teacher
         if (selectedKeys == "all") {
-            teacher = items.map(e => e.id)
+            teacher = items.map(e => e?.TeacherTrack?.id)
             setDisableSelectDelete(false)
         } else {
             teacher = [...selectedKeys.values()].map(id => parseInt(id))
@@ -106,7 +108,7 @@ const TeacherTrack = ({ track }) => {
             const option = await getOptions(URL, "DELETE", selectedTeachers)
             try {
                 await axios(option)
-                getTeachers()
+                await initData()
                 message.success("ลบข้อมูลสำเร็จ")
             } catch (error) {
                 console.log(error);
@@ -117,14 +119,8 @@ const TeacherTrack = ({ track }) => {
         }
     }, [])
 
-    const [tid, setTid] = useState(0);
-    const [editName, setEditName] = useState("");
-    const [editImage, setEditImage] = useState("");
-
-    const handleEditTeacher = useCallback((tid, teacherName, image) => {
-        setTid(tid)
-        setEditName(teacherName)
-        setEditImage(image)
+    const handleEditTeacher = useCallback((teacherData) => {
+        setTeacherEditData(teacherData)
         onOpenEdit()
     }, [])
 
@@ -162,10 +158,8 @@ const TeacherTrack = ({ track }) => {
                 onClose={onClose} />
 
             <EditTeacherModal
-                tid={tid}
-                editName={editName}
-                src={editImage}
-                getTeachers={getTeachers}
+                teacher={teacherEditData}
+                fn={initData}
                 isOpen={isOpenEdit}
                 onClose={onCloseEdit} />
 
@@ -208,9 +202,6 @@ const TeacherTrack = ({ track }) => {
                                     wrapper: "after:bg-blue-500 after:text-background text-background",
                                 },
                             }}
-                            // bottomContent={bottomContent}
-                            // bottomContentPlacement="outside"
-
                             isCompact
                             removeWrapper
                             selectionMode="multiple"
@@ -220,7 +211,6 @@ const TeacherTrack = ({ track }) => {
                             onRowAction={() => { }}
                         >
                             <TableHeader>
-                                <TableColumn style={{ display: "none" }}>ID</TableColumn>
                                 <TableColumn className="w-1/2 text-center">รูป</TableColumn>
                                 <TableColumn className="w-1/2">ชื่ออาจารย์</TableColumn>
                                 <TableColumn align="center" className="w-1/2">Actions</TableColumn>
@@ -235,14 +225,13 @@ const TeacherTrack = ({ track }) => {
                                 }
                                 items={items}>
                                 {(item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell style={{ display: "none" }}>{item.id}</TableCell>
+                                    <TableRow key={item?.TeacherTrack?.id}>
                                         <TableCell>
                                             <div className="w-full flex justify-center p-2">
                                                 <Image
                                                     width={80}
                                                     height={80}
-                                                    src={item?.TeacherTrack?.Image}
+                                                    src={item?.TeacherTrack?.image || ""}
                                                     fallback="/image/error_image.png"
                                                     className="rounded-full border border-gray-200"
                                                     alt={item.name} />
@@ -257,7 +246,7 @@ const TeacherTrack = ({ track }) => {
                                                         radius="sm"
                                                         isIconOnly
                                                         color='warning'
-                                                        onClick={() => handleEditTeacher(item.id, item.teacherName, item.image)}
+                                                        onClick={() => handleEditTeacher(item)}
                                                         aria-label="Edit">
                                                         <EditIcon2 className="w-5 h-5 text-yellow-600" />
                                                     </Button>
@@ -268,9 +257,9 @@ const TeacherTrack = ({ track }) => {
                                 )}
                             </TableBody>
                         </Table>
-                        {bottomContent}
                     </div>
             }
+            {bottomContent}
         </div>
     )
 }
