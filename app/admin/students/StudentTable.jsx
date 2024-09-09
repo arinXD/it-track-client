@@ -440,7 +440,7 @@ const StudentTable = () => {
                                         <DropdownItem
                                              href="students/create?tab=student-form"
                                              key="add-student"
-                                             description="เพิ่มรายชื่อนักศึกษาผ่านแบบฟอร์ม"
+                                             description="แบบฟอร์ม"
                                              startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
                                         >
                                              เพิ่มรายชื่อนักศึกษา
@@ -448,26 +448,42 @@ const StudentTable = () => {
                                         <DropdownItem
                                              href="students/create?tab=enroll-form"
                                              key="add-enrollment"
-                                             description="เพิ่มรายวิชาที่ลงทะเบียนผ่านแบบฟอร์ม"
+                                             description="แบบฟอร์ม"
                                              startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
                                         >
                                              เพิ่มรายวิชาที่ลงทะเบียน
                                         </DropdownItem>
                                         <DropdownItem
+                                             href="students/create?tab=advisor-form"
+                                             key="add-advisor-form"
+                                             description="แบบฟอร์ม"
+                                             startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
+                                        >
+                                             เพิ่มรายชื่อนักศึกษาในที่ปรึกษา
+                                        </DropdownItem>
+                                        <DropdownItem
                                              href="students/create?tab=student-sheet"
-                                             key="add-students-excel"
-                                             description="เพิ่มรายชื่อนักศึกษาผ่านไฟล์ excel"
+                                             key="add-students-sheet"
+                                             description="ไฟล์ Spreadsheet"
                                              startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
                                         >
                                              เพิ่มรายชื่อนักศึกษา
                                         </DropdownItem>
                                         <DropdownItem
                                              href="students/create?tab=enroll-sheet"
-                                             key="add-enrollment-excel"
-                                             description="เพิ่มรายวิชาที่ลงทะเบียนผ่านไฟล์ excel"
+                                             key="add-enrollment-sheet"
+                                             description="ไฟล์ Spreadsheet"
                                              startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
                                         >
                                              เพิ่มรายวิชาที่ลงทะเบียน
+                                        </DropdownItem>
+                                        <DropdownItem
+                                             href="students/create?tab=advisor-sheet"
+                                             key="add-advisor-sheet"
+                                             description="ไฟล์ Spreadsheet"
+                                             startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
+                                        >
+                                             เพิ่มรายชื่อนักศึกษาในที่ปรึกษา
                                         </DropdownItem>
                                    </DropdownMenu>
                               </Dropdown>

@@ -132,9 +132,9 @@ const InsertModal = ({ }) => {
 
      return (
           <section className='max-w-2xl mx-auto bg-white'>
-               <form onSubmit={insertStudent} className='flex flex-col space-y-4 mt-6 border p-6 rounded-lg shadow'>
-                    <div className='flex flex-col gap-4'>
-                         <div className='flex flex-row gap-4 mt-0'>
+               <form onSubmit={insertStudent} className='flex flex-col space-y-6 mt-6 border p-6 rounded-lg shadow'>
+                    <div className='flex flex-col gap-6'>
+                         <div className='flex flex-row gap-6 mt-0'>
                               <Input
                                    type="text"
                                    variant="bordered"
@@ -160,7 +160,7 @@ const InsertModal = ({ }) => {
                                    classNames={thinInputClass}
                               />
                          </div>
-                         <div className='flex flex-row gap-4'>
+                         <div className='flex flex-row gap-6'>
                               <Input
                                    type="text"
                                    radius='sm'
@@ -186,7 +186,7 @@ const InsertModal = ({ }) => {
                                    classNames={thinInputClass}
                               />
                          </div>
-                         <div className='w-full flex flex-row gap-4'>
+                         <div className='w-full flex flex-row gap-6'>
                               <Autocomplete
                                    inputProps={{
                                         classNames: {
@@ -234,7 +234,7 @@ const InsertModal = ({ }) => {
                                    {(item) => <AutocompleteItem key={item.program}>{item.program}</AutocompleteItem>}
                               </Autocomplete>
                          </div>
-                         <div className='w-full'>
+                         <div className='w-full my-2'>
                               <p className='text-sm mb-2'>เลือกโครงการ</p>
                               <RadioGroup
                                    isInvalid={invalid.courses_type}
@@ -252,12 +252,12 @@ const InsertModal = ({ }) => {
                               </RadioGroup>
                          </div>
                     </div>
-                    <div className='flex justify-end'>
-                         <Button type='button' className='border-1 h-[16px] py-4 rounded-[5px]' color="primary" variant='bordered' onPress={closeForm}>
-                              ยกเลิก
+                    <div className='flex gap-4 justify-start'>
+                         <Button disabled={inserting} isLoading={inserting} type='submit' className='rounded-lg' color="primary" variant='solid'>
+                              บันทึก
                          </Button>
-                         <Button disabled={inserting} isLoading={inserting} type='submit' className='h-[16px] py-4 ms-4 rounded-[5px]' color="primary" variant='solid'>
-                              เพิ่ม
+                         <Button type='button' size='md' className='border-1 rounded-lg' color="primary" variant='bordered' onPress={closeForm}>
+                              เคลียร์
                          </Button>
                     </div>
                </form>

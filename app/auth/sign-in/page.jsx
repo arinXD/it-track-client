@@ -117,7 +117,7 @@ const Page = () => {
                         </div>
 
                         <div className="mt-0">
-                            <div onClick={signInGoogle} className='border border-slate-500 rounded-[5px] flex flex-row gap-4 items-center justify-center p-3 w-full cursor-pointer text-gray-500 hover:text-blue-500 hover:border-blue-500'>
+                            <div onClick={signInGoogle} className='border border-slate-500 rounded-lg flex flex-row gap-3 items-center justify-center p-3 w-full cursor-pointer text-gray-500 hover:text-blue-500 hover:border-blue-500'>
                                 <img className='w-6 h-auto' src="/google.png" />
                                 <span className='text-sm'>
                                     เข้าสู่ระบบด้วยบัญชี Google หรือ KKU Mail

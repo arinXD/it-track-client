@@ -8,16 +8,19 @@ import InsertEnrollmentForm from "../InsertEnrollmentForm"
 import InsertExcel from "@/app/components/InsertExcel."
 import { useCallback } from "react"
 import { getOptions, getToken } from "@/app/components/serverAction/TokenAction"
+import InsertAdvisor from "../InsertAdvisor"
 
 const Page = () => {
      const searchParams = useSearchParams()
      const tab = searchParams.get('tab')
 
      const tabItems = [
-          { key: "student-form", label: "เพิ่มรายชื่อนักศึกษาผ่านแบบฟอร์ม", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
-          { key: "enroll-form", label: "เพิ่มเกรดผ่านแบบฟอร์ม", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
-          { key: "student-sheet", label: "เพิ่มรายชื่อนักศึกษาผ่านไฟล์ xlsx", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
-          { key: "enroll-sheet", label: "เพิ่มเกรดผ่านไฟล์ xlsx", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
+          { key: "student-form", label: "เพิ่มรายชื่อนักศึกษา", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
+          { key: "enroll-form", label: "เพิ่มรายวิชาที่ลงทะเบียน", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
+          { key: "advisor-form", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
+          { key: "student-sheet", label: "เพิ่มรายชื่อนักศึกษา", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
+          { key: "enroll-sheet", label: "เพิ่มรายวิชาที่ลงทะเบียน", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
+          { key: "advisor-sheet", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
      ]
 
      const insertStudentExcel = useCallback(async function (formattedData) {
@@ -57,7 +60,9 @@ const Page = () => {
 
      return (
           <div>
-               <TabsComponent current={tab} tabs={tabItems} />
+               <TabsComponent
+                    current={tab}
+                    tabs={tabItems} />
                {tab === tabItems[0].key &&
                     <InsertModal />
                }
@@ -65,6 +70,9 @@ const Page = () => {
                     <InsertEnrollmentForm />
                }
                {tab === tabItems[2].key &&
+                    <InsertAdvisor />
+               }
+               {tab === tabItems[3].key &&
                     <InsertExcel
                          isFileFromREG={true}
                          startRow={5}
@@ -85,7 +93,52 @@ const Page = () => {
                          hook={insertStudentExcel}
                     />
                }
-               {tab === tabItems[3].key &&
+               {tab === tabItems[4].key &&
+                    <InsertExcel
+                         title={"เพิ่มการลงทะเบียนของนักศึกษาผ่านไฟล์ Exel"}
+                         templateFileName={"enrollments_template"}
+                         headers={[
+                              {
+                                   groupTitle: "ข้อมูลนักศึกษา",
+                                   items: [
+                                        // นศ.
+                                        { required: true, label: "STUDENTCODE", desc: "รหัสนักศึกษา" },
+                                        { required: true, label: "STUDENTNAME", desc: "ชื่อ" },
+                                        { required: true, label: "STUDENTSURNAME", desc: "นามสกุล" },
+                                        { required: true, label: "PROGRAMNAME", desc: "หลักสูตร" },
+                                        { required: true, label: "KKUMAIL", desc: "อีเมล" },
+                                        { label: "STUDENTSTATUS", desc: "สถานะ" },
+                                   ]
+                              },
+                              {
+                                   groupTitle: "ข้อมูลวิชา",
+                                   items: [
+                                        // วิชา
+                                        { required: true, label: "COURSECODE", desc: "รหัสวิชา" },
+                                        { required: true, label: "COURSENAME", desc: "ชื่อวิชาภาษาไทย" },
+                                        { required: true, label: "COURSENAMEENG", desc: "ชื่อวิชาภาษาอังกฤษ" },
+                                        { required: true, label: "CREDITTOTAL", desc: "หน่วยกิต" },
+                                        { required: true, label: "ACADYEAR", desc: "ปีการศึกษา" },
+                                        { label: "GRADEENTRY2", desc: "เกรด" },
+                                   ]
+                              },
+                              {
+                                   groupTitle: "ข้อมูลอาจารย์ที่ปรึกษา",
+                                   items: [
+                                        // อาจารย์ที่ปรึกษา
+                                        { label: "PREFIXNAME", desc: "คำนำหน้าชื่ออาจารย์ภาษาไทย" },
+                                        { label: "OFFICERNAME", desc: "ชื่ออาจารย์ภาษาไทย" },
+                                        { label: "OFFICERSURNAME", desc: "นามสกุลอาจารย์ภาษาไทย" },
+                                        { label: "OFFICEREMAIL", desc: "อีเมล" },
+                                   ]
+                              },
+
+
+                         ]}
+                         hook={insertEnrollmentExcel}
+                    />
+               }
+               {tab === tabItems[5].key &&
                     <InsertExcel
                          title={"เพิ่มการลงทะเบียนของนักศึกษาผ่านไฟล์ Exel"}
                          templateFileName={"enrollments_template"}
