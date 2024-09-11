@@ -5,14 +5,14 @@ import { PlusIcon, SearchIcon, ChevronDownIcon, DeleteIcon2, DeleteIcon, EditIco
 import { capitalize } from "@/src/util/utils";
 import { fetchData } from '../action'
 import { getAcadyears } from "@/src/util/academicYear";
-import DeleteModal from "./DeleteModal";
-import { TbRestore } from "react-icons/tb";
-import DeleteSelectModal from "./DeleteSelectModal";
 import { deleteColor, insertColor, minimalTableClass, restoreColor, thinInputClass } from "@/src/util/ComponentClass";
 import { RiFileExcel2Fill } from "react-icons/ri";
 import { SiGoogleforms } from "react-icons/si";
-import { Empty } from "antd";
+import { Empty, message } from "antd";
 import { IoMdEye } from "react-icons/io";
+import { swal } from "@/src/util/sweetyAlert";
+import { getOptions } from "@/app/components/serverAction/TokenAction";
+import axios from "axios";
 
 const StudentTable = ({ email }) => {
 
@@ -58,10 +58,6 @@ const StudentTable = ({ email }) => {
      },
      ]), [])
 
-     // Modal state
-     const { isOpen: delIsOpen, onOpen: delOnOpen, onClose: delOnClose } = useDisclosure();
-     const { isOpen: delsIsOpen, onOpen: delsOnOpen, onClose: delsOnClose } = useDisclosure();
-
      // State
      const [fetching, setFetching] = useState(true)
      const acadyears = getAcadyears()
@@ -69,7 +65,6 @@ const StudentTable = ({ email }) => {
      const [selectAcadYear, setSelectAcadYear] = useState(acadyears[0])
      const [students, setStudents] = useState([])
      const [programs, setPrograms] = useState([])
-     const [delStdId, setDelStdId] = useState(null)
      const [disableSelectDelete, setDisableSelectDelete] = useState(false)
      const [selectedStudents, setSelectedStudents] = useState([])
      const [statusOptions, setStatusOptions] = useState([])
@@ -260,7 +255,7 @@ const StudentTable = ({ email }) => {
                                    content="ลบ"
                               >
                                    <Button
-                                        onPress={() => openDeleteModal(stu?.stu_id)}
+                                        onPress={() => handleDelete([stu?.id])}
                                         size='sm'
                                         color='danger'
                                         isIconOnly
@@ -297,13 +292,40 @@ const StudentTable = ({ email }) => {
           setPage(1)
      }, [])
 
-     const handleSelectDelete = useCallback(function () {
-          delsOnOpen()
-     }, [])
-
-     const openDeleteModal = useCallback(function (stuId) {
-          setDelStdId(stuId)
-          delOnOpen()
+     const handleDelete = useCallback(function (arr) {
+          swal.fire({
+               text: `ต้องการลบใช้หรือไม่ ?`,
+               icon: "question",
+               showCancelButton: true,
+               confirmButtonColor: "#3085d6",
+               cancelButtonColor: "#d33",
+               confirmButtonText: "ตกลง",
+               cancelButtonText: "ยกเลิก",
+               reverseButtons: true
+          }).then(async (result) => {
+               if (result.isConfirmed) {
+                    const options = await getOptions(`/api/advisors/students/multiple`, 'DELETE', arr)
+                    try {
+                         await axios(options)
+                         setFetching(true)
+                         const searchItem = localStorage.getItem("search-students-advisor")
+                         if (searchItem) {
+                              const { program, acadyear } = JSON.parse(searchItem)
+                              setSelectProgram(program)
+                              setSelectAcadYear(acadyear)
+                              document.querySelector('#selectProgram').value = program
+                              document.querySelector('#selectAcadyear').value = acadyear
+                              await getStudents(program, acadyear)
+                         }
+                         setSelectedKeys([])
+                         message.success("ลบนักศึกษาออกจากที่ปรึกษาสำเร็จ")
+                    } catch {
+                         message.warning("ไม่สามารถลบนักศึกษาออกจากที่ปรึกษา")
+                    } finally {
+                         setFetching(false)
+                    }
+               }
+          });
      }, [])
 
      // Multiple deleted
@@ -435,30 +457,29 @@ const StudentTable = ({ email }) => {
                                         aria-label="Dropdown menu"
                                    >
                                         <DropdownItem
-                                             href="students/create?tab=student-form"
-                                             key="add-student"
-                                             description="เพิ่มรายชื่อผ่านแบบฟอร์ม"
+                                             href="students-advisor/create?tab=advisor-form"
+                                             key="add-advisor-form"
+                                             description="แบบฟอร์ม"
                                              startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
+                                        >
+                                             เพิ่มรายชื่อนักศึกษาในที่ปรึกษา
+                                        </DropdownItem>
+                                        <DropdownItem
+                                             href="students-advisor/create?tab=advisor-sheet"
+                                             key="add-advisor-sheet"
+                                             description="ไฟล์ Spreadsheet"
+                                             startContent={<RiFileExcel2Fill className="w-5 h-5 text-green-600" />}
                                         >
                                              เพิ่มรายชื่อนักศึกษาในที่ปรึกษา
                                         </DropdownItem>
                                    </DropdownMenu>
                               </Dropdown>
-                              <Link href="#">
-                                   <Button
-                                        size="sm"
-                                        radius="sm"
-                                        className={restoreColor.color}
-                                        startContent={<TbRestore className="w-4 h-4" />}>
-                                        รายการที่ถูกลบ
-                                   </Button>
-                              </Link>
                               <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
                                    <Button
                                         radius="sm"
                                         size="sm"
                                         isDisabled={disableSelectDelete}
-                                        onPress={handleSelectDelete}
+                                        onClick={() => handleDelete(selectedStudents)}
                                         color="danger"
                                         className={deleteColor.color}
                                         startContent={<DeleteIcon2 className="w-5 h-5" />}>
@@ -514,20 +535,6 @@ const StudentTable = ({ email }) => {
 
      return (
           <section>
-               <DeleteModal
-                    callData={getStudents}
-                    delIsOpen={delIsOpen}
-                    delOnClose={delOnClose}
-                    stuId={delStdId} />
-               <DeleteSelectModal
-                    setSelectedKeys={setSelectedKeys}
-                    setDisableSelectDelete={setDisableSelectDelete}
-                    setSelectedStudents={setSelectedStudents}
-                    getStudents={getStudents}
-                    delIsOpen={delsIsOpen}
-                    delOnClose={delsOnClose}
-                    stuIdList={selectedStudents} />
-
                <div>
                     <>
                          <div className='border p-4 rounded-[10px] w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-4 flex-wrap'>
@@ -642,7 +649,6 @@ const StudentTable = ({ email }) => {
                               {topContent}
                               {
                                    !fetching ?
-
                                         <Table
                                              aria-label="Student Table"
                                              checkboxesProps={{

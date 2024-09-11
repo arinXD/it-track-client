@@ -230,8 +230,7 @@ const InsertEnrollmentForm = ({ }) => {
                          {studentData?.length == 0 ? undefined :
                               searchingStudent ?
                                    <div className='w-full flex justify-center'>
-                                        <Spinner label="กำลังโหลด..." color="primary" />
-                                        {searchingStudent}
+                                        Loading...
                                    </div>
                                    :
                                    <Table
@@ -298,7 +297,7 @@ const InsertEnrollmentForm = ({ }) => {
                          {subjectData?.length == 0 ? undefined :
                               searchingSubject ?
                                    <div className='w-full flex justify-center'>
-                                        <Spinner label="กำลังโหลด..." color="primary" />
+                                        Loading...
                                    </div>
                                    :
                                    <Table

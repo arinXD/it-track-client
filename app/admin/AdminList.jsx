@@ -48,6 +48,7 @@ const AdminList = ({ }) => {
                title: "ทั่วไป",
                links: [
                     { href: "/admin/users", label: "จัดการบัญชี", icon: RiUserSettingsLine },
+                    { href: "/admin/teachers", label: "จัดการข้อมูลอาจารย์", icon: RiUserSettingsLine },
                     { href: "/admin/news", label: "จัดการข่าวสาร", icon: IoNewspaperOutline },
                ]
           },

@@ -38,7 +38,6 @@ const Page = () => {
      }, [])
 
      const insertEnrollmentExcel = useCallback(async function (formattedData) {
-          // add required column
           if (formattedData.some(row =>
                row["PROGRAMNAME".toLowerCase()] != null &&
                row["STUDENTCODE".toLowerCase()] != null &&
@@ -52,6 +51,20 @@ const Page = () => {
                row["ACADYEAR".toLowerCase()] != null
           )) {
                const options = await getOptions("/api/students/enrollments/excel", "post")
+               return { status: true, options }
+          } else {
+               return { status: false, options: {} }
+          }
+     }, [])
+
+     const insertAdvisorsExcel = useCallback(async function (formattedData) {
+          if (formattedData.every(row =>
+               row["STUDENTNAME".toLowerCase()] != null &&
+               row["STUDENTSURNAME".toLowerCase()] != null &&
+               row["OFFICERNAME".toLowerCase()] != null &&
+               row["OFFICERSURNAME".toLowerCase()] != null
+          )) {
+               const options = await getOptions("/api/advisors/students/spread-sheet", "post")
                return { status: true, options }
           } else {
                return { status: false, options: {} }
@@ -140,47 +153,29 @@ const Page = () => {
                }
                {tab === tabItems[5].key &&
                     <InsertExcel
-                         title={"เพิ่มการลงทะเบียนของนักศึกษาผ่านไฟล์ Exel"}
-                         templateFileName={"enrollments_template"}
+                         title={"เพิ่มรายชื่อนักศึกษาในที่ปรึกษาผ่านไฟล์ Exel"}
+                         templateFileName={"advisor_template"}
                          headers={[
                               {
                                    groupTitle: "ข้อมูลนักศึกษา",
                                    items: [
                                         // นศ.
-                                        { required: true, label: "STUDENTCODE", desc: "รหัสนักศึกษา" },
                                         { required: true, label: "STUDENTNAME", desc: "ชื่อ" },
                                         { required: true, label: "STUDENTSURNAME", desc: "นามสกุล" },
-                                        { required: true, label: "PROGRAMNAME", desc: "หลักสูตร" },
-                                        { required: true, label: "KKUMAIL", desc: "อีเมล" },
-                                        { label: "STUDENTSTATUS", desc: "สถานะ" },
-                                   ]
-                              },
-                              {
-                                   groupTitle: "ข้อมูลวิชา",
-                                   items: [
-                                        // วิชา
-                                        { required: true, label: "COURSECODE", desc: "รหัสวิชา" },
-                                        { required: true, label: "COURSENAME", desc: "ชื่อวิชาภาษาไทย" },
-                                        { required: true, label: "COURSENAMEENG", desc: "ชื่อวิชาภาษาอังกฤษ" },
-                                        { required: true, label: "CREDITTOTAL", desc: "หน่วยกิต" },
-                                        { required: true, label: "ACADYEAR", desc: "ปีการศึกษา" },
-                                        { label: "GRADEENTRY2", desc: "เกรด" },
                                    ]
                               },
                               {
                                    groupTitle: "ข้อมูลอาจารย์ที่ปรึกษา",
                                    items: [
                                         // อาจารย์ที่ปรึกษา
-                                        { label: "PREFIXNAME", desc: "คำนำหน้าชื่ออาจารย์ภาษาไทย" },
-                                        { label: "OFFICERNAME", desc: "ชื่ออาจารย์ภาษาไทย" },
-                                        { label: "OFFICERSURNAME", desc: "นามสกุลอาจารย์ภาษาไทย" },
-                                        { label: "OFFICEREMAIL", desc: "อีเมล" },
+                                        { required: true, label: "OFFICERNAME", desc: "ชื่ออาจารย์ภาษาไทย" },
+                                        { required: true, label: "OFFICERSURNAME", desc: "นามสกุลอาจารย์ภาษาไทย" },
                                    ]
                               },
 
 
                          ]}
-                         hook={insertEnrollmentExcel}
+                         hook={insertAdvisorsExcel}
                     />
                }
           </div>

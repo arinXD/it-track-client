@@ -70,7 +70,7 @@ const UserTable = ({ email }) => {
                await axios(option)
                setNewRole(prev => prev.filter(item => item.id !== id));
                await getAllUsers()
-               // update newRole into filteredItems
+               message.success("แก้ไขโรลเรียบร้อย")
 
           } catch (error) {
                message.warning("ไม่สามารถแก้ไขโรลได่้")
@@ -160,9 +160,6 @@ const UserTable = ({ email }) => {
 
      return (
           <div className="space-y-4 p-4">
-               {/* <div>
-                    {JSON.stringify(newRole)}
-               </div> */}
                <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
                     <h2 className="text-2xl font-bold">ตารางบัญชีผู้ใช้</h2>
                     <div className="flex space-x-4">
@@ -183,7 +180,7 @@ const UserTable = ({ email }) => {
                               placeholder="Filter by role"
                               className="max-w-[150px]"
                               selectedKeys={[roleFilter]}
-                              onChange={(e) => handleRoleFilter(e.target.value)}
+                              onChange={(e) => handleRoleFilter(e.target.value || "all")}
                          >
                               <SelectItem key="all">ทั้งหมด</SelectItem>
                               <SelectItem key="admin">แอดมิน</SelectItem>
@@ -263,15 +260,6 @@ const UserTable = ({ email }) => {
                                                   เปลี่ยนโรล
                                              </Button>
                                              <Button
-                                                  size='sm'
-                                                  color='warning'
-                                                  isIconOnly
-                                                  aria-label="แก้ไข"
-                                                  className='p-2'
-                                             >
-                                                  <EditIcon2 className="w-5 h-5 text-yellow-600" />
-                                             </Button>
-                                             <Button
                                                   onClick={() => handleDelete(user.id)}
                                                   size='sm'
                                                   color='danger'
@@ -298,7 +286,7 @@ const UserTable = ({ email }) => {
                               size="sm"
                               className="w-[130px]"
                               selectedKeys={[rowsPerPage.toString()]}
-                              onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                              onChange={(e) => setRowsPerPage(Number(e.target.value) || 5)}
                          >
                               <SelectItem key="5">5 per page</SelectItem>
                               <SelectItem key="10">10 per page</SelectItem>

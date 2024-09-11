@@ -7,7 +7,7 @@ import { SearchIcon } from '@/app/components/icons';
 import Swal from 'sweetalert2';
 import { message } from 'antd';
 
-const InsertAdvisor = () => {
+const InsertAdvisor = ({ teacher }) => {
      const [studentData, setStudentData] = useState([]);
      const [inserting, setInserting] = useState(false);
      const [searchingStudent, setSearchingStudent] = useState(false);
@@ -16,23 +16,13 @@ const InsertAdvisor = () => {
      const [selectAdvisor, setSelectAdvisor] = useState(null);
      const [advisor, setAdvisors] = useState([]);
 
-     const getAllAdvisors = useCallback(async () => {
-          const option = await getOptions("/api/advisors", "get")
-          try {
-               const data = (await axios(option)).data.data
-               const advisorItems = data.map(({ id, prefix = '', name = '', surname = '' }) => ({
-                    key: id,
-                    label: `${prefix}${name}${surname ? ` ${surname}` : ''}`.trim()
-               }));
-               setAdvisors(advisorItems)
-          } catch {
-               setAdvisors([])
-          }
-     }, [])
-
      useEffect(() => {
-          getAllAdvisors()
-     }, [])
+          const advisorItems = [{
+               key: teacher?.id,
+               label: `${teacher?.prefix}${teacher?.name}${teacher?.surname ? ` ${teacher?.surname}` : ''}`.trim()
+          }]
+          setAdvisors(advisorItems)
+     }, [teacher])
 
      const findStudentAdvisor = useCallback(async (stuID) => {
           const options = await getOptions(`/api/advisors/students/${stuID}`, "get")
@@ -59,17 +49,13 @@ const InsertAdvisor = () => {
           }
      }, [])
 
-     const handleCreated = useCallback(async (stu_id, advisorId) => {
+     const handleCreated = useCallback(async (stu_id) => {
           if (!stu_id) {
                message.warning("เลือกนักศึกษา")
                return
           }
-          if (!advisorId) {
-               message.warning("เลือกอาจารย์")
-               return
-          }
           const hasAdvisor = await findStudentAdvisor(stu_id)
-          const option = await getOptions(`/api/advisors/${advisorId}/students/${stu_id}`, "POST")
+          const option = await getOptions(`/api/advisors/${teacher.id}/students/${stu_id}`, "POST")
           if (hasAdvisor) {
                swal.fire({
                     text: `นักศึกษามีที่ปรึกษาแล้วต้องการแก้ไขหรือไม่ ?`,
@@ -90,7 +76,7 @@ const InsertAdvisor = () => {
           } else {
                createStudentAdvisor(option)
           }
-     }, [])
+     }, [teacher])
 
      const fetchStudents = useCallback(async (student) => {
           if (searchingStudent) return
@@ -224,6 +210,7 @@ const InsertAdvisor = () => {
                     <div className='space-y-4'>
                          <div className='flex flex-row gap-4 justify-start items-end'>
                               <Autocomplete
+                                   isReadOnly
                                    classNames={{
                                         label: "text-xs"
                                    }}
@@ -240,8 +227,7 @@ const InsertAdvisor = () => {
                                    placeholder="เลือกอาจารย์ที่ปรึกษา"
                                    className="w-full"
                                    labelPlacement='outside'
-                                   selectedKey={selectAdvisor}
-                                   onSelectionChange={(value) => setSelectAdvisor(value)}
+                                   selectedKey={String(teacher.id)}
                                    scrollShadowProps={{
                                         isEnabled: false
                                    }}
@@ -253,7 +239,7 @@ const InsertAdvisor = () => {
                     <div></div>
                     <div className='flex gap-4 justify-start'>
                          <Button
-                              onPress={() => handleCreated(student?.stu_id, selectAdvisor)}
+                              onPress={() => handleCreated(student?.stu_id)}
                               isDisabled={inserting}
                               isLoading={inserting}
                               type='submit'

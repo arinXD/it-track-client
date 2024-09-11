@@ -16,10 +16,20 @@ async function getUserData(email, session) {
           return {}
      }
 }
+async function getAllTracks() {
+     const option = await getOptions(`/api/tracks/all`, "get")
+     try {
+          const data = (await axios(option)).data.data
+          const tracks = data.map(t => t.track)
+          return ["", ...tracks]
+     } catch (error) {
+          return []
+     }
+}
 
 const Page = async () => {
      const session = await getServerSession()
-     const userData = await getUserData(session.user.email, session)
+     const [userData, tracks] = await Promise.all([getUserData(session.user.email, session), getAllTracks()])
 
      return (
           <>
@@ -27,8 +37,11 @@ const Page = async () => {
                     <Navbar />
                </header>
                <Sidebar />
-               <ContentWrap className='bg-[#F5F5F5] h-full'>
-                    <UserProfile userData={userData} />
+               <ContentWrap className='bg-[#F5F5F5]'>
+                    <UserProfile
+                         userData={userData}
+                         tracks={tracks}
+                    />
                </ContentWrap>
           </>
      )
