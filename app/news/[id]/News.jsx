@@ -1,9 +1,9 @@
 "use client"
 import { simpleDMY } from "@/src/util/simpleDateFormatter"
-import { Empty } from "antd"
 import { sanitize } from "isomorphic-dompurify";
 import Image from "next/image"
 import Link from "next/link"
+import "./news.css"
 
 const News = ({ news = {}, allNews = [] }) => {
      return (
@@ -34,40 +34,55 @@ const News = ({ news = {}, allNews = [] }) => {
                          <div className="text-lg max-w-none">
                               <div dangerouslySetInnerHTML={{ __html: sanitize(news?.detail) }} />
                          </div>
-                         <hr className=" border my-10" />
-                         <div>
-                              <p className="mb-4">ข่าวอื่นๆ</p>
-                              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                   {allNews?.length > 0 && allNews.map((newsItem) => (
-                                        <Link
-                                             key={newsItem.id}
-                                             href={`/news/${newsItem.id}`}
-                                             className="block group hover:opacity-80 transition-all"
-                                        >
-                                             <div>
-                                                  <Image
-                                                       src={newsItem?.image}
-                                                       alt="news-image"
-                                                       width={150}
-                                                       height={150}
-                                                       className="w-full object-cover h-[200px]"
-                                                  />
-                                                  <p className="font-semibold text-sm mb-2 line-clamp-3 text-justify">
-                                                       {newsItem.title}
-                                                  </p>
-                                                  {/* <span className="text-sm font-medium text-blue-300 group-hover:text-blue-200 transition-colors duration-300">Read More →</span> */}
-                                             </div>
-                                        </Link>
-                                   ))}
-                              </div>
-                         </div>
+                         {allNews?.length > 0 &&
+                              <>
+                                   <hr className="border my-10" />
+                                   <div>
+                                        <p className="mb-4">ข่าวอื่นๆ</p>
+                                        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                                             {allNews.map((newsItem) => (
+                                                  <Link
+                                                       key={newsItem.id}
+                                                       href={`/news/${newsItem.id}`}
+                                                       className="block group hover:opacity-80 transition-all"
+                                                  >
+                                                       <div>
+                                                            <Image
+                                                                 src={newsItem?.image}
+                                                                 alt="news-image"
+                                                                 width={150}
+                                                                 height={150}
+                                                                 className="w-full object-cover h-[200px]"
+                                                            />
+                                                            <p className="font-semibold text-sm mb-2 line-clamp-3 text-justify">
+                                                                 {newsItem.title}
+                                                            </p>
+                                                       </div>
+                                                  </Link>
+                                             ))}
+                                        </div>
+                                   </div>
+                              </>
+                         }
                     </div>
                </article>
                :
-               <Empty
-                    className='my-4'
-                    description="นั่นแน่! I got chuuu!"
-               />
+               <div
+                    style={{ height: "calc(100vh - 128px)" }}
+                    className="h-screen flex justify-center items-center flex-col gap-1">
+                    <Image
+                         src={"/image/security.png"}
+                         alt="security"
+                         width={150}
+                         height={150}
+                    />
+                    <Image />
+                    <div className="flex flex-col justify-center items-center gap-1">
+                         <p className="text-xl font-bold">เนื้อหานี้ไม่พร้อมใช้งานในขณะนี้</p>
+                         <p>เหตุการณ์นี้มักจะเกิดขึ้นเนื่องจากเนื้อหาข่าวถูกซ่อนหรือลบไปแล้ว</p>
+                    </div>
+
+               </div>
      )
 }
 

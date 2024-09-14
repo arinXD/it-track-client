@@ -6,7 +6,7 @@ async function getNews() {
     const option = await getOptions("/api/news/published/all", "get")
     try {
         const news = (await axios(option)).data
-        return news
+        return news.slice(0, 4)
     } catch (error) {
         return []
     }

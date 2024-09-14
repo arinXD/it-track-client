@@ -4,6 +4,7 @@ import SidebarDrawer from './components/NavbarDrawer'
 import './homepage.css';
 import Footer from './components/Footer';
 import Link from 'next/link';
+import { Button } from '@nextui-org/react';
 
 const tracks = [
      { name: 'BIT', icon: '💼', description: 'เทคโนโลยีสารสนเทศทางธุรกิจ ' },
@@ -61,6 +62,7 @@ const HomePage = ({ news = mockNews }) => {
 
           return () => clearInterval(intervalId);
      }, [backgroundList]);
+
      return (
           <div className="min-h-screen bg-gray-50 ">
                <SidebarDrawer
@@ -87,7 +89,7 @@ const HomePage = ({ news = mockNews }) => {
                                    <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">ข่าวสารประชาสัมพันธ์</h2>
                                    <p className="mt-4 text-xl text-gray-600">อัปเดตข่าวสารประชาสัมพันธ์</p>
                               </div>
-                              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                              <div className={`grid grid-cols-1 gap-8 sm:grid-cols-${news.length < 3 ? news.length : 3} md:grid-cols-${news.length < 3 ? news.length : 3} lg:grid-cols-${news.length < 4 ? news.length : 4}`}>
                                    {news.map((newsItem, index) => (
                                         <Link
                                              key={newsItem.id}
@@ -117,6 +119,13 @@ const HomePage = ({ news = mockNews }) => {
                                         </Link>
                                    ))}
                               </div>
+                              <Link href={"/news"} className='block mt-8 mx-auto text-center'>
+                                   <Button
+                                        radius="none"
+                                        size='lg'
+                                        color="primary"
+                                   >อ่านข่าวทั้งหมด</Button>
+                              </Link>
                          </div>
                     </section>
                     : (

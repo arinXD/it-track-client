@@ -1,13 +1,19 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import axios from 'axios';
 import { Form, Input, Switch, message, Image } from 'antd';
 import { Button } from '@nextui-org/react';
 import { UploadOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { hostname } from '@/app/api/hostname';
-import ModernTextEditor from './ModernTextEditor';
+import dynamic from 'next/dynamic';
+import 'react-quill/dist/quill.snow.css';
+
+const ReactQuill = dynamic(() => import('react-quill'), {
+     ssr: false,
+     loading: () => <p>Loading editor...</p>,
+});
 
 const EditNews = ({ id }) => {
      const [form] = Form.useForm();
@@ -16,7 +22,7 @@ const EditNews = ({ id }) => {
      const [imageFile, setImageFile] = useState(null);
      const [newImagePreview, setNewImagePreview] = useState('');
      const [editorContent, setEditorContent] = useState('');
-     const [resultContent, setResultContent] = useState('');
+     const quillRef = useRef();
 
      useEffect(() => {
           if (id) {
@@ -34,7 +40,8 @@ const EditNews = ({ id }) => {
                     published: newsData.published,
                });
                setImageUrl(newsData.image);
-               setEditorContent(newsData.detail);
+               setEditorContent(newsData.detail || '');
+               form.setFieldsValue({ detail: newsData.detail || '' });
           } catch (error) {
                console.error('Error fetching news details:', error);
                message.error('Failed to fetch news details');
@@ -64,6 +71,18 @@ const EditNews = ({ id }) => {
           }
      };
 
+     const modules = useMemo(() => ({
+          toolbar: {
+               container: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+               ],
+          }
+     }), []);
+
      const onFinish = async (values) => {
           setLoading(true);
           const formData = new FormData();
@@ -77,7 +96,7 @@ const EditNews = ({ id }) => {
                }
           });
 
-          formData.append('detail', resultContent);
+          formData.append('detail', editorContent);
 
           try {
                await axios.put(`${hostname}/api/news/${id}`, formData, {
@@ -118,13 +137,20 @@ const EditNews = ({ id }) => {
                          <Input.TextArea rows={3} />
                     </Form.Item>
                     <Form.Item
+                         name="detail"
                          label="เนื้อหาข่าว"
                          rules={[{ required: true, message: 'Please input the detail!' }]}
                     >
-                         <ModernTextEditor
+                         <ReactQuill
+                              ref={quillRef}
+                              theme="snow"
                               value={editorContent}
-                              resultVal={resultContent}
-                              onChange={(content) => setResultContent(content)}
+                              onChange={(content, delta, source, editor) => {
+                                   setEditorContent(content);
+                                   form.setFieldsValue({ detail: content });
+                              }}
+                              modules={modules}
+                              style={{ height: '300px', marginBottom: '50px' }}
                          />
                     </Form.Item>
                     <div className='flex items-center gap-4 mb-6'>
@@ -142,6 +168,7 @@ const EditNews = ({ id }) => {
                                         className='w-full h-full object-cover rounded-lg'
                                         alt="New image preview"
                                         width={"100%"}
+                                        fallback="/image/error_image.png"
                                         height={300} />
                               </div>
                          </div>
@@ -155,7 +182,9 @@ const EditNews = ({ id }) => {
                                         className='w-full h-full object-cover rounded-lg'
                                         alt="New image preview"
                                         width={"100%"}
+                                        fallback="/image/error_image.png"
                                         height={300} />
+                                        
                               </div>
                          </div>
                     )}

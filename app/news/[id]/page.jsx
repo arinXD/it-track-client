@@ -32,7 +32,7 @@ const Page = async ({ params }) => {
      }
      return (
           <section>
-               <div className="min-h-screen bg-gray-100">
+               <div className="min-h-screen bg-gray-100 pb-10">
                     <NavbarDrawer />
                     <div className="pt-16">
                          <News
