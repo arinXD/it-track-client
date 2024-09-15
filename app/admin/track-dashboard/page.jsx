@@ -136,6 +136,31 @@ export default function Page() {
         },
     }), [])
 
+    const trackColors = useMemo(() => {
+        if (dashboardData?.popularity[0]?.data?.length) {
+            const colors = [
+                {
+                    bg: '#F4538A',
+                    font: "#f5bace"
+                },
+                {
+                    bg: '#FAA300',
+                    font: "#b57702"
+                },
+                {
+                    bg: '#7EA1FF',
+                    font: "#1b57f7"
+                },]
+            const tracks = dashboardData?.popularity[0].data?.slice(0, 3)
+            const trackColorObj = tracks.map((t, index) => ({
+                track: String(t?.track?.split(" ")[0]).toLowerCase(),
+                color: colors[index]
+            }))
+            return trackColorObj
+        }
+        return {}
+    }, [dashboardData])
+
     const studentTableItems = useCallback((items) => {
         if (isLoading) return <Spin className='mx-auto' />;
         if (error) return <Alert message={error} type="error" />;
@@ -143,11 +168,12 @@ export default function Page() {
             return (
                 <StudentTable
                     studentsData={items}
+                    trackColors={trackColors}
                 />
             );
         }
         return null;
-    }, [dashboardData, isLoading, error]);
+    }, [dashboardData, isLoading, error, trackColors]);
 
     const tabsItems = useMemo(() => {
         const selected = dashboardData?.selectedCount?.selected?.filter(sl => sl.courseType === courseType.value || courseType.value === "all")
@@ -308,7 +334,6 @@ export default function Page() {
         return option;
     }, [popularity, courseType]);
 
-
     return (
         <>
             <header>
@@ -363,9 +388,9 @@ export default function Page() {
                                         />
                                     </div>
                                     <Card
-                                        className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-fit'
+                                        className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-full'
                                     >
-                                        <CardBody>
+                                        <CardBody className='flex justify-center items-center'>
                                             <section className='p-2 flex flex-col gap-3'>
                                                 <p className='text-xs text-default-500 text-center'>นักศึกษาเข้าคัดแทร็ก</p>
                                                 <p className='flex gap-2 justify-center items-center'>
@@ -376,9 +401,9 @@ export default function Page() {
                                         </CardBody>
                                     </Card>
                                     <Card
-                                        className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-fit'
+                                        className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-full'
                                     >
-                                        <CardBody>
+                                        <CardBody className='flex justify-center items-center'>
                                             <section className='p-2 flex flex-col gap-3'>
                                                 <p className='text-xs text-default-500 text-center'>นักศึกษาไม่ได้เข้าคัดแทร็ก</p>
                                                 <p className='flex gap-2 justify-center items-center'>
@@ -394,14 +419,15 @@ export default function Page() {
                                             className='w-full rounded-[5px] border-1 border-gray-300 shadow-none'
                                         >
                                             <CardBody className='p-3 flex flex-col justify-between text-center'>
-                                                <p className='text-xs text-default-500'>นักศึกษาสังกัดแทร็ก {rs.track?.split(" ")[0]}</p>
-                                                <p className='flex gap-2 justify-center items-center'>
+                                                <p className='text-xs text-default-500 '>นักศึกษาสังกัดแทร็ก {rs.track?.split(" ")[0]}</p>
+                                                <p className='flex gap-4 justify-center items-center'>
                                                     <span className='text-lg'>{rs.total}</span>
                                                     <span className='text-lg'>คน</span>
                                                 </p>
-                                                <p className='text-xs text-default-600 flex justify-between px-6'>
+                                                <hr className='my-2' />
+                                                <p className='text-xs text-default-600 flex items-start justify-between'>
                                                     <span>เกรดเฉลี่ยรวม</span>
-                                                    <span>{rs?.gpaAvg?.toFixed(2)}</span>
+                                                    <span className='text-lg text-black'>{rs?.gpaAvg?.toFixed(2)}</span>
                                                 </p>
                                             </CardBody>
                                         </Card>
@@ -482,7 +508,6 @@ export default function Page() {
                                             </CardBody>
                                         </Card>
                                     </div>
-
 
                                     {/* Table */}
                                     <Card
