@@ -53,8 +53,8 @@ const Notification = ({ email = null }) => {
                          }}
                     >
                          <DropdownTrigger>
-                              <div className='active:scale-90 cursor-pointer flex justify-center items-center relative border border-black p-1 rounded-full'>
-                                   <IoNotificationsOutline className='w-5 h-5' />
+                              <div className='active:scale-90 cursor-pointer flex justify-center items-center relative p-1 rounded-full'>
+                                   <IoNotifications className='w-6 h-6' />
                                    {notifications?.length > 0 &&
                                         <div className='w-3.5 h-3.5 rounded-full flex justify-center items-center text-white text-[9px] absolute bg-red-500 top-[-2px] right-[-2px]'>
                                              <p>{notifications.length}</p>

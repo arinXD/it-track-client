@@ -12,9 +12,10 @@ import { BiSolidIdCard } from "react-icons/bi";
 import { MdOutlinePersonOutline } from "react-icons/md";
 import { useMemo, useState } from 'react';
 import { updateTeacherData } from './profileAction';
+import "./style.css"
 
 const UserProfile = ({ userData, tracks }) => {
-     const { email, username, role, sign_in_type, createdAt, Student, Teacher } = userData;
+     const { email, username, role, sign_in_type, createdAt, Student, Teacher, Admin } = userData;
      const [teacherTrack, setTeacherTrack] = useState(Teacher?.TeacherTrack?.track || "");
 
      const columns = [
@@ -73,7 +74,7 @@ const UserProfile = ({ userData, tracks }) => {
      return (
           <div className='w-full h-full flex flex-col gap-4'>
                <div className='w-full h-full grid grid-cols-2 gap-4'>
-                    <Card className={`w-full h-full col-span-${Teacher || Student ? "1" : "2"} ${!(Teacher || Student) && "max-w-xl mx-auto"}`}>
+                    <Card className={`w-full h-full col-span-1`}>
                          <div className='mb-4 flex gap-4'>
                               <Image
                                    className='rounded-[5px] object-cover'
@@ -108,7 +109,7 @@ const UserProfile = ({ userData, tracks }) => {
                                         </div>
                                         <p className='text-right text-xs text-default-500'>เข้าสู่ระบบ {dmy(createdAt)}</p>
                                    </div>
-                                   <div className={`flex ${Teacher || Student ? "flex-col" : "flex-row"}  gap-4`}>
+                                   <div className={`flex ${Student ? "flex-col" : "flex-row"}  gap-4`}>
                                         <Input
                                              classNames={{
                                                   inputWrapper: ["rounded-md"]
@@ -139,19 +140,19 @@ const UserProfile = ({ userData, tracks }) => {
                               </div>
                          </div>
                     </Card>
-                    {Teacher && (
+                    {Admin && (
                          <form onSubmit={handleEdit}>
-                              <Card className='w-full h-full col-span-1'>
+                              <Card className='w-full h-full !flex flex-col col-span-1 justify-between'>
                                    <div className='mb-4 flex gap-4'>
                                         <MdOutlinePersonOutline className={`text-5xl border-[${insertColor.onlyColor}] text-[${insertColor.onlyColor}] ${insertColor.bg} pointer-events-none flex-shrink-0`} />
                                         <div>
-                                             <p className='font-bold text-base'>Teacher Information</p>
-                                             <p className='text-sm text-default-600'>ข้อมูลอาจารย์</p>
+                                             <p className='font-bold text-base'>Admin Information</p>
+                                             <p className='text-sm text-default-600'>ข้อมูลเจ้าหน้าที่</p>
                                         </div>
                                    </div>
                                    <div className='grid grid-cols-5 gap-4'>
-                                        <input type="hidden" name="id" value={Teacher.id} readOnly />
-                                        <input type="hidden" name="role" value="teacher" readOnly />
+                                        <input type="hidden" name="id" value={Admin.id} readOnly />
+                                        <input type="hidden" name="role" value="admin" readOnly />
                                         <Input
                                              classNames={{
                                                   label: "text-black/50 text-[.9em]",
@@ -163,7 +164,7 @@ const UserProfile = ({ userData, tracks }) => {
                                              label="คำนำหน้า"
                                              name='prefix'
                                              labelPlacement="outside"
-                                             defaultValue={Teacher.prefix || ""}
+                                             defaultValue={Admin.prefix || ""}
                                         />
                                         <Input
                                              classNames={{
@@ -176,7 +177,7 @@ const UserProfile = ({ userData, tracks }) => {
                                              name='name'
                                              label="ชื่อ"
                                              labelPlacement="outside"
-                                             defaultValue={Teacher.name || ""}
+                                             defaultValue={Admin.name || ""}
                                         />
                                         <Input
                                              classNames={{
@@ -189,31 +190,8 @@ const UserProfile = ({ userData, tracks }) => {
                                              label="นามสกุล"
                                              name='surname'
                                              labelPlacement="outside"
-                                             defaultValue={Teacher.surname || ""}
+                                             defaultValue={Admin.surname || ""}
                                         />
-                                        {Teacher?.TeacherTrack?.track &&
-                                             <Select
-                                                  classNames={{
-                                                       value: "!text-black",
-                                                       label: "!text-xs !text-black",
-                                                       trigger: "border-0 h-10 !text-xs rounded-md bg-gray-100 !text-black",
-                                                  }}
-                                                  name='track'
-                                                  variant="bordered"
-                                                  placeholder="เลือกแทร็ก"
-                                                  label="แทร็ก"
-                                                  labelPlacement="outside"
-                                                  className="col-span-3 !text-black"
-                                                  selectedKeys={[teacherTrack]}
-                                                  onChange={(e) => setTeacherTrack(e.target.value || "")}
-                                             >
-                                                  {tracks.map(track => (
-                                                       <SelectItem key={track} value={track}>
-                                                            {track === '' ? 'ไม่มีแทร็ก' : track}
-                                                       </SelectItem>
-                                                  ))}
-                                             </Select>
-                                        }
                                    </div>
                                    <div className="mt-4 flex justify-start">
                                         <Button
@@ -226,6 +204,97 @@ const UserProfile = ({ userData, tracks }) => {
                                         </Button>
                                    </div>
                               </Card>
+                         </form>
+                    )}
+                    {Teacher && (
+                         <form onSubmit={handleEdit}>
+                              <div className='bg-white p-[24px] border border-[#f0f0f0] rounded-[8px] w-full h-full col-span-1 flex flex-col justify-between'>
+                                   <div className='flex flex-col'>
+                                        <div className='mb-4 flex gap-4'>
+                                             <MdOutlinePersonOutline className={`text-5xl border-[${insertColor.onlyColor}] text-[${insertColor.onlyColor}] ${insertColor.bg} pointer-events-none flex-shrink-0`} />
+                                             <div>
+                                                  <p className='font-bold text-base'>Teacher Information</p>
+                                                  <p className='text-sm text-default-600'>ข้อมูลอาจารย์</p>
+                                             </div>
+                                        </div>
+                                        <div className='grid grid-cols-5 gap-4'>
+                                             <input type="hidden" name="id" value={Teacher.id} readOnly />
+                                             <input type="hidden" name="role" value="teacher" readOnly />
+                                             <Input
+                                                  classNames={{
+                                                       label: "text-black/50 text-[.9em]",
+                                                       inputWrapper: ["rounded-md", "p-2"],
+                                                       input: "text-[1em]"
+                                                  }}
+                                                  className='w-full text-sm col-span-1'
+                                                  type="text"
+                                                  label="คำนำหน้า"
+                                                  name='prefix'
+                                                  labelPlacement="outside"
+                                                  defaultValue={Teacher.prefix || ""}
+                                             />
+                                             <Input
+                                                  classNames={{
+                                                       label: "text-black/50 text-[.9em]",
+                                                       inputWrapper: ["rounded-md", "p-2"],
+                                                       input: "text-[1em]"
+                                                  }}
+                                                  className='w-full text-sm col-span-2'
+                                                  type="text"
+                                                  name='name'
+                                                  label="ชื่อ"
+                                                  labelPlacement="outside"
+                                                  defaultValue={Teacher.name || ""}
+                                             />
+                                             <Input
+                                                  classNames={{
+                                                       label: "text-black/50 text-[.9em]",
+                                                       inputWrapper: ["rounded-md", "p-2"],
+                                                       input: "text-[1em]"
+                                                  }}
+                                                  className='w-full text-sm col-span-2'
+                                                  type="text"
+                                                  label="นามสกุล"
+                                                  name='surname'
+                                                  labelPlacement="outside"
+                                                  defaultValue={Teacher.surname || ""}
+                                             />
+                                             {Teacher?.TeacherTrack?.track &&
+                                                  <Select
+                                                       classNames={{
+                                                            value: "!text-black",
+                                                            label: "!text-xs !text-black",
+                                                            trigger: "border-0 h-10 !text-xs rounded-md bg-gray-100 !text-black",
+                                                       }}
+                                                       name='track'
+                                                       variant="bordered"
+                                                       placeholder="เลือกแทร็ก"
+                                                       label="แทร็ก"
+                                                       labelPlacement="outside"
+                                                       className="col-span-3 !text-black"
+                                                       selectedKeys={[teacherTrack]}
+                                                       onChange={(e) => setTeacherTrack(e.target.value || "")}
+                                                  >
+                                                       {tracks.map(track => (
+                                                            <SelectItem key={track} value={track}>
+                                                                 {track === '' ? 'ไม่มีแทร็ก' : track}
+                                                            </SelectItem>
+                                                       ))}
+                                                  </Select>
+                                             }
+                                        </div>
+                                   </div>
+                                   <div className="mt-4 flex justify-start">
+                                        <Button
+                                             type="submit"
+                                             size='md'
+                                             color='primary'
+                                             className='rounded-md text-[.9em] h-[40px] p-[8px] w-full'
+                                        >
+                                             บันทึก
+                                        </Button>
+                                   </div>
+                              </div>
                          </form>
                     )}
                     {Student && (

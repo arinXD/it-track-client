@@ -63,6 +63,30 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    value={formData.password || ""}
                                    onChange={(e) => handleInputChange("password", e.target.value)}
                               />
+                              <Input
+                                   labelPlacement="outside"
+                                   classNames={thinInputClass}
+                                   label="คำนำหน้า"
+                                   placeholder="กรอกคำนำหน้า"
+                                   value={formData.prefix || ""}
+                                   onChange={(e) => handleInputChange("prefix", e.target.value)}
+                              />
+                              <Input
+                                   labelPlacement="outside"
+                                   classNames={thinInputClass}
+                                   label="ชื่อ"
+                                   placeholder="กรอกชื่อ"
+                                   value={formData.name || ""}
+                                   onChange={(e) => handleInputChange("name", e.target.value)}
+                              />
+                              <Input
+                                   labelPlacement="outside"
+                                   classNames={thinInputClass}
+                                   label="นามสกุล"
+                                   placeholder="กรอกนามสกุล"
+                                   value={formData.surname || ""}
+                                   onChange={(e) => handleInputChange("surname", e.target.value)}
+                              />
                          </section>
                     );
                case "teacher":
