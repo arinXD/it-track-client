@@ -13,6 +13,7 @@ import { IoMdEye } from "react-icons/io";
 import { swal } from "@/src/util/sweetyAlert";
 import { getOptions } from "@/app/components/serverAction/TokenAction";
 import axios from "axios";
+import { HiOutlineAcademicCap } from "react-icons/hi2";
 
 const StudentTable = ({ email }) => {
 
@@ -204,8 +205,7 @@ const StudentTable = ({ email }) => {
                                         <Link className="ms-2" href={`https://mail.google.com/mail/?view=cm&fs=1&to=${stu.email}&authuser=1`} size="sm" isExternal>
                                              {stu.email}
                                         </Link>
-                                   )
-                                   }
+                                   )}
                                    name={(<p className="ms-2">{cellValue}</p>)}
                               />
                          </div>
@@ -222,7 +222,7 @@ const StudentTable = ({ email }) => {
                case "actions":
                     return (
                          <div className="relative flex justify-center items-center gap-2">
-                              <Link href={`/admin/students/${stu?.stu_id}`} target="_blank">
+                              <Link href={`/admin/students-advisor/${stu?.stu_id}`} target="_blank">
                                    <Tooltip
                                         content="รายละเอียด"
                                    >
@@ -236,7 +236,21 @@ const StudentTable = ({ email }) => {
                                         </Button>
                                    </Tooltip>
                               </Link>
-                              <Link href={`/admin/students/${stu?.stu_id}?edit=1`} target="_blank">
+                              <Link href={`/admin/students-advisor/verify?std_id=${stu?.stu_id}`} target="_blank">
+                                   <Tooltip
+                                        content="ตรวจสอบสำเร็จการศึกษา"
+                                   >
+                                        <Button
+                                             size='sm'
+                                             isIconOnly
+                                             aria-label="ตรวจสอบสำเร็จการศึกษา"
+                                             className='p-2 bg-blue-500'
+                                        >
+                                             <HiOutlineAcademicCap className="w-5 h-5 text-white" />
+                                        </Button>
+                                   </Tooltip>
+                              </Link>
+                              <Link href={`/admin/students-advisor/${stu?.stu_id}?edit=1`} target="_blank">
                                    <Tooltip
                                         content="แก้ไข"
                                    >

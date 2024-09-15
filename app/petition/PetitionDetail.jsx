@@ -152,6 +152,10 @@ const PetitionDetail = ({
                                                   src={petition?.Sender?.image}
                                                   width={200}
                                                   height={200}
+                                                  onError={({ currentTarget }) => {
+                                                       currentTarget.onerror = null;
+                                                       currentTarget.src = "/image/error_image.png";
+                                                  }}
                                              />
                                              <div
                                                   className="w-full">
@@ -269,10 +273,7 @@ const PetitionDetail = ({
                     </section>
                </section >
                :
-               <Empty
-                    className='my-4'
-                    description="นั่นแน่! I got chuuu!"
-               />
+               undefined
      )
 }
 

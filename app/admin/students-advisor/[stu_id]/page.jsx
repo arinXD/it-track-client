@@ -170,158 +170,155 @@ export default function Page({ params }) {
     return (
         <>
             <ToastContainer />
-            <header>
-                <Navbar />
-            </header>
-            <Sidebar />
-            <ContentWrap>
-                <BreadCrumb />
-                <EditModal
-                    status={status}
-                    programs={programs}
-                    showToastMessage={showToastMessage}
-                    getStudentData={getStudentData}
-                    student={updateData}
-                    isOpen={isOpen}
-                    onClose={onClose} />
-                <DeleteModal
-                    showToastMessage={showToastMessage}
-                    callData={initData}
-                    delIsOpen={delIsOpen}
-                    delOnClose={delOnClose}
-                    stuId={stu_id} />
-                <InsertEnrollmentForm
-                    showToastMessage={showToastMessage}
-                    isOpen={isOpenEnroll}
-                    student={student}
-                    callBack={initData}
-                    onClose={onCloseEnroll} />
-                <EditEnrollmentForm
-                    showToastMessage={showToastMessage}
-                    isOpen={isOpenEditEnroll}
-                    student={student}
-                    callBack={initData}
+            <EditModal
+                status={status}
+                programs={programs}
+                showToastMessage={showToastMessage}
+                getStudentData={getStudentData}
+                student={updateData}
+                isOpen={isOpen}
+                onClose={onClose} />
+            <DeleteModal
+                showToastMessage={showToastMessage}
+                callData={initData}
+                delIsOpen={delIsOpen}
+                delOnClose={delOnClose}
+                stuId={stu_id} />
+            <InsertEnrollmentForm
+                showToastMessage={showToastMessage}
+                isOpen={isOpenEnroll}
+                student={student}
+                callBack={initData}
+                onClose={onCloseEnroll} />
+            <EditEnrollmentForm
+                showToastMessage={showToastMessage}
+                isOpen={isOpenEditEnroll}
+                student={student}
+                callBack={initData}
 
-                    enroll={editEnroll}
-                    onClose={onCloseEditEnroll} />
+                enroll={editEnroll}
+                onClose={onCloseEditEnroll} />
 
-                <DeleteEnrollModal
-                    showToastMessage={showToastMessage}
-                    callData={initData}
-                    delIsOpen={isOpenDeleteEnroll}
-                    delOnClose={onCloseDeleteEnroll}
-                    enroll={editEnroll} />
+            <DeleteEnrollModal
+                showToastMessage={showToastMessage}
+                callData={initData}
+                delIsOpen={isOpenDeleteEnroll}
+                delOnClose={onCloseDeleteEnroll}
+                enroll={editEnroll} />
 
-                <div>
-                    {
-                        fetching ?
-                            <div className='w-full flex justify-center h-[70vh]'>
-                                <Spinner label="กำลังโหลด..." color="primary" />
-                            </div>
+            <div>
+                {
+                    fetching ?
+                        <div className='w-full flex justify-center h-[70vh]'>
+                            <Spinner label="กำลังโหลด..." color="primary" />
+                        </div>
+                        :
+                        Object.keys(student).length ?
+                            <>
+                                <div className='bg-gray-100 border-gray-200 border-1 p-3 flex flex-row justify-between items-center rounded-md'>
+                                    <h1>ข้อมูลของนักศึกษา</h1>
+                                    <div className='flex flex-2 gap-3'>
+                                        <Button
+                                            type='button'
+                                            className=''
+                                            radius='sm'
+                                            size='sm'
+                                            color="default"
+                                            variant='solid'
+                                            startContent={<EditIcon2 className={"w-5 h-5"} />}
+                                            onPress={handleEdit}>
+                                            แก้ไขรายชื่อนักศึกษา
+                                        </Button>
+                                        <Button
+                                            type='button'
+                                            className=''
+                                            radius='sm'
+                                            size='sm'
+                                            color="default"
+                                            startContent={<DeleteIcon2 className={"w-5 h-5"} />}
+                                            variant='solid'
+                                            onPress={delOnOpen}>
+                                            ลบรายชื่อนักศึกษา
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className='flex gap-8 py-6'>
+                                    <div className="w-[30%] flex flex-col justify-center items-center">
+                                        <Image
+                                            className='rounded-lg'
+                                            priority={true}
+                                            alt='student image'
+                                            width={150}
+                                            height={150}
+                                            src={student?.User?.image || "/image/user.png"}
+                                            onError={({ currentTarget }) => {
+                                                currentTarget.onerror = null;
+                                                currentTarget.src = "/image/error_image.png";
+                                            }}
+                                        />
+                                    </div>
+                                    <div className='w-[70%] flex flex-col space-y-2'>
+                                        <h1 className='text-lg'>{student.first_name} {student.last_name}</h1>
+                                        <div className='space-y-1'>
+                                            <p>
+                                                อีเมล:
+                                                <Link className='text-blue-500 ms-2' target='_blank' href={`https://mail.google.com/mail/?view=cm&fs=1&to=${student.email}&authuser=1`} >
+                                                    {student.email}
+                                                </Link>
+                                            </p>
+                                            <p>นักศึกษาหลักสูตร {student?.Program?.title_th} {student?.courses_type}</p>
+                                            <p>สถานะภาพ: <span className='ms-1'>{student?.StudentStatus?.description} ({student?.StudentStatus?.id})</span></p>
+                                            <p>
+                                                ปีการศึกษา: <span className='ms-1'>{student?.acadyear} </span>
+                                                {student?.acadyear_desc && <span className='text-xs'>({student?.acadyear_desc})</span>}
+                                            </p>
+                                            <p>GPA: <span className='ms-1'>{gpa}</span></p>
+                                            {
+                                                student?.User?.createdAt &&
+                                                <p>เข้าใช้เมื่อ {dmy(student?.User?.createdAt) || "-"}</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='my-3 space-y-3'>
+                                    <div className='flex gap-3 items-center'>
+                                        <p>รายวิชาที่ลงทะเบียน</p>
+                                        <Button
+                                            type='button'
+                                            className=''
+                                            radius='sm'
+                                            size='sm'
+                                            color="default"
+                                            variant='solid'
+                                            startContent={<PlusIcon width={4} height={4} />}
+                                            onPress={onOpenEnroll}>
+                                            เพิ่มรายวิชาที่ลงทะเบียน
+                                        </Button>
+                                    </div>
+                                    {
+                                        Object.keys(enrollmentsByYear).length == 0 ?
+                                            <>ไม่มีรายวิชาที่ลงทะเบียน</>
+                                            :
+                                            Object.keys(enrollmentsByYear).map((year) => (
+                                                <EnrollmentsTable
+                                                    key={year}
+                                                    year={year}
+                                                    callBack={initData}
+                                                    enrollments={enrollmentsByYear[year]}
+                                                    showToastMessage={showToastMessage}
+
+                                                    onOpenEditEnroll={onOpenEditEnroll}
+                                                    onOpenDeleteEnroll={onOpenDeleteEnroll}
+                                                    setEditEnroll={setEditEnroll}
+                                                />
+                                            ))
+                                    }
+                                </div>
+                            </>
                             :
-                            Object.keys(student).length ?
-                                <>
-                                    <div className='bg-gray-100 border-gray-200 border-1 p-3 flex flex-row justify-between items-center rounded-md'>
-                                        <h1>ข้อมูลของนักศึกษา</h1>
-                                        <div className='flex flex-2 gap-3'>
-                                            <Button
-                                                type='button'
-                                                className=''
-                                                radius='sm'
-                                                size='sm'
-                                                color="default"
-                                                variant='solid'
-                                                startContent={<EditIcon2 className={"w-5 h-5"} />}
-                                                onPress={handleEdit}>
-                                                แก้ไขรายชื่อนักศึกษา
-                                            </Button>
-                                            <Button
-                                                type='button'
-                                                className=''
-                                                radius='sm'
-                                                size='sm'
-                                                color="default"
-                                                startContent={<DeleteIcon2 className={"w-5 h-5"} />}
-                                                variant='solid'
-                                                onPress={delOnOpen}>
-                                                ลบรายชื่อนักศึกษา
-                                            </Button>
-                                        </div>
-                                    </div>
-                                    <div className='flex gap-8 py-6'>
-                                        <div className="w-[30%] flex flex-col justify-center items-center">
-                                            <Image
-                                                className='rounded-lg'
-                                                priority={true}
-                                                alt='student image'
-                                                width={150}
-                                                height={150}
-                                                src={student?.User?.image || "/image/user.png"}
-                                            />
-                                        </div>
-                                        <div className='w-[70%] flex flex-col space-y-2'>
-                                            <h1 className='text-lg'>{student.first_name} {student.last_name}</h1>
-                                            <div className='space-y-1'>
-                                                <p>
-                                                    อีเมล:
-                                                    <Link className='text-blue-500 ms-2' target='_blank' href={`https://mail.google.com/mail/?view=cm&fs=1&to=${student.email}&authuser=1`} >
-                                                        {student.email}
-                                                    </Link>
-                                                </p>
-                                                <p>นักศึกษาหลักสูตร {student?.Program?.title_th} {student?.courses_type}</p>
-                                                <p>สถานะภาพ: <span className='ms-1'>{student?.StudentStatus?.description} ({student?.StudentStatus?.id})</span></p>
-                                                <p>
-                                                    ปีการศึกษา: <span className='ms-1'>{student?.acadyear} </span>
-                                                    {student?.acadyear_desc && <span className='text-xs'>({student?.acadyear_desc})</span>}
-                                                </p>
-                                                <p>GPA: <span className='ms-1'>{gpa}</span></p>
-                                                {
-                                                    student?.User?.createdAt &&
-                                                    <p>เข้าใช้เมื่อ {dmy(student?.User?.createdAt) || "-"}</p>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className='my-3 space-y-3'>
-                                        <div className='flex gap-3 items-center'>
-                                            <p>รายวิชาที่ลงทะเบียน</p>
-                                            <Button
-                                                type='button'
-                                                className=''
-                                                radius='sm'
-                                                size='sm'
-                                                color="default"
-                                                variant='solid'
-                                                startContent={<PlusIcon width={4} height={4} />}
-                                                onPress={onOpenEnroll}>
-                                                เพิ่มรายวิชาที่ลงทะเบียน
-                                            </Button>
-                                        </div>
-                                        {
-                                            Object.keys(enrollmentsByYear).length == 0 ?
-                                                <>ไม่มีรายวิชาที่ลงทะเบียน</>
-                                                :
-                                                Object.keys(enrollmentsByYear).map((year) => (
-                                                    <EnrollmentsTable
-                                                        key={year}
-                                                        year={year}
-                                                        callBack={initData}
-                                                        enrollments={enrollmentsByYear[year]}
-                                                        showToastMessage={showToastMessage}
-
-                                                        onOpenEditEnroll={onOpenEditEnroll}
-                                                        onOpenDeleteEnroll={onOpenDeleteEnroll}
-                                                        setEditEnroll={setEditEnroll}
-                                                    />
-                                                ))
-                                        }
-                                    </div>
-                                </>
-                                :
-                                <>ไม่พบข้อมูลนักศึกษา</>
-                    }
-                </div>
-            </ContentWrap>
+                            <>ไม่พบข้อมูลนักศึกษา</>
+                }
+            </div>
         </>
     )
 }

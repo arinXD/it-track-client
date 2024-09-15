@@ -170,11 +170,11 @@ export default function SubGroup() {
         const queryLowerCase = searchQuery.toLowerCase();
 
         return (
-            subgroup.category.category_title.toLowerCase().includes(queryLowerCase) ||
-            subgroup.group.group_title.toLowerCase().includes(queryLowerCase) ||
-            subgroup.sub_group_title.toLowerCase().includes(queryLowerCase) ||
-            subgroup.createdAt.toLowerCase().includes(queryLowerCase) ||
-            subgroup.updatedAt.toLowerCase().includes(queryLowerCase)
+            subgroup?.category?.category_title?.toLowerCase().includes(queryLowerCase) ||
+            subgroup?.group?.group_title?.toLowerCase().includes(queryLowerCase) ||
+            subgroup?.sub_group_title?.toLowerCase().includes(queryLowerCase) ||
+            subgroup?.createdAt?.toLowerCase().includes(queryLowerCase) ||
+            subgroup?.updatedAt?.toLowerCase().includes(queryLowerCase)
         );
     });
 

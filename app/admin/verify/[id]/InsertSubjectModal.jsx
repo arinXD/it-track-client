@@ -91,11 +91,12 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
     useEffect(() => setFilterSubj(subjects), [subjects])
 
     useEffect(() => {
-        if (searchSubj) {
+        const searchString = searchSubj.replace(/\s/g,"")
+        if (searchString) {
             const data = subjects.filter(e => {
-                if (e.subject_code?.toLowerCase()?.includes(searchSubj.toLowerCase()) ||
-                    e.title_en?.toLowerCase()?.includes(searchSubj.toLowerCase()) ||
-                    e.title_th?.toLowerCase()?.includes(searchSubj.toLowerCase())) {
+                if (e.subject_code?.toLowerCase()?.includes(searchString.toLowerCase()) ||
+                    e.title_en?.toLowerCase()?.includes(searchString.toLowerCase()) ||
+                    e.title_th?.toLowerCase()?.includes(searchString.toLowerCase())) {
                     return e
                 }
             })

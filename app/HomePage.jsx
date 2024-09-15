@@ -119,13 +119,11 @@ const HomePage = ({ news = mockNews }) => {
                                         </Link>
                                    ))}
                               </div>
-                              <Link href={"/news"} className='block mt-8 mx-auto text-center'>
-                                   <Button
-                                        radius="none"
-                                        size='lg'
-                                        color="primary"
-                                   >อ่านข่าวทั้งหมด</Button>
-                              </Link>
+                              <div className='flex justify-center w-full'>
+                                   <Link href={"/news"} className='mt-8 text-center inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700'>
+                                        อ่านข่าวทั้งหมด
+                                   </Link>
+                              </div>
                          </div>
                     </section>
                     : (

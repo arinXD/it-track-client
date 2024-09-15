@@ -110,6 +110,10 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                                              src={petition?.Sender?.image}
                                              width={200}
                                              height={200}
+                                             onError={({ currentTarget }) => {
+                                                  currentTarget.onerror = null;
+                                                  currentTarget.src = "/image/error_image.png";
+                                             }}
                                         />
                                         <div
                                              className="w-full">
