@@ -483,19 +483,21 @@ export default function Page() {
                                                     placeholder='เลือกปีการศึกษา'
                                                 />
                                             </div>
-                                            <Button
-                                                onClick={async () => {
-                                                    await getPopularTracks(startYear.value, endYear.value)
-                                                }}
-                                                size="md"
-                                                color='primary'
-                                                className="rounded-[5px]"
-                                                isLoading={searching}
-                                                isDisabled={searching}
-                                                startContent={<SearchIcon className="w-5 h-5" />}
-                                            >
-                                                ค้นหา
-                                            </Button>
+                                            <div>
+                                                <Button
+                                                    onClick={async () => {
+                                                        await getPopularTracks(startYear.value, endYear.value)
+                                                    }}
+                                                    size="md"
+                                                    color='primary'
+                                                    className="rounded-[5px]"
+                                                    isLoading={searching}
+                                                    isDisabled={searching}
+                                                    startContent={<SearchIcon className="w-4 h-4" />}
+                                                >
+                                                    ค้นหา
+                                                </Button>
+                                            </div>
                                         </div>
                                         <Card
                                             className='col-span-5 shadow-none'

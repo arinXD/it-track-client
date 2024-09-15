@@ -24,20 +24,21 @@ const SuggestionForm = ({ form, email }) => {
     const [current, setCurrent] = useState(0)
     const [summarizing, setSummarizing] = useState(false);
     const [summarizeData, setsummarizeData] = useState({});
+    const [isSummarize, setIsSummarize] = useState(false);
     const steps = useMemo(() => ([
         {
-            title: Object.keys(summarizeData).length === 0 ? 'แบบทดสอบ' : 'ผลสรุปแบบทดสอบ',
+            title: 'คำถาม',
         },
         {
-            title: Object.keys(summarizeData).length === 0 ? 'แบบประเมิน' : 'ผลสรุปแบบประเมิน',
+            title: 'ความชอบ',
         },
         {
-            title: Object.keys(summarizeData).length === 0 ? 'ความชอบ' : 'ผลสรุปความชอบ',
+            title: 'อาชีพ',
         },
         {
-            title: Object.keys(summarizeData).length === 0 ? 'สรุปผล' : 'คำแนะนำ',
+            title: 'สรุปผล',
         },
-    ]), [Object.keys(summarizeData)])
+    ]), [isSummarize])
 
     const summarize = useMemo(() => ({
         questions: questions?.filter(q => q.aId).length === questions?.length,
@@ -90,6 +91,7 @@ const SuggestionForm = ({ form, email }) => {
             const res = await axios(option)
             const data = res.data.data
             setsummarizeData(data)
+            setIsSummarize(true)
             setCurrent(0)
         } catch (error) {
             setsummarizeData({})

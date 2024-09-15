@@ -64,7 +64,7 @@ const Questions = ({ setQuestions, allQuestions, next }) => {
                     >
                          <div className="flex flex-col">
                               <span className="text-sm text-default-400">Step 2</span>
-                              <span className="text-base">แบบประเมิน</span>
+                              <span className="text-base">ความชอบ</span>
                          </div>
                          <MdKeyboardArrowRight className="w-5 h-5" />
                     </div>

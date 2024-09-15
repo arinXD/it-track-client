@@ -68,11 +68,11 @@ const SummaryResult = ({ data }) => {
           },
      }), [trackSummaries])
 
-     const optionQ = useMemo(() => (getChartOption("questionScore", "แบบทดสอบ")), [trackSummaries])
-     const optionA = useMemo(() => (getChartOption("assessmentScore", "แบบประเมิน")), [trackSummaries])
-     const optionC = useMemo(() => (getChartOption("careerScore", "ความชอบ")), [trackSummaries])
+     const optionQ = useMemo(() => (getChartOption("questionScore", "คำถาม")), [trackSummaries])
+     const optionA = useMemo(() => (getChartOption("assessmentScore", "ความชอบ")), [trackSummaries])
+     const optionC = useMemo(() => (getChartOption("careerScore", "อาชีพ")), [trackSummaries])
      const optionAll = useMemo(() => {
-          const defOption = getChartOption("totalScore", "ผลแบบทดสอบกลุ่มความเชี่ยวชาญ", true)
+          const defOption = getChartOption("totalScore", "ผลสรุปแบบทดสอบ", true)
           defOption.options.chart.stacked = true
           defOption.options.stroke = {
                width: 1,
@@ -97,15 +97,15 @@ const SummaryResult = ({ data }) => {
           }
           defOption.series = [
                {
-                    name: "แบบทดสอบ",
+                    name: "คำถาม",
                     data: [trackSummaries[0].questionScore, trackSummaries[1].questionScore, trackSummaries[2].questionScore]
                },
                {
-                    name: "แบบประเมิน",
+                    name: "ความชอบ",
                     data: [trackSummaries[0].assessmentScore, trackSummaries[1].assessmentScore, trackSummaries[2].assessmentScore]
                },
                {
-                    name: "ความชอบ",
+                    name: "อาชีพ",
                     data: [trackSummaries[0].careerScore, trackSummaries[1].careerScore, trackSummaries[2].careerScore]
                },
           ]
@@ -151,12 +151,12 @@ const SummaryResult = ({ data }) => {
           <section className="">
                <section className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
                     <header className="bg-blue-600 text-white p-6">
-                         <h1 className="text-3xl font-bold">สรุปผลแบบทดสอบกลุ่มความเชี่ยวชาญโดยรวม</h1>
+                         <h1 className="text-3xl font-bold">สรุปผลแบบทดสอบกลุ่มความเชี่ยวชาญ</h1>
                     </header>
                     <section className="p-6 w-full">
                          <section className="p-6 bg-blue-50 gap-6 grid grid-cols-3">
                               <section className="bg-white p-4 rounded-lg shadow">
-                                   <h2 className="text-base font-semibold text-blue-800 mb-2">แบบทดสอบ</h2>
+                                   <h2 className="text-base font-semibold text-blue-800 mb-2">คำถาม</h2>
                                    <div className="grid grid-cols-1 gap-4">
                                         <div className="bg-white p-3 rounded border">
                                              <p className="text-xs text-gray-600 mb-1">ตอบถูกทั้งหมด</p>
@@ -170,7 +170,7 @@ const SummaryResult = ({ data }) => {
                               </section>
 
                               <section className="bg-white p-4 rounded-lg shadow">
-                                   <h2 className="text-base font-semibold text-blue-800 mb-2">แบบประเมิน</h2>
+                                   <h2 className="text-base font-semibold text-blue-800 mb-2">ความชอบ</h2>
                                    <div className="grid grid-cols-1 gap-4">
                                         <div className="bg-white p-3 rounded border">
                                              <p className="text-xs text-gray-600 mb-1">คำถามทั้งหมด</p>
@@ -186,7 +186,7 @@ const SummaryResult = ({ data }) => {
                                    </div>
                               </section>
                               <section className="bg-white p-4 rounded-lg shadow">
-                                   <h2 className="text-base font-semibold text-blue-800 mb-2">ความชอบ</h2>
+                                   <h2 className="text-base font-semibold text-blue-800 mb-2">อาชีพ</h2>
                                    <div className="grid grid-cols-1 gap-4">
                                         <div className="bg-white p-3 rounded border">
                                              <p className="text-xs text-gray-600 mb-1">อาชีพทั้งหมด</p>
@@ -247,7 +247,7 @@ const SummaryResult = ({ data }) => {
                                         <BarChart height={280} type={"bar"} option={optionAll} />
                                    </div>
                                    <div className='w-[50%] bg-white border rounded p-2'>
-                                        <p className='text-sm mb-[23.5px] ms-2 mt-0.5'> อัตราส่วนคะแนนในแต่ละแทร็ก  </p>
+                                        <p className='text-sm mb-[23.5px] ms-2 mt-0.5 font-bold'> อัตราส่วนคะแนนในแต่ละแทร็ก  </p>
                                         <BarChart height={280} type={"pie"} option={optionPieAll} />
                                    </div>
                               </div>

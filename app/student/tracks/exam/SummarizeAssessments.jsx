@@ -77,11 +77,11 @@ const SummarizeAssessments = ({ next, prev, data }) => {
             <section className='bg-gray-100 min-h-screen p-8 rounded-sm'>
                 <section className='max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden'>
                     <header className="bg-blue-600 text-white p-6">
-                        <h1 className="text-3xl font-bold">ผลสรุปแบบประเมิน</h1>
+                        <h1 className="text-3xl font-bold">ผลสรุปความชอบ</h1>
                     </header>
                     <div className="p-6 space-y-6">
                         <section className="bg-blue-50 p-4 rounded-lg">
-                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">การทำแบบประเมิน</h2>
+                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">การทำแบบประเมินความชอบ</h2>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-white p-3 rounded shadow">
                                     <p className="text-sm text-gray-600">คำถามทั้งหมด</p>
@@ -98,8 +98,7 @@ const SummarizeAssessments = ({ next, prev, data }) => {
                         </section>
 
                         <section className='p-6 bg-blue-50 rounded-lg '>
-                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">แบบประเมินทั้งหมด
-                            </h2>
+                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">แบบประเมินความชอบทั้งหมด</h2>
                             <div className="bg-white shadow overflow-auto rounded-lg">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
@@ -151,7 +150,7 @@ const SummarizeAssessments = ({ next, prev, data }) => {
                     <MdKeyboardArrowLeft className="w-5 h-5" />
                     <div className="flex flex-col">
                         <span className="text-sm text-default-400">Step 1</span>
-                        <span className="text-base">ผลสรุปแบบทดสอบ</span>
+                        <span className="text-base">ผลสรุปการตอบคำถาม</span>
                     </div>
                 </div>
                 <div
@@ -160,7 +159,7 @@ const SummarizeAssessments = ({ next, prev, data }) => {
                 >
                     <div className="flex flex-col">
                         <span className="text-sm text-default-400">Step 3</span>
-                        <span className="text-base">ผลสรุปความชอบ</span>
+                        <span className="text-base">ผลสรุปอาชีพ</span>
                     </div>
                     <MdKeyboardArrowRight className="w-5 h-5" />
                 </div>
