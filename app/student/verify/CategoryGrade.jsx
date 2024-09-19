@@ -3,13 +3,11 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Autocomplete, AutocompleteSection, AutocompleteItem } from '@nextui-org/react';
 import axios from 'axios';
-import { fetchData, fetchDataObj } from '../../action'
 import { hostname } from '@/app/api/hostname';
 import Select from 'react-select';
 import { Input, Textarea, Switch, Tabs, Tab, Link, Card, CardBody, CardHeader } from "@nextui-org/react";
 import { getOptions, getToken } from '@/app/components/serverAction/TokenAction';
 import { getAcadyears } from "@/src/util/academicYear";
-import { toast } from 'react-toastify';
 import { Empty, message } from 'antd';
 import { IoIosCloseCircle } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
@@ -71,10 +69,10 @@ export default function CategoryGrade({ catIndex, categorie, highestIndex }) {
                     </div>
 
                 ) : (
-                    <li className='flex justify-center items-center h-full'>
+                    <li className='flex justify-center items-center h-full my-5'>
                         <Empty
                             description={
-                                <span >ไม่มีข้อมูล</span>
+                                <span>ไม่มีข้อมูล</span>
                             }
                         />
                     </li>

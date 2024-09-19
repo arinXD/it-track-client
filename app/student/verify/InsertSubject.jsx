@@ -99,7 +99,11 @@ const InsertSubject = ({ subjects, catIndex, categorie, highestIndex, onVerifySu
                             ))
                             :
                             <li className='flex justify-center items-center h-full'>
-                                <Empty />
+                                <Empty
+                                    description={
+                                        <span>ไม่มีข้อมูล</span>
+                                    }
+                                />
                             </li>}
                     </ul>
                 </div>

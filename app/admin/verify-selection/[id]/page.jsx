@@ -1,13 +1,12 @@
 "use client"
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData, fetchDataObj } from '../../action'
+import { useToggleSideBarStore } from '@/src/store'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { format } from 'date-fns';
 import Swal from 'sweetalert2'
 import axios from 'axios';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { inputClass } from '@/src/util/ComponentClass';
 import { getCurrentDate } from '@/src/util/dateFormater';
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
@@ -19,11 +18,17 @@ import { FiDownload } from "react-icons/fi";
 import { calGrade, floorGpa, isNumber } from '@/src/util/grade';
 import { utils, writeFile } from "xlsx";
 import { tableClass } from '@/src/util/ComponentClass'
-import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useKbd, Spinner, Tooltip } from '@nextui-org/react'
+import { Button, Table, Textarea, TableBody, TableCell, TableColumn, TableHeader, TableRow, useKbd, Spinner, Tooltip } from '@nextui-org/react'
 import { Loading } from '@/app/components';
 import { Empty, message } from 'antd';
 import CategoryGrade from './CategoryGrade';
 import { RadioGroup, Radio } from "@nextui-org/radio";
+import { useSession } from 'next-auth/react';
+import { Drawer } from 'antd';
+import { Accordion, AccordionItem } from "@nextui-org/react";
+import { TbMessage2Exclamation } from "react-icons/tb";
+import { dMyt } from '@/src/util/dateFormater';
+
 
 const Page = ({ params }) => {
     const { id } = params
@@ -54,6 +59,44 @@ const Page = ({ params }) => {
     const [conditionCategory, setConditionCategory] = useState([]);
 
     const [subjectTrack, setSubjectTrack] = useState([]);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [desct, setDesct] = useState({});
+    const [descadmin, setDesAdmin] = useState([]);
+    const [desAll, setDesAll] = useState([]);
+    const [desc, setDesc] = useState('');
+
+    const { data: session } = useSession();
+
+    //////////// ant design ////////////
+
+    const [open, setOpen] = useState(false);
+
+    const showDrawer = () => {
+        setOpen(true);
+    };
+    const onClose = () => {
+        setOpen(false);
+    };
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(min-width: 1280px)'); // xl and above
+        const handleScreenSizeChange = (e) => {
+            if (e.matches) {
+                onClose(); // Close the drawer if screen size is xl or above
+            }
+        };
+
+        mediaQuery.addEventListener('change', handleScreenSizeChange);
+
+        // Cleanup listener on component unmount
+        return () => {
+            mediaQuery.removeEventListener('change', handleScreenSizeChange);
+        };
+    }, []);
+
+    ////////////////////////////////////////
+
 
     const fetchEnrollment = useCallback(async function (stu_id) {
         try {
@@ -93,10 +136,12 @@ const Page = ({ params }) => {
     const initVerify = useCallback(async function (id) {
         try {
             const result = await fetchDataObj(`/api/verifies/approve/${id}`);
-            console.log(result);
+
             setVerifySelect(result);
-            setUserData(result.Student);
-            setVerify(result.Verify);
+            setUserData(result?.Student);
+            setVerify(result?.Verify);
+
+            setDesct(result?.StudentVerifyApprovements);
 
 
             // Extract all subjects from the StudentVerifyDetails
@@ -158,11 +203,6 @@ const Page = ({ params }) => {
 
             setCategoryData(categoryData);
 
-            console.log(categoryVerifies);
-            console.log(categoryData);
-
-
-
             // Map subject verifies and include grade information
             const groupData = result.Verify.SubjectVerifies.map(subjectVerify => {
                 const subject = subjectVerify.Subject;
@@ -209,7 +249,6 @@ const Page = ({ params }) => {
     // console.log(conditionCategory);
 
     const fetchConditions = useCallback(async (verifyId) => {
-
         try {
             const url = `/api/condition/${verifyId}`;
             const option = await getOptions(url, "GET");
@@ -458,7 +497,7 @@ const Page = ({ params }) => {
             totalGrades: totalGrades,
             averageGrade: averageGrade
         };
-    }).filter(group => group.subjects.length > 0);    
+    }).filter(group => group.subjects.length > 0);
 
     const subjectCodesByGroup = combinedGroups.map(group => {
         const subjectsWithGrades = group.subjects
@@ -624,7 +663,7 @@ const Page = ({ params }) => {
         };
     }).filter(category => category.subjects.length > 0);
 
-    console.log(subjectCategorytest);
+    // console.log(subjectCategorytest);
 
 
     const subjectCategory = categoryverify.map(category => {
@@ -670,42 +709,196 @@ const Page = ({ params }) => {
 
     const combinedSubjectCategories = subjectCategorytest.concat(subjectCategory);
 
+    const calculatedValues = getCalculatedValues(subjectTrack);
+
+    const totalRegisteredCreditsss = [
+        ...combinedsubjectCodesByGroup,
+        ...subjectCodesBySubgroup,
+        ...combinedSubjectCategories
+    ].reduce((acc, categoryOrGroup) => acc + (categoryOrGroup.totalCredits || 0), calculatedValues.totalCredits);
+
+    const totalGradesss = [
+        ...combinedsubjectCodesByGroup,
+        ...subjectCodesBySubgroup,
+        ...combinedSubjectCategories
+    ].reduce((acc, categoryOrGroup) => acc + (categoryOrGroup.totalGrades || 0), calculatedValues.totalGrades);
+
+    // Calculate the average grade including getCalculatedValues data
+    const averageGrade = totalRegisteredCreditsss ? (totalGradesss / totalRegisteredCreditsss) : 0;
+
+
+    const fetchAdStatus = useCallback(async (email, stu_id) => {
+        try {
+            const url = `/api/verifies/approve/calldescall/${email}/${stu_id}`;
+            const option = await getOptions(url, "GET");
+            try {
+                const res = await axios(option);
+                // console.log(res);
+                const des = res.data.data;
+                setDesAdmin(des);
+            } catch (error) {
+                setDesAdmin([]);
+                return;
+            }
+        } catch (error) {
+            console.error('Error fetching conditions:', error);
+        }
+    }, []);
+
+    const fetchAllStatus = useCallback(async (stu_id) => {
+        try {
+            const url = `/api/verifies/approve/calldescall/${stu_id}`;
+            const option = await getOptions(url, "GET");
+            try {
+                const res = await axios(option);
+                // console.log(res);
+                const des = res.data.data;
+                setDesAll(des);
+            } catch (error) {
+                setDesAll([]);
+                return;
+            }
+        } catch (error) {
+            console.error('Error fetching conditions:', error);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (session?.user?.email && id) fetchAdStatus(session?.user?.email, id)
+        if (id) fetchAllStatus(id)
+    }, [session?.user?.email, id]);
+
+    useEffect(() => {
+        if (session?.user?.role === 'admin') {
+            if (descadmin?.desc) {
+                setDesc(descadmin?.desc)
+            } else {
+                setDesc('');
+            }
+        } else if (desct && desct.length > 0) {
+            setDesc(desct[0].desc);
+        }
+    }, [desct, session?.user?.role, descadmin?.desc]);
+
+    const handleChange = (event) => {
+        setDesc(event.target.value);
+    };
+
 
     const handleSubmit = useCallback(async function (stu_id) {
         try {
 
-            const url = `/api/verifies/approve/status/${stu_id}`;
+            const url = `/api/verifies/approve/status/${session?.user?.email}/${stu_id}`;
 
             const formData = {
                 stu_id: stu_id,
+                desc: desc,
             };
 
-            // console.log(formData);
+            setIsSubmitting(true);
             const options = await getOptions(url, "POST", formData);
             const result = await axios(options);
             const { ok, message: msg } = result.data;
 
-            // showToastMessage(ok, message);
             initVerify(id);
             initItGrade(id)
-            if (verify.id) fetchConditions(verify.id)
-            if (verify.id) fetchConditionSubgroups(verify.id)
+            if (verify?.id) fetchConditions(verify?.id)
+            if (verify?.id) fetchConditionSubgroups(verify?.id)
+            if (id) fetchAllStatus(id)
             message.success(msg)
         } catch (error) {
             console.log(error);
         }
-    }, [id, verify.id]);
+    }, [id, verify?.id, desc, session?.user?.email]);
 
+    const handleSubmitAdmin = useCallback(async function (stu_id) {
+        try {
 
+            const url = `/api/verifies/approve/status/admin/${session?.user?.email}/${stu_id}`;
+
+            const formData = {
+                stu_id: stu_id,
+                desc: desc,
+            };
+
+            setIsSubmitting(true);
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+
+            initVerify(id);
+            initItGrade(id)
+            if (verify?.id) fetchConditions(verify?.id)
+            if (verify?.id) fetchConditionSubgroups(verify?.id)
+            if (session?.user?.email && id) fetchAdStatus(session?.user?.email, id)
+            if (id) fetchAllStatus(id)
+            message.success(msg)
+        } catch (error) {
+            console.log(error);
+        }
+    }, [id, verify?.id, desc, session?.user?.email]);
+
+    const handleReject = useCallback(async function (stu_id) {
+        try {
+
+            const url = `/api/verifies/approve/status/reject/${session?.user?.email}/${stu_id}`;
+
+            const formData = {
+                stu_id: stu_id,
+                desc: desc,
+            };
+
+            setIsSubmitting(true);
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+
+            initVerify(id);
+            initItGrade(id)
+            if (verify?.id) fetchConditions(verify?.id)
+            if (verify?.id) fetchConditionSubgroups(verify?.id)
+            if (id) fetchAllStatus(id)
+            message.success(msg)
+        } catch (error) {
+            console.log(error);
+        }
+    }, [id, verify?.id, desc, session?.user?.email, session?.user?.user_id]);
+
+    const handleRejectAdmin = useCallback(async function (stu_id) {
+        try {
+
+            const url = `/api/verifies/approve/status/admin/reject/${session?.user?.email}/${stu_id}`;
+
+            const formData = {
+                stu_id: stu_id,
+                desc: desc,
+            };
+
+            setIsSubmitting(true);
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+
+            initVerify(id);
+            initItGrade(id)
+            if (verify?.id) fetchConditions(verify?.id)
+            if (verify?.id) fetchConditionSubgroups(verify?.id)
+            if (session?.user?.email && id) fetchAdStatus(session?.user?.email, id)
+            if (id) fetchAllStatus(id)
+            message.success(msg)
+        } catch (error) {
+            console.log(error);
+        }
+    }, [id, verify?.id, desc, session?.user?.email]);
 
     useEffect(() => {
         setLoading(false);
         initVerify(id);
         initItGrade(id)
-        if (verify.id) fetchConditions(verify.id)
-        if (verify.id) fetchConditionSubgroups(verify.id)
-        if (verify.id) fetchConditionCategory(verify.id)
-    }, [verify.id, fetchConditions, fetchConditionSubgroups, fetchConditionCategory])
+        if (verify?.id) fetchConditions(verify?.id)
+        if (verify?.id) fetchConditionSubgroups(verify?.id)
+        if (verify?.id) fetchConditionCategory(verify?.id)
+    }, [verify?.id, fetchConditions, fetchConditionSubgroups, fetchConditionCategory])
 
     const getSubTrack = useCallback((subgroup, subgroupIndex) => {
         // console.log(subgroup);
@@ -947,6 +1140,7 @@ const Page = ({ params }) => {
             </>
         );
     }
+    const toggleSideBar = useToggleSideBarStore((state) => state.toggle)
 
     return (
         <>
@@ -954,82 +1148,163 @@ const Page = ({ params }) => {
                 <Navbar />
             </header>
             <Sidebar />
-            <ContentWrap>
-                <BreadCrumb />
+            <div className={`p-4 md:p-8 md:ml-[240px] ${toggleSideBar ? 'md:ml-[240px]' : 'md:ml-[77px]'}`}>
                 {!verifySelect ? (
                     <p>No data</p>
                 ) : (
                     <div>
-                        <ToastContainer />
                         {loading ? (
                             <div className='w-full flex justify-center h-[70vh]'>
                                 <Spinner label="กำลังโหลด..." color="primary" />
                             </div>
                         ) : (
                             <>
+                                <div className='relative'>
+                                    <div className='hidden max-xl:block max-xl:fixed max-xl:top-16 max-xl:right-0 mt-5 z-50'>
+                                        {(verifySelect?.status === 0 || verifySelect.status === 1 || verifySelect.status === 2 || verifySelect.status === 3) && (
+                                            <Tooltip showArrow={true} placement='left-end' size='lg' content="สถานะการอนุมัติ">
+                                                <Button
+                                                    onClick={showDrawer}
+                                                    color="primary"
+                                                    radius="sm"
+                                                    variant="shadow"
+                                                    startContent={<TbMessage2Exclamation className='w-6 h-6' />}
+                                                />
+                                            </Tooltip>
+                                        )}
+                                    </div>
+                                </div>
                                 {Object.keys(verifySelect).length > 0 ? (
-                                    <div className='my-[30px] 2xl:px-44 xl:px-20'>
-                                        <div className=' text-xl text-black mb-5 px-5'>
-                                            <h1 className='text-3xl text-center  leading-relaxed'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br /> หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{verifySelect.Verify.Program.title_th} <br />(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.Verify.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
-                                            <div className='text-center mt-6'>
-                                                <p>แบบฟอร์มตรวจสอบการสำเร็จการศึกษาของ <span className='text-blue-600 font-bold'>{userData.first_name} {userData.last_name}</span> รหัสประจำตัว <span className='text-blue-600 font-bold'>{userData.stu_id}</span></p>
-                                                <div className='flex justify-center items-center my-3'>
-                                                    <p>คาดว่าจะได้รับปริญญาวิทยาศาสตรบัณฑิต  สาขาวิชา{verifySelect.Verify.Program.title_th} เกียรตินิยมอันดับ</p>
-                                                    <div className="relative ml-2 w-[70px]">
-                                                        <input
-                                                            className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
-                                                            placeholder=" "
-                                                            type="text"
-                                                            value={verifySelect.cum_laude}
-                                                            onChange={(e) => setCumLaude()}
-                                                            readOnly
-                                                        />
-                                                        <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-fit w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[4.1] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                                                            อันดับ
-                                                        </label>
+                                    <div className={`${verifySelect?.status === 0 || verifySelect?.status === 1 || verifySelect?.status === 2 || verifySelect?.status === 3 ? 'flex relative' : ''}`}>
+                                        <div className={`my-[30px] ${verifySelect?.status === 0 || verifySelect?.status === 1 || verifySelect?.status === 2 || verifySelect?.status === 3 ? 'w-[80%] 2xl:px-30 xl:pr-20' : 'w-[100%] 2xl:px-44 xl:px-20'} mt-16 max-xl:w-[100%] relative`}>
+                                            <BreadCrumb />
+                                            <div className=' text-xl text-black mb-5 px-5'>
+                                                <h1 className='text-3xl text-center  leading-relaxed'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br /> หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{verifySelect.Verify.Program.title_th} <br />(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.Verify.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
+                                                <div className='text-center mt-6'>
+                                                    <p>แบบฟอร์มตรวจสอบการสำเร็จการศึกษาของ <span className='text-blue-600 font-bold'>{userData.first_name} {userData.last_name}</span> รหัสประจำตัว <span className='text-blue-600 font-bold'>{userData.stu_id}</span></p>
+                                                    <div className='flex justify-center items-center my-3'>
+                                                        <p>คาดว่าจะได้รับปริญญาวิทยาศาสตรบัณฑิต  สาขาวิชา{verifySelect.Verify.Program.title_th} เกียรตินิยมอันดับ</p>
+                                                        <div className="relative ml-2 w-[130px]">
+                                                            <input
+                                                                className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                                                                placeholder=" "
+                                                                type="text"
+                                                                value={verifySelect.cum_laude === 0 ? "ไม่ได้รับเกียรตินิยม" : verifySelect.cum_laude}
+                                                                onChange={(e) => setCumLaude()}
+                                                                readOnly
+                                                            />
+                                                            <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-fit w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[4.1] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                                                อันดับ
+                                                            </label>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className='flex flex-wrap justify-center items-center'>
-                                                    <p>ภาคการศึกษา</p>
-                                                    <RadioGroup
-                                                        value={verifySelect.term}
-                                                        onChange={[]}
-                                                        orientation="horizontal"
-                                                        readOnly
-                                                    >
-                                                        <Radio value="ต้น" className='ml-2'>ต้น</Radio>
-                                                        <Radio value="ปลาย" className='ml-2' >ปลาย</Radio>
-                                                        <Radio value="ฤดูร้อน" className='mx-2' >ฤดูร้อน</Radio>
-                                                    </RadioGroup>
-                                                    <p>ปีการศึกษา {verifySelect.acadyear}</p>
+                                                    <div className='flex flex-wrap justify-center items-center'>
+                                                        <p>ภาคการศึกษา</p>
+                                                        <RadioGroup
+                                                            value={verifySelect.term}
+                                                            onChange={[]}
+                                                            orientation="horizontal"
+                                                            readOnly
+                                                        >
+                                                            <Radio value="ต้น" className='ml-2'>ต้น</Radio>
+                                                            <Radio value="ปลาย" className='ml-2' >ปลาย</Radio>
+                                                            <Radio value="ฤดูร้อน" className='mx-2' >ฤดูร้อน</Radio>
+                                                        </RadioGroup>
+                                                        <p>ปีการศึกษา {verifySelect.acadyear}</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        {Object.keys(groupedSubjectsByCategory).map((categoryId, index) => {
-                                            if (index > highestIndex) {
-                                                setHighestIndex(index);
-                                            }
-                                            const { category, groups, subgroups, semisubgroups } = groupedSubjectsByCategory[categoryId];
-                                            return (
-                                                <div key={categoryId} className='mb-5'>
-                                                    <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
-                                                        <h2 className='text-lg text-default-800'>{index + 1}. {category?.category_title}</h2>
-                                                    </div>
-                                                    {Object.keys(groups).map((groupId) => {
-                                                        const group = groups[groupId];
-                                                        return (
-                                                            <div key={groupId}>
-                                                                <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
-                                                                    <h3 className='text-lg text-default-800 px-4'>
-                                                                        <li>{group?.group_title}</li>
-                                                                    </h3>
+                                            {Object.keys(groupedSubjectsByCategory).map((categoryId, index) => {
+                                                if (index > highestIndex) {
+                                                    setHighestIndex(index);
+                                                }
+                                                const { category, groups, subgroups, semisubgroups } = groupedSubjectsByCategory[categoryId];
+                                                return (
+                                                    <div key={categoryId} className='mb-5'>
+                                                        <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
+                                                            <h2 className='text-lg text-default-800'>{index + 1}. {category?.category_title}</h2>
+                                                        </div>
+                                                        {Object.keys(groups).map((groupId) => {
+                                                            const group = groups[groupId];
+                                                            return (
+                                                                <div key={groupId}>
+                                                                    <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
+                                                                        <h3 className='text-lg text-default-800 px-4'>
+                                                                            <li>{group?.group_title}</li>
+                                                                        </h3>
+                                                                    </div>
+                                                                    <Table
+                                                                        classNames={tableClass}
+                                                                        removeWrapper
+                                                                        onRowAction={() => { }}
+                                                                        aria-label="subjects table"
+                                                                    >
+                                                                        <TableHeader>
+                                                                            <TableColumn>รหัสวิชา</TableColumn>
+                                                                            <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                                            <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                                            <TableColumn>หน่วยกิต</TableColumn>
+                                                                            <TableColumn></TableColumn>
+                                                                        </TableHeader>
+                                                                        <TableBody>
+                                                                            {group.subjects && group.subjects.map((subject) => (
+                                                                                <TableRow key={subject.subject_id || subject.subject_code}>
+                                                                                    <TableCell>{subject.subject_code}</TableCell>
+                                                                                    <TableCell className="w-1/3">{subject.title_en}</TableCell>
+                                                                                    <TableCell className="w-1/3">{subject.title_th}</TableCell>
+                                                                                    <TableCell>{subject.credit}</TableCell>
+                                                                                    <TableCell>
+                                                                                        {subject.grade ? (
+                                                                                            <div className="relative ml-2 w-[70px]">
+                                                                                                <input
+                                                                                                    className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                                                                                                    placeholder=" "
+                                                                                                    type="text"
+                                                                                                    value={subject.grade}
+                                                                                                    onChange={(e) => setCumLaude()}
+                                                                                                />
+                                                                                                <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-fit w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[4.1] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                                                                                    เกรด
+                                                                                                </label>
+                                                                                            </div>
+                                                                                        ) : (
+                                                                                            <p></p>
+                                                                                        )}
+                                                                                    </TableCell>
+                                                                                </TableRow>
+                                                                            ))}
+                                                                        </TableBody>
+                                                                    </Table>
                                                                 </div>
+                                                            );
+                                                        })}
+                                                        {getSubg(subgroups, semisubgroups)}
+                                                    </div>
+                                                );
+                                            })}
+
+
+                                            {categoryverify && categoryverify.map((categorie, catIndex) => (
+                                                <CategoryGrade
+                                                    key={catIndex}
+                                                    catIndex={catIndex}
+                                                    categorie={categorie}
+                                                    highestIndex={highestIndex}
+                                                />
+                                            ))}
+                                            {userData.program === "IT" && (
+                                                <>
+                                                    <h2 className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center mt-5 rounded-t-md text-lg text-default-800'>
+                                                        กลุ่มเลือก 3 วิชา
+                                                    </h2>
+                                                    <ul className='overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
+                                                        {itGrade.length > 0 ? (
+                                                            <div className='bg-gray-100 rounded-md relative gap-2'>
                                                                 <Table
                                                                     classNames={tableClass}
                                                                     removeWrapper
                                                                     onRowAction={() => { }}
-                                                                    aria-label="subjects table"
-                                                                >
+                                                                    aria-label="subjects table">
                                                                     <TableHeader>
                                                                         <TableColumn>รหัสวิชา</TableColumn>
                                                                         <TableColumn>ชื่อวิชา EN</TableColumn>
@@ -1038,21 +1313,21 @@ const Page = ({ params }) => {
                                                                         <TableColumn></TableColumn>
                                                                     </TableHeader>
                                                                     <TableBody>
-                                                                        {group.subjects && group.subjects.map((subject) => (
-                                                                            <TableRow key={subject.subject_id || subject.subject_code}>
-                                                                                <TableCell>{subject.subject_code}</TableCell>
-                                                                                <TableCell className="w-1/3">{subject.title_en}</TableCell>
-                                                                                <TableCell className="w-1/3">{subject.title_th}</TableCell>
-                                                                                <TableCell>{subject.credit}</TableCell>
+                                                                        {itGrade.map((it, index) => (
+                                                                            <TableRow key={index}>
+                                                                                <TableCell>{it.Subject.subject_code}</TableCell>
+                                                                                <TableCell className="w-1/3">{it.Subject.title_en}</TableCell>
+                                                                                <TableCell className="w-1/3">{it.Subject.title_th}</TableCell>
+                                                                                <TableCell>{it.Subject.credit}</TableCell>
                                                                                 <TableCell>
-                                                                                    {subject.grade ? (
+                                                                                    {it.grade ? (
                                                                                         <div className="relative ml-2 w-[70px]">
                                                                                             <input
                                                                                                 className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                                                                                                 placeholder=" "
                                                                                                 type="text"
-                                                                                                value={subject.grade}
-                                                                                                onChange={(e) => setCumLaude()}
+                                                                                                value={it.grade}
+                                                                                                onChange={(e) => setCumLaude(e.target.value)}
                                                                                             />
                                                                                             <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-fit w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[4.1] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
                                                                                                 เกรด
@@ -1067,126 +1342,100 @@ const Page = ({ params }) => {
                                                                     </TableBody>
                                                                 </Table>
                                                             </div>
-                                                        );
-                                                    })}
-                                                    {getSubg(subgroups, semisubgroups)}
-                                                </div>
-                                            );
-                                        })}
-
-
-                                        {categoryverify && categoryverify.map((categorie, catIndex) => (
-                                            <CategoryGrade
-                                                key={catIndex}
-                                                catIndex={catIndex}
-                                                categorie={categorie}
-                                                highestIndex={highestIndex}
-                                            />
-                                        ))}
-                                        {userData.program === "IT" && (
-                                            <>
-                                                <h2 className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center mt-5 rounded-t-md text-lg text-default-800'>
-                                                    กลุ่มเลือก 3 วิชา
-                                                </h2>
-                                                <ul className='h-full overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
-                                                    {itGrade.length > 0 ? (
-                                                        <div className='bg-gray-100 rounded-md relative gap-2'>
-                                                            <Table
-                                                                classNames={tableClass}
-                                                                removeWrapper
-                                                                onRowAction={() => { }}
-                                                                aria-label="subjects table">
-                                                                <TableHeader>
-                                                                    <TableColumn>รหัสวิชา</TableColumn>
-                                                                    <TableColumn>ชื่อวิชา EN</TableColumn>
-                                                                    <TableColumn>ชื่อวิชา TH</TableColumn>
-                                                                    <TableColumn>หน่วยกิต</TableColumn>
-                                                                    <TableColumn></TableColumn>
-                                                                </TableHeader>
-                                                                <TableBody>
-                                                                    {itGrade.map((it, index) => (
-                                                                        <TableRow key={index}>
-                                                                            <TableCell>{it.Subject.subject_code}</TableCell>
-                                                                            <TableCell className="w-1/3">{it.Subject.title_en}</TableCell>
-                                                                            <TableCell className="w-1/3">{it.Subject.title_th}</TableCell>
-                                                                            <TableCell>{it.Subject.credit}</TableCell>
-                                                                            <TableCell>
-                                                                                {it.grade ? (
-                                                                                    <div className="relative ml-2 w-[70px]">
-                                                                                        <input
-                                                                                            className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
-                                                                                            placeholder=" "
-                                                                                            type="text"
-                                                                                            value={it.grade}
-                                                                                            onChange={(e) => setCumLaude(e.target.value)}
-                                                                                        />
-                                                                                        <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-fit w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[4.1] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                                                                                            เกรด
-                                                                                        </label>
-                                                                                    </div>
-                                                                                ) : (
-                                                                                    <p></p>
-                                                                                )}
-                                                                            </TableCell>
-                                                                        </TableRow>
-                                                                    ))}
-                                                                </TableBody>
-                                                            </Table>
-                                                        </div>
-                                                    ) : (
-                                                        <li className='flex justify-center items-center h-full'>
-                                                            <Empty />
-                                                        </li>
-                                                    )}
-                                                </ul>
-                                            </>
-                                        )}
-                                        <Table
-                                            classNames={tableClass}
-                                            removeWrapper
-                                            onRowAction={() => { }}
-                                            aria-label="program table"
-                                            className='mt-5'
-                                        >
-                                            <TableHeader>
-                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                            </TableHeader>
-                                            {conditions.length > 0 ? (
-                                                <TableBody>
-                                                    {conditions.map((condition, index) => {
-                                                        const groupData = combinedsubjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
-                                                        const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = groupData;
-
-                                                        const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
-
-                                                        return (
-                                                            <TableRow key={index}>
-                                                                <TableCell>{condition?.Group?.group_title}</TableCell>
-                                                                <TableCell>{condition.credit}</TableCell>
-                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                                <TableCell>{totalGrades}</TableCell>
-                                                                <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                            </TableRow>
-                                                        );
-
-                                                    })}
-                                                </TableBody>
-                                            ) : (
-                                                <TableBody emptyContent={"ไม่มีเงื่อนไข"}>{[]}</TableBody>
+                                                        ) : (
+                                                            <li className='flex justify-center items-center h-full'>
+                                                                <Empty
+                                                                    description={
+                                                                        <span>ไม่มีข้อมูล</span>
+                                                                    }
+                                                                />
+                                                            </li>
+                                                        )}
+                                                    </ul>
+                                                </>
                                             )}
-                                        </Table>
+                                            <Table
+                                                classNames={tableClass}
+                                                removeWrapper
+                                                onRowAction={() => { }}
+                                                aria-label="condition category"
+                                                className='mt-5 w-full'
+                                            >
+                                                <TableHeader>
+                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                </TableHeader>
+                                                {conditionCategory.length > 0 ? (
+                                                    <TableBody>
+                                                        {conditionCategory.map((conditionCategory, index) => {
+                                                            const categoryDatas = combinedSubjectCategories.find(category => category.id === conditionCategory.Categorie.id) || {};
+                                                            const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = categoryDatas;
 
-                                        {conditionSubgroup.length > 0 && (
+                                                            const creditClassName = totalCredits < conditionCategory.credit ? 'bg-red-200' : '';
+
+                                                            return (
+                                                                <TableRow key={index}>
+                                                                    <TableCell>{conditionCategory?.Categorie?.category_title}</TableCell>
+                                                                    <TableCell>{conditionCategory.credit}</TableCell>
+                                                                    <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                    <TableCell>{totalGrades}</TableCell>
+                                                                    <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
+                                                                </TableRow>
+                                                            );
+
+                                                        })}
+                                                    </TableBody>
+                                                ) : (
+                                                    <TableBody emptyContent={"ไม่มีเงื่อนไขหมวดหมู่วิชา"}>{[]}</TableBody>
+                                                )}
+                                            </Table>
                                             <Table
                                                 classNames={tableClass}
                                                 removeWrapper
                                                 onRowAction={() => { }}
                                                 aria-label="program table"
-                                                className='mt-5'
+                                                className='mt-5  w-full'
+                                            >
+                                                <TableHeader>
+                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                </TableHeader>
+                                                {conditions.length > 0 ? (
+                                                    <TableBody>
+                                                        {conditions.map((condition, index) => {
+                                                            const groupData = combinedsubjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
+                                                            const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = groupData;
+
+                                                            const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
+
+                                                            return (
+                                                                <TableRow key={index}>
+                                                                    <TableCell>{condition?.Group?.group_title}</TableCell>
+                                                                    <TableCell>{condition.credit}</TableCell>
+                                                                    <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                    <TableCell>{totalGrades}</TableCell>
+                                                                    <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
+                                                                </TableRow>
+                                                            );
+
+                                                        })}
+                                                    </TableBody>
+                                                ) : (
+                                                    <TableBody emptyContent={"ไม่มีเงื่อนไขกลุ่มวิชา"}>{[]}</TableBody>
+                                                )}
+                                            </Table>
+                                            <Table
+                                                classNames={tableClass}
+                                                removeWrapper
+                                                onRowAction={() => { }}
+                                                aria-label="program table"
+                                                className='mt-5 w-full'
                                             >
                                                 <TableHeader>
                                                     <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
@@ -1215,101 +1464,347 @@ const Page = ({ params }) => {
                                                         })}
                                                     </TableBody>
                                                 ) : (
-                                                    <TableBody emptyContent={"ไม่มีเงื่อนไข"}>{[]}</TableBody>
+                                                    <TableBody emptyContent={"ไม่มีเงื่อนไขกลุ่มย่อยวิชา"}>{[]}</TableBody>
                                                 )}
                                             </Table>
-                                        )}
-                                        <Table
-                                            classNames={tableClass}
-                                            removeWrapper
-                                            onRowAction={() => { }}
-                                            aria-label="condition category"
-                                            className='mt-5'
-                                        >
-                                            <TableHeader>
-                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                            </TableHeader>
-                                            {conditionCategory.length > 0 ? (
-                                                <TableBody>
-                                                    {conditionCategory.map((conditionCategory, index) => {
-                                                        const categoryDatas = combinedSubjectCategories.find(category => category.id === conditionCategory.Categorie.id) || {};
-                                                        const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = categoryDatas;
+                                            {userData.program === "IT" && (
+                                                <Table
+                                                    classNames={tableClass}
+                                                    removeWrapper
+                                                    onRowAction={() => { }}
+                                                    aria-label="program table"
+                                                    className='mt-5 w-full'
+                                                >
+                                                    <TableHeader>
+                                                        <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                        <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                        <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                        <TableColumn>ค่าคะแนน</TableColumn>
+                                                        <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                    </TableHeader>
 
-                                                        const creditClassName = totalCredits < conditionCategory.credit ? 'bg-red-200' : '';
+                                                    <TableBody>
+                                                        {(() => {
 
-                                                        return (
-                                                            <TableRow key={index}>
-                                                                <TableCell>{conditionCategory?.Categorie?.category_title}</TableCell>
-                                                                <TableCell>{conditionCategory.credit}</TableCell>
-                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                                <TableCell>{totalGrades}</TableCell>
-                                                                <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                            </TableRow>
-                                                        );
+                                                            const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrack);
 
-                                                    })}
-                                                </TableBody>
-                                            ) : (
-                                                <TableBody emptyContent={"ไม่มีเงื่อนไข"}>{[]}</TableBody>
+                                                            const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
+
+                                                            return (
+                                                                <TableRow>
+                                                                    <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
+                                                                    <TableCell>21</TableCell>
+                                                                    <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                    <TableCell>{totalGrades}</TableCell>
+                                                                    <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
+                                                                </TableRow>
+                                                            );
+                                                        })()}
+                                                    </TableBody>
+
+                                                </Table>
                                             )}
-                                        </Table>
-                                        {userData.program === "IT" && (
+
                                             <Table
                                                 classNames={tableClass}
                                                 removeWrapper
                                                 onRowAction={() => { }}
-                                                aria-label="program table"
+                                                aria-label="sum table"
                                                 className='mt-5'
                                             >
                                                 <TableHeader>
-                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
                                                     <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
                                                     <TableColumn>ค่าคะแนน</TableColumn>
                                                     <TableColumn>คะแนนเฉลี่ย</TableColumn>
                                                 </TableHeader>
 
                                                 <TableBody>
-                                                    {(() => {
-
-                                                        const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrack);
-
-                                                        const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
-
-                                                        return (
-                                                            <TableRow>
-                                                                <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
-                                                                <TableCell>21</TableCell>
-                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                                <TableCell>{totalGrades}</TableCell>
-                                                                <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                            </TableRow>
-                                                        );
-                                                    })()}
+                                                    <TableRow>
+                                                        <TableCell>{totalRegisteredCreditsss}</TableCell>
+                                                        <TableCell>{totalGradesss}</TableCell>
+                                                        <TableCell>{averageGrade.toFixed(2)}</TableCell>
+                                                    </TableRow>
                                                 </TableBody>
-
                                             </Table>
-                                        )}
-                                        {verifySelect.status === 1 ? (
-                                            <Button type='submit' onClick={() => handleSubmit(userData.stu_id)} className='h-[16px] py-4 ms-4' radius='sm' color="primary" variant='solid'>
-                                                อนุมัติ
-                                            </Button>
-                                        ) : (
-                                            <p>อนุมัติแล้ว</p>
-                                        )}
+
+                                            {(session.user.role === 'admin' ? verifySelect.status === 2 : verifySelect.status === 1) ? (
+                                                <>
+                                                    <Textarea
+                                                        label="ความคิดเห็น"
+                                                        variant="bordered"
+                                                        color="primary"
+                                                        size="lg"
+                                                        value={desc}
+                                                        placeholder="เพิ่มความคิดเห็น..."
+                                                        disableAnimation
+                                                        disableAutosize
+                                                        classNames={{
+                                                            base: "w-full my-3",
+                                                            input: "resize-y min-h-[80px]",
+                                                        }}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <div className='flex justify-end items-end mt-3'>
+                                                        <Button
+                                                            type='submit'
+                                                            onClick={() => {
+                                                                if (session.user.role === 'admin') {
+                                                                    handleRejectAdmin(userData.stu_id);
+                                                                } else {
+                                                                    handleReject(userData.stu_id);
+                                                                }
+                                                            }}
+                                                            color="danger"
+                                                            variant="light"
+                                                            size='lg'
+                                                            className='text-lg mr-3'
+                                                            isLoading={isSubmitting}
+                                                        >
+                                                            {isSubmitting ? "กำลังโหลด..." : "ไม่อนุมัติ"}
+                                                        </Button>
+                                                        <Button
+                                                            type='submit'
+                                                            onClick={() => {
+                                                                if (session.user.role === 'admin') {
+                                                                    handleSubmitAdmin(userData.stu_id);
+                                                                } else {
+                                                                    handleSubmit(userData.stu_id);
+                                                                }
+                                                            }}
+                                                            color="primary"
+                                                            variant="ghost"
+                                                            size='lg'
+                                                            className='text-lg'
+                                                            isLoading={isSubmitting}
+                                                        >
+                                                            {isSubmitting ? "กำลังโหลด..." : "อนุมัติ"}
+                                                        </Button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Textarea
+                                                        label="ความคิดเห็น"
+                                                        variant="bordered"
+                                                        color={verifySelect?.status === 0 ? "danger" : "primary"}
+                                                        size="lg"
+                                                        value={desc}
+                                                        placeholder="ไม่มีความคิดเห็น"
+                                                        disableAnimation
+                                                        disableAutosize
+                                                        classNames={{
+                                                            base: "w-full my-3",
+                                                            input: "resize-y min-h-[80px]",
+                                                        }}
+                                                        isReadOnly
+
+                                                    />
+                                                    <div className='flex justify-end items-end mt-3'>
+                                                        {verifySelect.status === 0 ? (
+                                                            <Button
+                                                                color="danger"
+                                                                variant="ghost"
+                                                                size='lg'
+                                                                className='text-lg'
+                                                                isDisabled
+                                                            >
+                                                                ไม่อนุมัติ
+                                                            </Button>
+                                                        ) : (
+                                                            <Button
+                                                                color="primary"
+                                                                variant="ghost"
+                                                                size='lg'
+                                                                className='text-lg'
+                                                                isDisabled
+                                                            >
+                                                                อนุมัติแล้ว
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            <Drawer title="สถานะการอนุมัติ" onClose={onClose} open={open}>
+                                                {desAll.length > 0 ? (
+                                                    <Accordion selectionMode="multiple">
+                                                        {desAll.length > 0 ? (
+                                                            desAll.map((statuss, index) => (
+                                                                <AccordionItem
+                                                                    key={index}
+                                                                    aria-label={`Accordion ${index + 1}`}
+                                                                    title={
+                                                                        statuss.User.role === 'admin'
+                                                                            ? 'งานทะเบียนเรียน'
+                                                                            : statuss.User.role === 'teacher'
+                                                                                ? 'อาจารย์ที่ปรึกษา'
+                                                                                : 'Untitled'
+                                                                    }>
+                                                                    <div>
+                                                                        {/* Only show Teacher's information if all necessary fields are present and Teacher is not null */}
+                                                                        {statuss.User.Teacher && statuss.User.Teacher.name && statuss.User.Teacher.surname ? (
+                                                                            <h1>
+                                                                                {statuss.User.Teacher.prefix} {statuss.User.Teacher.name} {statuss.User.Teacher.surname}
+                                                                            </h1>
+                                                                        ) : (
+                                                                            <p>{statuss.User.email}</p>
+                                                                        )}
+
+                                                                        {statuss.User.Teacher && statuss.User.Teacher.name && statuss.User.Teacher.surname ? (
+                                                                            <div>
+                                                                                <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
+                                                                                <p className='my-2'><strong>เวลา:</strong> {dMyt(statuss.approver_time)}</p>
+                                                                                {statuss.desc && (
+                                                                                    <Textarea
+                                                                                        label="ความคิดเห็น"
+                                                                                        variant="bordered"
+                                                                                        color={verifySelect?.status === 0 ? 'danger' : 'primary'}
+                                                                                        size="lg"
+                                                                                        value={statuss.desc}
+                                                                                        placeholder="เพิ่มความคิดเห็น..."
+                                                                                        disableAnimation
+                                                                                        disableAutosize
+                                                                                        classNames={{
+                                                                                            base: "w-full my-3",
+                                                                                            input: "resize-y min-h-[80px]",
+                                                                                        }}
+                                                                                        isReadOnly
+                                                                                    />
+                                                                                )}
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div>
+                                                                                <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
+                                                                                <p className='my-2'><strong>เวลา :</strong> {dMyt(statuss.approver_time)}</p>
+                                                                                {statuss.desc && (
+                                                                                    <Textarea
+                                                                                        label="ความคิดเห็น"
+                                                                                        variant="bordered"
+                                                                                        color={verifySelect?.status === 0 ? 'danger' : 'primary'}
+                                                                                        size="lg"
+                                                                                        value={statuss.desc}
+                                                                                        placeholder="เพิ่มความคิดเห็น..."
+                                                                                        disableAnimation
+                                                                                        disableAutosize
+                                                                                        classNames={{
+                                                                                            base: "w-full my-3",
+                                                                                            input: "resize-y min-h-[80px]",
+                                                                                        }}
+                                                                                        isReadOnly
+                                                                                    />
+                                                                                )}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </AccordionItem>
+                                                            ))
+                                                        ) : (
+                                                            <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                        )}
+                                                    </Accordion>
+                                                ) : (
+                                                    <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                )}
+                                            </Drawer>
+                                        </div>
+                                        <div
+                                            className={`${verifySelect?.status === 0 || verifySelect?.status === 1 || verifySelect?.status === 2 || verifySelect?.status === 3 ? 'w-[20%]' : 'w-[20%]w-0'} fixed left-auto right-0 max-xl:hidden h-screen border-l border-l-gray-200/80`}
+                                        >
+                                            <div className='relative top-16 px-5'>
+                                                <h1 className='text-2xl mb-5'>สถานะการอนุมัติ</h1>
+                                                {desAll.length > 0 ? (
+                                                    <Accordion selectionMode="multiple">
+                                                        {desAll.length > 0 ? (
+                                                            desAll.map((statuss, index) => (
+                                                                <AccordionItem
+                                                                    key={index}
+                                                                    aria-label={`Accordion ${index + 1}`}
+                                                                    title={
+                                                                        statuss.User.role === 'admin'
+                                                                            ? 'งานทะเบียนเรียน'
+                                                                            : statuss.User.role === 'teacher'
+                                                                                ? 'อาจารย์ที่ปรึกษา'
+                                                                                : 'Untitled'
+                                                                    }>
+                                                                    <div>
+                                                                        {/* Only show Teacher's information if all necessary fields are present and Teacher is not null */}
+                                                                        {statuss.User.Teacher && statuss.User.Teacher.name && statuss.User.Teacher.surname ? (
+                                                                            <h1>
+                                                                                {statuss.User.Teacher.prefix} {statuss.User.Teacher.name} {statuss.User.Teacher.surname}
+                                                                            </h1>
+                                                                        ) : (
+                                                                            <p>{statuss.User.email}</p>
+                                                                        )}
+
+                                                                        {statuss.User.Teacher && statuss.User.Teacher.name && statuss.User.Teacher.surname ? (
+                                                                            <div>
+                                                                                <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
+                                                                                <p className='my-2'><strong>เวลา:</strong> {dMyt(statuss.approver_time)}</p>
+                                                                                {statuss.desc && (
+                                                                                    <Textarea
+                                                                                        label="ความคิดเห็น"
+                                                                                        variant="bordered"
+                                                                                        color={verifySelect?.status === 0 ? 'danger' : 'primary'}
+                                                                                        size="lg"
+                                                                                        value={statuss.desc}
+                                                                                        placeholder="เพิ่มความคิดเห็น..."
+                                                                                        disableAnimation
+                                                                                        disableAutosize
+                                                                                        classNames={{
+                                                                                            base: "w-full my-3",
+                                                                                            input: "resize-y min-h-[80px]",
+                                                                                        }}
+                                                                                        isReadOnly
+                                                                                    />
+                                                                                )}
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div>
+                                                                                <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
+                                                                                <p className='my-2'><strong>เวลา :</strong> {dMyt(statuss.approver_time)}</p>
+                                                                                {statuss.desc && (
+                                                                                    <Textarea
+                                                                                        label="ความคิดเห็น"
+                                                                                        variant="bordered"
+                                                                                        color={verifySelect?.status === 0 ? 'danger' : 'primary'}
+                                                                                        size="lg"
+                                                                                        value={statuss.desc}
+                                                                                        placeholder="เพิ่มความคิดเห็น..."
+                                                                                        disableAnimation
+                                                                                        disableAutosize
+                                                                                        classNames={{
+                                                                                            base: "w-full my-3",
+                                                                                            input: "resize-y min-h-[80px]",
+                                                                                        }}
+                                                                                        isReadOnly
+                                                                                    />
+                                                                                )}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </AccordionItem>
+                                                            ))
+                                                        ) : (
+                                                            <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                        )}
+                                                    </Accordion>
+                                                ) : (
+                                                    <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
+
+
                                 ) : (
-                                    <p className='text-center'>ไม่มีข้อมูลแบบฟอร์มตรวจสอบจบ {params.id}</p>
+                                    <p className='text-center mt-28'>ไม่มีข้อมูลแบบฟอร์มตรวจสอบจบ {params.id}</p>
                                 )}
                             </>
                         )}
+
                     </div>
                 )}
-            </ContentWrap>
+            </div>
         </>
     );
 
