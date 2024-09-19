@@ -426,7 +426,11 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                                                 ))
                                                 :
                                                 <li className='flex justify-center items-center h-full'>
-                                                    <Empty />
+                                                    <Empty
+                                                        description={
+                                                            <span>ไม่มีข้อมูล</span>
+                                                        }
+                                                    />
                                                 </li>}
                                         </ul>
                                     </div>
