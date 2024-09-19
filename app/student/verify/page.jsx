@@ -24,7 +24,6 @@ import { TbMessage2Exclamation } from "react-icons/tb";
 import CategoryGrade from './CategoryGrade';
 import { Accordion, AccordionItem } from "@nextui-org/react";
 import { dMyt } from '@/src/util/dateFormater';
-import Step from './Step';
 
 const Page = () => {
     ////////////////////////from///////////////////////////////////
