@@ -5,6 +5,7 @@ import './homepage.css';
 import Footer from './components/Footer';
 import Link from 'next/link';
 import { Button } from '@nextui-org/react';
+import { simpleDMY, simpleDMYHM } from '@/src/util/simpleDateFormatter';
 
 const tracks = [
      { name: 'BIT', icon: '💼', description: 'เทคโนโลยีสารสนเทศทางธุรกิจ ' },
@@ -112,7 +113,7 @@ const HomePage = ({ news = mockNews }) => {
                                                   }
                                                   <div className="p-6 text-white">
                                                        <p className="font-semibold text-lg mb-2 line-clamp-2">{newsItem.title}</p>
-                                                       <p className="text-sm line-clamp-2 mb-4">{newsItem.desc}</p>
+                                                       <p className="text-sm line-clamp-2 mb-1">เผยแพร่เมื่อ {simpleDMY(newsItem.createdAt)}</p>
                                                        <span className="text-sm font-medium text-blue-300 group-hover:text-blue-200 transition-colors duration-300">ข้อมูลเพิ่มเติม →</span>
                                                   </div>
                                              </div>

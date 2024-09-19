@@ -216,15 +216,15 @@ const SummaryResult = ({ data }) => {
                                                        <p className="text-sm font-bold">{ts.totalScore} คะแนน</p>
                                                   </div>
                                                   <div className="flex justify-between items-end">
-                                                       <p className="text-sm text-gray-600">แบบทดสอบ</p>
+                                                       <p className="text-sm text-gray-600">คำถาม</p>
                                                        <p className="text-sm font-bold">{ts.questionScore} คะแนน</p>
                                                   </div>
                                                   <div className="flex justify-between items-end">
-                                                       <p className="text-sm text-gray-600">แบบประเมิน</p>
+                                                       <p className="text-sm text-gray-600">ความชอบ</p>
                                                        <p className="text-sm font-bold">{ts.assessmentScore} คะแนน</p>
                                                   </div>
                                                   <div className="flex justify-between items-end">
-                                                       <p className="text-sm text-gray-600">ความชอบ</p>
+                                                       <p className="text-sm text-gray-600">อาชีพ</p>
                                                        <p className="text-sm font-bold">{ts.careerScore} คะแนน</p>
                                                   </div>
                                              </div>

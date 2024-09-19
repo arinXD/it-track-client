@@ -13,8 +13,8 @@ const CreateForm = ({ teacher }) => {
      const tab = searchParams.get('tab') ?? "advisor-form"
 
      const tabItems = [
-          { key: "advisor-form", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
-          { key: "advisor-sheet", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
+          { key: "advisor-form", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <SiGoogleforms className="w-4 h-4 text-blue-600" /> },
+          { key: "advisor-sheet", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <RiFileExcel2Fill className="w-4 h-4 text-green-600" /> },
      ]
 
      const insertAdvisorsExcel = useCallback(async function (formattedData) {

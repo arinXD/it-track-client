@@ -36,9 +36,12 @@ const News = ({ news = {}, allNews = [] }) => {
                          </div>
                          {allNews?.length > 0 &&
                               <>
-                                   <hr className="border my-10" />
+                                   <hr className="border mt-10 mb-5" />
                                    <div>
-                                        <p className="mb-4">ข่าวอื่นๆ</p>
+                                        <div className="flex gap-2 mb-4">
+                                             <div className="w-1 bg-blue-500"></div>
+                                             <p className="">ข่าวสารอื่นๆ</p>
+                                        </div>
                                         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                                              {allNews.map((newsItem) => (
                                                   <Link
@@ -54,7 +57,7 @@ const News = ({ news = {}, allNews = [] }) => {
                                                                  height={150}
                                                                  className="w-full object-cover h-[200px]"
                                                             />
-                                                            <p className="font-semibold text-sm mb-2 line-clamp-3 text-justify">
+                                                            <p className="text-sm mb-2 line-clamp-3 text-start">
                                                                  {newsItem.title}
                                                             </p>
                                                        </div>

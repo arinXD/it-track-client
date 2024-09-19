@@ -7,7 +7,8 @@ import { Empty } from "antd"
 const getAllNews = async () => {
      const option = await getOptions("/api/news/published/all", "get")
      try {
-          return (await axios(option)).data
+          const data = (await axios(option)).data
+          return data
      } catch {
           return []
      }
@@ -29,10 +30,7 @@ const Page = async () => {
                                         {news.map((item) => (
                                              <NewsCard
                                                   key={item.id}
-                                                  id={item.id}
-                                                  title={item.title}
-                                                  desc={item.desc}
-                                                  image={item.image}
+                                                  news={item}
                                              />
                                         ))}
                                    </div>

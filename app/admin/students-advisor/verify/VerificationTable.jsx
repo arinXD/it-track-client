@@ -2,23 +2,20 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import axios from 'axios';
-import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Spinner, Tooltip } from '@nextui-org/react'
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Spinner } from '@nextui-org/react'
 import { tableClass } from '@/src/util/ComponentClass'
 import { calGrade, floorGpa, isNumber } from '@/src/util/grade';
-import { Empty, message } from 'antd';
-import { IoIosCloseCircle } from "react-icons/io";
-import { IoSearchOutline } from "react-icons/io5";
-import { RadioGroup, Radio } from "@nextui-org/radio";
 
 const VerificationTable = ({ stdID }) => {
      const [cumlaude, setCumLaude] = useState(1)
      const findCumLaude = useCallback((enrollments) => {
           // อันดับ 1 
           // ไม่ต่ำกว่า 3.60
-          // อันดับ 1 
+          // อันดับ 2
           // ไม่ต่ำกว่า 3.25 และต่ำกว่า 3.60
 
-          // เรียนไม่เกิน 4 ปี
+          // เรียนไม่เกิน 4 ปี                        * ยังไม่ทำ 
+          // หากลงเรียนแก้เกรด ก็ไม่ถือว่าได้เกียรตินิยม    * ทำไม่ได้
           // ไม่ติด F, R, U
 
           const grades = {
@@ -63,9 +60,7 @@ const VerificationTable = ({ stdID }) => {
           setCumLaude(`${result} (${floorGpa(totalScore / totalCredit)})`)
      }, [])
      const [loading, setLoading] = useState(true)
-     const [isSubmitting, setIsSubmitting] = useState(false);
      const [verifySelect, setVerifySelect] = useState({})
-     const [verifySubjects, setVerifySubjects] = useState([])
      const [userData, setUserData] = useState({})
      const [enrollments, setEnrollment] = useState([])
      const [program, setProgram] = useState([])
@@ -73,13 +68,10 @@ const VerificationTable = ({ stdID }) => {
      const [groupData, setGroupData] = useState([]);
      const [cateData, setCategoryData] = useState([]);
      const [semisubgroupData, setSemiSubgroupData] = useState([]);
-     const [categoryverify, setCategoryVerifies] = useState([])
      const [highestIndex, setHighestIndex] = useState(0);
 
      const [verificationID, setVerificationID] = useState(null);
      const [status, setStatus] = useState(null);
-
-     const [subjects, setSubjects] = useState([]);
 
      const [conditions, setConditions] = useState([]);
      const [conditionSubgroup, setConditionSubgroup] = useState([]);
@@ -88,11 +80,8 @@ const VerificationTable = ({ stdID }) => {
      const [groupfirst, setGroupFirst] = useState([])
      const [group, setGroups] = useState([])
 
-
      const [pickSubj, setVerifySubj] = useState([]);
-
      const [subjectTrack, setSubjectTrack] = useState([]);
-
      const [studentcategory, setStudentCategory] = useState([]);
 
      const fetchEnrollment = useCallback(async function (stdID) {
@@ -184,8 +173,6 @@ const VerificationTable = ({ stdID }) => {
                     const categoryData = Object.values(subjectsByCategory);
 
                     setCategoryData(categoryData);
-
-                    // console.log(categoryData);
 
                     const subgroupData = data.SubjectVerifies.map(subjectVerify => {
                          const subject = subjectVerify.Subject;
@@ -334,10 +321,7 @@ const VerificationTable = ({ stdID }) => {
 
                     const filteredSubjects = filterSubjects.filter(subject => subject.track !== null && subject.track !== '');
                     setSubjectTrack(filteredSubjects)
-                    setSubjects(filterSubjects)
                } catch (error) {
-                    setSubjects([])
-                    // setSubjectTrack([])
                     return
                }
           } catch (error) {
@@ -345,11 +329,9 @@ const VerificationTable = ({ stdID }) => {
           }
      };
 
-
      useEffect(() => {
           fetchSubjects();
      }, [])
-
 
      ///////////////////////////////////////////////////////////////////////////////////////////
      const groupedSubjectsByCategory = useMemo(() => {
@@ -401,7 +383,6 @@ const VerificationTable = ({ stdID }) => {
 
 
      /////////////////////////////// เงือนไข //////////////////////////////////////////////
-
      useEffect(() => {
           const groupDatatest = [];
 
@@ -446,10 +427,6 @@ const VerificationTable = ({ stdID }) => {
 
           setGroups(allGroups);
      }, [groupedSubjectsByCategory]);
-
-     // console.log(groupedSubjectsByCategory);
-
-     // console.log(group);
 
      const condition = conditions.map(prev => prev.Group);
      const conditionsubgroups = conditionSubgroup.map(prev => prev.SubGroup);
@@ -504,7 +481,6 @@ const VerificationTable = ({ stdID }) => {
 
 
      //////////////////////////////////// เงื่อนไขกลุ่มวิชา  //////////////////////////////////////////////////////////////
-
      const subjectCodesByGroupFirst = combinedGroupfirst.map(group => {
           const subjectsWithGrades = group.subjects
                .map(subject => {
@@ -623,8 +599,6 @@ const VerificationTable = ({ stdID }) => {
      }).filter(subgroup => subgroup.subjects.length > 0);
 
      ///////////////// เงื่อนไข Category ## เสรี /////////////////
-
-
      const subjectCategorytest = cateData.map(({ category, subjects }) => {
           // Ensure 'subjects' is an array before mapping over it
           const subjectsWithGrades = Array.isArray(subjects) ? subjects
@@ -706,8 +680,6 @@ const VerificationTable = ({ stdID }) => {
 
 
      /////////////////////// เฉพาะ IT //////////////////////////
-
-
      const subData = pickSubj.map(subject => {
           const grade = getEnrollmentGrade(subject.subject_code);
           const credit = subject.credit;
@@ -1011,9 +983,6 @@ const VerificationTable = ({ stdID }) => {
                <>
                     {Object.keys(groupedSubgroups).map((groupTitle, groupIndex) => {
                          const subgroupsWithSameGroupTitle = groupedSubgroups[groupTitle];
-
-                         // console.log(subgroupsWithSameGroupTitle);
-
 
                          return (
                               <div key={groupIndex}>
