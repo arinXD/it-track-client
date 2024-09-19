@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { signOut, useSession } from "next-auth/react"
 import Image from 'next/image'
 import Link from 'next/link';
@@ -7,7 +7,7 @@ import { MdEditDocument, MdOutlineQuiz, MdQuiz, MdAdminPanelSettings, MdOutlineA
 import { usePathname } from 'next/navigation';
 import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
 import { GoHome, GoHomeFill } from "react-icons/go";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem, Skeleton, Badge } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem, Skeleton } from "@nextui-org/react";
 import { AiFillEdit, AiOutlineEdit, AiFillNotification } from 'react-icons/ai';
 import { RxHamburgerMenu } from "react-icons/rx";
 import "../style/hamburgers.css"
@@ -15,11 +15,10 @@ import { useToggleSideBarStore } from '@/src/store';
 import NextTopLoader from 'nextjs-toploader';
 import { Icon } from '@iconify/react';
 import { FaUser } from "react-icons/fa6";
-import { IoIosHelpCircle } from "react-icons/io";
 import { BiSolidExit } from "react-icons/bi";
-import { IoNotifications } from 'react-icons/io5';
-import PetitionNotification from './PetitionNotification';
 import { DROPDOWN_MENU_CLASS } from '@/src/util/ComponentClass';
+import { FaHistory } from 'react-icons/fa';
+import Notification from './Notification';
 
 const Navbar = () => {
     const { data: session, status } = useSession();
@@ -125,6 +124,10 @@ const Navbar = () => {
                                         <Image
                                             className='rounded-full'
                                             src={session?.user?.image}
+                                            onError={({ currentTarget }) => {
+                                                currentTarget.onerror = null;
+                                                currentTarget.src = "/image/admin.png";
+                                            }}
                                             width={40} height={40}
                                             alt="user image"
                                         />
@@ -144,14 +147,26 @@ const Navbar = () => {
                                         <span>ข้อมูลของฉัน</span>
                                     </div>
                                 </DropdownItem>
-                                <DropdownItem href='/petition/request' key="write_petition">
-                                    <div className='flex gap-3 items-center'>
-                                        <div className='w-5 h-5 flex items-center justify-center'>
-                                            <MdEditDocument className='w-5 h-5' />
+                                {session?.user?.role === "student" &&
+                                    <DropdownItem href='/summary-history' key="summary-history">
+                                        <div className='flex gap-3 items-center'>
+                                            <div className='w-5 h-5 flex items-center justify-center'>
+                                                <FaHistory className='w-4 h-4' />
+                                            </div>
+                                            <span>ประวัติการแนะนำแทร็ก</span>
                                         </div>
-                                        <span>ยื่นคำร้องย้ายแทร็ก</span>
-                                    </div>
-                                </DropdownItem>
+                                    </DropdownItem>
+                                }
+                                {session?.user?.role === "student" &&
+                                    <DropdownItem href='/petition/request' key="write_petition">
+                                        <div className='flex gap-3 items-center'>
+                                            <div className='w-5 h-5 flex items-center justify-center'>
+                                                <MdEditDocument className='w-5 h-5' />
+                                            </div>
+                                            <span>ยื่นคำร้องย้ายแทร็ก</span>
+                                        </div>
+                                    </DropdownItem>
+                                }
                                 <DropdownItem href='/help-feedback' key="help_and_feedback">
                                     <div className='flex gap-3 items-center'>
                                         <div className='w-5 h-5 flex items-center justify-center'>
@@ -233,13 +248,18 @@ const Navbar = () => {
                         </button>
                     </div>
                     <div className="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
-                        <PetitionNotification />
+
+                        {/* Noti */}
+                        <Notification email={session?.user?.email} />
+
+                        {/* User profile */}
                         <div className="relative ml-3 flex flex-row gap-3">
                             {renderUserProfile()}
-                        </div >
-                    </div >
-                </div >
-            </div >
+                        </div>
+
+                    </div>
+                </div>
+            </div>
             {
                 <div className={`md:hidden relative w-50`} id="mobile-menu">
                     <div className="h-fit absolute space-y-1 p-2 border-y-1 w-full border-y-gray-200" id='navstupid'

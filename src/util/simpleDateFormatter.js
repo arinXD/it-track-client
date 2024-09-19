@@ -68,7 +68,7 @@ function getDateProperty(date) {
 }
 
 export function simpleDMYHM(date) {
-     if(!date) return ""
+     if (!date) return ""
      const { day, thaiMonth, year, hours, minutes } = getDateProperty(date)
      return `${day} ${thaiMonth} ${year} ${hours}:${minutes} น.`;
 }
@@ -83,4 +83,29 @@ export function simpleDM(date) {
 export function simpleDmyhm(date) {
      const { day, thaiMonthY, defYear, hours, minutes } = getDateProperty(date)
      return `${day} ${thaiMonthY} ${defYear} ${hours}:${minutes}`;
+}
+
+export function timeAgo(dateString) {
+     if (!dateString) return ""
+     const date = new Date(dateString);
+     const now = new Date();
+     const secondsPast = (now.getTime() - date.getTime()) / 1000;
+
+     if (secondsPast < 60) {
+          return `1 นาทีก่อน`;
+     }
+     if (secondsPast < 3600) {
+          return `${Math.round(secondsPast / 60)} นาทีก่อน`;
+     }
+     if (secondsPast <= 86400) {
+          return `${Math.round(secondsPast / 3600)} ชั่วโมงก่อน`;
+     }
+     if (secondsPast <= 2592000) {
+          return `${Math.round(secondsPast / 86400)} วันก่อน`;
+     }
+     if (secondsPast <= 31536000) {
+          // อิงตามเดือนที่มี 30 วัน
+          return `${Math.round(secondsPast / 2592000)} เดือนก่อน`;
+     }
+     return `${Math.round(secondsPast / 31536000)} ปีก่อน`;
 }

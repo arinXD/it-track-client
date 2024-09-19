@@ -1,22 +1,28 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import axios from 'axios';
 import { Form, Input, Switch, message, Image } from 'antd';
 import { Button } from '@nextui-org/react';
 import { UploadOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { hostname } from '@/app/api/hostname';
+import dynamic from 'next/dynamic';
+import 'react-quill/dist/quill.snow.css';
 
-const { TextArea } = Input;
+const ReactQuill = dynamic(() => import('react-quill'), {
+     ssr: false,
+     loading: () => <p>Loading editor...</p>,
+});
 
 const EditNews = ({ id }) => {
      const [form] = Form.useForm();
-
      const [loading, setLoading] = useState(false);
      const [imageUrl, setImageUrl] = useState('');
      const [imageFile, setImageFile] = useState(null);
      const [newImagePreview, setNewImagePreview] = useState('');
+     const [editorContent, setEditorContent] = useState('');
+     const quillRef = useRef();
 
      useEffect(() => {
           if (id) {
@@ -31,10 +37,11 @@ const EditNews = ({ id }) => {
                form.setFieldsValue({
                     title: newsData.title,
                     desc: newsData.desc,
-                    detail: newsData.detail,
                     published: newsData.published,
                });
                setImageUrl(newsData.image);
+               setEditorContent(newsData.detail || '');
+               form.setFieldsValue({ detail: newsData.detail || '' });
           } catch (error) {
                console.error('Error fetching news details:', error);
                message.error('Failed to fetch news details');
@@ -64,6 +71,18 @@ const EditNews = ({ id }) => {
           }
      };
 
+     const modules = useMemo(() => ({
+          toolbar: {
+               container: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+               ],
+          }
+     }), []);
+
      const onFinish = async (values) => {
           setLoading(true);
           const formData = new FormData();
@@ -76,10 +95,14 @@ const EditNews = ({ id }) => {
                     formData.append(key, values[key]);
                }
           });
+
+          formData.append('detail', editorContent);
+
           try {
                await axios.put(`${hostname}/api/news/${id}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                });
+               message.success('News updated successfully');
                setTimeout(() => {
                     window.location.href = "/admin/news"
                }, 1000);
@@ -111,22 +134,29 @@ const EditNews = ({ id }) => {
                          label="รายละเอียดแบบย่อ"
                          rules={[{ required: true, message: 'Please input the description!' }]}
                     >
-                         <TextArea rows={3} />
+                         <Input.TextArea rows={3} />
                     </Form.Item>
                     <Form.Item
                          name="detail"
                          label="เนื้อหาข่าว"
                          rules={[{ required: true, message: 'Please input the detail!' }]}
                     >
-                         <TextArea rows={5} />
+                         <ReactQuill
+                              ref={quillRef}
+                              theme="snow"
+                              value={editorContent}
+                              onChange={(content, delta, source, editor) => {
+                                   setEditorContent(content);
+                                   form.setFieldsValue({ detail: content });
+                              }}
+                              modules={modules}
+                              style={{ height: '300px', marginBottom: '50px' }}
+                         />
                     </Form.Item>
                     <div className='flex items-center gap-4 mb-6'>
                          <p>สถานะการเผยแพร่</p>
                          <Form.Item className='mb-0' name="published" valuePropName="checked">
-                              <Switch style={{
-                                   
-                              }} />
-
+                              <Switch />
                          </Form.Item>
                     </div>
                     {!newImagePreview && (
@@ -138,6 +168,7 @@ const EditNews = ({ id }) => {
                                         className='w-full h-full object-cover rounded-lg'
                                         alt="New image preview"
                                         width={"100%"}
+                                        fallback="/image/error_image.png"
                                         height={300} />
                               </div>
                          </div>
@@ -151,7 +182,9 @@ const EditNews = ({ id }) => {
                                         className='w-full h-full object-cover rounded-lg'
                                         alt="New image preview"
                                         width={"100%"}
+                                        fallback="/image/error_image.png"
                                         height={300} />
+                                        
                               </div>
                          </div>
                     )}
@@ -178,7 +211,7 @@ const EditNews = ({ id }) => {
                               className='rounded-[5px]'
                               type='submit'
                          >
-                              บันทีก
+                              บันทึก
                          </Button>
                          <Link href="/admin/news">
                               <Button

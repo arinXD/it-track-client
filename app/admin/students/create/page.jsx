@@ -8,16 +8,19 @@ import InsertEnrollmentForm from "../InsertEnrollmentForm"
 import InsertExcel from "@/app/components/InsertExcel."
 import { useCallback } from "react"
 import { getOptions, getToken } from "@/app/components/serverAction/TokenAction"
+import InsertAdvisor from "../InsertAdvisor"
 
 const Page = () => {
      const searchParams = useSearchParams()
      const tab = searchParams.get('tab')
 
      const tabItems = [
-          { key: "student-form", label: "เพิ่มรายชื่อนักศึกษาผ่านแบบฟอร์ม", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
-          { key: "enroll-form", label: "เพิ่มเกรดผ่านแบบฟอร์ม", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
-          { key: "student-sheet", label: "เพิ่มรายชื่อนักศึกษาผ่านไฟล์ xlsx", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
-          { key: "enroll-sheet", label: "เพิ่มเกรดผ่านไฟล์ xlsx", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
+          { key: "student-form", label: "เพิ่มรายชื่อนักศึกษา", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
+          { key: "enroll-form", label: "เพิ่มรายวิชาที่ลงทะเบียน", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
+          { key: "advisor-form", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
+          { key: "student-sheet", label: "เพิ่มรายชื่อนักศึกษา", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
+          { key: "enroll-sheet", label: "เพิ่มรายวิชาที่ลงทะเบียน", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
+          { key: "advisor-sheet", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
      ]
 
      const insertStudentExcel = useCallback(async function (formattedData) {
@@ -35,7 +38,6 @@ const Page = () => {
      }, [])
 
      const insertEnrollmentExcel = useCallback(async function (formattedData) {
-          // add required column
           if (formattedData.some(row =>
                row["PROGRAMNAME".toLowerCase()] != null &&
                row["STUDENTCODE".toLowerCase()] != null &&
@@ -55,9 +57,25 @@ const Page = () => {
           }
      }, [])
 
+     const insertAdvisorsExcel = useCallback(async function (formattedData) {
+          if (formattedData.every(row =>
+               row["STUDENTNAME".toLowerCase()] != null &&
+               row["STUDENTSURNAME".toLowerCase()] != null &&
+               row["OFFICERNAME".toLowerCase()] != null &&
+               row["OFFICERSURNAME".toLowerCase()] != null
+          )) {
+               const options = await getOptions("/api/advisors/students/spread-sheet", "post")
+               return { status: true, options }
+          } else {
+               return { status: false, options: {} }
+          }
+     }, [])
+
      return (
           <div>
-               <TabsComponent current={tab} tabs={tabItems} />
+               <TabsComponent
+                    current={tab}
+                    tabs={tabItems} />
                {tab === tabItems[0].key &&
                     <InsertModal />
                }
@@ -65,6 +83,9 @@ const Page = () => {
                     <InsertEnrollmentForm />
                }
                {tab === tabItems[2].key &&
+                    <InsertAdvisor />
+               }
+               {tab === tabItems[3].key &&
                     <InsertExcel
                          isFileFromREG={true}
                          startRow={5}
@@ -85,7 +106,7 @@ const Page = () => {
                          hook={insertStudentExcel}
                     />
                }
-               {tab === tabItems[3].key &&
+               {tab === tabItems[4].key &&
                     <InsertExcel
                          title={"เพิ่มการลงทะเบียนของนักศึกษาผ่านไฟล์ Exel"}
                          templateFileName={"enrollments_template"}
@@ -128,6 +149,33 @@ const Page = () => {
 
                          ]}
                          hook={insertEnrollmentExcel}
+                    />
+               }
+               {tab === tabItems[5].key &&
+                    <InsertExcel
+                         title={"เพิ่มรายชื่อนักศึกษาในที่ปรึกษาผ่านไฟล์ Exel"}
+                         templateFileName={"advisor_template"}
+                         headers={[
+                              {
+                                   groupTitle: "ข้อมูลนักศึกษา",
+                                   items: [
+                                        // นศ.
+                                        { required: true, label: "STUDENTNAME", desc: "ชื่อ" },
+                                        { required: true, label: "STUDENTSURNAME", desc: "นามสกุล" },
+                                   ]
+                              },
+                              {
+                                   groupTitle: "ข้อมูลอาจารย์ที่ปรึกษา",
+                                   items: [
+                                        // อาจารย์ที่ปรึกษา
+                                        { required: true, label: "OFFICERNAME", desc: "ชื่ออาจารย์ภาษาไทย" },
+                                        { required: true, label: "OFFICERSURNAME", desc: "นามสกุลอาจารย์ภาษาไทย" },
+                                   ]
+                              },
+
+
+                         ]}
+                         hook={insertAdvisorsExcel}
                     />
                }
           </div>

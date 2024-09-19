@@ -4,7 +4,7 @@ import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md'
 import dynamic from 'next/dynamic';
 const BarChart = dynamic(() => import('@/app/components/charts/ApexBarChart'), { ssr: false });
 
-const SummarizeCareer = ({ next, prev, data, prompt }) => {
+const SummarizeCareer = ({ next, prev, data }) => {
     const { careersScores, trackSummaries } = data;
     const option = useMemo(() => ({
         series: [{
@@ -41,7 +41,7 @@ const SummarizeCareer = ({ next, prev, data, prompt }) => {
                     style: {
                         fontSize: '12px',
                         colors: ['#333'],
-                        ...prompt.style
+                        
                     },
                 },
                 title: {
@@ -50,7 +50,7 @@ const SummarizeCareer = ({ next, prev, data, prompt }) => {
                         paddingTop: "10px",
                         fontSize: '10px',
                         colors: ['#333'],
-                        ...prompt.style
+                        
                     }
                 },
             },
@@ -61,7 +61,7 @@ const SummarizeCareer = ({ next, prev, data, prompt }) => {
                         paddingTop: "10px",
                         fontSize: '10px',
                         colors: ['#333'],
-                        ...prompt.style
+                        
                     }
                 },
             },
@@ -72,11 +72,11 @@ const SummarizeCareer = ({ next, prev, data, prompt }) => {
             <section className='bg-gray-100 min-h-screen p-8 rounded-sm'>
                 <section className='max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden'>
                     <header className="bg-blue-600 text-white p-6">
-                        <h1 className="text-3xl font-bold">ผลสรุปความชอบ</h1>
+                        <h1 className="text-3xl font-bold">ผลสรุปอาชีพ</h1>
                     </header>
                     <div className="p-6 space-y-6">
                         <section className='p-6 bg-blue-50 rounded-lg '>
-                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">อาชีพทั้งหม {careersScores?.length} อาชีพ</h2>
+                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">อาชีพที่เลือกทั้งหมด {careersScores?.length} อาชีพ ได้แก่</h2>
                             <div className="bg-white shadow overflow-auto rounded-lg">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">

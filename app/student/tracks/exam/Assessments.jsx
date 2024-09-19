@@ -103,7 +103,7 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
                          <MdKeyboardArrowLeft className="w-5 h-5" />
                          <div className="flex flex-col">
                               <span className="text-sm text-default-400">Step 1</span>
-                              <span className="text-base">แบบทดสอบ</span>
+                              <span className="text-base">คำถาม</span>
                          </div>
                     </div>
                     <div
@@ -112,7 +112,7 @@ const Assessments = ({ assessments, allAssessments, setAssessments, next, prev }
                     >
                          <div className="flex flex-col">
                               <span className="text-sm text-default-400">Step 3</span>
-                              <span className="text-base">ความชอบ</span>
+                              <span className="text-base">อาชีพ</span>
                          </div>
                          <MdKeyboardArrowRight className="w-5 h-5" />
                     </div>

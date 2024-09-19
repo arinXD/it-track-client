@@ -13,10 +13,8 @@ import { Button } from "@nextui-org/react";
 import SummarizeQuestions from "./SummarizeQuestions";
 import SummarizeAssessments from "./SummarizeAssessments";
 import SummarizeCareers from "./SummarizeCareers";
-import localFont from 'next/font/local'
-const prompt = localFont({ src: '../../../../public/fonts/Prompt-Regular.woff2' })
 
-const SuggestionForm = ({ form }) => {
+const SuggestionForm = ({ form, email }) => {
     const allQuestions = form?.Questions
     const allAssessments = form?.Assessments
     const allCareers = form?.Careers
@@ -26,20 +24,21 @@ const SuggestionForm = ({ form }) => {
     const [current, setCurrent] = useState(0)
     const [summarizing, setSummarizing] = useState(false);
     const [summarizeData, setsummarizeData] = useState({});
+    const [isSummarize, setIsSummarize] = useState(false);
     const steps = useMemo(() => ([
         {
-            title: Object.keys(summarizeData).length === 0 ? 'แบบทดสอบ' : 'ผลสรุปแบบทดสอบ',
+            title: 'คำถาม',
         },
         {
-            title: Object.keys(summarizeData).length === 0 ? 'แบบประเมิน' : 'ผลสรุปแบบประเมิน',
+            title: 'ความชอบ',
         },
         {
-            title: Object.keys(summarizeData).length === 0 ? 'ความชอบ' : 'ผลสรุปความชอบ',
+            title: 'อาชีพ',
         },
         {
-            title: Object.keys(summarizeData).length === 0 ? 'สรุปผล' : 'คำแนะนำ',
+            title: 'สรุปผล',
         },
-    ]), [Object.keys(summarizeData)])
+    ]), [isSummarize])
 
     const summarize = useMemo(() => ({
         questions: questions?.filter(q => q.aId).length === questions?.length,
@@ -86,12 +85,13 @@ const SuggestionForm = ({ form }) => {
             assessments,
             careers,
         }
-        const option = await getOptions("/api/suggestion-forms/summarize", "post", formData)
+        const option = await getOptions(`/api/suggestion-forms/summarize/${email}`, "post", formData)
         try {
             setSummarizing(true)
             const res = await axios(option)
             const data = res.data.data
             setsummarizeData(data)
+            setIsSummarize(true)
             setCurrent(0)
         } catch (error) {
             setsummarizeData({})
@@ -99,7 +99,7 @@ const SuggestionForm = ({ form }) => {
             setSummarizing(false)
             window.scrollTo(0, 750)
         }
-    }, [questions, assessments, careers])
+    }, [questions, assessments, careers, email])
 
     const resetForm = useCallback(() => {
         initForm()
@@ -114,7 +114,7 @@ const SuggestionForm = ({ form }) => {
     }, [current])
 
     return (
-        <div className={` px-12 pb-12 bg-[#F9F9F9]`}>
+        <div className={`px-12 pb-12 bg-[#F9F9F9]`}>
             {
                 Object.keys(form).length === 0 ?
                     <section className='text-center font-bold text-lg py-28'>
@@ -180,7 +180,6 @@ const SuggestionForm = ({ form }) => {
                                             <SummarizeQuestions
                                                 next={next}
                                                 data={summarizeData}
-                                                prompt={prompt}
                                             />
                                         </section>
                                         <section className={`w-full ${current === 1 ? "block" : "hidden"}`}>
@@ -188,7 +187,6 @@ const SuggestionForm = ({ form }) => {
                                                 next={next}
                                                 prev={prev}
                                                 data={summarizeData}
-                                                prompt={prompt}
                                             />
                                         </section>
                                         <section className={`w-full ${current === 2 ? "block" : "hidden"}`}>
@@ -196,13 +194,11 @@ const SuggestionForm = ({ form }) => {
                                                 next={next}
                                                 prev={prev}
                                                 data={summarizeData}
-                                                prompt={prompt}
                                             />
                                         </section>
                                         <section className={`w-full ${current === 3 ? "block" : "hidden"}`}>
                                             <SummaryResult
                                                 data={summarizeData}
-                                                prompt={prompt}
                                             />
                                         </section>
                                     </section>

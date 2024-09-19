@@ -1,14 +1,17 @@
 "use client"
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, Select, SelectItem, Pagination } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, Select, SelectItem, Pagination, Spinner } from "@nextui-org/react";
 import { Empty, message } from 'antd';
 import axios from 'axios';
 import { thinInputClass } from '@/src/util/ComponentClass';
 import { DeleteIcon, EditIcon2, PlusIcon } from '@/app/components/icons';
 import { simpleDMY } from '@/src/util/simpleDateFormatter';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
+import { useSession } from 'next-auth/react';
+import { swal } from '@/src/util/sweetyAlert';
+import Link from 'next/link';
 
-const UserTable = ({ }) => {
+const UserTable = ({ email }) => {
      const [filteredUsers, setFilteredUsers] = useState([]);
      const [searchTerm, setSearchTerm] = useState('');
      const [roleFilter, setRoleFilter] = useState('all');
@@ -16,20 +19,20 @@ const UserTable = ({ }) => {
      const [rowsPerPage, setRowsPerPage] = useState(10);
      const [newRole, setNewRole] = useState([]);
      const [users, setUsers] = useState([]);
-     const [fetching, setFetching] = useState(false);
+     const [fetching, setFetching] = useState(true);
 
      const getAllUsers = useCallback(async function () {
           setFetching(true)
           const option = await getOptions("/api/users", "get")
           try {
                const users = (await axios(option)).data.data
-               setUsers(users)
+               setUsers(users.filter(user => user.email !== email))
           } catch (error) {
                setUsers([])
           } finally {
                setFetching(false)
           }
-     }, [])
+     }, [email])
 
      useEffect(() => {
           getAllUsers()
@@ -60,13 +63,14 @@ const UserTable = ({ }) => {
           });
      }, []);
 
-     const handleUpdateRole = useCallback(async (id, role) => {
-          const option = await getOptions(`/api/users/${id}/role/${role}`, "patch")
+     const handleUpdateRole = useCallback(async (id, role, userEmail) => {
+          const data = { role, email: userEmail }
+          const option = await getOptions(`/api/users/${id}/role`, "patch", data)
           try {
                await axios(option)
                setNewRole(prev => prev.filter(item => item.id !== id));
                await getAllUsers()
-               // update newRole into filteredItems
+               message.success("แก้ไขโรลเรียบร้อย")
 
           } catch (error) {
                message.warning("ไม่สามารถแก้ไขโรลได่้")
@@ -134,11 +138,28 @@ const UserTable = ({ }) => {
           return filteredUsers.slice(start, end);
      }, [page, filteredUsers, rowsPerPage]);
 
+     const handleDelete = useCallback(async (id) => {
+          swal.fire({
+               text: `ต้องการลบบัญชีผู้ใช้หรือไม่ ?`,
+               icon: "question",
+               showCancelButton: true,
+               confirmButtonColor: "#3085d6",
+               cancelButtonColor: "#d33",
+               confirmButtonText: "ตกลง",
+               cancelButtonText: "ยกเลิก",
+               reverseButtons: true
+          }).then(async (result) => {
+               if (result.isConfirmed) {
+                    const options = await getOptions(`/api/users/${id}`, 'DELETE')
+                    await axios(options)
+                    await getAllUsers()
+                    message.success("ลบบัญชีผู้ใช้เรียบร้อย")
+               }
+          });
+     }, [])
+
      return (
           <div className="space-y-4 p-4">
-               {/* <div>
-                    {JSON.stringify(newRole)}
-               </div> */}
                <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
                     <h2 className="text-2xl font-bold">ตารางบัญชีผู้ใช้</h2>
                     <div className="flex space-x-4">
@@ -159,7 +180,7 @@ const UserTable = ({ }) => {
                               placeholder="Filter by role"
                               className="max-w-[150px]"
                               selectedKeys={[roleFilter]}
-                              onChange={(e) => handleRoleFilter(e.target.value)}
+                              onChange={(e) => handleRoleFilter(e.target.value || "all")}
                          >
                               <SelectItem key="all">ทั้งหมด</SelectItem>
                               <SelectItem key="admin">แอดมิน</SelectItem>
@@ -168,11 +189,13 @@ const UserTable = ({ }) => {
                               <SelectItem key="user">ผู้ใช้</SelectItem>
                          </Select>
                          <div>
-                              <Button
-                                   className='bg-[#edf8f7] text-[#46bcaa]'
-                                   startContent={<PlusIcon className="w-4 h-4" />}>
-                                   เพิ่มบัญชี
-                              </Button>
+                              <Link href={"/admin/users/create"}>
+                                   <Button
+                                        className='bg-[#edf8f7] text-[#46bcaa]'
+                                        startContent={<PlusIcon className="w-4 h-4" />}>
+                                        เพิ่มบัญชี
+                                   </Button>
+                              </Link>
                          </div>
                     </div>
                </div>
@@ -185,6 +208,7 @@ const UserTable = ({ }) => {
                          )}
                     </TableHeader>
                     <TableBody
+                         loadingContent={<Spinner />}
                          isLoading={fetching}
                          emptyContent={
                               <Empty
@@ -231,21 +255,12 @@ const UserTable = ({ }) => {
                                                   size="sm"
                                                   color="primary"
                                                   isDisabled={!user.newRole && user.newRole !== user.role}
-                                                  onClick={() => handleUpdateRole(user.id, user.newRole)}
+                                                  onClick={() => handleUpdateRole(user.id, user.newRole, user.email)}
                                              >
                                                   เปลี่ยนโรล
                                              </Button>
                                              <Button
-                                                  size='sm'
-                                                  color='warning'
-                                                  isIconOnly
-                                                  aria-label="แก้ไข"
-                                                  className='p-2'
-                                             >
-                                                  <EditIcon2 className="w-5 h-5 text-yellow-600" />
-                                             </Button>
-                                             <Button
-                                                  onClick={() => { }}
+                                                  onClick={() => handleDelete(user.id)}
                                                   size='sm'
                                                   color='danger'
                                                   isIconOnly
@@ -271,7 +286,7 @@ const UserTable = ({ }) => {
                               size="sm"
                               className="w-[130px]"
                               selectedKeys={[rowsPerPage.toString()]}
-                              onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                              onChange={(e) => setRowsPerPage(Number(e.target.value) || 5)}
                          >
                               <SelectItem key="5">5 per page</SelectItem>
                               <SelectItem key="10">10 per page</SelectItem>

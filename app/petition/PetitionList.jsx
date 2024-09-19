@@ -3,7 +3,7 @@
 import { Checkbox, message } from "antd"
 import Petitionbar from "./Petitionbar"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Button } from "@nextui-org/react"
+import { Button, Spinner } from "@nextui-org/react"
 import { simpleDM } from "@/src/util/simpleDateFormatter"
 import Link from "next/link"
 import { getOptions } from "../components/serverAction/TokenAction"
@@ -124,7 +124,7 @@ const PetitionList = ({
                          </div>
                          {pending || fetching ? (
                               <div className="flex justify-center items-center h-64">
-                                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+                                   <Spinner />
                               </div>
                          ) : (
                               <ul className="divide-y divide-gray-200">

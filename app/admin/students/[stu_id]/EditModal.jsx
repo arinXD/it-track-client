@@ -197,10 +197,7 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
             showToastMessage(ok, message)
             const url = new URL(window.location.href)
             url.search = ""
-            setTimeout(() => {
-                window.location.href = url
-            }, 1500)
-            // getStudentData()
+            window.location.href = url
         } catch (error) {
             console.error(error);
             const { ok, message } = error?.response?.data

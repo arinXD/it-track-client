@@ -220,7 +220,7 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                                         {
                                             filteredItems?.length > 0 ?
                                                 filteredItems.map((q, index) => (
-                                                    <div className="first-of-type:mt-4 last-of-type:mb-4 my-2">
+                                                    <div key={index} className="first-of-type:mt-4 last-of-type:mb-4 my-2">
                                                         <Checkbox
                                                             onChange={(e) => selectQuestion(e, q.id)}
                                                             key={index}

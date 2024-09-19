@@ -3,7 +3,7 @@ import { Table } from 'antd';
 import { useMemo } from 'react';
 import { Chip } from "@nextui-org/chip";
 
-const StudentTable = ({ studentsData }) => {
+const StudentTable = ({ studentsData, trackColors }) => {
      const columns = useMemo(() => ([
           {
                title: 'รหัสนักศึกษา',
@@ -41,18 +41,24 @@ const StudentTable = ({ studentsData }) => {
                key: 'result',
                align: 'center',
                dataIndex: 'result',
-               render: (text) => (
-                    <setion className="w-full flex justify-center">
-                         <Chip
-                              className=''
-                              color={`${text?.toLowerCase() == "bit" ? "primary" : text?.toLowerCase() == "network" ? "secondary" : "success"}`}
-                              variant="flat">
-                              {text?.split(" ")[0] || '?'}
-                         </Chip>
-                    </setion>
-               ),
+               render: (text) => {
+                    const track = text?.split(" ")[0].toLowerCase()
+                    const trackColor = trackColors.filter(t => t.track === track)[0].color
+                    return (
+                         <setion className="w-full flex justify-center">
+                              <Chip
+                                   style={{
+                                        backgroundColor: trackColor.bg,
+                                        color: 'white'
+                                   }}
+                                   variant="flat">
+                                   {text?.split(" ")[0] || '?'}
+                              </Chip>
+                         </setion>
+                    )
+               },
           },
-     ]), [])
+     ]), [trackColors])
 
      return (
           <section className='h-[300px]' >

@@ -1,7 +1,7 @@
 "use client"
 import { inputClass } from "@/src/util/ComponentClass";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from "@nextui-org/react";
-import { useCallback, useEffect, useState } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem } from "@nextui-org/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { BsFillImageFill } from "react-icons/bs";
 import { UploadOutlined } from '@ant-design/icons';
 import { GoPaperclip } from "react-icons/go";
@@ -11,14 +11,13 @@ import { Image, message } from "antd";
 import { getToken } from "@/app/components/serverAction/TokenAction";
 import { hostname } from "@/app/api/hostname";
 
-const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName, tid }) => {
+const EditTeacherModal = ({ isOpen, onClose, teacher, fn }) => {
     const [uploadImageFile, setUploadImageFile] = useState({});
-    const [previewImage, setPreviewImage] = useState(src)
-    const [teacherName, setTeacherName] = useState(editName);
+    const [previewImage, setPreviewImage] = useState("")
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [editing, setEditing] = useState(false);
 
-    useEffect(() => setTeacherName(editName), [editName])
-    useEffect(() => setPreviewImage(src), [src])
+    useEffect(() => setPreviewImage(teacher?.TeacherTrack?.image), [teacher])
 
     const handleUpload = useCallback(e => {
         const file = e.target.files?.[0]
@@ -40,9 +39,9 @@ const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName, ti
         if (uploadImageFile instanceof Blob || uploadImageFile instanceof File) {
             setPreviewImage(URL.createObjectURL(uploadImageFile));
         } else {
-            setPreviewImage(src)
+            setPreviewImage(teacher?.TeacherTrack?.image)
         }
-    }, [uploadImageFile]);
+    }, [uploadImageFile, teacher]);
 
     const closeForm = useCallback(() => {
         document.querySelector("#image").value = ""
@@ -54,9 +53,10 @@ const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName, ti
 
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault()
+        setEditing(true)
         const formData = new FormData(e.target);
         const formDataObject = Object.fromEntries(formData.entries());
-        let URL = `/api/teachers/tracks/${tid}`
+        let URL = `/api/teachers/tracks/${teacher.id}`
         const token = await getToken()
         let headers = {
             'authorization': `${token}`,
@@ -79,15 +79,17 @@ const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName, ti
                     }
                 }
             });
-            await getTeachers()
+            await fn()
             closeForm()
             message.success("เพิ่มข้อมูลสำเร็จ")
         } catch (error) {
             console.log(error);
             message.error("เพิ่มข้อมูลไม่สำเร็จ")
+        } finally {
+            setEditing(false)
         }
 
-    }, [uploadImageFile, tid])
+    }, [uploadImageFile, teacher])
     return (
         <>
             <Modal
@@ -120,21 +122,11 @@ const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName, ti
                                                 </div>
                                         }
                                     </div>
-                                    <div className="w-1/2 flex flex-col">
-                                        <Input
-                                            name='teacherName'
-                                            type="text"
-                                            variant="bordered"
-                                            radius='sm'
-                                            label="ชื่ออาจารย์"
-                                            labelPlacement="outside"
-                                            placeholder="กรอกชื่ออาจารย์"
-                                            value={teacherName}
-                                            onValueChange={setTeacherName}
-                                            classNames={inputClass}
-                                            className='mb-4'
-                                            isRequired
-                                        />
+                                    <div className="w-1/2 flex gap-4 flex-col">
+                                        <div>
+                                            <p className="text-xs">อาจารย์</p>
+                                            <p className="text-lg">{`${teacher?.prefix || ""}${teacher?.name} ${teacher?.surname || ""}`}</p>
+                                        </div>
                                         <div className='flex flex-col justify-center items-start'>
                                             <span className="text-sm mb-2">อัพโหลดไฟล์รูปภาพ [ jpeg, jpg, png ]</span>
                                             <label className="w-fit hover:border-blue-500 hover:text-blue-500 transition duration-75 cursor-pointer border-1 border-default-300 rounded-md px-3.5 py-1 text-default-700">
@@ -193,10 +185,12 @@ const EditTeacherModal = ({ isOpen, onClose, src = "", getTeachers, editName, ti
                                     ยกเลิก
                                 </Button>
                                 <Button
+                                    isDisabled={editing || !(uploadImageFile instanceof Blob || uploadImageFile instanceof File)}
+                                    isLoading={editing}
                                     radius="sm"
                                     type="submit"
                                     color="primary">
-                                    แก้ไข
+                                    {editing ? "บันทึก..." : "บันทึก"}
                                 </Button>
                             </ModalFooter>
                         </form>

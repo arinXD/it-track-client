@@ -1,12 +1,19 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { Form, Input, Switch, message, Image } from 'antd';
 import { Button } from '@nextui-org/react';
 import { UploadOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { hostname } from '@/app/api/hostname';
+import dynamic from 'next/dynamic';
+import 'react-quill/dist/quill.snow.css';
+
+const ReactQuill = dynamic(() => import('react-quill'), {
+     ssr: false,
+     loading: () => <p>Loading editor...</p>,
+});
 
 const { TextArea } = Input;
 const CreateNews = () => {
@@ -14,6 +21,20 @@ const CreateNews = () => {
      const [loading, setLoading] = useState(false);
      const [imageFile, setImageFile] = useState(null);
      const [newImagePreview, setNewImagePreview] = useState('');
+     const [editorContent, setEditorContent] = useState('');
+     const quillRef = useRef();
+
+     const modules = useMemo(() => ({
+          toolbar: {
+               container: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+               ],
+          }
+     }), []);
 
      useEffect(() => {
           form.setFieldsValue({
@@ -103,13 +124,27 @@ const CreateNews = () => {
                     >
                          <TextArea rows={5} />
                     </Form.Item>
+                    <Form.Item
+                         name="detail"
+                         label="เนื้อหาข่าว"
+                         rules={[{ required: true, message: 'Please input the detail!' }]}
+                    >
+                         <ReactQuill
+                              ref={quillRef}
+                              theme="snow"
+                              value={editorContent}
+                              onChange={(content, delta, source, editor) => {
+                                   setEditorContent(content);
+                                   form.setFieldsValue({ detail: content });
+                              }}
+                              modules={modules}
+                              style={{ height: '300px', marginBottom: '50px' }}
+                         />
+                    </Form.Item>
                     <div className='flex items-center gap-4 mb-6'>
                          <p>สถานะการเผยแพร่</p>
                          <Form.Item className='mb-0' name="published" valuePropName="checked">
-                              <Switch style={{
-
-                              }} />
-
+                              <Switch />
                          </Form.Item>
                     </div>
                     {newImagePreview && (

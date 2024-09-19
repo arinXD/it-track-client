@@ -19,6 +19,9 @@ const TeacherTrack = ({ track }) => {
     const [selectedTeachers, setSelectedTeachers] = useState([])
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isOpenEdit, onOpen: onOpenEdit, onClose: onCloseEdit } = useDisclosure();
+    const [emptyTeachers, setEmptyTeachers] = useState([]);
+
+    const [teacherEditData, setTeacherEditData] = useState({});
 
     // Paging
     const pages = useMemo(() => (Math.ceil(teachers.length / rowsPerPage)), [teachers, rowsPerPage]);
@@ -29,6 +32,16 @@ const TeacherTrack = ({ track }) => {
 
         return teachers.slice(start, end);
     }, [page, teachers, rowsPerPage]);
+
+    const getEmptyTeachers = useCallback(async () => {
+        const option = await getOptions("/api/teachers/tracks/empty/teachers", "get")
+        try {
+            const data = (await axios(option)).data?.data
+            setEmptyTeachers(data)
+        } catch (error) {
+            setEmptyTeachers([])
+        }
+    }, [])
 
     const getTeachers = useCallback(async () => {
         setFetching(true)
@@ -46,52 +59,19 @@ const TeacherTrack = ({ track }) => {
 
     }, [])
 
-    // Pagination handle
-    const onNextPage = useCallback(() => {
-        if (page < pages) {
-            setPage(page + 1);
-        }
-    }, [page, pages]);
-
-    const onPreviousPage = useCallback(() => {
-        if (page > 1) {
-            setPage(page - 1);
-        }
-    }, [page]);
-
-    const bottomContent = useMemo(() => {
-        return (
-            teachers?.length > 0 ?
-                <div className="w-full py-2 px-2 flex justify-between items-center">
-                    <span className="w-[30%] text-small text-default-400">
-                        {selectedKeys === "all"
-                            ? "เลือกทั้งหมด"
-                            : `เลือก ${selectedKeys.size || 0} ใน ${teachers.length}`}
-                    </span>
-                    <Pagination
-                        isCompact
-                        showControls
-                        showShadow
-                        color="primary"
-                        page={page}
-                        total={pages}
-                        onChange={setPage}
-                    />
-                </div>
-                :
-                undefined
-        );
-    }, [selectedKeys, teachers, page, pages]);
+    const initData = useCallback(async () => {
+        await Promise.all([getTeachers(), getEmptyTeachers()])
+    }, [])
 
     useEffect(() => {
-        getTeachers()
+        initData()
     }, [])
 
     // Multiple deleted
     useEffect(() => {
         let teacher
         if (selectedKeys == "all") {
-            teacher = items.map(e => e.id)
+            teacher = items.map(e => e?.TeacherTrack?.id)
             setDisableSelectDelete(false)
         } else {
             teacher = [...selectedKeys.values()].map(id => parseInt(id))
@@ -128,7 +108,7 @@ const TeacherTrack = ({ track }) => {
             const option = await getOptions(URL, "DELETE", selectedTeachers)
             try {
                 await axios(option)
-                getTeachers()
+                await initData()
                 message.success("ลบข้อมูลสำเร็จ")
             } catch (error) {
                 console.log(error);
@@ -139,30 +119,47 @@ const TeacherTrack = ({ track }) => {
         }
     }, [])
 
-    const [tid, setTid] = useState(0);
-    const [editName, setEditName] = useState("");
-    const [editImage, setEditImage] = useState("");
-
-    const handleEditTeacher = useCallback((tid, teacherName, image) => {
-        setTid(tid)
-        setEditName(teacherName)
-        setEditImage(image)
+    const handleEditTeacher = useCallback((teacherData) => {
+        setTeacherEditData(teacherData)
         onOpenEdit()
     }, [])
+
+    const bottomContent = useMemo(() => {
+        return (
+            teachers?.length > 0 ?
+                <div className="w-full py-2 px-2 flex justify-between items-center">
+                    <span className="w-[30%] text-small text-default-400">
+                        {selectedKeys === "all"
+                            ? "เลือกทั้งหมด"
+                            : `เลือก ${selectedKeys.size || 0} ใน ${teachers.length}`}
+                    </span>
+                    <Pagination
+                        isCompact
+                        showControls
+                        showShadow
+                        color="primary"
+                        page={page}
+                        total={pages}
+                        onChange={setPage}
+                    />
+                </div>
+                :
+                undefined
+        );
+    }, [selectedKeys, teachers, page, pages]);
 
     return (
         <div className="border-1 p-4 rounded-[10px] h-full w-full">
             <InsertTeacherModal
-                getTeachers={getTeachers}
+                emptyTeachers={emptyTeachers}
+                fn={initData}
                 track={track}
                 isOpen={isOpen}
                 onClose={onClose} />
 
             <EditTeacherModal
-                tid={tid}
-                editName={editName}
-                src={editImage}
-                getTeachers={getTeachers}
+                teacher={teacherEditData}
+                fn={initData}
                 isOpen={isOpenEdit}
                 onClose={onCloseEdit} />
 
@@ -205,9 +202,6 @@ const TeacherTrack = ({ track }) => {
                                     wrapper: "after:bg-blue-500 after:text-background text-background",
                                 },
                             }}
-                            // bottomContent={bottomContent}
-                            // bottomContentPlacement="outside"
-
                             isCompact
                             removeWrapper
                             selectionMode="multiple"
@@ -217,7 +211,6 @@ const TeacherTrack = ({ track }) => {
                             onRowAction={() => { }}
                         >
                             <TableHeader>
-                                <TableColumn style={{ display: "none" }}>ID</TableColumn>
                                 <TableColumn className="w-1/2 text-center">รูป</TableColumn>
                                 <TableColumn className="w-1/2">ชื่ออาจารย์</TableColumn>
                                 <TableColumn align="center" className="w-1/2">Actions</TableColumn>
@@ -232,23 +225,19 @@ const TeacherTrack = ({ track }) => {
                                 }
                                 items={items}>
                                 {(item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell style={{ display: "none" }}>{item.id}</TableCell>
+                                    <TableRow key={item?.TeacherTrack?.id}>
                                         <TableCell>
                                             <div className="w-full flex justify-center p-2">
                                                 <Image
                                                     width={80}
                                                     height={80}
-                                                    src={item.image}
-                                                    onError={({ currentTarget }) => {
-                                                        currentTarget.onerror = null
-                                                        currentTarget.src = "/image/user.png";
-                                                    }}
+                                                    src={item?.TeacherTrack?.image || ""}
+                                                    fallback="/image/error_image.png"
                                                     className="rounded-full border border-gray-200"
-                                                    alt={item.teacherName} />
+                                                    alt={item.name} />
                                             </div>
                                         </TableCell>
-                                        <TableCell>{item.teacherName}</TableCell>
+                                        <TableCell>{item.prefix}{item.name} {item.surname}</TableCell>
                                         <TableCell>
                                             <div className="flex justify-center items-center">
                                                 <Tooltip content="แก้ไข">
@@ -257,7 +246,7 @@ const TeacherTrack = ({ track }) => {
                                                         radius="sm"
                                                         isIconOnly
                                                         color='warning'
-                                                        onClick={() => handleEditTeacher(item.id, item.teacherName, item.image)}
+                                                        onClick={() => handleEditTeacher(item)}
                                                         aria-label="Edit">
                                                         <EditIcon2 className="w-5 h-5 text-yellow-600" />
                                                     </Button>
@@ -268,9 +257,9 @@ const TeacherTrack = ({ track }) => {
                                 )}
                             </TableBody>
                         </Table>
-                        {bottomContent}
                     </div>
             }
+            {bottomContent}
         </div>
     )
 }

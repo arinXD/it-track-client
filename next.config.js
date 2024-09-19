@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    compiler: {
+        styledComponents: true,
+    },
+    experimental: {
+        missingSuspenseWithCSRBailout: false,
+    },
     reactStrictMode: false,
     images: {
         unoptimized: true,
@@ -15,12 +21,12 @@ const nextConfig = {
             },
             {
                 protocol: "http",
-                port:"4000",
+                port: "4000",
                 hostname: "localhost",
             },
             {
                 protocol: "http",
-                port:"3000",
+                port: "3000",
                 hostname: "*.localhost",
             },
         ],

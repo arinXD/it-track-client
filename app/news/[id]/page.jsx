@@ -1,4 +1,4 @@
-import SidebarDrawer from "@/app/components/SidebarDrawer"
+import NavbarDrawer from "@/app/components/NavbarDrawer"
 import News from "./News"
 import axios from "axios"
 import { getOptions } from "@/app/components/serverAction/TokenAction"
@@ -32,8 +32,8 @@ const Page = async ({ params }) => {
      }
      return (
           <section>
-               <div className="min-h-screen bg-gray-100">
-                    <SidebarDrawer />
+               <div className="min-h-screen bg-gray-100 pb-10">
+                    <NavbarDrawer />
                     <div className="pt-16">
                          <News
                               news={news}

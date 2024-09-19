@@ -4,7 +4,7 @@ import { MdKeyboardArrowRight } from 'react-icons/md'
 import dynamic from 'next/dynamic';
 const BarChart = dynamic(() => import('@/app/components/charts/ApexBarChart'), { ssr: false });
 
-const SummarizeQuestions = ({ next, data, prompt }) => {
+const SummarizeQuestions = ({ next, data }) => {
     const { questionScores, totalQuestionScore, totalCorrectAnswers, totalQuestions, overallCorrectPercentage, trackSummaries } = data;
     const option = useMemo(() => ({
         series: [{
@@ -41,7 +41,7 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
                     style: {
                         fontSize: '12px',
                         colors: ['#333'],
-                        ...prompt.style
+                        
                     },
                 },
                 title: {
@@ -50,7 +50,7 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
                         paddingTop: "10px",
                         fontSize: '10px',
                         colors: ['#333'],
-                        ...prompt.style
+                        
                     }
                 },
             },
@@ -61,7 +61,7 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
                         paddingTop: "10px",
                         fontSize: '10px',
                         colors: ['#333'],
-                        ...prompt.style
+                        
                     }
                 },
             },
@@ -73,11 +73,11 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
             <section className='bg-gray-100 min-h-screen p-8 rounded-sm'>
                 <section className='max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden'>
                     <header className="bg-blue-600 text-white p-6">
-                        <h1 className="text-3xl font-bold">ผลสรุปแบบทดสอบ</h1>
+                        <h1 className="text-3xl font-bold">ผลสรุปการตอบคำถาม</h1>
                     </header>
                     <div className="p-6 space-y-6">
                         <section className="bg-blue-50 p-4 rounded-lg">
-                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">การทำแบบทดสอบ</h2>
+                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">การตอบคำถาม</h2>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-white p-3 rounded shadow">
                                     <p className="text-xs text-gray-600 mb-1">คำถามทั้งหมด</p>
@@ -99,8 +99,7 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
                         </section>
 
                         <section className='p-6 bg-blue-50 rounded-lg '>
-                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">แบบทดสอบทั้งหมด
-                            </h2>
+                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">คำถามทั้งหมด</h2>
                             <div className="bg-white shadow overflow-auto rounded-lg">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
@@ -164,7 +163,7 @@ const SummarizeQuestions = ({ next, data, prompt }) => {
                 >
                     <div className="flex flex-col">
                         <span className="text-sm text-default-400">Step 2</span>
-                        <span className="text-base">ผลสรุปแบบประเมิน</span>
+                        <span className="text-base">ผลสรุปความชอบ</span>
                     </div>
                     <MdKeyboardArrowRight className="w-5 h-5" />
                 </div>
