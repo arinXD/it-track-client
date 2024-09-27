@@ -15,12 +15,12 @@ const Page = () => {
      const tab = searchParams.get('tab')
 
      const tabItems = [
-          { key: "student-form", label: "เพิ่มรายชื่อนักศึกษา", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
-          { key: "enroll-form", label: "เพิ่มรายวิชาที่ลงทะเบียน", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
-          { key: "advisor-form", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <SiGoogleforms className="w-4 h-4 text-gray-600" /> },
-          { key: "student-sheet", label: "เพิ่มรายชื่อนักศึกษา", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
-          { key: "enroll-sheet", label: "เพิ่มรายวิชาที่ลงทะเบียน", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
-          { key: "advisor-sheet", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <RiFileExcel2Fill className="w-4 h-4 text-gray-600" /> },
+          { key: "student-form", label: "เพิ่มรายชื่อนักศึกษา", icon: <SiGoogleforms className="w-4 h-4 text-blue-600" /> },
+          { key: "enroll-form", label: "เพิ่มรายวิชาที่ลงทะเบียน", icon: <SiGoogleforms className="w-4 h-4 text-blue-600" /> },
+          { key: "advisor-form", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <SiGoogleforms className="w-4 h-4 text-blue-600" /> },
+          { key: "student-sheet", label: "เพิ่มรายชื่อนักศึกษา", icon: <RiFileExcel2Fill className="w-4 h-4 text-green-600" /> },
+          { key: "enroll-sheet", label: "เพิ่มรายวิชาที่ลงทะเบียน", icon: <RiFileExcel2Fill className="w-4 h-4 text-green-600" /> },
+          { key: "advisor-sheet", label: "เพิ่มรายชื่อนักศึกษาในที่ปรึกษา", icon: <RiFileExcel2Fill className="w-4 h-4 text-green-600" /> },
      ]
 
      const insertStudentExcel = useCallback(async function (formattedData) {

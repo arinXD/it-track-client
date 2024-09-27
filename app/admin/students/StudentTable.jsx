@@ -441,7 +441,7 @@ const StudentTable = () => {
                                              href="students/create?tab=student-form"
                                              key="add-student"
                                              description="แบบฟอร์ม"
-                                             startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
+                                             startContent={<SiGoogleforms className="w-5 h-5 text-blue-600" />}
                                         >
                                              เพิ่มรายชื่อนักศึกษา
                                         </DropdownItem>
@@ -449,7 +449,7 @@ const StudentTable = () => {
                                              href="students/create?tab=enroll-form"
                                              key="add-enrollment"
                                              description="แบบฟอร์ม"
-                                             startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
+                                             startContent={<SiGoogleforms className="w-5 h-5 text-blue-600" />}
                                         >
                                              เพิ่มรายวิชาที่ลงทะเบียน
                                         </DropdownItem>
@@ -457,7 +457,7 @@ const StudentTable = () => {
                                              href="students/create?tab=advisor-form"
                                              key="add-advisor-form"
                                              description="แบบฟอร์ม"
-                                             startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
+                                             startContent={<SiGoogleforms className="w-5 h-5 text-blue-600" />}
                                         >
                                              เพิ่มรายชื่อนักศึกษาในที่ปรึกษา
                                         </DropdownItem>

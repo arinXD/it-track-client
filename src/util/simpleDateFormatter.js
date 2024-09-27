@@ -1,4 +1,3 @@
-"use client"
 import { format } from 'date-fns';
 
 const months = {
@@ -73,6 +72,9 @@ export function simpleDMYHM(date) {
      return `${day} ${thaiMonth} ${year} ${hours}:${minutes} น.`;
 }
 export function simpleDMY(date) {
+     if(!date) return ""
+     console.log(date);
+     
      const { day, thaiMonth, year } = getDateProperty(date)
      return `${day} ${thaiMonth} ${year}`;
 }

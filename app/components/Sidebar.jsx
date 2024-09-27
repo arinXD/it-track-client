@@ -43,6 +43,13 @@ const Sidebar = () => {
             condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
         },
         {
+            href: "/student/verify",
+            activeIcon: <HiAcademicCap className="w-5 h-5" />,
+            icon: <HiOutlineAcademicCap className="w-5 h-5" />,
+            label: "ตรวจสอบสำเร็จการศึกษา",
+            condition: session?.user?.role === "student"
+        },
+        {
             href: "/tracks",
             activeIcon: <HiUserGroup className="w-5 h-5" />,
             icon: <HiOutlineUserGroup className="w-5 h-5" />,
@@ -63,13 +70,6 @@ const Sidebar = () => {
             label: "แนะนำแทร็ก",
             condition: true
         },
-        {
-            href: "/student/verify",
-            activeIcon: <HiAcademicCap className="w-5 h-5" />,
-            icon: <HiOutlineAcademicCap className="w-5 h-5" />,
-            label: "ตรวจสอบสำเร็จการศึกษา",
-            condition: session?.user?.role === "student"
-        }
     ]), [session])
 
     return (

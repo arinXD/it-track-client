@@ -38,15 +38,15 @@ const Navbar = () => {
             href: "/admin",
             activeIcon: <MdAdminPanelSettings className="w-5 h-5 text-white" />,
             icon: <MdOutlineAdminPanelSettings className="w-5 h-5" />,
-            label: "Admin Panel",
+            label: session?.user?.role === "admin" ? "Admin Panel" : "Teacher Panel",
             condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
         },
         {
-            href: "/dashboard",
-            activeIcon: <Icon icon="mingcute:chart-pie-2-fill" className="w-5 h-5 text-white" />,
-            icon: <Icon icon="mingcute:chart-pie-2-line" className="w-5 h-5" />,
-            label: "Dashboard",
-            condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
+            href: "/student/verify",
+            activeIcon: <HiAcademicCap className="w-5 h-5" />,
+            icon: <HiOutlineAcademicCap className="w-5 h-5" />,
+            label: "ตรวจสอบสำเร็จการศึกษา",
+            condition: session?.user?.role === "student"
         },
         {
             href: "/tracks",
@@ -69,13 +69,6 @@ const Navbar = () => {
             label: "แนะนำแทร็ก",
             condition: true
         },
-        {
-            href: "/student/verify",
-            activeIcon: <HiAcademicCap className="w-5 h-5" />,
-            icon: <HiOutlineAcademicCap className="w-5 h-5" />,
-            label: "ตรวจสอบสำเร็จการศึกษา",
-            condition: true
-        }
     ], [session]);
 
     const navstupid = useCallback(function () {
@@ -147,16 +140,14 @@ const Navbar = () => {
                                         <span>ข้อมูลของฉัน</span>
                                     </div>
                                 </DropdownItem>
-                                {session?.user?.role === "student" &&
-                                    <DropdownItem href='/summary-history' key="summary-history">
-                                        <div className='flex gap-3 items-center'>
-                                            <div className='w-5 h-5 flex items-center justify-center'>
-                                                <FaHistory className='w-4 h-4' />
-                                            </div>
-                                            <span>ประวัติการแนะนำแทร็ก</span>
+                                <DropdownItem href='/summary-history' key="summary-history">
+                                    <div className='flex gap-3 items-center'>
+                                        <div className='w-5 h-5 flex items-center justify-center'>
+                                            <FaHistory className='w-4 h-4' />
                                         </div>
-                                    </DropdownItem>
-                                }
+                                        <span>ประวัติการแนะนำแทร็ก</span>
+                                    </div>
+                                </DropdownItem>
                                 {session?.user?.role === "student" &&
                                     <DropdownItem href='/petition/request' key="write_petition">
                                         <div className='flex gap-3 items-center'>

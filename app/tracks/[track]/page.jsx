@@ -64,6 +64,9 @@ const Page = async ({ params }) => {
                         <CoverImage track={trackData} />
                         <TrackSection>
                             <BreadCrumb />
+                            <section className=''>
+                                {trackData?.information}
+                            </section>
                             <TeacherList teachers={teachers} />
                             <SubjectList
                                 track={trackData}

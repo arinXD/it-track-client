@@ -17,6 +17,7 @@ import "./style.css"
 const UserProfile = ({ userData, tracks }) => {
      const { email, username, role, sign_in_type, createdAt, Student, Teacher, Admin } = userData;
      const [teacherTrack, setTeacherTrack] = useState(Teacher?.TeacherTrack?.track || "");
+     const [submiting, setSubmiting] = useState(false);
 
      const columns = [
           {
@@ -63,7 +64,9 @@ const UserProfile = ({ userData, tracks }) => {
      const handleEdit = async function (e) {
           e.preventDefault();
           const formData = new FormData(e.target)
+          setSubmiting(true)
           const { ok, message: msg } = await updateTeacherData(formData)
+          setSubmiting(false)
           if (ok) {
                message.success(msg)
           } else {
@@ -101,7 +104,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                        {capitalize(sign_in_type)}
                                                   </Chip>
                                              </Tooltip>
-                                             <Tooltip color="foreground" content="โรล" className='rounded-[5px]'>
+                                             <Tooltip color="foreground" content="ประเภทบัญชี" className='rounded-[5px]'>
                                                   <Chip size="sm" className={`${restoreColor.color} border-1 border-[#4d69fa] cursor-pointer rounded-[5px]`}>
                                                        {capitalize(role)}
                                                   </Chip>
@@ -156,10 +159,11 @@ const UserProfile = ({ userData, tracks }) => {
                                         <Input
                                              classNames={{
                                                   label: "text-black/50 text-[.9em]",
-                                                  inputWrapper: ["rounded-md", "p-2"],
+                                                  inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                   input: "text-[1em]"
                                              }}
                                              className='w-full text-sm col-span-1'
+                                             variant="bordered"
                                              type="text"
                                              label="คำนำหน้า"
                                              name='prefix'
@@ -169,10 +173,11 @@ const UserProfile = ({ userData, tracks }) => {
                                         <Input
                                              classNames={{
                                                   label: "text-black/50 text-[.9em]",
-                                                  inputWrapper: ["rounded-md", "p-2"],
+                                                  inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                   input: "text-[1em]"
                                              }}
                                              className='w-full text-sm col-span-2'
+                                             variant="bordered"
                                              type="text"
                                              name='name'
                                              label="ชื่อ"
@@ -182,10 +187,11 @@ const UserProfile = ({ userData, tracks }) => {
                                         <Input
                                              classNames={{
                                                   label: "text-black/50 text-[.9em]",
-                                                  inputWrapper: ["rounded-md", "p-2"],
+                                                  inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                   input: "text-[1em]"
                                              }}
                                              className='w-full text-sm col-span-2'
+                                             variant="bordered"
                                              type="text"
                                              label="นามสกุล"
                                              name='surname'
@@ -195,6 +201,8 @@ const UserProfile = ({ userData, tracks }) => {
                                    </div>
                                    <div className="mt-4 flex justify-start">
                                         <Button
+                                             isLoading={submiting}
+                                             isDisabled={submiting}
                                              type="submit"
                                              size='md'
                                              color='primary'
@@ -223,10 +231,11 @@ const UserProfile = ({ userData, tracks }) => {
                                              <Input
                                                   classNames={{
                                                        label: "text-black/50 text-[.9em]",
-                                                       inputWrapper: ["rounded-md", "p-2"],
+                                                       inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                        input: "text-[1em]"
                                                   }}
                                                   className='w-full text-sm col-span-1'
+                                                  variant="bordered"
                                                   type="text"
                                                   label="คำนำหน้า"
                                                   name='prefix'
@@ -236,10 +245,11 @@ const UserProfile = ({ userData, tracks }) => {
                                              <Input
                                                   classNames={{
                                                        label: "text-black/50 text-[.9em]",
-                                                       inputWrapper: ["rounded-md", "p-2"],
+                                                       inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                        input: "text-[1em]"
                                                   }}
                                                   className='w-full text-sm col-span-2'
+                                                  variant="bordered"
                                                   type="text"
                                                   name='name'
                                                   label="ชื่อ"
@@ -249,10 +259,11 @@ const UserProfile = ({ userData, tracks }) => {
                                              <Input
                                                   classNames={{
                                                        label: "text-black/50 text-[.9em]",
-                                                       inputWrapper: ["rounded-md", "p-2"],
+                                                       inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                        input: "text-[1em]"
                                                   }}
                                                   className='w-full text-sm col-span-2'
+                                                  variant="bordered"
                                                   type="text"
                                                   label="นามสกุล"
                                                   name='surname'
@@ -264,10 +275,10 @@ const UserProfile = ({ userData, tracks }) => {
                                                        classNames={{
                                                             value: "!text-black",
                                                             label: "!text-xs !text-black",
-                                                            trigger: "border-0 h-10 !text-xs rounded-md bg-gray-100 !text-black",
+                                                            trigger: "border-1 h-10 !text-xs rounded-md !text-black",
                                                        }}
                                                        name='track'
-                                                       variant="bordered"
+                                                       variant={"bordered"}
                                                        placeholder="เลือกแทร็ก"
                                                        label="แทร็ก"
                                                        labelPlacement="outside"
@@ -286,6 +297,8 @@ const UserProfile = ({ userData, tracks }) => {
                                    </div>
                                    <div className="mt-4 flex justify-start">
                                         <Button
+                                             isLoading={submiting}
+                                             isDisabled={submiting}
                                              type="submit"
                                              size='md'
                                              color='primary'
@@ -384,6 +397,22 @@ const UserProfile = ({ userData, tracks }) => {
                                              type="text"
                                              label="แทร็ก"
                                              value={Student.track || "ยังไม่มีแทร็ก"}
+                                             isReadOnly
+                                             labelPlacement="outside"
+                                        />
+                                   }
+                                   {
+                                        Student.Advisor &&
+                                        <Input
+                                             classNames={{
+                                                  label: "text-black/50 text-[.9em]",
+                                                  inputWrapper: ["rounded-none", "p-2"],
+                                                  input: "text-[1em]"
+                                             }}
+                                             className='w-full text-sm col-span-2'
+                                             type="text"
+                                             label="อาจารย์ที่ปรึกษา"
+                                             value={`${Student.Advisor.prefix || ""}${Student.Advisor.name || ""}${Student.Advisor.surname ? " " + Student.Advisor.surname : ""}`}
                                              isReadOnly
                                              labelPlacement="outside"
                                         />

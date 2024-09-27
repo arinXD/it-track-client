@@ -5,6 +5,7 @@ import './homepage.css';
 import Footer from './components/Footer';
 import Link from 'next/link';
 import { Button } from '@nextui-org/react';
+import { simpleDMY, simpleDMYHM } from '@/src/util/simpleDateFormatter';
 
 const tracks = [
      { name: 'BIT', icon: '💼', description: 'เทคโนโลยีสารสนเทศทางธุรกิจ ' },
@@ -78,7 +79,7 @@ const HomePage = ({ news = mockNews }) => {
                     <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
                          <div className="text-center">
                               <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Welcome to KKU IT</h1>
-                              <p className="mt-6 text-xl md:text-2xl max-w-3xl mx-auto">ค้นพบความเชี่ยวชาญหลักสูตรไอทีล่าสุด! ยกระดับทักษะของคุณด้วยความเชี่ยวชาญที่ล้ำสมัย นำทางไปสู่อนาคตของความสำเร็จทางเทคโนโลยี</p>
+                              <p className="mt-6 text-xl md:text-2xl max-w-3xl mx-auto">พัฒนาทักษะ IT สู่ความเป็นเลิศ - เรียนรู้เทคโนโลยีล่าสุด สร้างอาชีพที่มั่นคง เปิดประตูสู่อนาคตดิจิทัลที่สดใส</p>
                          </div>
                     </div>
                </section>
@@ -112,7 +113,7 @@ const HomePage = ({ news = mockNews }) => {
                                                   }
                                                   <div className="p-6 text-white">
                                                        <p className="font-semibold text-lg mb-2 line-clamp-2">{newsItem.title}</p>
-                                                       <p className="text-sm line-clamp-2 mb-4">{newsItem.desc}</p>
+                                                       <p className="text-sm line-clamp-2 mb-1">เผยแพร่เมื่อ {simpleDMY(newsItem.createdAt)}</p>
                                                        <span className="text-sm font-medium text-blue-300 group-hover:text-blue-200 transition-colors duration-300">ข้อมูลเพิ่มเติม →</span>
                                                   </div>
                                              </div>
@@ -169,7 +170,7 @@ const HomePage = ({ news = mockNews }) => {
                                         <p className="mt-4 text-lg leading-6 text-gray-600">
                                              ทำการประเมินของเราเพื่อดูว่าแทร็กใดสอดคล้องกับทักษะและความสนใจของคุณมากที่สุด
                                         </p>
-                                        <a href="#" className="mt-8 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                                        <a href="/student/tracks/exam" className="mt-8 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
                                              เริ่มทำแบบทดสอบ
                                              <svg className="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />

@@ -5,7 +5,7 @@ import { PlusIcon, SearchIcon, ChevronDownIcon, DeleteIcon2, DeleteIcon, EditIco
 import { capitalize } from "@/src/util/utils";
 import { fetchData } from '../action'
 import { getAcadyears } from "@/src/util/academicYear";
-import { deleteColor, insertColor, minimalTableClass, restoreColor, thinInputClass } from "@/src/util/ComponentClass";
+import { deleteColor, insertColor, minimalTableClass, thinInputClass } from "@/src/util/ComponentClass";
 import { RiFileExcel2Fill } from "react-icons/ri";
 import { SiGoogleforms } from "react-icons/si";
 import { Empty, message } from "antd";
@@ -244,9 +244,9 @@ const StudentTable = ({ email }) => {
                                              size='sm'
                                              isIconOnly
                                              aria-label="ตรวจสอบสำเร็จการศึกษา"
-                                             className='p-2 bg-blue-500'
+                                             className='p-2 bg-blue-100'
                                         >
-                                             <HiOutlineAcademicCap className="w-5 h-5 text-white" />
+                                             <HiOutlineAcademicCap className="w-5 h-5 text-blue-500" />
                                         </Button>
                                    </Tooltip>
                               </Link>
@@ -474,7 +474,7 @@ const StudentTable = ({ email }) => {
                                              href="students-advisor/create?tab=advisor-form"
                                              key="add-advisor-form"
                                              description="แบบฟอร์ม"
-                                             startContent={<SiGoogleforms className="w-5 h-5 text-green-600" />}
+                                             startContent={<SiGoogleforms className="w-5 h-5 text-blue-600" />}
                                         >
                                              เพิ่มรายชื่อนักศึกษาในที่ปรึกษา
                                         </DropdownItem>
