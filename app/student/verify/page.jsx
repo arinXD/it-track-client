@@ -1,5 +1,5 @@
 "use client"
-import { useCallback, useEffect, useState, useMemo } from 'react'
+import { useCallback, useEffect, useState, useMemo, useRef } from 'react'
 import { Navbar, Sidebar, ContentWrap } from '@/app/components';
 import { useSession } from "next-auth/react"
 import { useToggleSideBarStore } from '@/src/store'
@@ -8,7 +8,7 @@ import TMonlicaEmail from '@/app/components/TMonlicaEmail';
 import axios from 'axios';
 import { Loading } from '@/app/components'
 import { Button, Textarea, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useKbd, Spinner, Tooltip } from '@nextui-org/react'
-import { tableClass } from '@/src/util/ComponentClass'
+import { tableClass, tableClassCondition } from '@/src/util/ComponentClass'
 import { Checkbox } from "@nextui-org/checkbox";
 import { floorGpa, calGrade, isNumber } from '@/src/util/grade';
 import { Empty, message } from 'antd';
@@ -23,8 +23,15 @@ import { Drawer } from 'antd';
 import { TbMessage2Exclamation } from "react-icons/tb";
 import CategoryGrade from './CategoryGrade';
 import { Accordion, AccordionItem } from "@nextui-org/react";
-import { dMyt } from '@/src/util/dateFormater';
-import Step from './Step';
+import {
+    BorderBottomOutlined,
+    BorderTopOutlined,
+    RadiusBottomleftOutlined,
+    RadiusBottomrightOutlined,
+    RadiusUpleftOutlined,
+    RadiusUprightOutlined,
+} from '@ant-design/icons';
+import { Divider, notification, Space } from 'antd';
 
 const Page = () => {
     ////////////////////////from///////////////////////////////////
@@ -107,9 +114,89 @@ const Page = () => {
             mediaQuery.removeEventListener('change', handleScreenSizeChange);
         };
     }, []);
+
+    const [api, contextHolder] = notification.useNotification();
+
+    const openNotification = (placement) => {
+        api.info({
+            message: `โปรดเลือกปีการศึกษา`,
+            description: 'โปรดเลือกปีการศึกษาก่อนกดยืนยัน',
+            placement,
+        });
+    };
+
+    const openNotificationConditionCategories = (placement) => {
+        const description = (
+            <div>
+                {insufficientCreditCategories.map((item, index) => (
+                    <div key={index}>
+                        {item.title} <span className="font-bold">หน่วยกิตขาดอยู่ : {item.missingCredits} หน่วยกิต</span>
+                    </div>
+                ))}
+            </div>
+        );
+
+        api.info({
+            message: `หน่วยกิตหมวดหมู่วิชาไม่ครบ`,
+            description,
+            placement,
+        });
+    };
+
+    const openNotificationConditionGroups = (placement) => {
+        const description = (
+            <div>
+                {insufficientCreditGroups.map((item, index) => (
+                    <div key={index}>
+                        {item.title} <span className="font-bold">หน่วยกิตขาดอยู่ : {item.missingCredits} หน่วยกิต</span>
+                    </div>
+                ))}
+            </div>
+        );
+        api.info({
+            message: `หน่วยกิตกลุ่มวิชาไม่ครบ`,
+            description,
+            placement,
+        });
+    };
+
+    const openNotificationConditionSubgroups = (placement) => {
+        const description = (
+            <div>
+                {insufficientCreditSubGroups.map((item, index) => (
+                    <div key={index}>
+                        {item.title} <span className="font-bold">หน่วยกิตขาดอยู่ : {item.missingCredits} หน่วยกิต</span>
+                    </div>
+                ))}
+            </div>
+        );
+        api.info({
+            message: `หน่วยกิตกลุ่มย่อยวิชาไม่ครบ`,
+            description,
+            placement,
+        });
+    };
+
+    const openNotificationConditionIT = (placement) => {
+        const description = (
+            <div>
+                <span className="font-bold">หน่วยกิตที่ขาด : {insufficientCreditIT}</span>
+            </div>
+        );
+
+        api.info({
+            message: `หน่วยกิตกลุ่มเลือก 3 วิชาไม่ครบ`,
+            description,
+            placement,
+        });
+    };
+
     /////////////////////////// ตัวหนังสือสีๆแดงๆ ว่า ผ่านอะไรไม่ผ่านอะไร /////////////////////////////
 
-
+    const [insufficientCreditCategories, setInsufficientCreditCategories] = useState([]);
+    const [insufficientCreditGroups, setInsufficientCreditGroups] = useState([]);
+    const [insufficientCreditSubGroups, setInsufficientCreditSubGroups] = useState([]);
+    const [insufficientCreditIT, setInsufficientCreditIT] = useState([]);
 
 
     ////////////////////////////////// useState to verify_selection//////////////////////////////////////////////////////////////
@@ -460,17 +547,19 @@ const Page = () => {
         try {
             const url = `/api/verify/selects/status/verify/${stu_id}`;
             const option = await getOptions(url, "GET");
-            try {
-                const res = await axios(option);
-                const setstatus = res.data.data;
 
+            const res = await axios(option);
+
+            // Check if the response is successful and contains data
+            if (res.status === 200 && res.data.ok) {
+                const setstatus = res.data.data;
                 setStatusVerify(setstatus);
-            } catch (error) {
-                setStatusVerify([]);
-                return;
+            } else {
+                setStatusVerify([]); // No data found or unexpected response
             }
         } catch (error) {
-            console.error('Error fetching Status:', error);
+            // If any error occurs, set status to empty
+            setStatusVerify([]);
         }
     };
 
@@ -1059,9 +1148,7 @@ const Page = () => {
         };
     }).filter(category => category.subjects.length > 0);
 
-    const combinedSubjectCategories = (status?.status !== 0 & categoryverifyGrade.length > 0)
-        ? subjectCategorytest.concat(subjectCategoryHaveGrade)
-        : subjectCategorytest.concat(subjectCategory);
+    const combinedSubjectCategories = (status?.status !== 0 & categoryverifyGrade.length > 0) ? subjectCategorytest.concat(subjectCategoryHaveGrade) : subjectCategorytest.concat(subjectCategory);
 
 
     /////////////////////// เฉพาะ IT //////////////////////////
@@ -1080,7 +1167,7 @@ const Page = () => {
         };
     });
 
-    const getCalculatedValues = (subjectTrack) => {
+    const getCalculatedValues = (subjectTrack, requiredCredits) => {
         // Use subjectTrackGrade if available, otherwise use subjectTrack
         const dataToUse = subjectTrackGrade.length ? subjectTrackGrade : subjectTrack;
 
@@ -1112,25 +1199,160 @@ const Page = () => {
         const totalGrades = subtrack.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
         const averageGrade = totalCredits ? (totalGrades / totalCredits) : 0;
 
-        return { totalCredits, totalGrades, averageGrade };
+        // Calculate missing credits based on the required credits (e.g. 21)
+        const missingCredits = Math.max(0, requiredCredits - totalCredits);
+
+        return { totalCredits, totalGrades, averageGrade, missingCredits };
     };
 
-    const calculatedValues = getCalculatedValues(subjectTrack);
+    /////////////////////////////////////// รวมค่าคะแนน /////////////////////////////////////////////
 
-    const totalRegisteredCreditsss = [
-        ...combinedsubjectCodesByGroup,
-        ...subjectCodesBySubgroup,
-        ...combinedSubjectCategories
-    ].reduce((acc, categoryOrGroup) => acc + (categoryOrGroup.totalCredits || 0), calculatedValues.totalCredits);
+    const [sumCredits, setSumCredits] = useState(0);
+    const [sumGrades, setSumGrades] = useState(0);
 
-    const totalGradesss = [
-        ...combinedsubjectCodesByGroup,
-        ...subjectCodesBySubgroup,
-        ...combinedSubjectCategories
-    ].reduce((acc, categoryOrGroup) => acc + (categoryOrGroup.totalGrades || 0), calculatedValues.totalGrades);
+    const totalCreditsRef = useRef(0);
+    const totalGradesRef = useRef(0);
 
-    // Calculate the average grade including getCalculatedValues data
-    const averageGrade = totalRegisteredCreditsss ? (totalGradesss / totalRegisteredCreditsss) : 0;
+    useEffect(() => {
+        // Reset the refs on every data change
+        totalCreditsRef.current = 0;
+        totalGradesRef.current = 0;
+
+        // Calculate for conditionCategory
+        conditionCategory.forEach((condition) => {
+            const categoryDatas = combinedSubjectCategories.find(category => category.id === condition.Categorie.id) || {};
+            const { totalCredits = 0, totalGrades = 0 } = categoryDatas;
+            totalCreditsRef.current += totalCredits;
+            totalGradesRef.current += totalGrades;
+        });
+
+        // Calculate for conditions
+        conditions.forEach((condition) => {
+            const groupDatas = combinedsubjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
+            const { totalCredits = 0, totalGrades = 0 } = groupDatas;
+            totalCreditsRef.current += totalCredits;
+            totalGradesRef.current += totalGrades;
+        });
+
+        // Calculate for conditionSubgroup
+        conditionSubgroup.forEach((condition) => {
+            const subgroupDatas = subjectCodesBySubgroup.find(subgroup => subgroup.id === condition.SubGroup.id) || {};
+            const { totalCredits = 0, totalGrades = 0 } = subgroupDatas;
+            totalCreditsRef.current += totalCredits;
+            totalGradesRef.current += totalGrades;
+        });
+
+        // Calculate for IT program if applicable
+        if (userData.program === "IT") {
+            const { totalCredits, totalGrades } = getCalculatedValues(subjectTrackGrade.length ? subjectTrackGrade : subjectTrack);
+            totalCreditsRef.current += totalCredits;
+            totalGradesRef.current += totalGrades;
+        }
+
+        // Set the state with the accumulated values from the refs
+        setSumCredits(totalCreditsRef.current);
+        setSumGrades(totalGradesRef.current);
+
+    }, [conditionCategory, combinedSubjectCategories, conditions, combinedsubjectCodesByGroup, conditionSubgroup, subjectCodesBySubgroup, userData.program, subjectTrack, subjectTrackGrade, subData]);
+
+
+    //////////////////////////////////////////////ตัวหนังสือ แดงๆ///////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        const categoriesWithInsufficientCredits = [];
+
+        conditionCategory.forEach((conditionCategory) => {
+            const categoryDatas = combinedSubjectCategories.find(category => category.id === conditionCategory.Categorie.id) || {};
+            const { totalCredits = 0 } = categoryDatas;
+
+            // Check if totalCredits is less than the required credits
+            if (totalCredits < conditionCategory.credit) {
+                const missingCredits = conditionCategory.credit - totalCredits;
+                categoriesWithInsufficientCredits.push({
+                    title: conditionCategory?.Categorie?.category_title,
+                    missingCredits,
+                });
+            }
+        });
+
+        const areArraysEqual = (arr1, arr2) =>
+            arr1.length === arr2.length && arr1.every((val, index) => val.title === arr2[index].title);
+
+        if (!areArraysEqual(categoriesWithInsufficientCredits, insufficientCreditCategories)) {
+            setInsufficientCreditCategories(categoriesWithInsufficientCredits); // Only update if different
+        }
+
+    }, [conditionCategory, combinedSubjectCategories]);
+
+    useEffect(() => {
+        const groupsWithInsufficientCredits = [];
+
+        conditions.forEach((condition) => {
+            const groupDatas = combinedsubjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
+            const { totalCredits = 0 } = groupDatas;
+
+            // Check if totalCredits is less than the required credits
+            if (totalCredits < condition.credit) {
+                const missingCredits = condition.credit - totalCredits;
+                groupsWithInsufficientCredits.push({
+                    title: condition?.Group?.group_title,
+                    missingCredits,
+                });
+            }
+        });
+
+        const areArraysEqual = (arr1, arr2) =>
+            arr1.length === arr2.length && arr1.every((val, index) => val.title === arr2[index].title);
+
+        if (!areArraysEqual(groupsWithInsufficientCredits, insufficientCreditGroups)) {
+            setInsufficientCreditGroups(groupsWithInsufficientCredits); // Only update if different
+        }
+
+    }, [conditions, combinedsubjectCodesByGroup]);
+
+    useEffect(() => {
+        const subgroupsWithInsufficientCredits = [];
+
+        conditionSubgroup.forEach((conditionSubgroup) => {
+            const subgroupDatas = subjectCodesBySubgroup.find(subgroup => subgroup.id === conditionSubgroup.SubGroup.id) || {};
+            const { totalCredits = 0 } = subgroupDatas;
+
+            // Check if totalCredits is less than the required credits
+            if (totalCredits < conditionSubgroup.credit) {
+                const missingCredits = conditionSubgroup.credit - totalCredits;
+                subgroupsWithInsufficientCredits.push({
+                    title: conditionSubgroup?.SubGroup?.sub_group_title,
+                    missingCredits,
+                });
+            }
+        });
+
+        const areArraysEqual = (arr1, arr2) =>
+            arr1.length === arr2.length && arr1.every((val, index) => val.title === arr2[index].title);
+
+        if (!areArraysEqual(subgroupsWithInsufficientCredits, insufficientCreditSubGroups)) {
+            setInsufficientCreditSubGroups(subgroupsWithInsufficientCredits); // Only update if different
+        }
+    }, [conditionSubgroup, subjectCodesBySubgroup]);
+
+    useEffect(() => {
+        // Call getCalculatedValues with the required credits for IT (e.g. 21)
+        const { missingCredits } = getCalculatedValues(subjectTrackGrade.length ? subjectTrackGrade : subjectTrack, 21);
+
+        // If there are missing credits, update the state using setInsufficientCreditIT
+        if (missingCredits > 0) {
+            setInsufficientCreditIT(missingCredits);
+        } else {
+            setInsufficientCreditIT(0); // Reset or clear if no credits are missing
+        }
+    }, [subjectTrackGrade, subjectTrack, subData, setInsufficientCreditIT]);
+
+
+    // console.log(insufficientCreditCategories);
+    // console.log(insufficientCreditGroups);
+    // console.log(insufficientCreditSubGroups);
+    // console.log(insufficientCreditIT);
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     //เงื่อนไข FIX 21
@@ -1240,12 +1462,38 @@ const Page = () => {
     // console.log(studentcategory);
     // console.log(subData);
 
-
     /////////////////////////////////////////sent to verify_selection////////////////////////////////////////////////////////////////
 
     const handleSubmit = useCallback(async function () {
         try {
             const url = `/api/verify/selects/${ids}/${userData.stu_id}`;
+
+            if (!term) {
+                openNotification('top');
+                return;
+            }
+
+            if (insufficientCreditCategories.length > 0) {
+                openNotificationConditionCategories('top');
+                return;
+            }
+
+            if (insufficientCreditGroups.length > 0) {
+                openNotificationConditionGroups('top');
+                return;
+            }
+
+            if (insufficientCreditSubGroups.length > 0) {
+                openNotificationConditionSubgroups('top');
+                return;
+            }
+
+            if (userData.program === "IT") {
+                if (insufficientCreditIT !== 0) {
+                    openNotificationConditionIT('top');
+                    return; // Exit early if there are insufficient credits for IT
+                }
+            }
 
             const filteredData = insertData.map(subj => ({
                 ...subj,
@@ -1309,6 +1557,33 @@ const Page = () => {
     const handleSubmitAgain = useCallback(async function () {
         try {
             const url = `/api/verify/selects/again/${ids}/${userData.stu_id}`;
+
+            if (!term) {
+                openNotification('top');
+                return;
+            }
+
+            if (insufficientCreditCategories.length > 0) {
+                openNotificationConditionCategories('top');
+                return;
+            }
+
+            if (insufficientCreditGroups.length > 0) {
+                openNotificationConditionGroups('top');
+                return;
+            }
+
+            if (insufficientCreditSubGroups.length > 0) {
+                openNotificationConditionSubgroups('top');
+                return;
+            }
+
+            if (userData.program === "IT") {
+                if (insufficientCreditIT !== 0) {
+                    openNotificationConditionIT('top');
+                    return; // Exit early if there are insufficient credits for IT
+                }
+            }
 
             const filteredData = insertData.map(subj => ({
                 ...subj,
@@ -1626,6 +1901,7 @@ const Page = () => {
             </header>
             <Sidebar />
             <div className={`p-4 md:p-8 md:ml-[240px]`}>
+                {contextHolder}
                 {loading ?
                     <div className='w-full flex justify-center h-[70vh]'>
                         <Spinner label="กำลังโหลด..." color="primary" />
@@ -1711,7 +1987,6 @@ const Page = () => {
                                             <div key={index} className='mb-5'>
                                                 <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
                                                     <h2 className='text-lg text-default-800'>{index + 1}. {category?.category_title}</h2>
-                                                    {/* <h2 className='text-sm text-default-800'>จำนวน {creditgroup} หน่วยกิต</h2> */}
                                                 </div>
                                                 {Object.keys(groups).map((groupId, groupIndex) => {
                                                     const group = groups[groupId];
@@ -1980,180 +2255,210 @@ const Page = () => {
                                             </div>
                                         </div> */}
 
-                                    <Table
-                                        classNames={tableClass}
-                                        removeWrapper
-                                        onRowAction={() => { }}
-                                        aria-label="condition category"
-                                        className='mt-5 w-full'
-                                    >
-                                        <TableHeader>
-                                            <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                            <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                            <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                            <TableColumn>ค่าคะแนน</TableColumn>
-                                            <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                        </TableHeader>
-                                        {conditionCategory.length > 0 ? (
-                                            <TableBody>
-                                                {conditionCategory.map((conditionCategory, index) => {
-                                                    const categoryDatas = combinedSubjectCategories.find(category => category.id === conditionCategory.Categorie.id) || {};
-                                                    const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = categoryDatas;
+                                    {conditionCategory.length > 0 ? (
+                                        <>
+                                            <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                <h2 className='text-lg text-default-800'>เงื่อนไขหมวดหมู่วิชา</h2>
+                                            </div>
+                                            <Table
+                                                aria-label="เงื่อนไขหมวดหมู่วิชา"
+                                                className={tableClassCondition}
+                                            >
+                                                <TableHeader>
+                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                </TableHeader>
+                                                {conditionCategory.length > 0 ? (
+                                                    <TableBody>
+                                                        {conditionCategory.map((conditionCategory, index) => {
+                                                            const categoryDatas = combinedSubjectCategories.find(category => category.id === conditionCategory.Categorie.id) || {};
+                                                            const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = categoryDatas;
 
-                                                    const creditClassName = totalCredits < conditionCategory.credit ? 'bg-red-200' : '';
+                                                            const creditClassName = totalCredits < conditionCategory.credit ? 'bg-red-200' : '';
+                                                            const creditClass = totalCredits < conditionCategory.credit ? '' : 'bg-green-200';
 
-                                                    return (
-                                                        <TableRow key={index}>
-                                                            <TableCell>{conditionCategory?.Categorie?.category_title}</TableCell>
-                                                            <TableCell>{conditionCategory.credit}</TableCell>
-                                                            <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                            <TableCell>{totalGrades}</TableCell>
-                                                            <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                        </TableRow>
-                                                    );
+                                                            return (
+                                                                <TableRow key={index}>
+                                                                    <TableCell >{conditionCategory?.Categorie?.category_title}</TableCell>
+                                                                    <TableCell>{conditionCategory.credit}</TableCell>
+                                                                    <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                    <TableCell>{totalGrades}</TableCell>
+                                                                    <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
+                                                                </TableRow>
+                                                            );
+                                                        })}
+                                                    </TableBody>
+                                                ) : (
+                                                    <TableBody emptyContent={"ไม่มีเงื่อนไขหมวดหมู่วิชา"}>{[]}</TableBody>
+                                                )}
+                                            </Table>
+                                        </>
+                                    ) : (
+                                        <></>
+                                    )}
 
-                                                })}
-                                            </TableBody>
-                                        ) : (
-                                            <TableBody emptyContent={"ไม่มีเงื่อนไขหมวดหมู่วิชา"}>{[]}</TableBody>
-                                        )}
-                                    </Table>
+                                    {conditions.length > 0 ? (
+                                        <>
+                                            <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                <h2 className='text-lg text-default-800'>เงื่อนไขกลุ่มวิชา</h2>
+                                            </div>
+                                            <Table
+                                                aria-label="เงื่อนไขกลุ่มวิชา"
+                                                className={tableClassCondition}
+                                            >
+                                                <TableHeader>
+                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                </TableHeader>
+                                                {conditions.length > 0 ? (
+                                                    <TableBody>
+                                                        {conditions.map((condition, index) => {
+                                                            const groupData = combinedsubjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
+                                                            const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = groupData;
 
-                                    <Table
-                                        classNames={tableClass}
-                                        removeWrapper
-                                        onRowAction={() => { }}
-                                        aria-label="program table"
-                                        className='mt-5 w-full'
-                                    >
-                                        <TableHeader>
-                                            <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                            <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                            <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                            <TableColumn>ค่าคะแนน</TableColumn>
-                                            <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                        </TableHeader>
-                                        {conditions.length > 0 ? (
-                                            <TableBody>
-                                                {conditions.map((condition, index) => {
-                                                    const groupData = combinedsubjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
-                                                    const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = groupData;
+                                                            const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
+                                                            const creditClass = totalCredits < condition.credit ? '' : 'bg-green-200';
 
-                                                    const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
+                                                            return (
+                                                                <TableRow key={index}>
+                                                                    <TableCell>{condition?.Group?.group_title}</TableCell>
+                                                                    <TableCell>{condition.credit}</TableCell>
+                                                                    <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                    <TableCell>{totalGrades}</TableCell>
+                                                                    <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
+                                                                </TableRow>
+                                                            );
 
-                                                    return (
-                                                        <TableRow key={index}>
-                                                            <TableCell>{condition?.Group?.group_title}</TableCell>
-                                                            <TableCell>{condition.credit}</TableCell>
-                                                            <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                            <TableCell>{totalGrades}</TableCell>
-                                                            <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                        </TableRow>
-                                                    );
+                                                        })}
+                                                    </TableBody>
+                                                ) : (
+                                                    <TableBody emptyContent={"ไม่มีเงื่อนไขกลุ่มวิชา"}>{[]}</TableBody>
+                                                )}
+                                            </Table>
+                                        </>
+                                    ) : (
+                                        <></>
+                                    )}
 
-                                                })}
-                                            </TableBody>
-                                        ) : (
-                                            <TableBody emptyContent={"ไม่มีเงื่อนไขกลุ่มวิชา"}>{[]}</TableBody>
-                                        )}
-                                    </Table>
+                                    {conditionSubgroup.length > 0 ? (
+                                        <>
+                                            <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                <h2 className='text-lg text-default-800'>เงื่อนไขกลุ่มย่อยวิชา</h2>
+                                            </div>
+                                            <Table
+                                                aria-label="เงื่อนไขกลุ่มย่อยวิชา"
+                                                className={tableClassCondition}
+                                            >
+                                                <TableHeader>
+                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                </TableHeader>
+                                                {conditionSubgroup.length > 0 ? (
+                                                    <TableBody>
+                                                        {conditionSubgroup.map((condition, index) => {
+                                                            const subgroupData = subjectCodesBySubgroup.find(subgroup => subgroup.id === condition.SubGroup.id) || {};
+                                                            const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = subgroupData;
 
-                                    <Table
-                                        classNames={tableClass}
-                                        removeWrapper
-                                        onRowAction={() => { }}
-                                        aria-label="program table"
-                                        className='mt-5 w-full'
-                                    >
-                                        <TableHeader>
-                                            <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                            <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                            <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                            <TableColumn>ค่าคะแนน</TableColumn>
-                                            <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                        </TableHeader>
-                                        {conditionSubgroup.length > 0 ? (
-                                            <TableBody>
-                                                {conditionSubgroup.map((condition, index) => {
-                                                    const subgroupData = subjectCodesBySubgroup.find(subgroup => subgroup.id === condition.SubGroup.id) || {};
-                                                    const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = subgroupData;
+                                                            const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
+                                                            const creditClass = totalCredits < condition.credit ? '' : 'bg-green-200';
 
-                                                    const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
-
-                                                    return (
-                                                        <TableRow key={index}>
-                                                            <TableCell>{condition?.SubGroup?.sub_group_title}</TableCell>
-                                                            <TableCell>{condition.credit}</TableCell>
-                                                            <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                            <TableCell>{totalGrades}</TableCell>
-                                                            <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                        </TableRow>
-                                                    );
-                                                })}
-                                            </TableBody>
-                                        ) : (
-                                            <TableBody emptyContent={"ไม่มีเงื่อนไขกลุ่มย่อยวิชา"}>{[]}</TableBody>
-                                        )}
-                                    </Table>
+                                                            return (
+                                                                <TableRow key={index}>
+                                                                    <TableCell>{condition?.SubGroup?.sub_group_title}</TableCell>
+                                                                    <TableCell>{condition.credit}</TableCell>
+                                                                    <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                    <TableCell>{totalGrades}</TableCell>
+                                                                    <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
+                                                                </TableRow>
+                                                            );
+                                                        })}
+                                                    </TableBody>
+                                                ) : (
+                                                    <TableBody emptyContent={"ไม่มีเงื่อนไขกลุ่มย่อยวิชา"}>{[]}</TableBody>
+                                                )}
+                                            </Table>
+                                        </>
+                                    ) : (
+                                        <></>
+                                    )}
 
                                     {userData.program === "IT" && (
+                                        <>
+                                            <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                <h2 className='text-lg text-default-800'>เงื่อนไขเฉพาะหลักสูตร IT</h2>
+                                            </div>
+                                            <Table
+                                                aria-label="เงื่อนไขเฉพาะหลักสูตร IT"
+                                                className={tableClassCondition}
+                                            >
+                                                <TableHeader>
+                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                </TableHeader>
+
+                                                <TableBody>
+                                                    {(() => {
+                                                        // Use subjectTrackGrade if available, otherwise use subjectTrack
+                                                        const { totalCredits, totalGrades, averageGrade, missingCredits } = getCalculatedValues(subjectTrackGrade.length ? subjectTrackGrade : subjectTrack);
+
+                                                        const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
+                                                        const creditClass = totalCredits < 21 ? '' : 'bg-green-200';
+
+
+                                                        return (
+                                                            <TableRow>
+                                                                <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
+                                                                <TableCell>21</TableCell>
+                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                <TableCell>{totalGrades}</TableCell>
+                                                                <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })()}
+                                                </TableBody>
+                                            </Table>
+                                        </>
+                                    )}
+
+                                    <>
+                                        <div className='bg-blue-200 border-blue-200 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                            <h2 className='text-lg text-default-800'>รวมหน่วยกิตและค่าคะแนนทั้งหมด</h2>
+                                        </div>
                                         <Table
-                                            classNames={tableClass}
-                                            removeWrapper
-                                            onRowAction={() => { }}
-                                            aria-label="program table"
-                                            className='mt-5 w-full'
+                                            aria-label="รวมหน่วยกิตและค่าคะแนนทั้งหมด"
+                                            className={tableClassCondition}
                                         >
                                             <TableHeader>
-                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                <TableColumn className='w-1/3'>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                <TableColumn>#</TableColumn>
+                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
                                                 <TableColumn>ค่าคะแนน</TableColumn>
                                                 <TableColumn>คะแนนเฉลี่ย</TableColumn>
                                             </TableHeader>
 
                                             <TableBody>
-                                                {(() => {
-                                                    // Use subjectTrackGrade if available, otherwise use subjectTrack
-                                                    const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrackGrade.length ? subjectTrackGrade : subjectTrack);
-
-                                                    const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
-
-                                                    return (
-                                                        <TableRow>
-                                                            <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
-                                                            <TableCell>21</TableCell>
-                                                            <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                            <TableCell>{totalGrades}</TableCell>
-                                                            <TableCell className='bg-green-200'>{averageGrade.toFixed(2)}</TableCell>
-                                                        </TableRow>
-                                                    );
-                                                })()}
+                                                <TableRow>
+                                                    <TableCell>รวม</TableCell>
+                                                    <TableCell>{sumCredits}</TableCell>
+                                                    <TableCell>{sumGrades}</TableCell>
+                                                    <TableCell>
+                                                        {sumCredits > 0 ? (sumGrades / sumCredits).toFixed(2) : 'N/A'}
+                                                    </TableCell>
+                                                </TableRow>
                                             </TableBody>
                                         </Table>
-                                    )}
-
-                                    <Table
-                                        classNames={tableClass}
-                                        removeWrapper
-                                        onRowAction={() => { }}
-                                        aria-label="sum table"
-                                        className='mt-5'
-                                    >
-                                        <TableHeader>
-                                            <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                            <TableColumn>ค่าคะแนน</TableColumn>
-                                            <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                        </TableHeader>
-
-                                        <TableBody>
-                                            <TableRow>
-                                                <TableCell>{totalRegisteredCreditsss}</TableCell>
-                                                <TableCell>{totalGradesss}</TableCell>
-                                                <TableCell>{averageGrade.toFixed(2)}</TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
+                                    </>
 
                                     {(status?.status !== 1 && status?.status !== 2 && status?.status !== 3) && (
                                         <div className='flex justify-end items-end mt-3'>
@@ -2173,7 +2478,33 @@ const Page = () => {
 
 
                                     {/* This element will be absolutely positioned and visible on screens `max-xl` */}
-                                    <Drawer title="สถานะการอนุมัติ" onClose={onClose} open={open}>
+                                    <Drawer
+                                        title="สถานะการอนุมัติ"
+                                        onClose={onClose}
+                                        open={open}
+                                        extra={
+                                            <Space>
+                                                {status?.status === 0 && (
+                                                    <div className='inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300'>
+                                                        <span className='w-3 h-3 inline-block bg-red-500 rounded-full mr-2'></span>
+                                                        ไม่อนุมัติ
+                                                    </div>
+                                                )}
+                                                {(status?.status === 1 || status?.status === 2) && (
+                                                    <div className='inline-flex items-center bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-orange-900 dark:text-orange-300'>
+                                                        <span className='w-3 h-3 inline-block bg-yellow-500 rounded-full mr-2'></span>
+                                                        รอการยืนยัน
+                                                    </div>
+                                                )}
+                                                {status?.status === 3 && (
+                                                    <div className='inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300'>
+                                                        <span className='w-3 h-3 inline-block bg-green-500 rounded-full mr-2'></span>
+                                                        อนุมัติ
+                                                    </div>
+                                                )}
+                                            </Space>
+                                        }
+                                    >
                                         {statusVerify.length > 0 ? (
                                             <Accordion selectionMode="multiple">
                                                 {statusVerify.length > 0 ? (
@@ -2201,7 +2532,7 @@ const Page = () => {
                                                                 {statuss.User.Teacher && statuss.User.Teacher.name && statuss.User.Teacher.surname ? (
                                                                     <div>
                                                                         <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
-                                                                        <p className='my-2'><strong>เวลา:</strong> {dMyt(statuss.approver_time)}</p>
+                                                                        <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
                                                                         {statuss.desc && (
                                                                             <Textarea
                                                                                 label="ความคิดเห็น"
@@ -2223,7 +2554,7 @@ const Page = () => {
                                                                 ) : (
                                                                     <div>
                                                                         <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
-                                                                        <p className='my-2'><strong>เวลา :</strong> {dMyt(statuss.approver_time)}</p>
+                                                                        <p className='my-2'><strong>เวลา :</strong> {simpleDMYHM(statuss.approver_time)}</p>
                                                                         {statuss.desc && (
                                                                             <Textarea
                                                                                 label="ความคิดเห็น"
@@ -2260,7 +2591,27 @@ const Page = () => {
                                         className={`${status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3 ? 'w-[20%]' : 'w-[20%]w-0'} fixed left-auto right-0 max-xl:hidden h-screen border-l border-l-gray-200/80`}
                                     >
                                         <div className='relative top-16 px-5'>
-                                            <h1 className='text-2xl mb-5'>สถานะการอนุมัติ</h1>
+                                            <div className='flex justify-between items-center mb-5'>
+                                                <h1 className='text-2xl'>สถานะการอนุมัติ</h1>
+                                                {status?.status === 0 && (
+                                                    <div className='inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300'>
+                                                        <span className='w-3 h-3 inline-block bg-red-500 rounded-full mr-2'></span>
+                                                        ไม่อนุมัติ
+                                                    </div>
+                                                )}
+                                                {(status?.status === 1 || status?.status === 2) && (
+                                                    <div className='inline-flex items-center bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-orange-900 dark:text-orange-300'>
+                                                        <span className='w-3 h-3 inline-block bg-yellow-500 rounded-full mr-2'></span>
+                                                        รอการยืนยัน
+                                                    </div>
+                                                )}
+                                                {status?.status === 3 && (
+                                                    <div className='inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300'>
+                                                        <span className='w-3 h-3 inline-block bg-green-500 rounded-full mr-2'></span>
+                                                        อนุมัติ
+                                                    </div>
+                                                )}
+                                            </div>
                                             {statusVerify.length > 0 ? (
                                                 <Accordion selectionMode="multiple">
                                                     {statusVerify.length > 0 ? (
@@ -2288,7 +2639,7 @@ const Page = () => {
                                                                     {statuss.User.Teacher && statuss.User.Teacher.name && statuss.User.Teacher.surname ? (
                                                                         <div>
                                                                             <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
-                                                                            <p className='my-2'><strong>เวลา:</strong> {dMyt(statuss.approver_time)}</p>
+                                                                            <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
                                                                             {statuss.desc && (
                                                                                 <Textarea
                                                                                     label="ความคิดเห็น"
@@ -2310,7 +2661,7 @@ const Page = () => {
                                                                     ) : (
                                                                         <div>
                                                                             <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
-                                                                            <p className='my-2'><strong>เวลา :</strong> {dMyt(statuss.approver_time)}</p>
+                                                                            <p className='my-2'><strong>เวลา :</strong> {simpleDMYHM(statuss.approver_time)}</p>
                                                                             {statuss.desc && (
                                                                                 <Textarea
                                                                                     label="ความคิดเห็น"
