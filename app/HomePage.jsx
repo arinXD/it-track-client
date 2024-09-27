@@ -79,7 +79,7 @@ const HomePage = ({ news = mockNews }) => {
                     <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
                          <div className="text-center">
                               <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Welcome to KKU IT</h1>
-                              <p className="mt-6 text-xl md:text-2xl max-w-3xl mx-auto">ค้นพบความเชี่ยวชาญหลักสูตรไอทีล่าสุด! ยกระดับทักษะของคุณด้วยความเชี่ยวชาญที่ล้ำสมัย นำทางไปสู่อนาคตของความสำเร็จทางเทคโนโลยี</p>
+                              <p className="mt-6 text-xl md:text-2xl max-w-3xl mx-auto">พัฒนาทักษะ IT สู่ความเป็นเลิศ - เรียนรู้เทคโนโลยีล่าสุด สร้างอาชีพที่มั่นคง เปิดประตูสู่อนาคตดิจิทัลที่สดใส</p>
                          </div>
                     </div>
                </section>
