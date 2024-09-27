@@ -170,7 +170,7 @@ const HomePage = ({ news = mockNews }) => {
                                         <p className="mt-4 text-lg leading-6 text-gray-600">
                                              ทำการประเมินของเราเพื่อดูว่าแทร็กใดสอดคล้องกับทักษะและความสนใจของคุณมากที่สุด
                                         </p>
-                                        <a href="#" className="mt-8 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                                        <a href="/student/tracks/exam" className="mt-8 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
                                              เริ่มทำแบบทดสอบ
                                              <svg className="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />

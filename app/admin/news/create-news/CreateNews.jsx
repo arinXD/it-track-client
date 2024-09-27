@@ -122,13 +122,6 @@ const CreateNews = () => {
                          label="เนื้อหาข่าว"
                          rules={[{ required: true, message: 'Please input the detail!' }]}
                     >
-                         <TextArea rows={5} />
-                    </Form.Item>
-                    <Form.Item
-                         name="detail"
-                         label="เนื้อหาข่าว"
-                         rules={[{ required: true, message: 'Please input the detail!' }]}
-                    >
                          <ReactQuill
                               ref={quillRef}
                               theme="snow"

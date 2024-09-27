@@ -17,6 +17,7 @@ import "./style.css"
 const UserProfile = ({ userData, tracks }) => {
      const { email, username, role, sign_in_type, createdAt, Student, Teacher, Admin } = userData;
      const [teacherTrack, setTeacherTrack] = useState(Teacher?.TeacherTrack?.track || "");
+     const [submiting, setSubmiting] = useState(false);
 
      const columns = [
           {
@@ -63,7 +64,9 @@ const UserProfile = ({ userData, tracks }) => {
      const handleEdit = async function (e) {
           e.preventDefault();
           const formData = new FormData(e.target)
+          setSubmiting(true)
           const { ok, message: msg } = await updateTeacherData(formData)
+          setSubmiting(false)
           if (ok) {
                message.success(msg)
           } else {
@@ -198,6 +201,8 @@ const UserProfile = ({ userData, tracks }) => {
                                    </div>
                                    <div className="mt-4 flex justify-start">
                                         <Button
+                                             isLoading={submiting}
+                                             isDisabled={submiting}
                                              type="submit"
                                              size='md'
                                              color='primary'
@@ -292,6 +297,8 @@ const UserProfile = ({ userData, tracks }) => {
                                    </div>
                                    <div className="mt-4 flex justify-start">
                                         <Button
+                                             isLoading={submiting}
+                                             isDisabled={submiting}
                                              type="submit"
                                              size='md'
                                              color='primary'

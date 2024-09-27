@@ -1,6 +1,6 @@
 "use client"
 import { inputClass } from "@/src/util/ComponentClass";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Spinner } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { BsFillImageFill } from "react-icons/bs";
 import { UploadOutlined } from '@ant-design/icons';
@@ -21,8 +21,10 @@ const EditCareerModal = ({ isOpen, onClose, careerId, getCareers }) => {
      const [track, setTrack] = useState("");
      const [uploadProgress, setUploadProgress] = useState(0);
      const [updating, setUpdating] = useState(false);
+     const [fetching, setFetching] = useState(false);
 
      const getCareerByID = useCallback(async (careerId) => {
+          setFetching(true)
           const option = await getOptions(`/api/careers/${careerId}`)
           try {
                const res = await axios(option)
@@ -37,6 +39,8 @@ const EditCareerModal = ({ isOpen, onClose, careerId, getCareers }) => {
                setNameTh("")
                setNameEn("")
                setTrack("")
+          } finally {
+               setFetching(false)
           }
      }, [])
 
@@ -83,6 +87,7 @@ const EditCareerModal = ({ isOpen, onClose, careerId, getCareers }) => {
 
      const handleSubmit = useCallback(async (e) => {
           e.preventDefault()
+          setUpdating(true)
           const formData = new FormData(e.target);
           const formDataObject = {
                originalImage: defaultImage,
@@ -114,6 +119,8 @@ const EditCareerModal = ({ isOpen, onClose, careerId, getCareers }) => {
           } catch (error) {
                console.log(error);
                message.error("เพิ่มข้อมูลไม่สำเร็จ")
+          } finally {
+               setUpdating(false)
           }
 
      }, [uploadImageFile, careerId, previewImage])
@@ -150,94 +157,103 @@ const EditCareerModal = ({ isOpen, onClose, careerId, getCareers }) => {
                                                   }
                                              </div>
                                              <div className="w-1/2 flex flex-col">
-                                                  <input
-                                                       type="hidden"
-                                                       name="track"
-                                                       value={track} />
-                                                  <Input
-                                                       name='name_th'
-                                                       type="text"
-                                                       variant="bordered"
-                                                       radius='sm'
-                                                       label="อาชีพ (TH)"
-                                                       labelPlacement="outside"
-                                                       placeholder="ชื่ออาชีพภาษาไทย"
-                                                       value={nameTh}
-                                                       onValueChange={setNameTh}
-                                                       classNames={inputClass}
-                                                       className='mb-4'
-                                                       isRequired
-                                                  />
-                                                  <Input
-                                                       name='name_en'
-                                                       type="text"
-                                                       variant="bordered"
-                                                       radius='sm'
-                                                       label="อาชีพ (EN)"
-                                                       labelPlacement="outside"
-                                                       placeholder="ชื่ออาชีพภาษาอังกฤษ"
-                                                       value={nameEn}
-                                                       onValueChange={setNameEn}
-                                                       classNames={inputClass}
-                                                       className='mb-4'
-                                                       isRequired
-                                                  />
-                                                  <Input
-                                                       name='desc'
-                                                       type="text"
-                                                       variant="bordered"
-                                                       radius='sm'
-                                                       label="คำอธิบายอาชีพ (optional)"
-                                                       labelPlacement="outside"
-                                                       placeholder="คำอธิบายอาชีพ"
-                                                       value={desc}
-                                                       onValueChange={setDesc}
-                                                       classNames={inputClass}
-                                                       className='mb-4'
-                                                  />
-                                                  <div className='flex flex-col justify-center items-start'>
-                                                       <span className="text-sm mb-2">อัพโหลดไฟล์รูปภาพ [ jpeg, jpg, png ]</span>
-                                                       <label className="w-fit hover:border-blue-500 hover:text-blue-500 transition duration-75 cursor-pointer border-1 border-default-300 rounded-md px-3.5 py-1 text-default-700">
-                                                            <input
-                                                                 type="file"
-                                                                 accept='.jpg, .png, .jpeg'
-                                                                 name="image"
-                                                                 id="image"
-                                                                 onChange={handleUpload}
-                                                                 style={{ display: "none" }} />
-                                                            <UploadOutlined className='w-3.5 h-3.5' />
-                                                            <span className='ms-2.5 text-sm'>Click to Upload</span>
-                                                       </label>
-                                                  </div>
-                                                  <div className='flex flex-col'>
-                                                       {
-                                                            (uploadImageFile instanceof Blob || uploadImageFile instanceof File) &&
-                                                            <div className='text-sm flex items-center mt-2 w-full gap-2'>
-                                                                 <GoPaperclip className='text-default-500' />
-                                                                 <span className='block whitespace-nowrap w-full overflow-hidden text-ellipsis'>
-                                                                      {uploadImageFile.name}
-                                                                 </span>
-                                                                 <div
-                                                                      title="Remove file"
-                                                                      onClick={() => {
-                                                                           document.querySelector("#image").value = ""
-                                                                           setUploadImageFile({})
-                                                                      }}
-                                                                      className='bg-gray-200 p-1 ms-auto cursor-pointer transition duration-75 hover:bg-gray-300 rounded-md'>
-                                                                      <AiOutlineDelete className='text-default-500 w-4 h-4' />
-                                                                 </div>
-                                                            </div>
-                                                       }
-                                                  </div>
                                                   {
-                                                       uploadProgress > 0 &&
-                                                       <div className='flex gap-4 items-center'>
-                                                            <progress
-                                                                 max={100}
-                                                                 value={uploadProgress}
-                                                                 className='w-[90%] mt-2 h-1 bg-default-500 [&::-webkit-progress-bar]:rounded-lg [&::-webkit-progress-value]:rounded-lg   [&::-webkit-progress-bar]:bg-slate-300 [&::-webkit-progress-value]:bg-violet-400 [&::-moz-progress-bar]:bg-violet-400' />
-                                                            <span className='text-sm text-default-500'>{uploadProgress}%</span>
-                                                       </div>
+                                                       fetching ?
+                                                            <div className="my-4 flex items-center justify-center h-full">
+                                                                 <Spinner label="Loading...." />
+                                                            </div>
+                                                            :
+                                                            <>
+                                                                 <input
+                                                                      type="hidden"
+                                                                      name="track"
+                                                                      value={track} />
+                                                                 <Input
+                                                                      name='name_th'
+                                                                      type="text"
+                                                                      variant="bordered"
+                                                                      radius='sm'
+                                                                      label="อาชีพ (TH)"
+                                                                      labelPlacement="outside"
+                                                                      placeholder="ชื่ออาชีพภาษาไทย"
+                                                                      value={nameTh}
+                                                                      onValueChange={setNameTh}
+                                                                      classNames={inputClass}
+                                                                      className='mb-4'
+                                                                      isRequired
+                                                                 />
+                                                                 <Input
+                                                                      name='name_en'
+                                                                      type="text"
+                                                                      variant="bordered"
+                                                                      radius='sm'
+                                                                      label="อาชีพ (EN)"
+                                                                      labelPlacement="outside"
+                                                                      placeholder="ชื่ออาชีพภาษาอังกฤษ"
+                                                                      value={nameEn}
+                                                                      onValueChange={setNameEn}
+                                                                      classNames={inputClass}
+                                                                      className='mb-4'
+                                                                      isRequired
+                                                                 />
+                                                                 <Input
+                                                                      name='desc'
+                                                                      type="text"
+                                                                      variant="bordered"
+                                                                      radius='sm'
+                                                                      label="คำอธิบายอาชีพ (optional)"
+                                                                      labelPlacement="outside"
+                                                                      placeholder="คำอธิบายอาชีพ"
+                                                                      value={desc}
+                                                                      onValueChange={setDesc}
+                                                                      classNames={inputClass}
+                                                                      className='mb-4'
+                                                                 />
+                                                                 <div className='flex flex-col justify-center items-start'>
+                                                                      <span className="text-sm mb-2">อัพโหลดไฟล์รูปภาพ [ jpeg, jpg, png ]</span>
+                                                                      <label className="w-fit hover:border-blue-500 hover:text-blue-500 transition duration-75 cursor-pointer border-1 border-default-300 rounded-md px-3.5 py-1 text-default-700">
+                                                                           <input
+                                                                                type="file"
+                                                                                accept='.jpg, .png, .jpeg'
+                                                                                name="image"
+                                                                                id="image"
+                                                                                onChange={handleUpload}
+                                                                                style={{ display: "none" }} />
+                                                                           <UploadOutlined className='w-3.5 h-3.5' />
+                                                                           <span className='ms-2.5 text-sm'>Click to Upload</span>
+                                                                      </label>
+                                                                 </div>
+                                                                 <div className='flex flex-col'>
+                                                                      {
+                                                                           (uploadImageFile instanceof Blob || uploadImageFile instanceof File) &&
+                                                                           <div className='text-sm flex items-center mt-2 w-full gap-2'>
+                                                                                <GoPaperclip className='text-default-500' />
+                                                                                <span className='block whitespace-nowrap w-full overflow-hidden text-ellipsis'>
+                                                                                     {uploadImageFile.name}
+                                                                                </span>
+                                                                                <div
+                                                                                     title="Remove file"
+                                                                                     onClick={() => {
+                                                                                          document.querySelector("#image").value = ""
+                                                                                          setUploadImageFile({})
+                                                                                     }}
+                                                                                     className='bg-gray-200 p-1 ms-auto cursor-pointer transition duration-75 hover:bg-gray-300 rounded-md'>
+                                                                                     <AiOutlineDelete className='text-default-500 w-4 h-4' />
+                                                                                </div>
+                                                                           </div>
+                                                                      }
+                                                                 </div>
+                                                                 {
+                                                                      uploadProgress > 0 &&
+                                                                      <div className='flex gap-4 items-center'>
+                                                                           <progress
+                                                                                max={100}
+                                                                                value={uploadProgress}
+                                                                                className='w-[90%] mt-2 h-1 bg-default-500 [&::-webkit-progress-bar]:rounded-lg [&::-webkit-progress-value]:rounded-lg   [&::-webkit-progress-bar]:bg-slate-300 [&::-webkit-progress-value]:bg-violet-400 [&::-moz-progress-bar]:bg-violet-400' />
+                                                                           <span className='text-sm text-default-500'>{uploadProgress}%</span>
+                                                                      </div>
+                                                                 }
+                                                            </>
                                                   }
                                              </div>
                                         </div>
