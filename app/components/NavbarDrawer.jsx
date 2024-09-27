@@ -64,6 +64,13 @@ const SidebarDrawer = () => {
                condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
           },
           {
+               href: "/student/verify",
+               activeIcon: <HiAcademicCap className="w-5 h-5" />,
+               icon: <HiOutlineAcademicCap className="w-5 h-5" />,
+               label: "ตรวจสอบสำเร็จการศึกษา",
+               condition: session?.user?.role === "student"
+          },
+          {
                href: "/tracks",
                activeIcon: <HiUserGroup className="w-5 h-5" />,
                icon: <HiOutlineUserGroup className="w-5 h-5" />,
@@ -84,13 +91,6 @@ const SidebarDrawer = () => {
                label: "แนะนำแทร็ก",
                condition: true
           },
-          {
-               href: "/student/verify",
-               activeIcon: <HiAcademicCap className="w-5 h-5" />,
-               icon: <HiOutlineAcademicCap className="w-5 h-5" />,
-               label: "ตรวจสอบสำเร็จการศึกษา",
-               condition: session?.user?.role === "student"
-          }
      ]), [session])
 
      const links = useMemo(() => [
@@ -109,6 +109,13 @@ const SidebarDrawer = () => {
                condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
           },
           {
+               href: "/student/verify",
+               activeIcon: <HiAcademicCap className="w-5 h-5" />,
+               icon: <HiOutlineAcademicCap className="w-5 h-5" />,
+               label: "ตรวจสอบสำเร็จการศึกษา",
+               condition: session?.user?.role === "student"
+          },
+          {
                href: "/tracks",
                activeIcon: <HiUserGroup className="w-5 h-5" />,
                icon: <HiOutlineUserGroup className="w-5 h-5" />,
@@ -119,7 +126,7 @@ const SidebarDrawer = () => {
                href: "/student/tracks",
                activeIcon: <AiFillEdit className="w-5 h-5" />,
                icon: <AiOutlineEdit className="w-5 h-5" />,
-               label: "คัดเลือกแทร็ก " + String(session?.user?.role),
+               label: "คัดเลือกแทร็ก",
                condition: session?.user?.role === "student"
           },
           {
@@ -129,13 +136,6 @@ const SidebarDrawer = () => {
                label: "แนะนำแทร็ก",
                condition: true
           },
-          {
-               href: "/student/verify",
-               activeIcon: <HiAcademicCap className="w-5 h-5" />,
-               icon: <HiOutlineAcademicCap className="w-5 h-5" />,
-               label: "ตรวจสอบสำเร็จการศึกษา",
-               condition: true
-          }
      ], [session]);
 
      const navstupid = useCallback(function () {
