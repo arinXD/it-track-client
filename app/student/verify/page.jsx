@@ -1040,7 +1040,7 @@ const Page = () => {
                 const credit = subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" ||
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
                     (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
                     return null;
                 }
@@ -1079,7 +1079,7 @@ const Page = () => {
                 const credit = subject.Subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" ||
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
                     (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
                     return null;
                 }
@@ -1117,7 +1117,7 @@ const Page = () => {
                 const credit = subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" ||
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
                     (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
                     return null;
                 }
@@ -1179,7 +1179,7 @@ const Page = () => {
             const grade = subjectTrackGrade.length ? prev.grade : getEnrollmentGrade(prev.subject_code);
             const credit = prev.credit;
 
-            if (grade === "ไม่มีเกรด" ||
+            if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
                 (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
                 return null;
             }

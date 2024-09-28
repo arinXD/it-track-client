@@ -634,7 +634,7 @@ const Page = ({ params }) => {
                 const credit = subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" ||
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
                     (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
                     return null;
                 }
@@ -678,7 +678,7 @@ const Page = ({ params }) => {
                 console.log(subject);
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" ||
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
                     (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
                     return null;
                 }
