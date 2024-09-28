@@ -39,7 +39,6 @@ const Page = ({ params }) => {
     const [subgroupData, setSubgroupData] = useState([]);
     const [semisubgroupData, setSemiSubgroupData] = useState([]);
     const [userData, setUserData] = useState({})
-    const [userDatas, setUserDatas] = useState({})
     const [enrollments, setEnrollment] = useState([])
 
     const [cateData, setCategoryData] = useState([]);
@@ -103,15 +102,12 @@ const Page = ({ params }) => {
             const option = await getOptions(URL, "GET")
             const response = await axios(option)
             const data = response.data.data
-            setUserDatas(data)
-            // console.log(data);
             if (data.Enrollments.length > 0) {
                 setEnrollment(data.Enrollments)
             } else {
                 setEnrollment([])
             }
         } catch (error) {
-            setUserDatas({})
             setEnrollment([])
         }
     }, [])
@@ -134,7 +130,11 @@ const Page = ({ params }) => {
 
     const initVerify = useCallback(async function (id) {
         try {
-            const result = await fetchDataObj(`/api/verifies/approve/${id}`);
+
+            const URL = `/api/verifies/approve/${id}`
+            const option = await getOptions(URL, "GET")
+            const response = await axios(option)
+            const result = response.data.data
 
             setVerifySelect(result);
             setUserData(result?.Student);
@@ -241,7 +241,10 @@ const Page = ({ params }) => {
     }, []);
 
     const initItGrade = useCallback(async function (id) {
-        const result = await fetchDataObj(`/api/verifies/approve/it/${id}`)
+        const URL = `/api/verifies/approve/it/${id}`
+        const option = await getOptions(URL, "GET")
+        const response = await axios(option)
+        const result = response.data.data
         setItGrade(result)
     }, [])
 
@@ -756,7 +759,7 @@ const Page = ({ params }) => {
         setSumCredits(totalCreditsRef.current);
         setSumGrades(totalGradesRef.current);
 
-    }, [conditionCategory, combinedSubjectCategories, conditions, combinedsubjectCodesByGroup, conditionSubgroup, subjectCodesBySubgroup, userData.program, subjectTrack, subData]);
+    }, [conditionCategory, combinedSubjectCategories, userData.program, conditions, combinedsubjectCodesByGroup, conditionSubgroup, subjectCodesBySubgroup, subjectTrack, subData]);
 
 
     //////////////////////////////////////////////////////////

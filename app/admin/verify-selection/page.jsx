@@ -8,7 +8,6 @@ import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
 import { useDisclosure } from "@nextui-org/react";
 import { getAcadyears } from '@/src/util/academicYear';
 import Link from 'next/link'
-import { dmy, dmyt } from '@/src/util/dateFormater'
 import { Input, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import { PlusIcon, EditIcon, DeleteIcon, EditIcon2, ChevronDownIcon, DeleteIcon2, SearchIcon, EyeIcon } from "@/app/components/icons";
 import { Icon } from '@iconify/react';
@@ -20,6 +19,7 @@ import { VscArchive, VscCheckAll, VscHistory } from "react-icons/vsc";
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { CiSearch } from "react-icons/ci";
+import { simpleDMY, simpleDMYHM } from '@/src/util/simpleDateFormatter'
 
 
 const Page = () => {
@@ -69,7 +69,10 @@ const Page = () => {
 
     const getStudentStatuses = useCallback(async function () {
         try {
-            const statuses = await fetchData("/api/statuses")
+            const URL = `/api/statuses`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const statuses = response.data.data;
             setStatusOptions(statuses)
         } catch (err) {
             setStatusOptions([])
@@ -214,7 +217,7 @@ const Page = () => {
                                                                     </span>
                                                                 </div>
                                                                 <p className='text-sm mt-2'>
-                                                                    {dmyt(verifies.createdAt)}
+                                                                    {simpleDMYHM(verifies.createdAt)}
                                                                 </p>
                                                             </div>
                                                             <div className='inline-flex items-center bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-orange-900 dark:text-orange-300'>
@@ -262,7 +265,7 @@ const Page = () => {
                                                                     </span>
                                                                 </div>
                                                                 <p className='text-sm mt-2'>
-                                                                    {dmyt(verifies.createdAt)}
+                                                                    {simpleDMYHM(verifies.createdAt)}
                                                                 </p>
                                                             </div>
                                                             <div className='inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300'>
@@ -310,7 +313,7 @@ const Page = () => {
                                                                     </span>
                                                                 </div>
                                                                 <p className='text-sm mt-2'>
-                                                                    {dmyt(verifies.createdAt)}
+                                                                    {simpleDMYHM(verifies.createdAt)}
                                                                 </p>
                                                             </div>
                                                             <div className='inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300'>
