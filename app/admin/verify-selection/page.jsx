@@ -40,14 +40,13 @@ const Page = () => {
             const option = await getOptions(URL, "GET");
             const response = await axios(option);
             const data = response.data.data;
-
+    
             const filteredData = data.filter((verifies) => {
-                const teacherEmail = verifies.Student.Teacher?.email;
+                const teacherEmail = verifies.Student.Advisor?.email;
                 return teacherEmail === session?.user?.email;
             });
-
+    
             setVerify(filteredData);
-
         } catch (error) {
             console.log("fetch error:", error);
         }
@@ -169,7 +168,7 @@ const Page = () => {
                                         classNames={{
                                             base: "w-full",
                                             inputWrapper: "border-1",
-                                        
+
                                         }}
                                         className='text-lg'
                                         color='primary'
@@ -247,7 +246,7 @@ const Page = () => {
                                         <div className='border-t mt-5 border-gray-300'></div>
 
                                         {applySearchFilter(session?.user?.role === 'teacher' ? verify : verifyAdmin)
-                                            .filter(verifies => session?.user?.role === 'admin' ? verifies.status === 3 : verifies.status === 2)
+                                            .filter(verifies => session?.user?.role === 'admin' ? verifies.status === 3 : verifies.status === 2 || verifies.status === 3)
                                             .map(verifies => (
                                                 <div key={verifies.id}>
                                                     <Link
