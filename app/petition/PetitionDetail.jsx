@@ -232,10 +232,11 @@ const PetitionDetail = ({
                                                   <div>
                                                        <h3 className="font-medium">ผู้อนุมัติ</h3>
                                                        <p className="mt-1">
-                                                            {petition?.Approver?.Teacher?.teacherName ?
-                                                                 <>{petition?.Approver?.Teacher?.prefix} {petition?.Approver?.Teacher?.teacherName}</>
-                                                                 :
-                                                                 <>{petition?.Approver?.email}</>
+                                                            {petition?.Approver?.Admin ?
+                                                                 <>{`${petition?.Approver?.Admin?.prefix || ""}${petition?.Approver?.Admin?.name || ""}${petition?.Approver?.Admin?.surname ? " " + petition?.Approver?.Admin?.surname : ""}`}</> :
+                                                                 petition?.Approver?.Teacher ?
+                                                                      <>{`${petition?.Approver?.Teacher?.prefix || ""}${petition?.Approver?.Teacher?.name || ""}${petition?.Approver?.Teacher?.surname ? " " + petition?.Approver?.Teacher?.surname : ""}`}</> :
+                                                                      <>{petition?.Approver?.email}</>
                                                             }
                                                        </p>
                                                   </div>
@@ -243,10 +244,11 @@ const PetitionDetail = ({
                                                        <div className="flex justify-between text-sm">
                                                             <span className="text-gray-500">ลงนามโดย</span>
                                                             <span>
-                                                                 {petition?.Approver?.Teacher?.teacherName ?
-                                                                      <>{petition?.Approver?.Teacher?.teacherName}</>
-                                                                      :
-                                                                      <>{petition?.Approver?.email}</>
+                                                                 {petition?.Approver?.Admin ?
+                                                                      <>{`${petition?.Approver?.Admin?.name || ""}${petition?.Approver?.Admin?.surname ? " " + petition?.Approver?.Admin?.surname : ""}`}</> :
+                                                                      petition?.Approver?.Teacher ?
+                                                                           <>{`${petition?.Approver?.Teacher?.name || ""}${petition?.Approver?.Teacher?.surname ? " " + petition?.Approver?.Teacher?.surname : ""}`}</> :
+                                                                           <>{petition?.Approver?.email}</>
                                                                  }
                                                             </span>
                                                        </div>
