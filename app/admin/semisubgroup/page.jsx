@@ -23,7 +23,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { TbRestore } from "react-icons/tb";
 import Link from 'next/link';
 import { fetchData, fetchDataObj } from '../action';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
 import InsertSemi from './insertSemi';
+import { Empty, message } from 'antd';
 
 
 export default function SemiSubGroup() {
@@ -32,7 +34,10 @@ export default function SemiSubGroup() {
 
     const callSemi = useCallback(async () => {
         try {
-            const semisubgroups = await fetchData("/api/semisubgroups");
+            const URL = `/api/semisubgroups`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const semisubgroups = response.data.data;
             setSemi(semisubgroups);
             console.log(semisubgroups);
 
@@ -55,7 +60,7 @@ export default function SemiSubGroup() {
 
     const handleDataInserted = async () => {
         try {
-            await callSemi();
+            callSemi();
             handleInsertModalClose();
 
         } catch (error) {
@@ -64,6 +69,20 @@ export default function SemiSubGroup() {
         }
     };
 
+    const handleDeleteSemi = async (id) => {
+        const url = `/api/semisubgroups/${id}`
+        const options = await getOptions(url, 'DELETE')
+        axios(options)
+            .then(async result => {
+                const { ok, message:msg } = result.data
+                message.success(msg)
+                callSemi();
+            })
+            .catch(error => {
+                const { ok, message:msg } = result.data
+                message.success(msg)
+            })
+    };
 
     return (
         <>
@@ -94,33 +113,18 @@ export default function SemiSubGroup() {
                                     onPress={handleInsertModalOpen}
                                     color="primary"
                                     endContent={<PlusIcon width={16} height={16} />}>
-                                    เพิ่มกลุ่มย่อยๆวิชา
+                                    เพิ่มกลุ่มรองวิชา
                                 </Button>
-                                <Button
-                                    radius="sm"
-                                    color="danger"
-                                    endContent={<DeleteIcon2 width={16} height={16} />}>
-                                    ลบรายการที่เลือก
-                                </Button>
-                                <Link href={'/admin/subgroup/restore'}>
-                                    <Button
-                                        radius="sm"
-                                        color="default"
-                                        endContent={<TbRestore className="w-[18px] h-[18px]" />}>
-                                        รายการที่ถูกลบ
-                                    </Button>
-                                </Link>
                             </div>
                         </div>
                     </div>
                     <Table
                         removeWrapper
-                        selectionMode="multiple"
                         onRowAction={() => { }}
                         aria-label="subgroup table">
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>
-                            <TableColumn>กลุ่มย่อยๆวิชา</TableColumn>
+                            <TableColumn>กลุ่มรองวิชา</TableColumn>
                             <TableColumn>กลุ่มย่อยวิชา</TableColumn>
                             <TableColumn>กลุ่มวิชา</TableColumn>
                             <TableColumn>วันที่สร้าง</TableColumn>
@@ -132,16 +136,9 @@ export default function SemiSubGroup() {
                                     <TableRow key={semisubgroup.id}>
                                         <TableCell>
                                             <div className='relative flex items-center gap-2'>
-                                                <Tooltip content="แก้ไข">
-                                                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                                        {/* <EditIcon2 onClick={() => handleUpdateModalOpen(subgroup)} /> */}
-                                                        <EditIcon2 />
-                                                    </span>
-                                                </Tooltip>
                                                 <Tooltip color="danger" content="ลบ">
                                                     <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                        {/* <DeleteIcon2 onClick={() => handleDeleteSubGroup(subgroup)} /> */}
-                                                        <DeleteIcon2 />
+                                                        <DeleteIcon2 onClick={() => handleDeleteSemi(semisubgroup.id)} />
                                                     </span>
                                                 </Tooltip>
                                             </div>

@@ -217,12 +217,6 @@ export default function Group() {
                                     endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มกลุ่มวิชา
                                 </Button>
-                                <Button
-                                    radius="sm"
-                                    color="danger"
-                                    endContent={<DeleteIcon2 width={16} height={16} />}>
-                                    ลบรายการที่เลือก
-                                </Button>
                                 <Link href={'/admin/group/restore'}>
                                     <Button
                                         radius="sm"
@@ -236,7 +230,6 @@ export default function Group() {
                     </div>
                     <Table
                         removeWrapper
-                        selectionMode="multiple"
                         onRowAction={() => { }}
                         aria-label="group table">
                         <TableHeader>

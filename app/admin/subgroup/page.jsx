@@ -219,12 +219,6 @@ export default function SubGroup() {
                                     endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มกลุ่มย่อยวิชา
                                 </Button>
-                                <Button
-                                    radius="sm"
-                                    color="danger"
-                                    endContent={<DeleteIcon2 width={16} height={16} />}>
-                                    ลบรายการที่เลือก
-                                </Button>
                                 <Link href={'/admin/subgroup/restore'}>
                                     <Button
                                         radius="sm"
@@ -238,7 +232,6 @@ export default function SubGroup() {
                     </div>
                     <Table
                         removeWrapper
-                        selectionMode="multiple"
                         onRowAction={() => { }}
                         aria-label="subgroup table">
                         <TableHeader>

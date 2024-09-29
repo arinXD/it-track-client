@@ -135,8 +135,8 @@ export default function InsertSemi({ isOpen, onClose, onDataInserted }) {
                     {(onClose) => (
                         <form onSubmit={createForm}>
                             <ModalHeader className="flex flex-col gap-1">
-                                <h2>เพิ่มกลุ่มย่อยๆวิชา</h2>
-                                <span className='text-base font-normal'>แบบฟอร์มเพิ่มกลุ่มย่อยๆวิชา</span>
+                                <h2>เพิ่มกลุ่มรองวิชา</h2>
+                                <span className='text-base font-normal'>แบบฟอร์มเพิ่มกลุ่มรองวิชา</span>
                             </ModalHeader>
                             <ModalBody>
                                 <label htmlFor="group">กลุ่มย่อยวิชา</label>

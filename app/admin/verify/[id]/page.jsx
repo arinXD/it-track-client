@@ -175,7 +175,7 @@ const Page = ({ params }) => {
      }, [groupedSubjectsByCategory]);
 
      // console.log(category);
-     
+
 
      useEffect(() => {
           const groupData = Object.keys(groupedSubjectsByCategory).flatMap(categoryId => {
@@ -335,12 +335,10 @@ const Page = ({ params }) => {
                .catch(error => {
                     showToastMessage(false, error)
                })
-
      };
 
      const handleDeleteSubGroupSubjectAndTrack = async (sgt) => {
           // console.log(`Deleting SubGroupSubjectAndTrack with id: ${sgt}`);
-          console.log("IDF: ", idss)
 
           const url = `/api/verify/subgroup/${sgt}/${idss}`
           const options = await getOptions(url, 'DELETE')

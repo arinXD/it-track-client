@@ -6,6 +6,7 @@ import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import { Input } from "@nextui-org/react";
 import { toast } from 'react-toastify';
+
 export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }) {
   const [newTitle, setNewTitle] = useState('');
   const [currentTitle, setCurrentTitle] = useState('');

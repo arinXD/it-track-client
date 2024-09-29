@@ -30,6 +30,7 @@ import { fetchData } from '../action'
 
 import { getAcadyears } from "@/src/util/academicYear";
 import { getOptions } from '@/app/components/serverAction/TokenAction';
+import { FiDownload, FiTrash } from "react-icons/fi";
 
 
 async function fetchDatas() {
@@ -37,7 +38,7 @@ async function fetchDatas() {
         let option = await getOptions("/api/subjects", "GET")
         const result = await axios(option)
         const subjects = result.data.data;
-        
+
         option = await getOptions("/api/tracks/all", "GET")
         const track = await axios(option)
         const tracks = track.data.data;
@@ -245,14 +246,13 @@ export default function Subject() {
                 subject.title_th || "-",
                 subject.title_en || "-",
                 subject.credit || "-",
-                getTrackTitle(subject.track),
                 subject.information || "-",
             ]);
 
             const csvHeaders = [
                 // 'Acadyear', 'Group', 'SubGroup', 'Semester', 'Subject Code',
                 // 'Title (TH)', 'Title (EN)', 'Information', 'Credit'
-                'Subject Code', 'Title (TH)', 'Title (EN)', 'Credit', 'Track', 'Information'
+                'subject_code', 'title_th', 'title_en', 'credit', 'information'
             ];
 
             csvData.unshift(csvHeaders);
@@ -283,12 +283,11 @@ export default function Subject() {
                 // Group: getGroupTitle(subject.group_id),
                 // SubGroup: getSubGroupTitle(subject.sub_group_id),
                 // Semester: subject.semester || "-",
-                'Subject Code': subject.subject_code || "-",
-                'Title (TH)': subject.title_th || "-",
-                'Title (EN)': subject.title_en || "-",
-                Credit: subject.credit || "-",
-                Track: getTrackTitle(subject.track) || "-",
-                Information: subject.information || "-",
+                'subject_code': subject.subject_code || "-",
+                'title_th': subject.title_th || "-",
+                'title_en': subject.title_en || "-",
+                credit: subject.credit || "-",
+                information: subject.information || "-",
             })));
 
             // Add the worksheet to the workbook
@@ -303,6 +302,36 @@ export default function Subject() {
             showToastMessage(false, 'Error exporting Excel');
         }
     };
+
+    const handleExportExcelTemplate = () => {
+        try {
+            // Create a workbook with a worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(subjects.map(subject => ({
+                // 'Acadyear': getAcadyearTitle(subject.acadyear),
+                // Group: getGroupTitle(subject.group_id),
+                // SubGroup: getSubGroupTitle(subject.sub_group_id),
+                // Semester: subject.semester || "-",
+                'subject_code': "",
+                'title_th': "",
+                'title_en': "",
+                'credit': "",
+                'information': "",
+            })));
+
+            // Add the worksheet to the workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Subjects');
+
+            // Save the workbook to a file
+            XLSX.writeFile(wb, 'subjects_template.xlsx');
+
+            showToastMessage(true, 'Excel export successful');
+        } catch (error) {
+            console.error('Error exporting Excel:', error);
+            showToastMessage(false, 'Error exporting Excel');
+        }
+    };
+
     const filteredSubject = subjects.filter(subject => {
         const queryLowerCase = searchQuery.toLowerCase();
 
@@ -522,6 +551,11 @@ export default function Subject() {
                         <ModalBody>
                             <ExcelUpload onDataInsertXlsx={handleDataInserted} />
                         </ModalBody>
+                        <div className='flex justify-center items-center mt-5'>
+                            <Button color="primary" onClick={handleExportExcelTemplate} endContent={<FiDownload className="w-4 h-4 text-white" />}>
+                                ดาวน์โหลด Template
+                            </Button>
+                        </div>
                         <ModalFooter>
                             <Button onClick={handleImportModalClose} color="error">
                                 Close
