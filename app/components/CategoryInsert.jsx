@@ -5,6 +5,9 @@ import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import { Input } from "@nextui-org/react";
 import { toast } from 'react-toastify';
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 export default function CategoryInsert({ isOpen, onClose, onDataInserted }) {
     const [categoryTitle, setCategoryTitle] = useState('');
 
@@ -35,7 +38,9 @@ export default function CategoryInsert({ isOpen, onClose, onDataInserted }) {
     };
     const checkDuplicateCategory = async (title) => {
         try {
-            const response = await axios.get(`${hostname}/api/categories/checkDuplicate/${title}`);
+            const URL = `/api/categories/checkDuplicate/${title}`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
             return response.data.exists;
         } catch (error) {
             console.error('Error checking duplicate category:', error);
@@ -56,11 +61,16 @@ export default function CategoryInsert({ isOpen, onClose, onDataInserted }) {
                 return;
             }
 
-            const result = await axios.post(`${hostname}/api/categories/insertCategory`, {
-                category_title: categoryTitle,
-            });
-            
-            showToastMessage(true, `เพิ่มหมวดหมู่วิชา ${categoryTitle} สำเร็จ`);
+            const url = `/api/categories/insertCategory`;
+            const formData = {
+                category_title: categoryTitle
+            };
+
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+            message.success(msg)
+
             onDataInserted();
         } catch (error) {
             showToastMessage(false, 'หมวดหมู่วิชาต้องห้ามซ้ำ');

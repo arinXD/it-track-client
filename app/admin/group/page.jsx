@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar, Sidebar, GroupInsert, GroupUpdate, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
@@ -22,30 +22,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from 'next/link';
 import { TbRestore } from "react-icons/tb";
+import { fetchDataObj } from '../action'
 
-async function fetchData() {
-    try {
-        const result = await axios.get(`${hostname}/api/groups`);
-        const data = result.data.data;
-        let groupData = []
-        if (data.length) {
-            groupData = await Promise.all(data.map(async group => {
-                const categoryResult = await axios.get(`${hostname}/api/categories/${group.category_id}`);
-                const categoryData = categoryResult.data.data;
-
-                return {
-                    ...group,
-                    category: categoryData
-                };
-            }));
-        }
-
-        return groupData;
-    } catch (error) {
-        console.log(error);
-        return [{ "group_title": "ไม่มี" }];
-    }
-}
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
 
 export default function Group() {
     const [isInsertModalOpen, setInsertModalOpen] = useState(false);
@@ -80,9 +59,25 @@ export default function Group() {
         }
     };
 
-    useEffect(() => {
-        fetchData().then(data => setGroups(data));
+    const callGroup = useCallback(async () => {
+        try {
+            const URL = `/api/groups`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const g = response.data.data;
+
+            console.log(g);
+
+            setGroups(g);
+
+        } catch (error) {
+            console.log("fetch error:", error);
+        }
     }, []);
+
+    useEffect(() => {
+        callGroup();
+    }, [])
 
     const handleInsertModalOpen = () => {
         setInsertModalOpen(true);
@@ -94,8 +89,7 @@ export default function Group() {
 
     const handleDataInserted = async () => {
         try {
-            const data = await fetchData();
-            setGroups(data);
+            callGroup();
             handleInsertModalClose();
         } catch (error) {
             console.error('Error inserting data:', error);
@@ -118,10 +112,7 @@ export default function Group() {
 
     const handleDataUpdated = async () => {
         try {
-
-            const data = await fetchData();
-            setGroups(data);
-
+            callGroup();
             showToastMessage(true, `อัปเดตข้อมูลสำเร็จ`);
             handleUpdateModalClose();
         } catch (error) {
@@ -151,13 +142,19 @@ export default function Group() {
 
         if (value) {
             try {
-                const result = await axios.delete(`${hostname}/api/groups/deleteGroup/${group.id}`);
 
-                const { ok, message } = result.data
-                showToastMessage(ok, `ลบกลุ่มวิชา ${group.group_title} สำเร็จ`)
+                const url = `/api/groups/deleteGroup/${group.id}`
+                const options = await getOptions(url, 'DELETE')
+                axios(options)
+                    .then(async result => {
+                        const { ok, message } = result.data
+                        showToastMessage(ok, message)
+                    })
+                    .catch(error => {
+                        showToastMessage(false, error)
+                    })
 
-                const data = await fetchData();
-                setGroups(data);
+                callGroup();
             } catch (error) {
 
                 const message = error?.response?.data?.message
@@ -169,7 +166,7 @@ export default function Group() {
         const queryLowerCase = searchQuery.toLowerCase();
 
         return (
-            group.category.category_title.toLowerCase().includes(queryLowerCase) ||
+            group?.Categorie?.category_title.toLowerCase().includes(queryLowerCase) ||
             group.group_title.toLowerCase().includes(queryLowerCase) ||
             group.createdAt.toLowerCase().includes(queryLowerCase) ||
             group.updatedAt.toLowerCase().includes(queryLowerCase)
@@ -258,7 +255,7 @@ export default function Group() {
                                             </div>
                                         </TableCell>
                                         <TableCell>{group.group_title}</TableCell>
-                                        <TableCell>{group.category ? group.category.category_title : 'No Group'}</TableCell>
+                                        <TableCell>  {group?.Categorie?.category_title ? group.Categorie.category_title : "-"}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(group[column]) : group[column]}</span>

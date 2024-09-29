@@ -333,12 +333,16 @@ const Page = ({ params }) => {
           // console.log(id);
           axios(options)
                .then(async result => {
-                    const { ok, message } = result.data
-                    showToastMessage(ok, message)
-                    initVerify(id);
+                    const { ok, message: msg } = result.data;
+                    if (ok) {
+                         message.success(msg);
+                         initVerify(id);
+                    }
                })
                .catch(error => {
-                    showToastMessage(false, error)
+                    console.log(error);
+                    message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
+                    
                })
      };
 
@@ -349,12 +353,15 @@ const Page = ({ params }) => {
           const options = await getOptions(url, 'DELETE')
           axios(options)
                .then(async result => {
-                    const { ok, message } = result.data
-                    showToastMessage(ok, message)
-                    initVerify(id);
+                    const { ok, message: msg } = result.data;
+                    if (ok) {
+                         message.success(msg);
+                         initVerify(id);
+                    }
                })
                .catch(error => {
-                    showToastMessage(false, error)
+                    console.log(error);
+                    message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
                })
      };
 
@@ -367,12 +374,15 @@ const Page = ({ params }) => {
           const options = await getOptions(url, 'DELETE')
           axios(options)
                .then(async result => {
-                    const { ok, message } = result.data
-                    showToastMessage(ok, message)
-                    initVerify(id);
+                    const { ok, message: msg } = result.data;
+                    if (ok) {
+                         message.success(msg);
+                         initVerify(id);
+                    }
                })
                .catch(error => {
-                    showToastMessage(false, error)
+                    console.log(error);
+                    message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
                })
      };
 
@@ -383,12 +393,15 @@ const Page = ({ params }) => {
           const options = await getOptions(url, 'DELETE')
           axios(options)
                .then(async result => {
-                    const { ok, message } = result.data
-                    showToastMessage(ok, message)
-                    initVerify(id);
+                    const { ok, message: msg } = result.data;
+                    if (ok) {
+                         message.success(msg);
+                         initVerify(id);
+                    }
                })
                .catch(error => {
-                    showToastMessage(false, error)
+                    console.log(error);
+                    message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
                })
 
      };

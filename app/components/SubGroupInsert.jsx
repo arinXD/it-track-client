@@ -9,6 +9,9 @@ import { hostname } from '@/app/api/hostname';
 import { Input } from "@nextui-org/react";
 import { toast } from 'react-toastify';
 
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 export default function SubGroupInsert({ isOpen, onClose, onDataInserted }) {
     const [subGroupTitle, setSubGroupTitle] = useState('');
     const [selectedGroup, setSelectedGroup] = useState(null);
@@ -41,10 +44,12 @@ export default function SubGroupInsert({ isOpen, onClose, onDataInserted }) {
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                const result = await axios.get(`${hostname}/api/groups`);
-                const data = result.data.data;
+                const URL = `/api/groups`;
+                const option = await getOptions(URL, "GET");
+                const response = await axios(option);
+                const g = response.data.data;
 
-                const groupOptions = data.map(group => ({
+                const groupOptions = g.map(group => ({
                     value: group.id,
                     label: group.group_title
                 }));
@@ -71,12 +76,18 @@ export default function SubGroupInsert({ isOpen, onClose, onDataInserted }) {
                 return;
             }
 
-            const result = await axios.post(`${hostname}/api/subgroups/insertSubGroup`, {
+            
+            const url = `/api/subgroups/insertSubGroup`;
+            const formData = {
                 sub_group_title: subGroupTitle,
                 group_id: selectedGroup.value
-            });
+            };
 
-            showToastMessage(true, `เพิ่มกลุ่มย่อย ${subGroupTitle} สำเร็จ`);
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+            message.success(msg)
+            
             onDataInserted();
         } catch (error) {
             showToastMessage(false, 'กลุ่มย่อยวิชาซ้ำ');

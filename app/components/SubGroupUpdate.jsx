@@ -9,6 +9,10 @@ import { hostname } from '@/app/api/hostname';
 import { Input } from "@nextui-org/react";
 import { toast } from 'react-toastify';
 
+
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }) {
     const [newTitle, setNewTitle] = useState('');
     const [selectedGroup, setSelectedGroup] = useState(null);
@@ -41,18 +45,19 @@ export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch the subgroup details
-                const subgroupResult = await axios.get(`${hostname}/api/subgroups/${subGroupId}`);
-                const subgroupData = subgroupResult.data.data;
+                const URLs = `/api/subgroups/${subGroupId}`;
+                const optiondd = await getOptions(URLs, "GET");
+                const responsess = await axios(optiondd);
+                const sg = responsess.data.data;
+                setNewTitle(sg?.sub_group_title);
 
-                setNewTitle(subgroupData.sub_group_title);
-
-                // Fetch the list of groups
-                const groupsResult = await axios.get(`${hostname}/api/groups`);
-                const groupsData = groupsResult.data.data;
+                const URL = `/api/groups`;
+                const option = await getOptions(URL, "GET");
+                const response = await axios(option);
+                const subgroupData = response.data.data;
 
                 // Map groups for react-select
-                const options = groupsData.map(group => ({
+                const options = subgroupData.map(group => ({
                     value: group.id,
                     label: group.group_title
                 }));
@@ -60,8 +65,9 @@ export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }
                 setGroups(options);
 
                 // Find the selected group based on the current subgroup's group ID
-                const selectedGroup = options.find(option => option.value === subgroupData.group_id);
+                const selectedGroup = options.find(option => option.value === sg.group_id);
                 setSelectedGroup(selectedGroup);
+
             } catch (error) {
                 console.error('Error fetching subgroup details:', error);
             }
@@ -83,12 +89,17 @@ export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }
                 return;
             }
 
-            await axios.post(`${hostname}/api/subgroups/updateSubGroup/${subGroupId}`, {
+            const url = `/api/subgroups/updateSubGroup/${subGroupId}`;
+            const formData = {
                 sub_group_title: newTitle,
                 group_id: selectedGroup.value
-            });
+            };
 
-            // Notify the parent component that data has been updated
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+            message.success(msg)
+
             onUpdate();
 
             // Close the modal after updating

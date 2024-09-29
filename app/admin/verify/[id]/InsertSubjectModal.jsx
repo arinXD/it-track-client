@@ -51,7 +51,10 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const result = await fetchDataObj(`/api/categories`);
+                const URLProgram = `/api/categories`;
+                const options = await getOptions(URLProgram, "GET");
+                const responses = await axios(options);
+                const result = responses.data.data;
 
                 const categoriesOptions = result.map(category => ({
                     value: category.id,

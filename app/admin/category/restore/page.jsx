@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
@@ -24,15 +24,8 @@ import "react-toastify/dist/ReactToastify.css";
 import Link from 'next/link';
 import { TbRestore } from "react-icons/tb";
 
-async function fetchDatas() {
-    try {
-        const result = await axios.get(`${hostname}/api/categories/getrestore`);
-        const categories = result.data.data;
-        return { categories };
-    } catch (error) {
-        console.log(error);
-    }
-}
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+import { Empty, message } from 'antd';
 
 
 export default function RestoreProgramCode() {
@@ -65,14 +58,23 @@ export default function RestoreProgramCode() {
         }
     };
 
-    useEffect(() => {
-        fetchDatas().then(data => {
-            console.log(data);
-            setRestores(data.categories)
-        }).catch(err => {
-            console.log("error on useeffect:", err);
-        });
+    const callgetrestore = useCallback(async () => {
+        try {
+            const URL = `/api/categories/getrestore`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const cat = response.data.data;
+
+            setRestores(cat);
+
+        } catch (error) {
+            console.log("fetch error:", error);
+        }
     }, []);
+
+    useEffect(() => {
+        callgetrestore();
+    }, [])
 
     const handleRestore = async (id) => {
         const swal = Swal.mixin({
@@ -94,11 +96,17 @@ export default function RestoreProgramCode() {
         });
         if (value) {
             try {
-                const result = await axios.post(`${hostname}/api/categories/restoreCategorie/${id.id}`);
-                const { ok, message } = result.data
-                showToastMessage(true, `คืนค่าหมวดหมู่วิชา ${id.category_title} สำเร็จ`)
-                const data = await fetchDatas();
-                setRestores(data.categories)
+                const url = `/api/categories/restoreCategorie/${id.id}`;
+                const formData = {
+                    id: id.id
+                };
+
+                const options = await getOptions(url, "POST", formData);
+                const result = await axios(options);
+                const { ok, message: msg } = result.data;
+                message.success(msg)
+
+                callgetrestore();
             } catch (error) {
                 const message = error?.response?.data?.message
                 showToastMessage(false, message)
@@ -139,7 +147,7 @@ export default function RestoreProgramCode() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             <Button
-                            className='ml-3'
+                                className='ml-3'
                                 radius="sm"
                                 color="default"
                                 endContent={<TbRestore className="w-[18px] h-[18px]" />}>
@@ -150,7 +158,6 @@ export default function RestoreProgramCode() {
                     </div>
                     <Table
                         removeWrapper
-                        selectionMode="multiple"
                         onRowAction={() => { }}
                         aria-label="programcode table"
                     >

@@ -83,6 +83,37 @@ const Page = () => {
         }
     };
 
+    const handleDeleteVerify = async (id) => {
+        const url = `/api/verify/${id}`;
+        const options = await getOptions(url, 'DELETE');
+
+        axios(options)
+            .then(result => {
+                // Handle success case (status code 200)
+                const { ok, message: msg } = result.data;
+                if (ok) {
+                    message.success(msg);
+                    callVerify(); // Refresh the data after deletion
+                }
+            })
+            .catch(error => {
+                // Handle error response (status code 400, 500, etc.)
+                if (error.response) {
+                    const { data, status } = error.response;
+                    if (status === 400) {
+                        // Handle 400 error specifically
+                        message.error(data.message || 'ไม่สามารถลบได้ กรุณาลบข้อมูลที่เกี่ยวข้องก่อน');
+                    } else {
+                        // Generic error message for other status codes
+                        message.error('เกิดข้อผิดพลาดในการลบแบบฟอร์ม');
+                    }
+                } else {
+                    console.error(error); // Log the actual error for debugging
+                    message.error('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
+                }
+            });
+    };
+
 
     return (
         <>
@@ -149,8 +180,7 @@ const Page = () => {
                                                     <div className='relative flex items-center gap-2'>
                                                         <Tooltip color="danger" content="ลบ">
                                                             <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                                {/* <DeleteIcon2 onClick={() => handleDeleteVerify(verifies?.id)} /> */}
-                                                                <DeleteIcon2 />
+                                                                <DeleteIcon2 onClick={() => handleDeleteVerify(verifies?.id)} />
                                                             </span>
                                                         </Tooltip>
                                                     </div>

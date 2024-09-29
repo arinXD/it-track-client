@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Navbar, Sidebar, CategoryInsert, CategoryUpdate, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
@@ -22,16 +22,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from 'next/link';
 import { TbRestore } from "react-icons/tb";
-async function fetchData() {
-    try {
-        const result = await axios.get(`${hostname}/api/categories`);
-        const data = result.data.data;
-        return data;
-    } catch (error) {
-        console.log(error);
-    }
-}
-import { getToken } from '@/app/components/serverAction/TokenAction'
+
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 export default function Category() {
     const showToastMessage = (ok, message) => {
         if (ok) {
@@ -64,19 +57,23 @@ export default function Category() {
 
     const [selectedKey, setSelectedKey] = useState([])
 
-    useEffect(() => {
-        const getData = async () => {
-            try {
-                const data = await fetchData();
-                setCategories(data);
-            } catch (error) {
-                // Handle error if needed
-                console.error('Error fetching data:', error);
-            }
-        };
+    const callCat = useCallback(async () => {
+        try {
+            const URL = `/api/categories`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const cat = response.data.data;
 
-        getData();
+            setCategories(cat);
+
+        } catch (error) {
+            console.log("fetch error:", error);
+        }
     }, []);
+
+    useEffect(() => {
+        callCat();
+    }, [])
 
     const handleModalOpen = () => {
         setModalOpen(true);
@@ -89,8 +86,7 @@ export default function Category() {
     const handleDataInserted = async () => {
         try {
 
-            const data = await fetchData();
-            setCategories(data);
+            callCat();
             handleModalClose();
         } catch (error) {
             // Handle error if needed
@@ -120,13 +116,18 @@ export default function Category() {
 
         if (value) {
             try {
-                const result = await axios.delete(`${hostname}/api/categories/deleteCategory/${category.id}`);
-                // Fetch data again after deleting to update the list
-                const { ok, message } = result.data
-                showToastMessage(ok, `ลบหมวดหมู่วิชา ${category.category_title} สำเร็จ`)
+                const url = `/api/categories/deleteCategory/${category.id}`
+                const options = await getOptions(url, 'DELETE')
+                axios(options)
+                    .then(async result => {
+                        const { ok, message } = result.data
+                        showToastMessage(ok, message)
+                    })
+                    .catch(error => {
+                        showToastMessage(false, error)
+                    })
 
-                const data = await fetchData();
-                setCategories(data);
+                callCat();
 
             } catch (error) {
                 const message = error?.response?.data?.message
@@ -152,10 +153,7 @@ export default function Category() {
     const handleDataUpdated = async (categoryId) => {
         try {
 
-            const data = await fetchData();
-            setCategories(data);
-
-            showToastMessage(true, `อัปเดตข้อมูลสำเร็จ`);
+            callCat();
             handleUpdateModalClose()
 
         } catch (error) {
