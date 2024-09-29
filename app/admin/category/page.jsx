@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Navbar, Sidebar, CategoryInsert, CategoryUpdate, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
@@ -22,16 +22,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from 'next/link';
 import { TbRestore } from "react-icons/tb";
-async function fetchData() {
-    try {
-        const result = await axios.get(`${hostname}/api/categories`);
-        const data = result.data.data;
-        return data;
-    } catch (error) {
-        console.log(error);
-    }
-}
-import { getToken } from '@/app/components/serverAction/TokenAction'
+
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 export default function Category() {
     const showToastMessage = (ok, message) => {
         if (ok) {
@@ -64,19 +57,23 @@ export default function Category() {
 
     const [selectedKey, setSelectedKey] = useState([])
 
-    useEffect(() => {
-        const getData = async () => {
-            try {
-                const data = await fetchData();
-                setCategories(data);
-            } catch (error) {
-                // Handle error if needed
-                console.error('Error fetching data:', error);
-            }
-        };
+    const callCat = useCallback(async () => {
+        try {
+            const URL = `/api/categories`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const cat = response.data.data;
 
-        getData();
+            setCategories(cat);
+
+        } catch (error) {
+            console.log("fetch error:", error);
+        }
     }, []);
+
+    useEffect(() => {
+        callCat();
+    }, [])
 
     const handleModalOpen = () => {
         setModalOpen(true);
@@ -89,8 +86,7 @@ export default function Category() {
     const handleDataInserted = async () => {
         try {
 
-            const data = await fetchData();
-            setCategories(data);
+            callCat();
             handleModalClose();
         } catch (error) {
             // Handle error if needed
@@ -120,13 +116,18 @@ export default function Category() {
 
         if (value) {
             try {
-                const result = await axios.delete(`${hostname}/api/categories/deleteCategory/${category.id}`);
-                // Fetch data again after deleting to update the list
-                const { ok, message } = result.data
-                showToastMessage(ok, `ลบหมวดหมู่วิชา ${category.category_title} สำเร็จ`)
+                const url = `/api/categories/deleteCategory/${category.id}`
+                const options = await getOptions(url, 'DELETE')
+                axios(options)
+                    .then(async result => {
+                        const { ok, message } = result.data
+                        showToastMessage(ok, message)
+                    })
+                    .catch(error => {
+                        showToastMessage(false, error)
+                    })
 
-                const data = await fetchData();
-                setCategories(data);
+                callCat();
 
             } catch (error) {
                 const message = error?.response?.data?.message
@@ -152,10 +153,7 @@ export default function Category() {
     const handleDataUpdated = async (categoryId) => {
         try {
 
-            const data = await fetchData();
-            setCategories(data);
-
-            showToastMessage(true, `อัปเดตข้อมูลสำเร็จ`);
+            callCat();
             handleUpdateModalClose()
 
         } catch (error) {
@@ -188,88 +186,6 @@ export default function Category() {
         setCurrentPage(newPage);
     };
 
-    // function handleSetSelectedKey(selectedKey) {
-    //     let allId;
-    //     if (selectedKey === "all") {
-    //         if (categories && categories.length > 0) {
-    //             allId = categories.map(e => e.id);
-    //             setSelectedKey(allId);
-    //         }
-    //     } else {
-    //         let values = [...selectedKey.values()];
-    //         if (values.length > 0) {
-    //             allId = [];
-    //             values.map(e => {
-    //                 if (categories && categories[parseInt(e)]) {
-    //                     allId.push(categories[parseInt(e)].id);
-    //                 }
-    //             });
-    //             setSelectedKey(allId);
-    //         } else {
-    //             setSelectedKey([]);
-    //         }
-    //     }
-    // }
-
-    // async function handleSelectedDel(id) {
-    //     if (id.length == 0) return
-    //     Swal.fire({
-    //         text: `ต้องการลบหมวดหมู่ ${id.join(", ")} หรือไม่ ?`,
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#3085d6",
-    //         cancelButtonColor: "#d33",
-    //         confirmButtonText: "ตกลง",
-    //         cancelButtonText: "ยกเลิก"
-    //     }).then(async (result) => {
-    //         if (result.isConfirmed) {
-    //             const token = await getToken()
-    //             const options = {
-    //                 url: `${hostname}/api/categories/selected`,
-    //                 method: 'DELETE',
-    //                 headers: {
-    //                     'Accept': 'application/json',
-    //                     'Content-Type': 'application/json;charset=UTF-8',
-    //                     "authorization": `${token}`,
-    //                 },
-    //                 data: {
-    //                     categoriesArr: id
-    //                 }
-    //             };
-    //             axios(options)
-    //                 .then(async result => {
-    //                     const { ok, message } = result.data
-    //                     showToastMessage(ok, message)
-
-    //                     const data = await fetchData();
-    //                     setCategories(data);
-
-    //                     // Select All
-    //                     const selectAllElement = document.querySelectorAll('[aria-label="Select All"]')
-    //                     const selectElement = document.querySelectorAll('[aria-label="Select"]')
-    //                     selectElement.forEach(element => {
-    //                         if (element.tagName === "input") {
-    //                             element.checked = false
-    //                         } else {
-    //                             element.setAttribute("data-selected", false)
-    //                         }
-    //                     });
-    //                     selectAllElement.forEach(element => {
-    //                         if (element.tagName === "input") {
-    //                             element.checked = false
-    //                         } else {
-    //                             element.setAttribute("data-selected", false)
-    //                         }
-    //                     });
-    //                 })
-    //                 .catch(error => {
-    //                     const message = error.response.data.message
-    //                     showToastMessage(false, message)
-    //                 })
-    //         }
-    //     });
-    // }
-
     return (
         <>
             <header>
@@ -301,16 +217,6 @@ export default function Category() {
                                     endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มหมวดหมู่วิชา
                                 </Button>
-                                <Button
-                                    radius="sm"
-                                    color="danger"
-                                    // onPress={async () => {
-                                    //     await handleSelectedDel(selectedKey)
-                                    //     setSelectedKey([])
-                                    // }}
-                                    endContent={<DeleteIcon2 width={16} height={16} />}>
-                                    ลบรายการที่เลือก
-                                </Button>
                                 <Link href={'/admin/category/restore'}>
                                     <Button
                                         radius="sm"
@@ -324,7 +230,6 @@ export default function Category() {
                     </div>
                     <Table
                         removeWrapper
-                        selectionMode="multiple"
                         onRowAction={() => { }}
                         // onSelectionChange={handleSetSelectedKey}
                         aria-label="category table">

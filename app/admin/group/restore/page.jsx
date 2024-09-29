@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
@@ -24,28 +24,8 @@ import "react-toastify/dist/ReactToastify.css";
 import Link from 'next/link';
 import { TbRestore } from "react-icons/tb";
 
-async function fetchDatas() {
-    try {
-        const result = await axios.get(`${hostname}/api/groups/getrestore`);
-        const data = result.data.data;
-
-        const groupData = await Promise.all(data.map(async group => {
-            const categoryResult = await axios.get(`${hostname}/api/categories/${group.category_id}`);
-            const categoryData = categoryResult.data.data;
-
-            return {
-                ...group,
-                category: categoryData
-            };
-        }));
-
-        return groupData;
-    } catch (error) {
-        console.log(error);
-        return [{ "group_title": "ไม่มี" }];
-    }
-}
-
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
 
 export default function RestoreProgramCode() {
     const [restores, setRestores] = useState([]);
@@ -77,9 +57,25 @@ export default function RestoreProgramCode() {
         }
     };
 
-    useEffect(() => {
-        fetchDatas().then(data => setRestores(data));
+    const callGroup = useCallback(async () => {
+        try {
+            const URL = `/api/groups/getrestore`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const g = response.data.data;
+
+            console.log(g);
+
+            setRestores(g);
+
+        } catch (error) {
+            console.log("fetch error:", error);
+        }
     }, []);
+
+    useEffect(() => {
+        callGroup();
+    }, [])
 
     const handleRestore = async (id) => {
         const swal = Swal.mixin({
@@ -101,11 +97,17 @@ export default function RestoreProgramCode() {
         });
         if (value) {
             try {
-                const result = await axios.post(`${hostname}/api/groups/restoreGroup/${id.id}`);
-                const { ok, message } = result.data
-                showToastMessage(true, `คืนค่ารหัสกลุ่มวิชา ${id.group_title} สำเร็จ`)
-                const data = await fetchDatas();
-                setRestores(data)
+                const url = `/api/groups/restoreGroup/${id.id}`;
+                const formData = {
+                    id: id.id
+                };
+
+                const options = await getOptions(url, "POST", formData);
+                const result = await axios(options);
+                const { ok, message: msg } = result.data;
+                message.success(msg)
+
+                callGroup();
             } catch (error) {
                 const message = error?.response?.data?.message
                 showToastMessage(false, message)
@@ -118,8 +120,8 @@ export default function RestoreProgramCode() {
         const queryLowerCase = searchQuery.toLowerCase();
 
         return (
-            (group.category.category_title && group.category.category_title.toLowerCase().includes(queryLowerCase)) ||
-            (group.group_title && group.group_title.toLowerCase().includes(queryLowerCase))
+            (group?.Categorie?.category_title.toLowerCase().includes(queryLowerCase)) ||
+            (group?.group_title.toLowerCase().includes(queryLowerCase))
         );
     });
 
@@ -147,7 +149,7 @@ export default function RestoreProgramCode() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             <Button
-                            className='ml-3'
+                                className='ml-3'
                                 radius="sm"
                                 color="default"
                                 endContent={<TbRestore className="w-[18px] h-[18px]" />}>
@@ -174,8 +176,8 @@ export default function RestoreProgramCode() {
                                 {filteredGroup.map((group, index) => (
                                     <TableRow key={group.id}>
                                         <TableCell>{index + 1}</TableCell>
-                                        <TableCell>{group.category ? group.category.category_title : "-"}</TableCell>
                                         <TableCell>{group.group_title}</TableCell>
+                                        <TableCell>{group?.Categorie?.category_title}</TableCell>
                                         <TableCell>{dmy(group.deletedAt || "-")}</TableCell>
                                         <TableCell>
                                             <div className='relative flex items-center gap-2'>

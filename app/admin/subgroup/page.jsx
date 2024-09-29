@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Navbar, Sidebar, SubGroupInsert, SubGroupUpdate, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
@@ -23,32 +23,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { TbRestore } from "react-icons/tb";
 
 import Link from 'next/link';
-async function fetchData() {
-    try {
-        const result = await axios.get(`${hostname}/api/subgroups`);
-        const data = result.data.data;
 
-        const subGroupData = await Promise.all(data.map(async subgroup => {
-            const groupResult = await axios.get(`${hostname}/api/groups/${subgroup.group_id}`);
-            const groupData = groupResult.data.data;
-
-            // Fetch category details for each group
-            const categoryResult = await axios.get(`${hostname}/api/categories/${groupData.category_id}`);
-            const categoryData = categoryResult.data.data;
-
-            return {
-                ...subgroup,
-                group: groupData,
-                category: categoryData
-            };
-        }));
-
-        return subGroupData;
-    } catch (error) {
-        console.log(error);
-        return [{ "sub_group_title": "ไม่มี" }];
-    }
-}
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
 
 export default function SubGroup() {
     const [isInsertModalOpen, setInsertModalOpen] = useState(false);
@@ -83,9 +60,23 @@ export default function SubGroup() {
         }
     };
 
-    useEffect(() => {
-        fetchData().then(data => setSubGroups(data));
+    const callsubGroup = useCallback(async () => {
+        try {
+            const URL = `/api/subgroups`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const sg = response.data.data;
+
+            setSubGroups(sg);
+
+        } catch (error) {
+            console.log("fetch error:", error);
+        }
     }, []);
+
+    useEffect(() => {
+        callsubGroup();
+    }, [])
 
     const handleInsertModalOpen = () => {
         setInsertModalOpen(true);
@@ -97,8 +88,7 @@ export default function SubGroup() {
 
     const handleDataInserted = async () => {
         try {
-            const data = await fetchData();
-            setSubGroups(data);
+            callsubGroup()
             handleInsertModalClose();
         } catch (error) {
             console.error('Error inserting data:', error);
@@ -118,8 +108,7 @@ export default function SubGroup() {
 
     const handleDataUpdated = async () => {
         try {
-            const data = await fetchData();
-            setSubGroups(data);
+            callsubGroup()
             showToastMessage(true, `อัปเดตข้อมูลสำเร็จ`);
             handleUpdateModalClose();
 
@@ -150,18 +139,20 @@ export default function SubGroup() {
 
         if (value) {
             try {
-                const result = await axios.delete(`${hostname}/api/subgroups/deleteSubGroup/${subgroupId.id}`);
-
-                const { ok, message } = result.data
-                showToastMessage(ok, `ลบกลุ่มย่อย ${subgroupId.sub_group_title} สำเร็จ`)
-
-                const data = await fetchData();
-                setSubGroups(data);
-
+                const url = `/api/subgroups/deleteSubGroup/${subgroupId.id}`
+                const options = await getOptions(url, 'DELETE')
+                axios(options)
+                    .then(async result => {
+                        const { ok, message } = result.data
+                        showToastMessage(ok, message)
+                    })
+                    .catch(error => {
+                        showToastMessage(false, error)
+                    })
+                callsubGroup();
 
             } catch (error) {
-                const message = error?.response?.data?.message
-                showToastMessage(false, message)
+                console.log(error);
             }
         }
     };
@@ -170,8 +161,8 @@ export default function SubGroup() {
         const queryLowerCase = searchQuery.toLowerCase();
 
         return (
-            subgroup?.category?.category_title?.toLowerCase().includes(queryLowerCase) ||
-            subgroup?.group?.group_title?.toLowerCase().includes(queryLowerCase) ||
+            subgroup?.Group?.Categorie?.category_title?.toLowerCase().includes(queryLowerCase) ||
+            subgroup?.Group?.group_title?.toLowerCase().includes(queryLowerCase) ||
             subgroup?.sub_group_title?.toLowerCase().includes(queryLowerCase) ||
             subgroup?.createdAt?.toLowerCase().includes(queryLowerCase) ||
             subgroup?.updatedAt?.toLowerCase().includes(queryLowerCase)
@@ -219,12 +210,6 @@ export default function SubGroup() {
                                     endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มกลุ่มย่อยวิชา
                                 </Button>
-                                <Button
-                                    radius="sm"
-                                    color="danger"
-                                    endContent={<DeleteIcon2 width={16} height={16} />}>
-                                    ลบรายการที่เลือก
-                                </Button>
                                 <Link href={'/admin/subgroup/restore'}>
                                     <Button
                                         radius="sm"
@@ -238,7 +223,6 @@ export default function SubGroup() {
                     </div>
                     <Table
                         removeWrapper
-                        selectionMode="multiple"
                         onRowAction={() => { }}
                         aria-label="subgroup table">
                         <TableHeader>
@@ -268,8 +252,8 @@ export default function SubGroup() {
                                             </div>
                                         </TableCell>
                                         <TableCell>{subgroup.sub_group_title}</TableCell>
-                                        <TableCell>{subgroup.group ? subgroup.group.group_title : 'ไม่มีกลุ่มวิชา'}</TableCell>
-                                        <TableCell>{subgroup.category ? subgroup.category.category_title : 'ไม่มีหมวดหมู่วิชา'}</TableCell>
+                                        <TableCell>{subgroup?.Group?.group_title ? subgroup?.Group?.group_title : "-"}</TableCell>
+                                        <TableCell>{subgroup?.Group?.Categorie?.category_title ? subgroup?.Group?.Categorie?.category_title : "-"}</TableCell>
                                         {["createdAt", "updatedAt"].map(column => (
                                             <TableCell key={column}>
                                                 <span>{column === "createdAt" || column === "updatedAt" ? dmy(subgroup[column]) : subgroup[column]}</span>

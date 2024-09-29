@@ -64,7 +64,10 @@ const Page = ({ params }) => {
      const { id } = params
 
      const initID = useCallback(async function (id) {
-          const result = await fetchDataObj(`/api/verify/${id}`)
+          const URL = `/api/verify/${id}`;
+          const option = await getOptions(URL, "GET");
+          const response = await axios(option);
+          const result = response.data.data;
           setId(result.id)
           idss = result.id;
      }, [])
@@ -75,8 +78,10 @@ const Page = ({ params }) => {
      const initVerify = useCallback(async function (id) {
           // console.log(id);
           try {
-               const result = await fetchDataObj(`/api/verify/${id}`)
-               // console.log(result);
+               const URL = `/api/verify/${id}`;
+               const option = await getOptions(URL, "GET");
+               const response = await axios(option);
+               const result = response.data.data;
                setVerifySelect(result)
                setProgram(result?.Program)
 
@@ -175,7 +180,7 @@ const Page = ({ params }) => {
      }, [groupedSubjectsByCategory]);
 
      // console.log(category);
-     
+
 
      useEffect(() => {
           const groupData = Object.keys(groupedSubjectsByCategory).flatMap(categoryId => {
@@ -296,7 +301,7 @@ const Page = ({ params }) => {
 
      const handleDataInserted = async () => {
           try {
-               await initVerify(id);
+               initVerify(id);
                handleInsertModalClose();
 
           } catch (error) {
@@ -308,7 +313,7 @@ const Page = ({ params }) => {
 
      const handleDataConditionInserted = async () => {
           try {
-               await initVerify(id);
+               initVerify(id);
 
           } catch (error) {
                console.error('Error inserting data:', error);
@@ -328,30 +333,35 @@ const Page = ({ params }) => {
           // console.log(id);
           axios(options)
                .then(async result => {
-                    const { ok, message } = result.data
-                    showToastMessage(ok, message)
-                    initVerify(id);
+                    const { ok, message: msg } = result.data;
+                    if (ok) {
+                         message.success(msg);
+                         initVerify(id);
+                    }
                })
                .catch(error => {
-                    showToastMessage(false, error)
+                    console.log(error);
+                    message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
+                    
                })
-
      };
 
      const handleDeleteSubGroupSubjectAndTrack = async (sgt) => {
           // console.log(`Deleting SubGroupSubjectAndTrack with id: ${sgt}`);
-          console.log("IDF: ", idss)
 
           const url = `/api/verify/subgroup/${sgt}/${idss}`
           const options = await getOptions(url, 'DELETE')
           axios(options)
                .then(async result => {
-                    const { ok, message } = result.data
-                    showToastMessage(ok, message)
-                    initVerify(id);
+                    const { ok, message: msg } = result.data;
+                    if (ok) {
+                         message.success(msg);
+                         initVerify(id);
+                    }
                })
                .catch(error => {
-                    showToastMessage(false, error)
+                    console.log(error);
+                    message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
                })
      };
 
@@ -364,28 +374,34 @@ const Page = ({ params }) => {
           const options = await getOptions(url, 'DELETE')
           axios(options)
                .then(async result => {
-                    const { ok, message } = result.data
-                    showToastMessage(ok, message)
-                    initVerify(id);
+                    const { ok, message: msg } = result.data;
+                    if (ok) {
+                         message.success(msg);
+                         initVerify(id);
+                    }
                })
                .catch(error => {
-                    showToastMessage(false, error)
+                    console.log(error);
+                    message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
                })
      };
 
      const handleDeleteCategory = async (cat) => {
           // console.log(`Deleting handleDeleteCategory with id: ${cat}`);
 
-          const url = `/api/verify/category/${cat}`
+          const url = `/api/verify/category/${cat}/${ids}`
           const options = await getOptions(url, 'DELETE')
           axios(options)
                .then(async result => {
-                    const { ok, message } = result.data
-                    showToastMessage(ok, message)
-                    initVerify(id);
+                    const { ok, message: msg } = result.data;
+                    if (ok) {
+                         message.success(msg);
+                         initVerify(id);
+                    }
                })
                .catch(error => {
-                    showToastMessage(false, error)
+                    console.log(error);
+                    message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
                })
 
      };
@@ -738,7 +754,7 @@ const Page = ({ params }) => {
                                                             <div className='relative flex items-center gap-2'>
                                                                  <Tooltip color="danger" content="ลบ">
                                                                       <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                                           <DeleteIcon2 onClick={() => handleDeleteCategory(categorie.id)} />
+                                                                           <DeleteIcon2 onClick={() => handleDeleteCategory(categorie.id, ids)} />
                                                                       </span>
                                                                  </Tooltip>
                                                             </div>

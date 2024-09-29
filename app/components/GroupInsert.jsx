@@ -7,6 +7,9 @@ import Select from 'react-select';
 import { Input } from "@nextui-org/react";
 import { toast } from 'react-toastify';
 
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
     const [groupTitle, setGroupTitle] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -39,9 +42,12 @@ export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await axios.get(`${hostname}/api/categories`);
-                const data = result.data.data;
-                setCategories(data);
+                const URL = `/api/categories`;
+                const option = await getOptions(URL, "GET");
+                const response = await axios(option);
+                const cat = response.data.data;
+
+                setCategories(cat);
             } catch (error) {
                 console.error('Error fetching categories:', error);
             }
@@ -64,19 +70,22 @@ export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
                 return;
             }
 
-            const result = await axios.post(`${hostname}/api/groups/insertGroup`, {
+            const url = `/api/groups/insertGroup`;
+            const formData = {
                 group_title: groupTitle,
-                category_id: selectedCategory.value // Assuming 'value' property contains the ID
-            });
+                category_id: selectedCategory.value
+            };
 
-            console.log('Inserted group:', result.data.data);
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+            message.success(msg)
 
             onDataInserted();
-
-            showToastMessage(true, `เพิ่มกลุ่มวิชา ${groupTitle} สำเร็จ`);
             onClose();
         } catch (error) {
-            showToastMessage(false, 'กลุ่มวิชาต้องห้ามซ้ำ');
+            console.log(error);
+            
         }
     };
 

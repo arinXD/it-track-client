@@ -6,6 +6,9 @@ import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import { Input } from "@nextui-org/react";
 import { toast } from 'react-toastify';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+import { Empty, message } from 'antd';
+
 export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }) {
   const [newTitle, setNewTitle] = useState('');
   const [currentTitle, setCurrentTitle] = useState('');
@@ -37,8 +40,12 @@ export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }
   useEffect(() => {
     const fetchCategoryTitle = async () => {
       try {
-        const response = await axios.get(`${hostname}/api/categories/${categoryId}`);
-        setNewTitle(response.data.data.category_title); // Set the newTitle as well
+        const URL = `/api/categories/${categoryId}`;
+        const option = await getOptions(URL, "GET");
+        const response = await axios(option);
+        const cat = response.data.data;
+        setNewTitle(cat?.category_title);
+        
       } catch (error) {
         // Handle error if needed
         console.error('Error fetching category title:', error);
@@ -51,7 +58,9 @@ export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }
 
   const checkDuplicateCategory = async (title) => {
     try {
-      const response = await axios.get(`${hostname}/api/categories/checkDuplicate/${title}`);
+      const URL = `/api/categories/checkDuplicate/${title}`;
+      const option = await getOptions(URL, "GET");
+      const response = await axios(option);
       return response.data.exists;
     } catch (error) {
       console.error('Error checking duplicate category:', error);
@@ -73,11 +82,17 @@ export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }
         return;
       }
 
-      await axios.put(`${hostname}/api/categories/updateCategory/${categoryId}`, {
-        category_title: newTitle,
-      });
+      const url = `/api/categories/updateCategory/${categoryId}`;
 
-      // Notify the parent component that data has been updated
+      const formData = {
+        category_title: newTitle
+      };
+
+      const options = await getOptions(url, "PUT", formData);
+      const result = await axios(options);
+      const { ok, message: msg } = result.data;
+      message.success(msg)
+
       onUpdate();
 
       // Close the modal after updating

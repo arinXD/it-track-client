@@ -17,6 +17,7 @@ import { Loading } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import InsertVerify from './InsertVerify';
+import { Empty, message } from 'antd';
 
 const Page = () => {
     const [verify, setVerify] = useState([]);
@@ -46,9 +47,13 @@ const Page = () => {
 
     const callVerify = useCallback(async () => {
         try {
-            const verifySelections = await fetchData("/api/verify");
+            const URL = `/api/verify`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const verifySelections = response.data.data;
+
             setVerify(verifySelections);
-            
+
         } catch (error) {
             console.log("fetch error:", error);
         }
@@ -69,13 +74,44 @@ const Page = () => {
 
     const handleDataInserted = async () => {
         try {
-            await callVerify();
+            callVerify();
             handleInsertModalClose();
 
         } catch (error) {
             console.error('Error inserting data:', error);
             showToastMessage(false, "Error adding verify")
         }
+    };
+
+    const handleDeleteVerify = async (id) => {
+        const url = `/api/verify/${id}`;
+        const options = await getOptions(url, 'DELETE');
+
+        axios(options)
+            .then(result => {
+                // Handle success case (status code 200)
+                const { ok, message: msg } = result.data;
+                if (ok) {
+                    message.success(msg);
+                    callVerify(); // Refresh the data after deletion
+                }
+            })
+            .catch(error => {
+                // Handle error response (status code 400, 500, etc.)
+                if (error.response) {
+                    const { data, status } = error.response;
+                    if (status === 400) {
+                        // Handle 400 error specifically
+                        message.error(data.message || 'ไม่สามารถลบได้ กรุณาลบข้อมูลที่เกี่ยวข้องก่อน');
+                    } else {
+                        // Generic error message for other status codes
+                        message.error('เกิดข้อผิดพลาดในการลบแบบฟอร์ม');
+                    }
+                } else {
+                    console.error(error); // Log the actual error for debugging
+                    message.error('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
+                }
+            });
     };
 
 
@@ -114,16 +150,6 @@ const Page = () => {
                                 startContent={<PlusIcon className="w-5 h-5" />}>
                                 เพิ่มแบบฟอร์มตรวจสอบจบ
                             </Button>
-                            <div>
-                                <Button
-                                    radius="sm"
-                                    className='bg-gray-300'
-                                    size='sm'
-                                    color="default"
-                                    startContent={<DeleteIcon2 className="w-5 h-5" />}>
-                                    ลบรายการที่เลือก
-                                </Button>
-                            </div>
                         </div>
                     </div>
                     {
@@ -136,7 +162,6 @@ const Page = () => {
                                 {/* {JSON.stringify(verify)} */}
                                 <Table
                                     removeWrapper
-                                    selectionMode="multiple"
                                     onRowAction={() => { }}
                                     aria-label="programcode table">
                                     <TableHeader>
@@ -155,7 +180,7 @@ const Page = () => {
                                                     <div className='relative flex items-center gap-2'>
                                                         <Tooltip color="danger" content="ลบ">
                                                             <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                                <DeleteIcon2 />
+                                                                <DeleteIcon2 onClick={() => handleDeleteVerify(verifies?.id)} />
                                                             </span>
                                                         </Tooltip>
                                                     </div>

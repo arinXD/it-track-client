@@ -10,6 +10,9 @@ import { Input } from "@nextui-org/react";
 
 import { toast } from 'react-toastify';
 
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+import { Empty, message } from 'antd';
+
 
 export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
     const [newTitle, setNewTitle] = useState('');
@@ -44,15 +47,20 @@ export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
     useEffect(() => {
         const fetchCategoryTitle = async () => {
             try {
-                const response = await axios.get(`${hostname}/api/groups/${groupId}`);
-                setNewTitle(response.data.data.group_title);
+                const URL = `/api/groups/${groupId}`;
+                const option = await getOptions(URL, "GET");
+                const response = await axios(option);
+                const g = response.data.data;
+                setNewTitle(g?.group_title);
 
-                // Fetch categories
-                const categoriesResult = await axios.get(`${hostname}/api/categories`);
-                const categoriesData = categoriesResult.data.data;
+                // Fetch categorie
+                const URLcat = `/api/categories`;
+                const optionsd = await getOptions(URLcat, "GET");
+                const responses = await axios(optionsd);
+                const cat = responses.data.data;
 
                 // Map categories for react-select
-                const options = categoriesData.map(category => ({
+                const options = cat.map(category => ({
                     value: category.id,
                     label: category.category_title
                 }));
@@ -83,11 +91,16 @@ export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
                 showToastMessage(false, 'กลุ่มวิชาห้ามเป็นค่าว่าง');
                 return;
             }
-
-            await axios.post(`${hostname}/api/groups/updateGroup/${groupId}`, {
+            const url = `/api/groups/updateGroup/${groupId}`;
+            const formData = {
                 group_title: newTitle,
                 category_id: selectedCategory.value,
-            });
+            };
+
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+            message.success(msg)
 
             // Notify the parent component that data has been updated
             onUpdate();

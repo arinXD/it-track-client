@@ -16,7 +16,7 @@ export default function InsertVerify({ isOpen, onClose, onDataInserted }) {
     const [mainAtLeast, setMainAtLeast] = useState('');
     const [programs, setPrograms] = useState([]);
     const [selectedProgram, setSelectedProgram] = useState(null);
-    
+
     const [acadyears, setAcadYear] = useState([]);
     const [selectedAcadYear, setSelectedAcadYear] = useState(null);
     const [acadValue, setAcadValue] = useState('');
@@ -41,11 +41,17 @@ export default function InsertVerify({ isOpen, onClose, onDataInserted }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await axios.get(`${hostname}/api/programs`);
-                const data = result.data.data;
-                
-                const veri = await axios.get(`${hostname}/api/verify`);
-                setExistingData(veri.data.data);
+                const URLProgram = `/api/programs`;
+                const options = await getOptions(URLProgram, "GET");
+                const responses = await axios(options);
+                const data = responses.data.data;
+
+                const URL = `/api/verify`;
+                const option = await getOptions(URL, "GET");
+                const response = await axios(option);
+                const verify = response.data.data;  
+
+                setExistingData(verify);
 
                 const programOptions = data.map(program => ({
                     value: program.program,
@@ -71,14 +77,14 @@ export default function InsertVerify({ isOpen, onClose, onDataInserted }) {
         if (isOpen) {
             setSelectedAcadYear(acadyears[0]);
             setSelectedProgram(programs[0]);
-            setProValue(programs[0]?.value); 
+            setProValue(programs[0]?.value);
             setAcadValue(acadyears[0]?.value);
             setVerify('');
             setLastValue(acadyears[0]?.value?.toString().slice(-2));
             setTitle(`B.Sc. ${programs[0]?.value || ''} ${acadyears[0]?.value || ''} ตรวจสอบการสำเร็จการศึกษา (รหัส ${acadyears[0]?.value?.toString().slice(-2) || ''} เป็นต้นไป)`);
         }
     }, [isOpen, acadyears, programs]);
-    
+
     const handleSelectionChange = useCallback(function (selectedOption) {
         if (selectedOption) {
             const newAcad = selectedOption.value.toString();
@@ -96,8 +102,8 @@ export default function InsertVerify({ isOpen, onClose, onDataInserted }) {
                 }
             });
         }
-    }, [acadValue , lastValue]);
-    
+    }, [acadValue, lastValue]);
+
     const handleProSelectionChange = useCallback(function (selectedOption) {
         if (selectedOption) {
             const newPro = selectedOption.value.toString();
@@ -144,22 +150,22 @@ export default function InsertVerify({ isOpen, onClose, onDataInserted }) {
             showToastMessage(false, "รหัสแบบฟอร์มต้องไม่เป็นค่าว่าง");
             return;
         }
-        if(!englishRegex.test(verify)){
+        if (!englishRegex.test(verify)) {
             showToastMessage(false, "ต้องเป็นภาษาอังกฤษเท่านั้น");
             return;
         }
 
-        if(!selectedAcadYear){
+        if (!selectedAcadYear) {
             showToastMessage(false, "โปรดเลือกปีการศึกษา");
             return;
         }
 
-        if(!selectedProgram){
+        if (!selectedProgram) {
             showToastMessage(false, "โปรดเลือกหลักสูตร");
             return;
         }
 
-        if(!title.trim()){
+        if (!title.trim()) {
             showToastMessage(false, "ชื่อแบบฟอร์มต้องไม่เป็นค่าว่าง");
             return;
         }
@@ -169,7 +175,7 @@ export default function InsertVerify({ isOpen, onClose, onDataInserted }) {
         const formData = {
             verify: verify,
             title: title,
-            main_at_least : mainAtLeast,
+            main_at_least: mainAtLeast,
             acadyear: selectedAcadYear.value,
             program: selectedProgram.value,
         }
