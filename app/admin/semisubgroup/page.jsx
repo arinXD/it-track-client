@@ -39,7 +39,6 @@ export default function SemiSubGroup() {
             const response = await axios(option);
             const semisubgroups = response.data.data;
             setSemi(semisubgroups);
-            console.log(semisubgroups);
 
         } catch (error) {
             console.log("fetch error:", error);

@@ -64,7 +64,10 @@ const Page = ({ params }) => {
      const { id } = params
 
      const initID = useCallback(async function (id) {
-          const result = await fetchDataObj(`/api/verify/${id}`)
+          const URL = `/api/verify/${id}`;
+          const option = await getOptions(URL, "GET");
+          const response = await axios(option);
+          const result = response.data.data;
           setId(result.id)
           idss = result.id;
      }, [])
@@ -75,8 +78,10 @@ const Page = ({ params }) => {
      const initVerify = useCallback(async function (id) {
           // console.log(id);
           try {
-               const result = await fetchDataObj(`/api/verify/${id}`)
-               // console.log(result);
+               const URL = `/api/verify/${id}`;
+               const option = await getOptions(URL, "GET");
+               const response = await axios(option);
+               const result = response.data.data;
                setVerifySelect(result)
                setProgram(result?.Program)
 
@@ -296,7 +301,7 @@ const Page = ({ params }) => {
 
      const handleDataInserted = async () => {
           try {
-               await initVerify(id);
+               initVerify(id);
                handleInsertModalClose();
 
           } catch (error) {
@@ -308,7 +313,7 @@ const Page = ({ params }) => {
 
      const handleDataConditionInserted = async () => {
           try {
-               await initVerify(id);
+               initVerify(id);
 
           } catch (error) {
                console.error('Error inserting data:', error);
@@ -374,7 +379,7 @@ const Page = ({ params }) => {
      const handleDeleteCategory = async (cat) => {
           // console.log(`Deleting handleDeleteCategory with id: ${cat}`);
 
-          const url = `/api/verify/category/${cat}`
+          const url = `/api/verify/category/${cat}/${ids}`
           const options = await getOptions(url, 'DELETE')
           axios(options)
                .then(async result => {
@@ -736,7 +741,7 @@ const Page = ({ params }) => {
                                                             <div className='relative flex items-center gap-2'>
                                                                  <Tooltip color="danger" content="ลบ">
                                                                       <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                                           <DeleteIcon2 onClick={() => handleDeleteCategory(categorie.id)} />
+                                                                           <DeleteIcon2 onClick={() => handleDeleteCategory(categorie.id, ids)} />
                                                                       </span>
                                                                  </Tooltip>
                                                             </div>
