@@ -85,6 +85,7 @@ const Page = () => {
                         <div className='space-y-10'>
                             <Input
                                 labelPlacement="outside"
+                                name="email"
                                 classNames={thinInputClass}
                                 label="อีเมล"
                                 placeholder="กรอกอีเมล"
@@ -93,6 +94,7 @@ const Page = () => {
                             />
                             <Input
                                 labelPlacement="outside"
+                                name="password"
                                 classNames={thinInputClass}
                                 label="รหัสผ่าน"
                                 placeholder="กรอกรหัสผ่าน"

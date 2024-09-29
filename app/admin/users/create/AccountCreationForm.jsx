@@ -48,6 +48,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                               <Input
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
+                                   name='email'
                                    type="email"
                                    label="อีเมล"
                                    placeholder="กรอกอีเมล"
@@ -57,6 +58,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                               <Input
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
+                                   name='password'
                                    type="password"
                                    label="รหัสผ่าน"
                                    placeholder="กรอกรหัสผ่าน"
@@ -66,6 +68,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                               <Input
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
+                                   name='prefix'
                                    label="คำนำหน้า"
                                    placeholder="กรอกคำนำหน้า"
                                    value={formData.prefix || ""}
@@ -74,6 +77,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                               <Input
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
+                                   name='name'
                                    label="ชื่อ"
                                    placeholder="กรอกชื่อ"
                                    value={formData.name || ""}
@@ -82,6 +86,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                               <Input
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
+                                   name='surname'
                                    label="นามสกุล"
                                    placeholder="กรอกนามสกุล"
                                    value={formData.surname || ""}
@@ -97,6 +102,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                         labelPlacement="outside"
                                         classNames={thinInputClass}
                                         type="email"
+                                        name='email'
                                         label="อีเมล"
                                         placeholder="กรอกอีเมล"
                                         value={formData.email || ""}
@@ -105,6 +111,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    <Input
                                         labelPlacement="outside"
                                         classNames={thinInputClass}
+                                        name='prefix'
                                         label="คำนำหน้า"
                                         placeholder="กรอกคำนำหน้า"
                                         value={formData.prefix || ""}
@@ -113,6 +120,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    <Input
                                         labelPlacement="outside"
                                         classNames={thinInputClass}
+                                        name='name'
                                         label="ชื่อ"
                                         placeholder="กรอกชื่อ"
                                         value={formData.name || ""}
@@ -121,6 +129,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    <Input
                                         labelPlacement="outside"
                                         classNames={thinInputClass}
+                                        name='surname'
                                         label="นามสกุล"
                                         placeholder="กรอกนามสกุล"
                                         value={formData.surname || ""}
@@ -130,6 +139,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                               <div className='grid grid-cols-4'>
                                    <div className='col-span-1 w-full flex justify-start items-start'>
                                         <Checkbox
+                                             name='has-track'
                                              className=''
                                              classNames={{
                                                   label: "!text-xs font-bold",
@@ -147,6 +157,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                                   classNames={{
                                                        trigger: "border-1",
                                                   }}
+                                                  name='track'
                                                   labelPlacement='outside'
                                                   label="แทร็ก"
                                                   placeholder="เลือกแทร็ก"
@@ -171,6 +182,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
                                    label="อีเมล"
+                                   name='email'
                                    type="email"
                                    placeholder="กรอกอีเมล"
                                    value={formData.email || ""}
@@ -179,6 +191,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                               <Input
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
+                                   name='std-id'
                                    label="รหัสนักศึกษา"
                                    placeholder="กรอกรหัสนักศึกษา"
                                    value={formData.stu_id || ""}
@@ -187,6 +200,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                               <Input
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
+                                   name='name'
                                    label="ชื่อ"
                                    placeholder="กรอกชื่อ"
                                    value={formData.first_name || ""}
@@ -195,6 +209,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                               <Input
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
+                                   name='surname'
                                    label="นามสกุล"
                                    placeholder="กรอกนามสกุล"
                                    value={formData.last_name || ""}
@@ -206,6 +221,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                         trigger: "border-1",
                                    }}
                                    labelPlacement='outside'
+                                   name='courses-type'
                                    label="โครงการ"
                                    placeholder="เลือกโครงการ"
                                    onChange={(e) => handleInputChange("courses_type", e.target.value)}
@@ -222,6 +238,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                         trigger: "border-1",
                                    }}
                                    labelPlacement='outside'
+                                   name='program'
                                    label="หลักสูตร"
                                    placeholder="เลือกหลักสูตร"
                                    onChange={(e) => handleInputChange("program", e.target.value)}
