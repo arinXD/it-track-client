@@ -110,7 +110,10 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
 
     const fetchCategories = async () => {
         try {
-            const result = await fetchDataObj(`/api/categories`);
+            const URLProgram = `/api/categories`;
+            const options = await getOptions(URLProgram, "GET");
+            const responses = await axios(options);
+            const result = responses.data.data;
 
             const categoriesOptions = result.map(category => ({
                 value: category.id,
@@ -132,7 +135,11 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
         setSelectedSubgroup(null);
 
         try {
-            const result = await fetchDataObj(`/api/categories/${selectedOption?.value}/groups`);
+            const URL = `/api/categories/${selectedOption?.value}/groups`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const result = response.data.data;
+
             const groupsOptions = result.map(group => ({
                 value: group.id,
                 label: group.group_title,
@@ -149,7 +156,11 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
         setSelectedSubgroup(null);
 
         try {
-            const result = await fetchDataObj(`/api/groups/${selectedOption?.value}/subgroups`);
+            const URL = `/api/groups/${selectedOption?.value}/subgroups`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const result = response.data.data;
+
             const subgroupsOptions = result.map(subgroup => ({
                 value: subgroup.id,
                 label: subgroup.sub_group_title,
