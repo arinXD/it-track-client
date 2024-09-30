@@ -29,7 +29,8 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextu
 import { fetchData } from '../action'
 
 import { getAcadyears } from "@/src/util/academicYear";
-import { getOptions } from '@/app/components/serverAction/TokenAction';
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
 import { FiDownload, FiTrash } from "react-icons/fi";
 
 
@@ -203,9 +204,17 @@ export default function Subject() {
 
         if (value) {
             try {
-                const result = await axios.delete(`${hostname}/api/subjects/deleteSubject/${subjectId.subject_id}`);
-                const { ok, message } = result.data
-                showToastMessage(true, `ลบวิชา ${subjectId.title_th ? subjectId.title_th : subjectId.subject_code} สำเร็จ`)
+                const url = `/api/subjects/deleteSubject/${subjectId.subject_id}`
+                const options = await getOptions(url, 'DELETE')
+                axios(options)
+                    .then(async result => {
+                        const { ok, message } = result.data
+                        showToastMessage(ok, message)
+                    })
+                    .catch(error => {
+                        showToastMessage(false, error)
+                    })
+
                 const data = await fetchDatas();
                 setSubjects(data.subjects);
 
@@ -423,12 +432,6 @@ export default function Subject() {
                                     style={{ backgroundColor: '#24b565', color: 'white' }}
                                     endContent={<FaRegFile width={16} height={16} />}>
                                     Import Excel
-                                </Button>
-                                <Button
-                                    radius="sm"
-                                    color="danger"
-                                    endContent={<DeleteIcon2 width={16} height={16} />}>
-                                    ลบรายการที่เลือก
                                 </Button>
                             </div>
                         </div>

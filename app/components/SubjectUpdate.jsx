@@ -11,6 +11,9 @@ import { Input, Textarea } from "@nextui-org/react";
 import { toast } from 'react-toastify';
 import { getAcadyears } from "@/src/util/academicYear";
 
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) {
     // const [semester, setSemester] = useState('');
     const [subject_code, setSubjectCode] = useState('');
@@ -35,14 +38,16 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
     useEffect(() => {
         const fetchDatas = async () => {
             try {
-                const subjectResult = await axios.get(`${hostname}/api/subjects/${subjectId}`);
-                const subjectData = subjectResult.data.data;
+                const URL = `/api/subjects/${subjectId}`;
+                const option = await getOptions(URL, "GET");
+                const response = await axios(option);
+                const sub = response.data.data;
 
-                setSubjectCode(subjectData.subject_code ?? '');
-                setNewTitleTH(subjectData.title_th ?? '');
-                setNewTitleEN(subjectData.title_en ?? '');
-                setInformation(subjectData.information ?? '');
-                setCredit(subjectData.credit ?? '');
+                setSubjectCode(sub.subject_code ?? '');
+                setNewTitleTH(sub.title_th ?? '');
+                setNewTitleEN(sub.title_en ?? '');
+                setInformation(sub.information ?? '');
+                setCredit(sub.credit ?? '');
 
             } catch (error) {
                 console.error('Error fetching subject details:', error);
@@ -65,15 +70,47 @@ export default function SubjectUpdate({ isOpen, onClose, onUpdate, subjectId }) 
                 return;
             }
 
-            await axios.post(`${hostname}/api/subjects/updateSubject/${subjectId}`, {
-                // semester: semester ? semester : null,
-                subject_code: subject_code ? subject_code : null,
+            const subjectCodePattern = /^[A-Za-z0-9\s]+$/; // Regular Expression สำหรับตัวอักษรภาษาอังกฤษ ตัวเลข และช่องว่าง
+    
+            if (!subjectCodePattern.test(subject_code.trim())) {
+                showToastMessage(false, 'รหัสวิชาต้องประกอบด้วยตัวอักษรภาษาอังกฤษ ตัวเลข และช่องว่างเท่านั้น');
+                return;
+            }
+
+            const englishPattern = /^[A-Za-z\s]+$/;
+            if (!title_en.trim()) {
+                showToastMessage(false, 'ชื่ออังกฤษห้ามเป็นค่าว่าง');
+                return;
+            } else if (!englishPattern.test(title_en.trim())) {
+                showToastMessage(false, 'ชื่ออังกฤษต้องเป็นตัวอักษรภาษาอังกฤษเท่านั้น');
+                return;
+            }
+
+            const thaiPattern = /^[ก-๙\s]+$/;
+            if (!title_th.trim()) {
+                showToastMessage(false, 'ชื่อไทยห้ามเป็นค่าว่าง');
+                return;
+            } else if (!thaiPattern.test(title_th.trim())) {
+                showToastMessage(false, 'ชื่อไทยต้องเป็นตัวอักษรภาษาไทยเท่านั้น');
+                return;
+            }
+            const trimmedSubjectCode = subject_code.replace(/\s/g, '');
+
+            const url = `/api/subjects/updateSubject/${subjectId}}`;
+
+            const formData = {
+                subject_code: trimmedSubjectCode ? trimmedSubjectCode : null,
                 title_th: title_th ? title_th : null,
                 title_en: title_en ? title_en : null,
                 information: information ? information : null,
                 credit: credit ? credit : null,
-                // track: selectedTrack ? selectedTrack.value : null,
-            });
+            };
+
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+            message.success(msg)
+
             onUpdate();
             onClose();
         } catch (error) {

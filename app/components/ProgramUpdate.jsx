@@ -7,6 +7,10 @@ import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import { toast } from 'react-toastify';
 
+
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 export default function ProgramUpdate({ isOpen, onClose, onUpdate, programId }) {
     const [program, setProgram] = useState('');
     const [title_en, setProgramTitleEn] = useState('');
@@ -39,10 +43,13 @@ export default function ProgramUpdate({ isOpen, onClose, onUpdate, programId }) 
     useEffect(() => {
         const fetchProgram = async () => {
             try {
-                const response = await axios.get(`${hostname}/api/programs/${programId}`);
-                setProgram(response.data.data.program);
-                setProgramTitleEn(response.data.data.title_en);
-                setProgramTitleTh(response.data.data.title_th);
+                const URL = `/api/programs/${programId}`;
+                const option = await getOptions(URL, "GET");
+                const response = await axios(option);
+                const program = response.data.data;
+                setProgram(program?.program);
+                setProgramTitleEn(program?.title_en);
+                setProgramTitleTh(program?.title_th);
             } catch (error) {
                 console.error('Error fetching program:', error);
             }
@@ -53,16 +60,48 @@ export default function ProgramUpdate({ isOpen, onClose, onUpdate, programId }) 
 
     const handleUpdateProgram = async () => {
         try {
-            const result = await axios.put(`${hostname}/api/programs/updateProgram/${programId}`, {
+
+            const programPattern = /^[A-Za-zก-๙0-9\s]+$/; // Regular Expression สำหรับภาษาอังกฤษ ภาษาไทย ตัวเลข และช่องว่าง
+            if (!program.trim()) {
+                showToastMessage(false, 'หลักสูตรห้ามเป็นค่าว่าง');
+                return;
+            } else if (!programPattern.test(program.trim())) {
+                showToastMessage(false, 'หลักสูตรต้องประกอบด้วยตัวอักษรภาษาไทย, ภาษาอังกฤษ, และตัวเลขเท่านั้น');
+                return;
+            }
+
+            const englishPattern = /^[A-Za-z\s]+$/;
+            if (!title_en.trim()) {
+                showToastMessage(false, 'ชื่ออังกฤษห้ามเป็นค่าว่าง');
+                return;
+            } else if (!englishPattern.test(title_en.trim())) {
+                showToastMessage(false, 'ชื่ออังกฤษต้องเป็นตัวอักษรภาษาอังกฤษเท่านั้น');
+                return;
+            }
+
+            const thaiPattern = /^[ก-๙\s]+$/;
+            if (!title_th.trim()) {
+                showToastMessage(false, 'ชื่อไทยห้ามเป็นค่าว่าง');
+                return;
+            } else if (!thaiPattern.test(title_th.trim())) {
+                showToastMessage(false, 'ชื่อไทยต้องเป็นตัวอักษรภาษาไทยเท่านั้น');
+                return;
+            }
+
+            const url = `/api/programs/updateProgram/${programId}`;
+            const formData = {
                 program: program,
                 title_en: title_en,
                 title_th: title_th,
-            });
+            };
 
-            // Notify the parent component that data has been updated
+            const options = await getOptions(url, "PUT", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+            message.success(msg)
+
             onUpdate();
 
-            showToastMessage(true, `อัปเดตหลักสูตร ${result.data.data.program} สำเร็จ`);
             onClose();
         } catch (error) {
             showToastMessage(false, 'หลักสูตรซ้ำ');

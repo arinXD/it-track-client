@@ -6,6 +6,10 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import { toast } from 'react-toastify';
+
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 export default function ProgramInsert({ isOpen, onClose, onDataInserted }) {
     const [program, setProgram] = useState('');
     const [title_en, setProgramTitleEn] = useState('');
@@ -38,20 +42,47 @@ export default function ProgramInsert({ isOpen, onClose, onDataInserted }) {
     const handleInsertProgram = async () => {
         try {
 
+            const programPattern = /^[A-Za-zก-๙0-9\s]+$/; // Regular Expression สำหรับภาษาอังกฤษ ภาษาไทย ตัวเลข และช่องว่าง
             if (!program.trim()) {
                 showToastMessage(false, 'หลักสูตรห้ามเป็นค่าว่าง');
                 return;
+            } else if (!programPattern.test(program.trim())) {
+                showToastMessage(false, 'หลักสูตรต้องประกอบด้วยตัวอักษรภาษาไทย, ภาษาอังกฤษ, และตัวเลขเท่านั้น');
+                return;
             }
 
-            const result = await axios.post(`${hostname}/api/programs/insertProgram`, {
+            const englishPattern = /^[A-Za-z\s]+$/;
+            if (!title_en.trim()) {
+                showToastMessage(false, 'ชื่ออังกฤษห้ามเป็นค่าว่าง');
+                return;
+            } else if (!englishPattern.test(title_en.trim())) {
+                showToastMessage(false, 'ชื่ออังกฤษต้องเป็นตัวอักษรภาษาอังกฤษเท่านั้น');
+                return;
+            }
+
+            const thaiPattern = /^[ก-๙\s]+$/;
+            if (!title_th.trim()) {
+                showToastMessage(false, 'ชื่อไทยห้ามเป็นค่าว่าง');
+                return;
+            } else if (!thaiPattern.test(title_th.trim())) {
+                showToastMessage(false, 'ชื่อไทยต้องเป็นตัวอักษรภาษาไทยเท่านั้น');
+                return;
+            }
+
+            const url = `/api/programs/insertProgram`;
+            const formData = {
                 program: program,
                 title_en: title_en,
                 title_th: title_th,
-            });
+            };
+
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+            message.success(msg)
 
             // Notify the parent component that data has been inserted
             onDataInserted();
-            showToastMessage(true, `เพิ่มหลักสูตร ${result.data.data.program} สำเร็จ`);
             onClose();
         } catch (error) {
             // Handle error if needed

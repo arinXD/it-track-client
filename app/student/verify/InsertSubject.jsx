@@ -41,7 +41,7 @@ const InsertSubject = ({ subjects, catIndex, categorie, highestIndex, onVerifySu
         if (enrollment) {
             return enrollment.grade;
         }
-        return "ไม่มีเกรด";
+        return "-";
     }
 
     const addSubj = useCallback(function (subj) {
@@ -91,8 +91,9 @@ const InsertSubject = ({ subjects, catIndex, categorie, highestIndex, onVerifySu
                                         type="text"
                                         name="verifySubj[]"
                                         value={sbj.subject_code} />
-                                    <p className='flex flex-col text-sm'>
+                                    <p className='flex justify-between text-sm'>
                                         <span>{sbj.title_th}</span>
+                                        <span>{getEnrollmentGrade(sbj.subject_code)}</span>
                                     </p>
                                     <IoIosCloseCircle onClick={() => delSubj(sbj.subject_code)} className="absolute top-1 right-1 w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
                                 </li>
@@ -122,12 +123,21 @@ const InsertSubject = ({ subjects, catIndex, categorie, highestIndex, onVerifySu
                         <ul className='rounded-md border-1 h-[180px] overflow-y-auto p-2 flex flex-col gap-1'>
                             {filterSubj.map((subject, index) => (
                                 !(verifySubj.map(z => z.subject_code).includes(subject.subject_code)) &&
-                                <li onClick={() => addSubj(subject)} key={index} className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border-1 border-b-gray-300 cursor-pointer'>
-                                    <strong className='block'>{subject.subject_code}</strong>
-                                    <p className='flex flex-col text-sm'>
-                                        <span>{subject.title_en}</span>
-                                        <span>{subject.title_th}</span>
-                                    </p>
+                                <li
+                                    onClick={() => addSubj(subject)}
+                                    key={index}
+                                    className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border border-b-gray-300 cursor-pointer'
+                                >
+                                    <div className='flex flex-grow gap-2 justify-start'>
+                                        <strong className='block'>{subject.subject_code}</strong>
+                                        <p className='flex flex-col text-sm'>
+                                            <span>{subject.title_en}</span>
+                                            <span>{subject.title_th}</span>
+                                        </p>
+                                    </div>
+                                    <div className='flex justify-end text-sm mr-2'>
+                                        <p>{getEnrollmentGrade(subject.subject_code)}</p>
+                                    </div>
                                 </li>
                             ))}
                         </ul>

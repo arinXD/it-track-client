@@ -28,6 +28,9 @@ import '../style/excel.css';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
   const [data, setData] = useState([]);
   const [editingCell, setEditingCell] = useState(null);
@@ -159,12 +162,12 @@ function ExcelUpload({ onDataInsertXlsx, onClearFile }) {
         // Check if subject_code is present and not null for each row
         if (formattedData.every(row => row.subject_code !== undefined && row.subject_code !== null)) {
           // Check if any subject_code is null or contains spaces
-          console.log('DATA', formattedData);
           if (formattedData.some(row => !row.subject_code.trim())) {
             showToastMessage(false, 'Code is null or contains spaces');
           } else {
-            const result = await axios.post(`${hostname}/api/subjects/insertSubjectsFromExcel`, formattedData);
-            console.log('DATA', formattedData);
+            const url = `/api/subjects/insertSubjectsFromExcel`;
+            const options = await getOptions(url, "POST", formattedData);
+            const result = await axios(options);
 
             onDataInsertXlsx();
 

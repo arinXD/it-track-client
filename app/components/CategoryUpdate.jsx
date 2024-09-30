@@ -45,7 +45,6 @@ export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }
         const response = await axios(option);
         const cat = response.data.data;
         setNewTitle(cat?.category_title);
-        
       } catch (error) {
         // Handle error if needed
         console.error('Error fetching category title:', error);
@@ -71,14 +70,18 @@ export default function CategoryUpdate({ isOpen, onClose, onUpdate, categoryId }
   const handleUpdateCategory = async () => {
     try {
 
-      if (!newTitle.trim()) {
-        showToastMessage(false, 'หมวดหมู่วิชาห้ามเป็นค่าว่าง');
-        return;
-      }
-
       const isDuplicate = await checkDuplicateCategory(newTitle);
       if (isDuplicate) {
         showToastMessage(false, 'หมวดหมู่วิชานี้มีอยู่แล้ว');
+        return;
+      }
+
+      const programPattern = /^[A-Za-zก-๙0-9\s]+$/; // Regular Expression สำหรับภาษาอังกฤษ ภาษาไทย ตัวเลข และช่องว่าง
+      if (!newTitle.trim()) {
+        showToastMessage(false, 'หมวดหมู่วิชาห้ามเป็นค่าว่าง');
+        return;
+      } else if (!programPattern.test(newTitle.trim())) {
+        showToastMessage(false, 'หมวดหมู่วิชาต้องประกอบด้วยตัวอักษรภาษาไทย, ภาษาอังกฤษ, และตัวเลขเท่านั้น');
         return;
       }
 

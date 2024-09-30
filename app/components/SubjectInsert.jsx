@@ -13,6 +13,9 @@ import { Input, Textarea } from "@nextui-org/react";
 
 import { getAcadyears } from "@/src/util/academicYear";
 
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 import { toast } from 'react-toastify';
 
 export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
@@ -48,7 +51,9 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
 
     const checkDuplicate = async (subject_code) => {
         try {
-            const response = await axios.get(`${hostname}/api/subjects/getSubjectByCode/${subject_code}`);
+            const URL = `/api/subjects/getSubjectByCode/${subject_code}`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
             return response.data.exists;
         } catch (error) {
             console.error('Error checking duplicate:', error);
@@ -58,30 +63,64 @@ export default function SubjectInsert({ isOpen, onClose, onDataInserted }) {
 
     const handleInsertSubject = async () => {
         try {
+            // ตรวจสอบว่า credit ต้องเป็นเลขบวกเท่านั้น
             if (credit < 0) {
                 showToastMessage(false, 'หน่วยกิตต้องเป็นเลขบวกเท่านั้น');
                 return;
             }
 
+            const subjectCodePattern = /^[A-Za-z0-9\s]+$/; // Regular Expression สำหรับตัวอักษรภาษาอังกฤษ ตัวเลข และช่องว่าง
+    
+            if (!subjectCodePattern.test(subject_code.trim())) {
+                showToastMessage(false, 'รหัสวิชาต้องประกอบด้วยตัวอักษรภาษาอังกฤษ ตัวเลข และช่องว่างเท่านั้น');
+                return;
+            }
+    
+            // ทำการลบช่องว่างออกจาก subject_code
             const trimmedSubjectCode = subject_code.replace(/\s/g, '');
-
-            const isDuplicate = await checkDuplicate(subject_code);
+    
+            // ตรวจสอบว่ามีการซ้ำของรหัสวิชาหรือไม่
+            const isDuplicate = await checkDuplicate(trimmedSubjectCode);
             if (isDuplicate) {
                 showToastMessage(false, 'วิชานี้มีอยู่แล้ว');
                 return;
             }
-
-            const response = await axios.post(`${hostname}/api/subjects/insertSubject`, {
+    
+            // ตรวจสอบ title_en
+            const englishPattern = /^[A-Za-z\s]+$/;
+            if (!title_en.trim()) {
+                showToastMessage(false, 'ชื่ออังกฤษห้ามเป็นค่าว่าง');
+                return;
+            } else if (!englishPattern.test(title_en.trim())) {
+                showToastMessage(false, 'ชื่ออังกฤษต้องเป็นตัวอักษรภาษาอังกฤษเท่านั้น');
+                return;
+            }
+    
+            // ตรวจสอบ title_th
+            const thaiPattern = /^[ก-๙\s]+$/;
+            if (!title_th.trim()) {
+                showToastMessage(false, 'ชื่อไทยห้ามเป็นค่าว่าง');
+                return;
+            } else if (!thaiPattern.test(title_th.trim())) {
+                showToastMessage(false, 'ชื่อไทยต้องเป็นตัวอักษรภาษาไทยเท่านั้น');
+                return;
+            }
+    
+            // ส่งข้อมูลไปยัง API
+            const url = `/api/subjects/insertSubject`;
+            const formData = {
                 subject_code: trimmedSubjectCode || null,
                 title_th: title_th || null,
                 title_en: title_en || null,
                 information: information || null,
                 credit: credit || null,
-                // track: selectedTrack ? selectedTrack.value : null,
-            });
-
+            };
+    
+            const options = await getOptions(url, "POST", formData);
+            const result = await axios(options);
+            const { ok, message: msg } = result.data;
+    
             onDataInserted();
-            showToastMessage(true, `เพิ่มวิชา ${response.data.data.subject_code} สำเร็จ`);
         } catch (error) {
             console.error('Error inserting subjects:', error);
             showToastMessage(false, 'รหัสวิชาซ้ำ');

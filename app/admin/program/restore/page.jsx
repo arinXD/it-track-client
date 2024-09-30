@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
@@ -24,16 +24,8 @@ import "react-toastify/dist/ReactToastify.css";
 import Link from 'next/link';
 import { TbRestore } from "react-icons/tb";
 
-async function fetchDatas() {
-    try {
-        const programResult = await axios.get(`${hostname}/api/programs/getrestore`);
-        const program = programResult.data.data;
-
-        return { program };
-    } catch (error) {
-        console.error("Fetch error:", error);
-    }
-}
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
 
 
 export default function RestoreProgramCode() {
@@ -66,14 +58,23 @@ export default function RestoreProgramCode() {
         }
     };
 
-    useEffect(() => {
-        fetchDatas().then(data => {
-            console.log(data);
-            setRestores(data.program)
-        }).catch(err => {
-            console.log("error on useeffect:", err);
-        });
+    const callre = useCallback(async () => {
+        try {
+            const URL = `/api/programs/getrestore`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const pro = response.data.data;
+
+            setRestores(pro);
+
+        } catch (error) {
+            console.log("fetch error:", error);
+        }
     }, []);
+
+    useEffect(() => {
+        callre();
+    }, [])
 
     const handleRestore = async (program) => {
         const swal = Swal.mixin({
@@ -95,11 +96,16 @@ export default function RestoreProgramCode() {
         });
         if (value) {
             try {
-                const result = await axios.post(`${hostname}/api/programs/restorePrograms/${program}`);
-                const { ok, message } = result.data
-                showToastMessage(true, `คืนค่าหลักสูตร ${program} สำเร็จ`)
-                const data = await fetchDatas();
-                setRestores(data.program)
+                const url = `/api/programs/restorePrograms/${program}`;
+                const formData = {
+                    program: program
+                };
+                const options = await getOptions(url, "POST", formData);
+                const result = await axios(options);
+                const { ok, message: msg } = result.data;
+                message.success(msg)
+
+                callre();
             } catch (error) {
                 const message = error?.response?.data?.message
                 showToastMessage(false, `คืนค่าหลักสูตรไม่สำเร็จ`)

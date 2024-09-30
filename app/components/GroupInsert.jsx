@@ -65,8 +65,12 @@ export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
                 return;
             }
 
+            const programPattern = /^[A-Za-zก-๙0-9\s]+$/; // Regular Expression สำหรับภาษาอังกฤษ ภาษาไทย ตัวเลข และช่องว่าง
             if (!groupTitle.trim()) {
                 showToastMessage(false, 'กลุ่มวิชาห้ามเป็นค่าว่าง');
+                return;
+            } else if (!programPattern.test(groupTitle.trim())) {
+                showToastMessage(false, 'กลุ่มวิชาต้องประกอบด้วยตัวอักษรภาษาไทย, ภาษาอังกฤษ, และตัวเลขเท่านั้น');
                 return;
             }
 

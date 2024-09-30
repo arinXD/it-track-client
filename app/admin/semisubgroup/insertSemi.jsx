@@ -94,14 +94,17 @@ export default function InsertSemi({ isOpen, onClose, onDataInserted }) {
     const createForm = useCallback(async function (e) {
         e.preventDefault();
 
-
-        if (!semisubGroupTitle.trim()) {
-            showToastMessage(false, "กลุ่มรองวิชาต้องไม่เป็นค่าว่าง");
+        if (!selectedSubgroup) {
+            showToastMessage(false, "โปรดเลือกกลุ่มย่อยวิชา");
             return;
         }
 
-        if (!selectedSubgroup) {
-            showToastMessage(false, "โปรดเลือกกลุ่มย่อยวิชา");
+        const programPattern = /^[A-Za-zก-๙0-9\s]+$/; // Regular Expression สำหรับภาษาอังกฤษ ภาษาไทย ตัวเลข และช่องว่าง
+        if (!semisubGroupTitle.trim()) {
+            showToastMessage(false, 'กลุ่มรองวิชาห้ามเป็นค่าว่าง');
+            return;
+        } else if (!programPattern.test(semisubGroupTitle.trim())) {
+            showToastMessage(false, 'กลุ่มรองวิชาต้องประกอบด้วยตัวอักษรภาษาไทย, ภาษาอังกฤษ, และตัวเลขเท่านั้น');
             return;
         }
 
