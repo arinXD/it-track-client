@@ -553,6 +553,8 @@ const Page = () => {
             // Check if the response is successful and contains data
             if (res.status === 200 && res.data.ok) {
                 const setstatus = res.data.data;
+                console.log(setstatus);
+
                 setStatusVerify(setstatus);
             } else {
                 setStatusVerify([]); // No data found or unexpected response
@@ -574,11 +576,6 @@ const Page = () => {
     }, [ids, userData?.stu_id]);
 
 
-    useEffect(() => {
-        if (Object.keys(userData).length > 0) {
-            fetchData()
-        }
-    }, [userData])
 
     const fetchSubjects = async () => {
         try {
@@ -588,13 +585,13 @@ const Page = () => {
                 const res = await axios(option)
                 const filterSubjects = res.data.data
 
-                const filteredSubjects = filterSubjects.filter(subject => subject.track !== null && subject.track !== '');
-                // const subjectsWithGrades = filteredSubjects.filter(subject => {
-                //     const grade = getEnrollmentGrade(subject.subject_code);
-                //     return grade !== "ไม่มีเกรด";
-                // });
-                // console.log(filterSubjects);
-
+                const filteredSubjects = filterSubjects
+                    .filter(subject => subject.track !== null && subject.track !== '') // Valid track
+                    .map(subject => ({
+                        ...subject,
+                        grade: getEnrollmentGrade(subject.subject_code) // Get grade for the subject
+                    }))
+                    .filter(subject => subject.grade !== "ไม่มีเกรด"); // Filter out subjects without a grade
 
                 setSubjectTrack(filteredSubjects)
                 setSubjects(filterSubjects)
@@ -608,10 +605,18 @@ const Page = () => {
         }
     };
 
-
     useEffect(() => {
-        fetchSubjects();
-    }, [])
+        const fetchDataAsync = async () => {
+            if (Object.keys(userData).length > 0) {
+                await fetchData();
+                await fetchSubjects();
+            }
+        };
+
+        fetchDataAsync();
+    }, [userData]);
+
+
 
     ////////////////////////////////////////fetch from have grade///////////////////////////////////////////////////
 
@@ -2189,8 +2194,9 @@ const Page = () => {
                                                                                 name="pickSubj[]"
                                                                                 value={sbj.subject_code}
                                                                             />
-                                                                            <p className='flex flex-col text-sm'>
+                                                                            <p className='flex justify-between text-sm'>
                                                                                 <span>{sbj.title_th}</span>
+                                                                                <span>{getEnrollmentGrade(sbj.subject_code)}</span>
                                                                             </p>
                                                                             <IoIosCloseCircle onClick={() => delSubj(sbj.subject_code)} className="absolute top-1 right-1 w-5 h-5 cursor-pointer active:scale-95 hover:opacity-75" />
                                                                         </li>
@@ -2222,12 +2228,21 @@ const Page = () => {
                                                                 <ul className='rounded-md border-1 h-[180px] overflow-y-auto p-2 flex flex-col gap-1'>
                                                                     {filterSubj.map((subject, index) => (
                                                                         !pickSubj.some(z => z.subject_code === subject.subject_code) && (
-                                                                            <li onClick={() => addSubj(subject)} key={index} className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border-1 border-b-gray-300 cursor-pointer'>
-                                                                                <strong className='block'>{subject.subject_code}</strong>
-                                                                                <p className='flex flex-col text-sm'>
-                                                                                    <span>{subject.title_en}</span>
-                                                                                    <span>{subject.title_th}</span>
-                                                                                </p>
+                                                                            <li
+                                                                                onClick={() => addSubj(subject)}
+                                                                                key={index}
+                                                                                className='bg-gray-100 rounded-md flex flex-row gap-2 p-1 border border-b-gray-300 cursor-pointer'
+                                                                            >
+                                                                                <div className='flex flex-grow gap-2 justify-start'>
+                                                                                    <strong className='block'>{subject.subject_code}</strong>
+                                                                                    <p className='flex flex-col text-sm'>
+                                                                                        <span>{subject.title_en}</span>
+                                                                                        <span>{subject.title_th}</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div className='flex justify-end text-sm mr-2'>
+                                                                                    <p>{getEnrollmentGrade(subject.subject_code)}</p>
+                                                                                </div>
                                                                             </li>
                                                                         )
                                                                     ))}
@@ -2520,16 +2535,23 @@ const Page = () => {
                                                                         : 'Untitled'
                                                             }>
                                                             <div>
-                                                                {/* Only show Teacher's information if all necessary fields are present and Teacher is not null */}
-                                                                {statuss.User.Teacher && statuss.User.Teacher.name && statuss.User.Teacher.surname ? (
+                                                                {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
+                                                                    // Case 1: Teacher
                                                                     <h1>
                                                                         {statuss.User.Teacher.prefix} {statuss.User.Teacher.name} {statuss.User.Teacher.surname}
                                                                     </h1>
+                                                                ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
+                                                                    // Case 2: Admin
+                                                                    <h1>
+                                                                        {statuss.User.Admin.prefix} {statuss.User.Admin.name} {statuss.User.Admin.surname}
+                                                                    </h1>
                                                                 ) : (
+                                                                    // Case 3: Fallback to email
                                                                     <p>{statuss.User.email}</p>
                                                                 )}
 
-                                                                {statuss.User.Teacher && statuss.User.Teacher.name && statuss.User.Teacher.surname ? (
+                                                                {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
+                                                                    // Case 1: Teacher is present
                                                                     <div>
                                                                         <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
                                                                         <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
@@ -2551,7 +2573,31 @@ const Page = () => {
                                                                             />
                                                                         )}
                                                                     </div>
+                                                                ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
+                                                                    // Case 2: Admin is present
+                                                                    <div>
+                                                                        <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Admin.name} {statuss.User.Admin.surname}</p>
+                                                                        <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                        {statuss.desc && (
+                                                                            <Textarea
+                                                                                label="ความคิดเห็น"
+                                                                                variant="bordered"
+                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                size="lg"
+                                                                                value={statuss.desc}
+                                                                                placeholder="เพิ่มความคิดเห็น..."
+                                                                                disableAnimation
+                                                                                disableAutosize
+                                                                                classNames={{
+                                                                                    base: "w-full my-3",
+                                                                                    input: "resize-y min-h-[80px]",
+                                                                                }}
+                                                                                isReadOnly
+                                                                            />
+                                                                        )}
+                                                                    </div>
                                                                 ) : (
+                                                                    // Case 3: Fallback to email
                                                                     <div>
                                                                         <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
                                                                         <p className='my-2'><strong>เวลา :</strong> {simpleDMYHM(statuss.approver_time)}</p>
@@ -2628,15 +2674,23 @@ const Page = () => {
                                                                 }>
                                                                 <div>
                                                                     {/* Only show Teacher's information if all necessary fields are present and Teacher is not null */}
-                                                                    {statuss.User.Teacher && statuss.User.Teacher.name && statuss.User.Teacher.surname ? (
+                                                                    {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
+                                                                        // Case 1: Teacher
                                                                         <h1>
                                                                             {statuss.User.Teacher.prefix} {statuss.User.Teacher.name} {statuss.User.Teacher.surname}
                                                                         </h1>
+                                                                    ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
+                                                                        // Case 2: Admin
+                                                                        <h1>
+                                                                            {statuss.User.Admin.prefix} {statuss.User.Admin.name} {statuss.User.Admin.surname}
+                                                                        </h1>
                                                                     ) : (
+                                                                        // Case 3: Fallback to email
                                                                         <p>{statuss.User.email}</p>
                                                                     )}
 
-                                                                    {statuss.User.Teacher && statuss.User.Teacher.name && statuss.User.Teacher.surname ? (
+                                                                    {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
+                                                                        // Case 1: Teacher is present
                                                                         <div>
                                                                             <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
                                                                             <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
@@ -2658,7 +2712,31 @@ const Page = () => {
                                                                                 />
                                                                             )}
                                                                         </div>
+                                                                    ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
+                                                                        // Case 2: Admin is present
+                                                                        <div>
+                                                                            <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Admin.name} {statuss.User.Admin.surname}</p>
+                                                                            <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                            {statuss.desc && (
+                                                                                <Textarea
+                                                                                    label="ความคิดเห็น"
+                                                                                    variant="bordered"
+                                                                                    color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                    size="lg"
+                                                                                    value={statuss.desc}
+                                                                                    placeholder="เพิ่มความคิดเห็น..."
+                                                                                    disableAnimation
+                                                                                    disableAutosize
+                                                                                    classNames={{
+                                                                                        base: "w-full my-3",
+                                                                                        input: "resize-y min-h-[80px]",
+                                                                                    }}
+                                                                                    isReadOnly
+                                                                                />
+                                                                            )}
+                                                                        </div>
                                                                     ) : (
+                                                                        // Case 3: Fallback to email
                                                                         <div>
                                                                             <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
                                                                             <p className='my-2'><strong>เวลา :</strong> {simpleDMYHM(statuss.approver_time)}</p>
@@ -2681,6 +2759,7 @@ const Page = () => {
                                                                             )}
                                                                         </div>
                                                                     )}
+
                                                                 </div>
                                                             </AccordionItem>
                                                         ))

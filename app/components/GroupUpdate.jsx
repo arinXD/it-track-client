@@ -87,10 +87,15 @@ export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
                 return;
             }
 
+            const programPattern = /^[A-Za-zก-๙0-9\s]+$/; // Regular Expression สำหรับภาษาอังกฤษ ภาษาไทย ตัวเลข และช่องว่าง
             if (!newTitle.trim()) {
                 showToastMessage(false, 'กลุ่มวิชาห้ามเป็นค่าว่าง');
                 return;
+            } else if (!programPattern.test(newTitle.trim())) {
+                showToastMessage(false, 'กลุ่มวิชาต้องประกอบด้วยตัวอักษรภาษาไทย, ภาษาอังกฤษ, และตัวเลขเท่านั้น');
+                return;
             }
+            
             const url = `/api/groups/updateGroup/${groupId}`;
             const formData = {
                 group_title: newTitle,

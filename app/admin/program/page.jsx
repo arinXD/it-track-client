@@ -1,7 +1,7 @@
 "use client"
 
 // Program.js
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Navbar, Sidebar, ProgramInsert, ProgramUpdate, ContentWrap, BreadCrumb } from '@/app/components';
 import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
@@ -24,16 +24,10 @@ import { TbRestore } from "react-icons/tb";
 
 import Link from 'next/link';
 import { tableClass } from '@/src/util/ComponentClass';
-async function fetchData() {
-    try {
-        const programResult = await axios.get(`${hostname}/api/programs`);
-        const program = programResult.data.data;
 
-        return { program };
-    } catch (error) {
-        console.error("Fetch error:", error);
-    }
-}
+import { Empty, message } from 'antd';
+import { getOptions, getToken } from '@/app/components/serverAction/TokenAction'
+
 
 export default function Program() {
     const [isInsertModalOpen, setInsertModalOpen] = useState(false);
@@ -68,14 +62,26 @@ export default function Program() {
         }
     };
 
-    useEffect(() => {
-        fetchData().then(data => {
-            console.log(data);
-            setPrograms(data.program)
-        }).catch(err => {
-            console.log("error on useeffect:", err);
-        });
+    const callprogram = useCallback(async () => {
+        try {
+            const URL = `/api/programs`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const pro = response.data.data;
+
+            console.log(pro);
+
+
+            setPrograms(pro);
+
+        } catch (error) {
+            console.log("fetch error:", error);
+        }
     }, []);
+
+    useEffect(() => {
+        callprogram();
+    }, [])
 
     const handleInsertModalOpen = () => {
         setInsertModalOpen(true);
@@ -88,9 +94,7 @@ export default function Program() {
     const handleDataInserted = async () => {
         try {
 
-            const data = await fetchData();
-            setPrograms(data.program)
-
+            callprogram();
             handleInsertModalClose();
 
         } catch (error) {
@@ -113,8 +117,7 @@ export default function Program() {
 
     const handleDataUpdated = async () => {
         try {
-            const data = await fetchData();
-            setPrograms(data.program)
+            callprogram();
             handleUpdateModalClose();
 
         } catch (error) {
@@ -144,13 +147,17 @@ export default function Program() {
 
         if (value) {
             try {
-                const result = await axios.delete(`${hostname}/api/programs/deleteProgram/${program.program}`);
-
-                const { ok, message } = result.data
-                showToastMessage(ok, `ลบหลักสูตร ${program.title_th ? program.title_th : program.program} สำเร็จ`)
-                const data = await fetchData();
-
-                setPrograms(data.program);
+                const url = `/api/programs/deleteProgram/${program.program}`
+                const options = await getOptions(url, 'DELETE')
+                axios(options)
+                    .then(async result => {
+                        const { ok, message } = result.data
+                        showToastMessage(ok, message)
+                    })
+                    .catch(error => {
+                        showToastMessage(false, error)
+                    })
+                callprogram();
 
             } catch (error) {
                 const message = error?.response?.data?.message

@@ -84,8 +84,12 @@ export default function SubGroupUpdate({ isOpen, onClose, onUpdate, subGroupId }
                 return;
             }
 
+            const programPattern = /^[A-Za-zก-๙0-9\s]+$/; // Regular Expression สำหรับภาษาอังกฤษ ภาษาไทย ตัวเลข และช่องว่าง
             if (!newTitle.trim()) {
-                showToastMessage(false, 'กลุ่มย่อยห้ามเป็นค่าว่าง');
+                showToastMessage(false, 'กลุ่มย่อยวิชาห้ามเป็นค่าว่าง');
+                return;
+            } else if (!programPattern.test(newTitle.trim())) {
+                showToastMessage(false, 'กลุ่มย่อยวิชาต้องประกอบด้วยตัวอักษรภาษาไทย, ภาษาอังกฤษ, และตัวเลขเท่านั้น');
                 return;
             }
 

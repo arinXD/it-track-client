@@ -104,7 +104,6 @@ const Page = () => {
             const option = await getOptions(URL, "GET");
             const response = await axios(option);
             const statuses = response.data.data;
-            console.log(statuses);
 
             setStatusOptions(statuses)
         } catch (err) {
@@ -114,8 +113,11 @@ const Page = () => {
 
     const getPrograms = useCallback(async function () {
         try {
-            const programs = await fetchData(`/api/programs`)
-            console.log(programs);
+
+            const URL = `/api/programs`;
+            const option = await getOptions(URL, "GET");
+            const response = await axios(option);
+            const programs = response.data.data;
 
             setPrograms(programs)
         } catch (error) {
