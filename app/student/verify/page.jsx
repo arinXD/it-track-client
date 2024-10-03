@@ -386,7 +386,7 @@ const Page = () => {
         }
     }).filter(enroll => enroll !== null);
 
-    const totalenrolls = enrolls.reduce((sum, enroll) => sum += enroll.credit, 0);
+    // const totalenrolls = enrolls.reduce((sum, enroll) => sum += enroll.credit, 0);
 
     // console.log('Total Credits:', totalenrolls);
 
@@ -2180,12 +2180,12 @@ const Page = () => {
                                                 <p>ปีการศึกษา {verifyHaveGrade?.acadyear ? verifyHaveGrade.acadyear : userData.acadyear + 4}</p>
                                             </div>
                                         </div>
-                                        {(() => {
+                                        {/* {(() => {
                                             const creditClassName = verifySelect.main_at_least < totalenrolls ? '' : 'text-red-400';
                                             // `font-bold ${verifySelect.main_at_least < totalenrolls ? 'text-red-500' : ''}
 
                                             return <h2 className='mt-6 text-center '>ขอยื่นแบบฟอร์มแสดงรายละเอียดการศึกษารายวิชาที่ได้เรียนมาทั้งหมด อย่างน้อย <span className={`font-bold ${creditClassName}`}>{verifySelect.main_at_least}</span> หน่วยกิต ต่องานทะเบียนและประมวลผลการศึกษา ดังต่อไปนี้คือ.—</h2>
-                                        })()}
+                                        })()} */}
 
 
                                     </div>
