@@ -125,6 +125,14 @@ const Page = () => {
         });
     };
 
+    const openNotificationCon = (placement) => {
+        api.info({
+            message: `โปรดรอเจ้าหน้าที่เพิ่มเงื่อนไข`,
+            description: 'โปรดรอเจ้าหน้าที่เพิ่มเงื่อนไขก่อนกดยืนยัน',
+            placement,
+        });
+    };
+
     const openNotificationConditionCategories = (placement) => {
         const description = (
             <div>
@@ -346,17 +354,36 @@ const Page = () => {
         const credit = prev?.Subject?.credit;
 
         // Check for invalid grades or low credits
-        if (grade === "ไม่มีเกรด" ||
-            (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+        if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
             return null;
         }
 
-        // Return valid enrollments
-        return {
-            subject_code: prev?.Subject?.subject_code,
-            grade: grade,
-            credit: credit
-        };
+        const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+        const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
+
+        let calculatedGrade = null;
+        let numericGrade = null;
+
+        if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+            // Only count credits, not grades
+            return {
+                subject_code: prev?.Subject?.subject_code,
+                grade: grade,  // Keep the original grade
+                credit: credit,
+                numericGrade: null // Do not calculate grade
+            };
+        } else if (gradeAndCreditGrades.includes(grade)) {
+            // Count both credits and grades
+            calculatedGrade = calGrade(grade);
+            numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+            return {
+                subject_code: prev?.Subject?.subject_code,
+                grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                credit: credit,
+                numericGrade: numericGrade
+            };
+        }
     }).filter(enroll => enroll !== null);
 
     const totalenrolls = enrolls.reduce((sum, enroll) => sum += enroll.credit, 0);
@@ -553,7 +580,6 @@ const Page = () => {
             // Check if the response is successful and contains data
             if (res.status === 200 && res.data.ok) {
                 const setstatus = res.data.data;
-                console.log(setstatus);
 
                 setStatusVerify(setstatus);
             } else {
@@ -925,19 +951,36 @@ const Page = () => {
                 const credit = subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null // Store numeric grade if valid
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
             })
             .filter(subject => subject !== null);
 
@@ -963,19 +1006,36 @@ const Page = () => {
                 const credit = subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null // Store numeric grade if valid
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
             })
             .filter(subject => subject !== null);
 
@@ -1004,19 +1064,36 @@ const Page = () => {
                 const credit = subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
             })
             .filter(subject => subject !== null);
 
@@ -1045,19 +1122,36 @@ const Page = () => {
                 const credit = subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
             })
             .filter(subject => subject !== null)
             : []; // Return an empty array if 'subjects' is not an array
@@ -1084,19 +1178,36 @@ const Page = () => {
                 const credit = subject.Subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.Subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject.Subject.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject.Subject.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
             })
             .filter(subject => subject !== null);
 
@@ -1122,19 +1233,36 @@ const Page = () => {
                 const credit = subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
             })
             .filter(subject => subject !== null);
 
@@ -1154,6 +1282,26 @@ const Page = () => {
     }).filter(category => category.subjects.length > 0);
 
     const combinedSubjectCategories = (status?.status !== 0 & categoryverifyGrade.length > 0) ? subjectCategorytest.concat(subjectCategoryHaveGrade) : subjectCategorytest.concat(subjectCategory);
+
+    const [sumCate, setSumCate] = useState([]);
+
+    ////////////////// รวมค่าคะแนนหมวดหมู่วิชา///////////////////////
+
+    useEffect(() => {
+        const sum = []; // Initialize a new array to collect the results
+
+        cateData.forEach((ceta) => {
+            const categoryDatas = combinedSubjectCategories.find(category => category.id === ceta.category.id) || {};
+            const { totalCredits = 0, totalGrades = 0 } = categoryDatas;
+            sum.push({ totalCredits, totalGrades });
+        });
+
+        if (JSON.stringify(sum) !== JSON.stringify(sumCate)) {
+            setSumCate(sum);
+        }
+    }, [cateData, combinedSubjectCategories, sumCate]);
+
+    console.log(combinedsubjectCodesByGroup);
 
 
     /////////////////////// เฉพาะ IT //////////////////////////
@@ -1184,19 +1332,37 @@ const Page = () => {
             const grade = subjectTrackGrade.length ? prev.grade : getEnrollmentGrade(prev.subject_code);
             const credit = prev.credit;
 
-            if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
-                (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+            if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                 return null;
             }
 
-            const calculatedGrade = calGrade(grade);
+            const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+            const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-            return {
-                subject_code: prev.subject_code,
-                grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                credit: credit,
-                numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
-            };
+            let calculatedGrade = null;
+            let numericGrade = null;
+
+            if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                // Only count credits, not grades
+                return {
+                    subject_code: prev.subject_code,
+                    grade: grade,  // Keep the original grade
+                    credit: credit,
+                    numericGrade: null // Do not calculate grade
+                };
+            } else if (gradeAndCreditGrades.includes(grade)) {
+                // Count both credits and grades
+                calculatedGrade = calGrade(grade);
+                numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                return {
+                    subject_code: prev.subject_code,
+                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                    credit: credit,
+                    numericGrade: numericGrade
+                };
+            }
+
         }).filter(item => item !== null);
 
         // Calculate total credits, total grades, and average grade
@@ -1473,6 +1639,12 @@ const Page = () => {
         try {
             const url = `/api/verify/selects/${ids}/${userData.stu_id}`;
 
+            const hasConditionCategoryData = conditionCategory && conditionCategory.length > 0;
+            const hasConditionSubgroupData = conditionSubgroup && conditionSubgroup.length > 0;
+            const hasConditionsData = conditions && conditions.length > 0;
+
+            // If none of them have data, prevent the submission
+
             if (!term) {
                 openNotification('top');
                 return;
@@ -1498,6 +1670,11 @@ const Page = () => {
                     openNotificationConditionIT('top');
                     return; // Exit early if there are insufficient credits for IT
                 }
+            }
+
+            if (!hasConditionCategoryData && !hasConditionSubgroupData && !hasConditionsData) {
+                openNotificationCon('top');
+                return; // Exit early
             }
 
             const filteredData = insertData.map(subj => ({
@@ -1557,7 +1734,7 @@ const Page = () => {
             // const message = error?.response?.data?.message || error.message;
             // showToastMessage(false, message);
         }
-    }, [ids, term, cumlaude, userData.stu_id, insertData, subData]);
+    }, [ids, term, cumlaude, userData.stu_id, insertData, subData, conditionCategory, conditionSubgroup, conditions]);
 
     const handleSubmitAgain = useCallback(async function () {
         try {
@@ -1849,7 +2026,8 @@ const Page = () => {
                             ))}
                         </TableBody>
                     </Table>
-                </div>)
+                </div>
+            )
         }
     }
 
@@ -1883,15 +2061,45 @@ const Page = () => {
 
                     // console.log(subgroupsWithSameGroupTitle);
 
+                    const { totalCredits, totalGrades } = combinedsubjectCodesByGroup[groupIndex] || { totalCredits: 0, totalGrades: 0 };
 
                     return (
-                        <div key={groupIndex}>
-                            <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
-                                <h3 className='text-lg text-default-800 px-4'><li>{groupTitle}</li></h3>
+                        <div key={groupTitle}>
+                            <div>
+                                <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
+                                    <h3 className='text-lg text-default-800 px-4'>
+                                        <li>{groupTitle}</li>
+                                    </h3>
+                                </div>
+                                {subgroupsWithSameGroupTitle.map((subgroup, subgroupIndex) => (
+                                    getSubTrack(subgroup, subgroupIndex)
+                                ))}
                             </div>
-                            {subgroupsWithSameGroupTitle.map((subgroup, subgroupIndex) => (
-                                getSubTrack(subgroup, subgroupIndex)
-                            ))}
+
+                            {groupTitle !== "กลุ่มวิชาเลือกสาขา" && (
+                                <Table aria-label="Sum" classNames={tableClass} removeWrapper color="primary">
+                                    <TableHeader>
+                                        <TableColumn>#</TableColumn>
+                                        <TableColumn></TableColumn>
+                                        <TableColumn></TableColumn>
+                                        <TableColumn>หน่วยกิต</TableColumn>
+                                        <TableColumn>ค่าคะแนน</TableColumn>
+                                        <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell className='font-bold'>รวมคะแนน {groupTitle}</TableCell>
+                                            <TableCell className="w-1/3"></TableCell>
+                                            <TableCell></TableCell>
+                                            <TableCell>{totalCredits}</TableCell>
+                                            <TableCell>{totalGrades}</TableCell>
+                                            <TableCell>
+                                                {totalCredits > 0 ? (totalGrades / totalCredits).toFixed(2) : 'N/A'}
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            )}
                         </div>
                     );
                 })}
@@ -1986,65 +2194,93 @@ const Page = () => {
                                         if (index > highestIndex) {
                                             setHighestIndex(index);
                                         }
-                                        // console.log(conditions);
+                                        const { totalCredits, totalGrades } = sumCate[index] || { totalCredits: 0, totalGrades: 0 };
 
                                         return (
                                             <div key={index} className='mb-5'>
-                                                <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
-                                                    <h2 className='text-lg text-default-800'>{index + 1}. {category?.category_title}</h2>
-                                                </div>
-                                                {Object.keys(groups).map((groupId, groupIndex) => {
-                                                    const group = groups[groupId];
+                                                <div>
+                                                    <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
+                                                        <h2 className='text-lg text-default-800'>{index + 1}. {category?.category_title}</h2>
+                                                    </div>
+                                                    {Object.keys(groups).map((groupId, groupIndex) => {
+                                                        const group = groups[groupId];
 
-                                                    return (
-                                                        <div key={groupIndex} >
-                                                            <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
-                                                                <h3 className='text-lg text-default-800 px-4'><li>{group?.group_title}</li></h3>
+                                                        return (
+                                                            <div key={groupId}>
+                                                                <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
+                                                                    <h3 className='text-lg text-default-800 px-4'>
+                                                                        <li>{group?.group_title}</li>
+                                                                    </h3>
+                                                                </div>
+                                                                <Table
+                                                                    classNames={tableClass}
+                                                                    removeWrapper
+                                                                    onRowAction={() => { }}
+                                                                    aria-label="subjects table">
+                                                                    <TableHeader>
+                                                                        <TableColumn>รหัสวิชา</TableColumn>
+                                                                        <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                                        <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                                        <TableColumn>หน่วยกิต</TableColumn>
+                                                                        <TableColumn>เกรด</TableColumn>
+                                                                        <TableColumn>ค่าคะแนน</TableColumn>
+                                                                    </TableHeader>
+                                                                    <TableBody>
+                                                                        {group.subjects && group.subjects.map((subject, subjectIndex) => (
+                                                                            <TableRow key={subject.subject_code}>
+                                                                                <TableCell>{subject.subject_code}</TableCell>
+                                                                                <TableCell className="w-1/3">{subject.title_en}</TableCell>
+                                                                                <TableCell className="w-1/3">{subject.title_th}</TableCell>
+                                                                                <TableCell>{subject.credit}</TableCell>
+                                                                                <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
+                                                                                <TableCell>
+                                                                                    {(() => {
+                                                                                        const grade = calGrade(getEnrollmentGrade(subject.subject_code));
+                                                                                        const credit = subject.credit;
+                                                                                        if (grade == null) {
+                                                                                            return "-";
+                                                                                        } else if (isNumber(grade)) {
+                                                                                            return String(grade * credit);
+                                                                                        } else {
+                                                                                            return grade;
+                                                                                        }
+                                                                                    })()}
+                                                                                </TableCell>
+                                                                            </TableRow>
+                                                                        ))}
+                                                                    </TableBody>
+                                                                </Table>
                                                             </div>
-                                                            <Table
-                                                                classNames={tableClass}
-                                                                removeWrapper
-                                                                onRowAction={() => { }}
-                                                                aria-label="subjects table">
-                                                                <TableHeader>
-                                                                    <TableColumn>รหัสวิชา</TableColumn>
-                                                                    <TableColumn>ชื่อวิชา EN</TableColumn>
-                                                                    <TableColumn>ชื่อวิชา TH</TableColumn>
-                                                                    <TableColumn>หน่วยกิต</TableColumn>
-                                                                    <TableColumn>เกรด</TableColumn>
-                                                                    <TableColumn>ค่าคะแนน</TableColumn>
-                                                                </TableHeader>
-                                                                <TableBody>
-                                                                    {group.subjects && group.subjects.map((subject, subjectIndex) => (
-                                                                        <TableRow key={subjectIndex}>
-                                                                            <TableCell className=''>{subject.subject_code}</TableCell>
-                                                                            <TableCell className="w-1/3">{subject.title_en}</TableCell>
-                                                                            <TableCell className="w-1/3">{subject.title_th}</TableCell>
-                                                                            <TableCell>{subject.credit}</TableCell>
-                                                                            <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
-                                                                            <TableCell>
-                                                                                {(() => {
-                                                                                    const grade = calGrade(getEnrollmentGrade(subject.subject_code));
-                                                                                    const credit = subject.credit;
-                                                                                    if (grade == null) {
-                                                                                        return "-";
-                                                                                    } else if (isNumber(grade)) {
-                                                                                        return String(grade * credit);
-                                                                                    } else {
-                                                                                        return grade;
-                                                                                    }
-                                                                                })()}
-                                                                            </TableCell>
-                                                                        </TableRow>
-                                                                    ))}
-                                                                </TableBody>
-                                                            </Table>
-                                                        </div>
-                                                    );
-                                                })}
-                                                {
-                                                    getSubg(subgroups, semisubgroups)
-                                                }
+                                                        );
+                                                    })}
+                                                    {
+                                                        getSubg(subgroups, semisubgroups)
+                                                    }
+                                                </div>
+                                                <Table aria-label="Sum"
+                                                    classNames={tableClass}
+                                                    removeWrapper
+                                                    color="primary"
+                                                >
+                                                    <TableHeader>
+                                                        <TableColumn>#</TableColumn>
+                                                        <TableColumn></TableColumn>
+                                                        <TableColumn></TableColumn>
+                                                        <TableColumn>หน่วยกิต</TableColumn>
+                                                        <TableColumn>ค่าคะแนน</TableColumn>
+                                                        <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        <TableRow>
+                                                            <TableCell className='font-bold'>รวมคะแนน{category?.category_title}</TableCell>
+                                                            <TableCell className="w-1/3"></TableCell>
+                                                            <TableCell></TableCell>
+                                                            <TableCell>{totalCredits}</TableCell>
+                                                            <TableCell>{totalGrades}</TableCell>
+                                                            <TableCell>{totalCredits > 0 ? (totalGrades / totalCredits).toFixed(2) : 'N/A'}</TableCell>
+                                                        </TableRow>
+                                                    </TableBody>
+                                                </Table>
                                             </div>
                                         );
                                     })}
@@ -2448,32 +2684,39 @@ const Page = () => {
                                     )}
 
                                     <>
-                                        <div className='bg-blue-200 border-blue-200 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
-                                            <h2 className='text-lg text-default-800'>รวมหน่วยกิตและค่าคะแนนทั้งหมด</h2>
-                                        </div>
-                                        <Table
-                                            aria-label="รวมหน่วยกิตและค่าคะแนนทั้งหมด"
-                                            className={tableClassCondition}
-                                        >
-                                            <TableHeader>
-                                                <TableColumn>#</TableColumn>
-                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                            </TableHeader>
+                                        {(conditionCategory?.length > 0 || conditionSubgroup?.length > 0 || conditions?.length > 0) ? (
+                                            <>
+                                                <div className='bg-blue-200 border-blue-200 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                    <h2 className='text-lg text-default-800'>รวมหน่วยกิตและค่าคะแนนทั้งหมด</h2>
+                                                </div>
+                                                <Table
+                                                    aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
+                                                    className={tableClassCondition}
+                                                >
+                                                    <TableHeader>
+                                                        <TableColumn>#</TableColumn>
+                                                        <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                        <TableColumn>ค่าคะแนน</TableColumn>
+                                                        <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                    </TableHeader>
 
-                                            <TableBody>
-                                                <TableRow>
-                                                    <TableCell>รวม</TableCell>
-                                                    <TableCell>{sumCredits}</TableCell>
-                                                    <TableCell>{sumGrades}</TableCell>
-                                                    <TableCell>
-                                                        {sumCredits > 0 ? (sumGrades / sumCredits).toFixed(2) : 'N/A'}
-                                                    </TableCell>
-                                                </TableRow>
-                                            </TableBody>
-                                        </Table>
+                                                    <TableBody>
+                                                        <TableRow>
+                                                            <TableCell>รวม</TableCell>
+                                                            <TableCell>{sumCredits}</TableCell>
+                                                            <TableCell>{sumGrades}</TableCell>
+                                                            <TableCell>
+                                                                {sumCredits > 0 ? (sumGrades / sumCredits).toFixed(2) : 'N/A'}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableBody>
+                                                </Table>
+                                            </>
+                                        ) : (
+                                            <></>
+                                        )}
                                     </>
+
 
                                     {(status?.status !== 1 && status?.status !== 2 && status?.status !== 3) && (
                                         <div className='flex justify-end items-end mt-3'>
