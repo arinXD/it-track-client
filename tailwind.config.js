@@ -3,6 +3,7 @@ const {
     nextui
 } = require("@nextui-org/react");
 module.exports = {
+    mode: 'jit',
     content: [
         './pages/**/*.{js,ts,jsx,tsx,mdx}',
         './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -41,5 +42,6 @@ module.exports = {
         require("daisyui"),
         nextui(),
         require('tailwindcss-animated'),
+        ...(process.env.STAGE === 'prod' ? { cssnano: {} } : {})
     ],
 }
