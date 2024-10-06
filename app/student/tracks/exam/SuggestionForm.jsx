@@ -145,7 +145,7 @@ const SuggestionForm = ({ form, email, setResultData }) => {
                 reverseButtons: true
             }).then(result => {
                 if (result.isConfirmed) {
-                    window.open("https://docs.google.com/forms/d/e/1FAIpQLSdJ2NQilMU1IGdekQIkiZZ3uvZ09Ef1XXA7MOuNHhDptqjnHg/viewform?usp=sf_link")
+                    window.open(process.env.FEEDBACK_SUGGESTION_URL)
                 }
             })
         }
