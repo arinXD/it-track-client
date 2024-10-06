@@ -100,12 +100,8 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                 desc: null
             }
 
-            const updatedQuestions = [...prevQuestions, newQuestion]
+            const updatedQuestions = [newQuestion, ...prevQuestions, ]
             questionRefs.current = updatedQuestions.map((_, i) => questionRefs.current[i] || createRef())
-
-            setTimeout(() => {
-                questionRefs.current[updatedQuestions.length - 1].current.scrollIntoView({ behavior: 'smooth' })
-            }, 100)
 
             return updatedQuestions
         })
@@ -185,7 +181,7 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                             <>
                                 <ModalHeader className="flex items-end gap-1">
                                     <div className="w-full flex flex-col gap-1">
-                                        <p className="mb-1">คลังคำถามแบบประเมิน</p>
+                                        <p className="mb-1">คลังคำถามความชอบ</p>
                                         <Input
                                             isClearable
                                             className="w-full h-fit rounded-[5px]"
@@ -278,7 +274,7 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                         :
                         <>
                             <div className="flex justify-between">
-                                <h2 className="text-black">คำถามประเมินตนเองภายในแบบฟอร์ม</h2>
+                                <h2 className="text-black">คำถามความชอบภายในแบบฟอร์ม</h2>
                                 <div className="flex justify-end gap-4">
                                     <Button
                                         isIconOnly

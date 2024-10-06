@@ -13,8 +13,9 @@ import { Button } from "@nextui-org/react";
 import SummarizeQuestions from "./SummarizeQuestions";
 import SummarizeAssessments from "./SummarizeAssessments";
 import SummarizeCareers from "./SummarizeCareers";
+import { swal } from "@/src/util/sweetyAlert";
 
-const SuggestionForm = ({ form, email }) => {
+const SuggestionForm = ({ form, email, setResultData }) => {
     const allQuestions = form?.Questions
     const allAssessments = form?.Assessments
     const allCareers = form?.Careers
@@ -25,6 +26,8 @@ const SuggestionForm = ({ form, email }) => {
     const [summarizing, setSummarizing] = useState(false);
     const [summarizeData, setsummarizeData] = useState({});
     const [isSummarize, setIsSummarize] = useState(false);
+    const [isAskingFeedback, setIsAskingFeedback] = useState(false);
+
     const steps = useMemo(() => ([
         {
             title: 'คำถาม',
@@ -93,11 +96,12 @@ const SuggestionForm = ({ form, email }) => {
             setsummarizeData(data)
             setIsSummarize(true)
             setCurrent(0)
+            setResultData(data)
+            window.scrollTo(0, 0)
         } catch (error) {
             setsummarizeData({})
         } finally {
             setSummarizing(false)
-            window.scrollTo(0, 750)
         }
     }, [questions, assessments, careers, email])
 
@@ -106,28 +110,73 @@ const SuggestionForm = ({ form, email }) => {
         setCareers([])
         setCurrent(0)
         setsummarizeData({})
+        setResultData({})
         window.scrollTo(0, 0)
     }, [])
 
+
+    const detectDeviceType = useCallback(async () => {
+        const userAgent = navigator.userAgent;
+
+        const mobilePattern = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i;
+        const tabletPattern = /iPad|iPad|Tablet|PlayBook/i;
+
+        if (tabletPattern.test(userAgent)) {
+            return 'tablet';
+        } else if (mobilePattern.test(userAgent)) {
+            return 'mobile';
+        } else {
+            return 'desktop';
+        }
+    }, [])
+
     useEffect(() => {
-        if (current) window.scrollTo(0, 750)
+        if (Object.keys(summarizeData).length > 0 && current == 3 && !isAskingFeedback) {
+            setIsAskingFeedback(true)
+            swal.fire({
+                title: "ขออนุญาตผู้ใช้ทำแบบสอบถาม",
+                text: `ขออนุญาตผู้ใช้ทำแบบสอบถามเพื่อนำ feedback มาปรับปรุงแก้ไขเว็บไซต์ให้มีประสิทธิภาพต่อไป`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "ยินยอม",
+                cancelButtonText: "ไม่ยินยอม",
+                reverseButtons: true
+            }).then(result => {
+                if (result.isConfirmed) {
+                    window.open(`https://forms.gle/q2zNnbxfDXxv1R4d6`)
+                }
+            })
+        }
+        const type = detectDeviceType()
+        if (type == "mobile") {
+            window.scrollTo(0, 680)
+        } else if (type == "tablet") {
+            window.scrollTo(0, 700)
+        }
+        else {
+            const range = Object.keys(summarizeData).length == 0 ? 750 : 0
+            if (current) {
+                window.scrollTo(0, range)
+            }
+        }
     }, [current])
 
     return (
-        <div className={`px-12 pb-12 bg-[#F9F9F9]`}>
+        <div className={`p-4 md:pt-0 md:px-12 md:pb-12 bg-[#F9F9F9] ${Object.keys(summarizeData).length === 0 ? "" : "pt-4 md:pt-12"}`}>
             {
                 Object.keys(form).length === 0 ?
                     <section className='text-center font-bold text-lg py-28'>
                         Coming soon!
                     </section>
                     :
-                    <section className="min-h-screen p-8 max-w-4xl mx-auto bg-white shadow-sm rounded-[5px] border-1 border-gray-200">
+                    <section className={`min-h-screen ${Object.keys(summarizeData).length === 0 ? "p-4 " : "p-0"} lg:p-8 max-w-4xl mx-auto bg-white border border-gray-100 shadow rounded-lg`}>
                         <Steps
-                            className="mb-8"
+                            className="mb-6 !hidden md:!flex"
                             current={current}
                             onChange={setCurrent}
                             items={items} />
-                        {/* {JSON.stringify(Object.keys(summarizeData).length === 0)} */}
                         {
                             Object.keys(summarizeData).length === 0
                                 ?
@@ -204,7 +253,7 @@ const SuggestionForm = ({ form, email }) => {
                                     </section>
                                     {
                                         current === 3 &&
-                                        <div className="flex justify-center mt-8">
+                                        <div className="flex justify-center mt-4 md:mt-8 mb-8 md:mb-8 lg:mb-0">
                                             <Button
                                                 onClick={resetForm}
                                                 color="primary"

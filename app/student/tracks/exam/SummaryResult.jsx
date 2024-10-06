@@ -149,12 +149,12 @@ const SummaryResult = ({ data }) => {
 
      return (
           <section className="">
-               <section className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+               <section className="max-w-4xl mx-auto bg-white md:shadow-lg rounded-lg overflow-hidden">
                     <header className="bg-blue-600 text-white p-6">
-                         <h1 className="text-3xl font-bold">สรุปผลแบบทดสอบกลุ่มความเชี่ยวชาญ</h1>
+                         <h1 className="text-2xl md:text-3xl font-bold">สรุปผลแบบทดสอบกลุ่มความเชี่ยวชาญ</h1>
                     </header>
-                    <section className="p-6 w-full">
-                         <section className="p-6 bg-blue-50 gap-6 grid grid-cols-3">
+                    <section className="p-2 md:p-6 w-full">
+                         <section className="p-4 md:p-6 bg-blue-50 gap-4 md:gap-6 grid-cols-1 grid md:grid-cols-3">
                               <section className="bg-white p-4 rounded-lg shadow">
                                    <h2 className="text-base font-semibold text-blue-800 mb-2">คำถาม</h2>
                                    <div className="grid grid-cols-1 gap-4">
@@ -203,10 +203,10 @@ const SummaryResult = ({ data }) => {
                               </section>
                          </section>
                     </section>
-                    <div className="p-6 pt-0 space-y-8">
-                         <section className='bg-gray-100 p-6'>
+                    <div className="p-2 md:p-6 md:pt-0 space-y-4 md:space-y-6">
+                         <section className='bg-gray-100 p-4 md:p-6'>
                               <h2 className="text-2xl font-semibold text-blue-800 mb-4 text-center">สรุปผลแทร็ก</h2>
-                              <div className="gap-4 grid grid-cols-3">
+                              <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
                                    {trackSummaries.map((ts) => (
                                         <div key={ts.track} className="bg-white p-6 rounded-lg border">
                                              <h3 className="text-base font-semibold text-blue-600 mb-3">{ts.track}</h3>
@@ -231,7 +231,7 @@ const SummaryResult = ({ data }) => {
                                         </div>
                                    ))}
                               </div>
-                              <div className="gap-4 grid grid-cols-3 mt-4">
+                              <div className="gap-4 grid grid-cols-1 md:grid-cols-3 mt-4">
                                    <div className='bg-white border rounded p-2'>
                                         <BarChart height={250} type={"bar"} option={optionQ} />
                                    </div>
@@ -242,18 +242,18 @@ const SummaryResult = ({ data }) => {
                                         <BarChart height={250} type={"bar"} option={optionC} />
                                    </div>
                               </div>
-                              <div className='flex gap-4 mt-4'>
-                                   <div className='w-[50%] bg-white border rounded p-2'>
+                              <div className='flex flex-col md:flex-row gap-4 mt-4'>
+                                   <div className='w-full md:w-[50%] bg-white border rounded p-2'>
                                         <BarChart height={280} type={"bar"} option={optionAll} />
                                    </div>
-                                   <div className='w-[50%] bg-white border rounded p-2'>
+                                   <div className='w-full md:w-[50%] bg-white border rounded p-2'>
                                         <p className='text-sm mb-[23.5px] ms-2 mt-0.5 font-bold'> อัตราส่วนคะแนนในแต่ละแทร็ก  </p>
                                         <BarChart height={280} type={"pie"} option={optionPieAll} />
                                    </div>
                               </div>
                          </section>
 
-                         <section className="bg-yellow-50 p-6 rounded-lg">
+                         <section className="bg-yellow-50 p-4 md:p-6 rounded-lg">
                               <h2 className="text-2xl font-semibold text-yellow-800 mb-4">คำแนะนำ</h2>
                               <ul className="text-gray-800 flex flex-col gap-4">
                                    {

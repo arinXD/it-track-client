@@ -39,7 +39,7 @@ const ManageForm = ({ formId }) => {
           },
           {
                title: 'Step 3',
-               description: 'เพิ่มแบบประเมินตนเอง',
+               description: 'เพิ่มความชอบ',
           },
           {
                title: 'Finish',
@@ -115,7 +115,7 @@ const ManageForm = ({ formId }) => {
           if (!createTrigger) return
           if (!Object.values(suggestForm).every(value => value)) { message.warning("จำเป็นต้องเพิ่มข้อมูลแบบฟอร์ม"); setCurrent(0); return; }
           if (!questions.length) { message.warning("จำเป็นต้องเพิ่มคำถาม"); setCurrent(1); return; }
-          if (!assesstion.length) { message.warning("จำเป็นต้องเพิ่มแบบประเมินตนเอง"); setCurrent(2); return; }
+          if (!assesstion.length) { message.warning("จำเป็นต้องเพิ่มความชอบ"); setCurrent(2); return; }
           if (!careers.length) { message.warning("จำเป็นต้องเพิ่มอาชีพ"); setCurrent(3); return; }
           const formData = {
                id: formId,
@@ -156,8 +156,8 @@ const ManageForm = ({ formId }) => {
                          </div>
                     ));
                }
-          } finally {
                setCreating(false)
+          } finally {
                setCreateTrigger(false)
           }
 

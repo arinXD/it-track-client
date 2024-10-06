@@ -69,9 +69,9 @@ export default function Page({ params }) {
 
     useEffect(() => {
         if (fetching == false && Object.keys(student).length == 0) {
-            // setTimeout(() => {
-            //     window.location.href = "/admin/students"
-            // }, 1500)
+            setTimeout(() => {
+                window.location.href = "/admin/students"
+            }, 3000)
         }
     }, [fetching, student])
 
@@ -142,9 +142,9 @@ export default function Page({ params }) {
 
     async function initData() {
         setFetching(true)
-        // await getStudentData()
-        // await getPrograms()
-        // await getStudentStatuses()
+        await getStudentData()
+        await getPrograms()
+        await getStudentStatuses()
         setFetching(false)
     }
 

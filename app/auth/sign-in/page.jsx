@@ -119,7 +119,9 @@ const Page = () => {
                             className={`font-medium rounded-lg text-sm w-full mt-4 border-1 border-gray-500 text-gray-500 hover:text-blue-500 hover:border-blue-500`}
                             startContent={<img className='w-5 h-auto' src="/google.png" />}
                         >
-                            เข้าสู่ระบบด้วยบัญชี Google หรือ KKU Mail
+                            
+                            <span className='hidden md:inline'>เข้าสู่ระบบด้วยบัญชี</span>
+                            <span>Google หรือ KKU Mail</span>
                         </Button>
                     </form>
                 </div>

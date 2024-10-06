@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Navbar, Sidebar, BreadCrumb, ContentWrap } from '@/app/components';
 import { getAcadyears } from '@/src/util/academicYear';
 import { SearchIcon } from '@/app/components/icons';
-import { Button } from '@nextui-org/react';
+import { Button, Spinner } from '@nextui-org/react';
 import { fetchDataObj } from '../action';
 import Select from 'react-select';
 import dynamic from 'next/dynamic';
@@ -137,7 +137,7 @@ export default function Page() {
     }), [])
 
     const trackColors = useMemo(() => {
-        if (dashboardData?.popularity[0]?.data?.length) {
+        if (dashboardData && Object.keys(dashboardData).length > 0 && dashboardData?.popularity[0]?.data?.length) {
             const colors = [
                 {
                     bg: '#F4538A',
@@ -369,162 +369,167 @@ export default function Page() {
                             เลือกปีการศึกษาที่ต้องการ
                         </p>
                         :
-                        Object.keys(dashboardData).length === 0 ?
-                            <p className='text-lg font-bold color-[#11142D] mb-4 text-center'>
-                                ไม่พบข้อมูลการคัดเลือกที่ค้นหา
-                            </p>
+                        isLoading ?
+                            <div className='mt-10 flex justify-center items-center'>
+                                <Spinner label='กำลังโหลด....' />
+                            </div>
                             :
-                            <section className='w-full bg-gray-100 p-6 rounded-sm h-full'>
-                                <section className='grid grid-cols-5 gap-6'>
-                                    <div className='col-span-5'>
-                                        <label className='text-[12px] text-default-500'>ประเภทโครงการ</label>
-                                        <Select
-                                            className='w-full'
-                                            id="acadyear"
-                                            value={courseType}
-                                            options={courseTypes}
-                                            onChange={(selectedOption) => setCourseType(selectedOption)}
-                                            placeholder='เลือกปีการศึกษา'
-                                        />
-                                    </div>
-                                    <Card
-                                        className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-full'
-                                    >
-                                        <CardBody className='flex justify-center items-center'>
-                                            <section className='p-2 flex flex-col gap-3'>
-                                                <p className='text-xs text-default-500 text-center'>นักศึกษาเข้าคัดแทร็ก</p>
-                                                <p className='flex gap-2 justify-center items-center'>
-                                                    <span className='text-2xl'>{selectedCount.selected.length}</span>
-                                                    <span className='text-2xl'>คน</span>
-                                                </p>
-                                            </section>
-                                        </CardBody>
-                                    </Card>
-                                    <Card
-                                        className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-full'
-                                    >
-                                        <CardBody className='flex justify-center items-center'>
-                                            <section className='p-2 flex flex-col gap-3'>
-                                                <p className='text-xs text-default-500 text-center'>นักศึกษาไม่ได้เข้าคัดแทร็ก</p>
-                                                <p className='flex gap-2 justify-center items-center'>
-                                                    <span className='text-2xl'>{selectedCount.nonSelected.length}</span>
-                                                    <span className='text-2xl'>คน</span>
-                                                </p>
-                                            </section>
-                                        </CardBody>
-                                    </Card>
-                                    {filteredResults.map((rs, index) => (
+                            Object.keys(dashboardData).length === 0 ?
+                                <p className='text-lg font-bold color-[#11142D] mb-4 text-center'>
+                                    ไม่พบข้อมูลการคัดเลือกที่ค้นหา
+                                </p>
+                                :
+                                <section className='w-full bg-gray-100 p-6 rounded-sm h-full'>
+                                    <section className='grid grid-cols-5 gap-6'>
+                                        <div className='col-span-5'>
+                                            <label className='text-[12px] text-default-500'>ประเภทโครงการ</label>
+                                            <Select
+                                                className='w-full'
+                                                id="acadyear"
+                                                value={courseType}
+                                                options={courseTypes}
+                                                onChange={(selectedOption) => setCourseType(selectedOption)}
+                                                placeholder='เลือกปีการศึกษา'
+                                            />
+                                        </div>
                                         <Card
-                                            key={index}
-                                            className='w-full rounded-[5px] border-1 border-gray-300 shadow-none'
+                                            className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-full'
                                         >
-                                            <CardBody className='p-3 flex flex-col justify-between text-center'>
-                                                <p className='text-xs text-default-500 '>นักศึกษาสังกัดแทร็ก {rs.track?.split(" ")[0]}</p>
-                                                <p className='flex gap-4 justify-center items-center'>
-                                                    <span className='text-lg'>{rs.total}</span>
-                                                    <span className='text-lg'>คน</span>
-                                                </p>
-                                                <hr className='my-2' />
-                                                <p className='text-xs text-default-600 flex items-start justify-between'>
-                                                    <span>เกรดเฉลี่ยรวม</span>
-                                                    <span className='text-lg text-black'>{rs?.gpaAvg?.toFixed(2)}</span>
-                                                </p>
+                                            <CardBody className='flex justify-center items-center'>
+                                                <section className='p-2 flex flex-col gap-3'>
+                                                    <p className='text-xs text-default-500 text-center'>นักศึกษาเข้าคัดแทร็ก</p>
+                                                    <p className='flex gap-2 justify-center items-center'>
+                                                        <span className='text-2xl'>{selectedCount.selected.length}</span>
+                                                        <span className='text-2xl'>คน</span>
+                                                    </p>
+                                                </section>
                                             </CardBody>
                                         </Card>
-                                    ))}
+                                        <Card
+                                            className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-full'
+                                        >
+                                            <CardBody className='flex justify-center items-center'>
+                                                <section className='p-2 flex flex-col gap-3'>
+                                                    <p className='text-xs text-default-500 text-center'>นักศึกษาไม่ได้เข้าคัดแทร็ก</p>
+                                                    <p className='flex gap-2 justify-center items-center'>
+                                                        <span className='text-2xl'>{selectedCount.nonSelected.length}</span>
+                                                        <span className='text-2xl'>คน</span>
+                                                    </p>
+                                                </section>
+                                            </CardBody>
+                                        </Card>
+                                        {filteredResults.map((rs, index) => (
+                                            <Card
+                                                key={index}
+                                                className='w-full rounded-[5px] border-1 border-gray-300 shadow-none'
+                                            >
+                                                <CardBody className='p-3 flex flex-col justify-between text-center'>
+                                                    <p className='text-xs text-default-500 '>นักศึกษาสังกัดแทร็ก {rs.track?.split(" ")[0]}</p>
+                                                    <p className='flex gap-4 justify-center items-center'>
+                                                        <span className='text-lg'>{rs.total}</span>
+                                                        <span className='text-lg'>คน</span>
+                                                    </p>
+                                                    <hr className='my-2' />
+                                                    <p className='text-xs text-default-600 flex items-start justify-between'>
+                                                        <span>เกรดเฉลี่ยรวม</span>
+                                                        <span className='text-lg text-black'>{rs?.gpaAvg?.toFixed(2)}</span>
+                                                    </p>
+                                                </CardBody>
+                                            </Card>
+                                        ))}
 
-                                </section>
-                                <section className='w-full mt-6 grid grid-cols-5 gap-6'>
-                                    <section className='col col-span-5 grid grid-cols-2 gap-6'>
+                                    </section>
+                                    <section className='w-full mt-6 grid grid-cols-5 gap-6'>
+                                        <section className='col col-span-5 grid grid-cols-2 gap-6'>
+                                            <Card
+                                                className='col-span-1 rounded-[5px] border-1 border-gray-300 shadow-none'
+                                            >
+                                                <CardBody>
+                                                    <p className='text-center text-sm mb-7 mt-2'>แทร็กที่ถูกเลือกเยอะในปีการศึกษา {acadyear.value}</p>
+                                                    <BarChart
+                                                        height={250}
+                                                        type={"bar"}
+                                                        option={popularityOption} />
+                                                </CardBody>
+                                            </Card>
+                                            <Card
+                                                className='col-span-1 rounded-[5px] border-1 border-gray-300 shadow-none'
+                                            >
+                                                <CardBody>
+                                                    <p className='text-center text-sm mb-8 mt-2'>อัตราส่วนแทร็กที่ถูกเลือกเยอะที่สุด</p>
+                                                    <BarChart
+                                                        height={250}
+                                                        type={"pie"}
+                                                        option={ratioPopulation} />
+                                                </CardBody>
+                                            </Card>
+                                        </section>
+                                        <div className='bg-white col-span-5 grid grid-cols-5 rounded-[5px] border-1 border-gray-300'>
+                                            <div className=' col-span-5 flex gap-4 items-end py-4 px-4'>
+                                                <div className='w-full'>
+                                                    <label className='text-[12px] text-default-500'>เริ่มต้น</label>
+                                                    <Select
+                                                        className='w-full'
+                                                        id="acadyear"
+                                                        value={startYear}
+                                                        options={acadyears}
+                                                        onChange={(selectedOption) => setStartYear(selectedOption)}
+                                                        placeholder='เลือกปีการศึกษา'
+                                                    />
+                                                </div>
+                                                <div className='w-full'>
+                                                    <label className='text-[12px] text-default-500'>สิ้นสุด</label>
+                                                    <Select
+                                                        className='w-full'
+                                                        id="acadyear"
+                                                        value={endYear}
+                                                        options={acadyears}
+                                                        onChange={(selectedOption) => setEndYear(selectedOption)}
+                                                        placeholder='เลือกปีการศึกษา'
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Button
+                                                        onClick={async () => {
+                                                            await getPopularTracks(startYear.value, endYear.value)
+                                                        }}
+                                                        size="md"
+                                                        color='primary'
+                                                        className="rounded-[5px]"
+                                                        isLoading={searching}
+                                                        isDisabled={searching}
+                                                        startContent={<SearchIcon className="w-4 h-4" />}
+                                                    >
+                                                        ค้นหา
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            <Card
+                                                className='col-span-5 shadow-none'
+                                            >
+                                                <CardBody>
+                                                    <BarChart
+                                                        height={250}
+                                                        type={"bar"}
+                                                        option={trackPopularityEachYear} />
+                                                </CardBody>
+                                            </Card>
+                                        </div>
+
+                                        {/* Table */}
                                         <Card
-                                            className='col-span-1 rounded-[5px] border-1 border-gray-300 shadow-none'
+                                            className='w-full col-span-5 rounded-[5px] border-1 border-gray-300 shadow-none'
                                         >
                                             <CardBody>
-                                                <p className='text-center text-sm mb-7 mt-2'>แทร็กที่ถูกเลือกเยอะในปีการศึกษา {acadyear.value}</p>
-                                                <BarChart
-                                                    height={250}
-                                                    type={"bar"}
-                                                    option={popularityOption} />
-                                            </CardBody>
-                                        </Card>
-                                        <Card
-                                            className='col-span-1 rounded-[5px] border-1 border-gray-300 shadow-none'
-                                        >
-                                            <CardBody>
-                                                <p className='text-center text-sm mb-8 mt-2'>อัตราส่วนแทร็กที่ถูกเลือกเยอะที่สุด</p>
-                                                <BarChart
-                                                    height={250}
-                                                    type={"pie"}
-                                                    option={ratioPopulation} />
+                                                <Tabs
+                                                    defaultActiveKey="1"
+                                                    items={tabsItems}
+                                                    aria-label="Student selection status tabs"
+                                                />
                                             </CardBody>
                                         </Card>
                                     </section>
-                                    <div className='bg-white col-span-5 grid grid-cols-5 rounded-[5px] border-1 border-gray-300'>
-                                        <div className=' col-span-5 flex gap-4 items-end py-4 px-4'>
-                                            <div className='w-full'>
-                                                <label className='text-[12px] text-default-500'>เริ่มต้น</label>
-                                                <Select
-                                                    className='w-full'
-                                                    id="acadyear"
-                                                    value={startYear}
-                                                    options={acadyears}
-                                                    onChange={(selectedOption) => setStartYear(selectedOption)}
-                                                    placeholder='เลือกปีการศึกษา'
-                                                />
-                                            </div>
-                                            <div className='w-full'>
-                                                <label className='text-[12px] text-default-500'>สิ้นสุด</label>
-                                                <Select
-                                                    className='w-full'
-                                                    id="acadyear"
-                                                    value={endYear}
-                                                    options={acadyears}
-                                                    onChange={(selectedOption) => setEndYear(selectedOption)}
-                                                    placeholder='เลือกปีการศึกษา'
-                                                />
-                                            </div>
-                                            <div>
-                                                <Button
-                                                    onClick={async () => {
-                                                        await getPopularTracks(startYear.value, endYear.value)
-                                                    }}
-                                                    size="md"
-                                                    color='primary'
-                                                    className="rounded-[5px]"
-                                                    isLoading={searching}
-                                                    isDisabled={searching}
-                                                    startContent={<SearchIcon className="w-4 h-4" />}
-                                                >
-                                                    ค้นหา
-                                                </Button>
-                                            </div>
-                                        </div>
-                                        <Card
-                                            className='col-span-5 shadow-none'
-                                        >
-                                            <CardBody>
-                                                <BarChart
-                                                    height={250}
-                                                    type={"bar"}
-                                                    option={trackPopularityEachYear} />
-                                            </CardBody>
-                                        </Card>
-                                    </div>
-
-                                    {/* Table */}
-                                    <Card
-                                        className='w-full col-span-5 rounded-[5px] border-1 border-gray-300 shadow-none'
-                                    >
-                                        <CardBody>
-                                            <Tabs
-                                                defaultActiveKey="1"
-                                                items={tabsItems}
-                                                aria-label="Student selection status tabs"
-                                            />
-                                        </CardBody>
-                                    </Card>
                                 </section>
-                            </section>
                 }
             </ContentWrap >
         </>

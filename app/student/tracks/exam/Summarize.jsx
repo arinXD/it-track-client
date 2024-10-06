@@ -16,6 +16,7 @@ const Summarize = ({ prev, setCurrent, summarize, summarizing }) => {
      return (
           <section>
                <Result
+                    className="test-result p-2 md:p-4"
                     status={isSummarize ? "success" : "warning"}
                     title={isSummarize ? "ยืนยันเพื่อสรุปผล" : "ไม่สามารถสรุปผลได้"}
                     subTitle="โปรดตรวจสอบว่าตอบคำถาม แบบสอบถาม และความชอบครบถ้วนก่อนสรุปผล"
@@ -33,7 +34,9 @@ const Summarize = ({ prev, setCurrent, summarize, summarizing }) => {
                               </Button>,
                          ]}
                >
-                    <Spin spinning={summarizing}>
+                    <Spin
+                         className="p-0"
+                         spinning={summarizing}>
                          <Paragraph>
                               <Text
                                    strong
@@ -50,34 +53,39 @@ const Summarize = ({ prev, setCurrent, summarize, summarizing }) => {
                                    }
                               </Text>
                          </Paragraph>
-                         <Paragraph className="flex justify-start items-center gap-2.5">
-                              {
-                                   summarize.questions ?
+                         <Paragraph className="flex flex-col md:flex-row lg:justify-start lg:items-center gap-2.5">
+                              <div className="flex items-center gap-2">
+                                   {summarize.questions ?
                                         <GoCheckCircle className="w-[15px] h-[15px] text-green-600 inline-block" />
                                         :
                                         <CloseCircleOutlined className="text-red-500" />
-                              }
-                              <span>Step 1) ตอบคำถาม{!summarize.questions && "ไม่"}ครบ </span>
-                              {!summarize.questions && <a onClick={() => setCurrent(0)}>ตอบคำถาม.</a>}
+                                   }
+                                   <span>Step 1) ตอบคำถาม{!summarize.questions && "ไม่"}ครบ </span>
+                              </div>
+                              {!summarize.questions && <a onClick={() => setCurrent(0)}>ตอบคำถาม</a>}
                          </Paragraph>
-                         <Paragraph className="flex justify-start items-center gap-2.5">
-                              {
-                                   summarize.assessments ?
-                                        <GoCheckCircle className="w-[15px] h-[15px] text-green-600 inline-block" />
-                                        :
-                                        <CloseCircleOutlined className="text-red-500" />
-                              }
-                              <span>Step 2) ตอบแบบประเมินความชอบ{!summarize.assessments && "ไม่"}ครบ</span>
+                         <Paragraph className="flex flex-col md:flex-row lg:justify-start lg:items-center gap-2.5">
+                              <div className="flex items-center gap-2">
+                                   <div>
+                                        {summarize.assessments ?
+                                             <GoCheckCircle className="w-[15px] h-[15px] text-green-600 inline-block" />
+                                             :
+                                             <CloseCircleOutlined className="text-red-500" />
+                                        }
+                                   </div>
+                                   <span>Step 2) ตอบแบบประเมินความชอบ{!summarize.assessments && "ไม่"}ครบ</span>
+                              </div>
                               {!summarize.assessments && <a onClick={() => setCurrent(1)}>ตอบแบบประเมิน</a>}
                          </Paragraph>
-                         <Paragraph className="flex justify-start items-center gap-2.5">
-                              {
-                                   summarize.careers ?
+                         <Paragraph className="flex flex-col md:flex-row lg:justify-start lg:items-center gap-2.5">
+                              <div className="flex items-center gap-2">
+                                   {summarize.careers ?
                                         <GoCheckCircle className="w-[15px] h-[15px] text-green-600 inline-block" />
                                         :
                                         <CloseCircleOutlined className="text-red-500" />
-                              }
-                              <span>Step 3) {!summarize.careers && "ไม่"}เลือกอาชีพที่ชอบ</span>
+                                   }
+                                   <span>Step 3) {!summarize.careers && "ไม่"}เลือกอาชีพที่ชอบ</span>
+                              </div>
                               {!summarize.careers && <a onClick={() => setCurrent(2)}>เลือกอาชีพ</a>}
                          </Paragraph>
                     </Spin>

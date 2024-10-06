@@ -11,6 +11,7 @@ import axios from 'axios';
 import { getOptions } from '@/app/components/serverAction/TokenAction'
 import { useDisclosure } from "@nextui-org/react";
 import { getAcadyears } from '@/src/util/academicYear';
+import { message } from 'antd';
 
 const Page = () => {
 
@@ -82,16 +83,16 @@ const Page = () => {
             const url = "/api/tracks/selects"
             const options = await getOptions(url, "POST", formData)
             const result = await axios(options)
-            const { ok, message } = result.data
+            const { message:msg } = result.data
 
             // refresh track selection data
-            callTrackSelection()
+            await callTrackSelection()
             onClose()
-            showToastMessage(ok, message)
+            message.success(msg)
             return
         } catch (error) {
-            const message = error?.response?.data?.message
-            showToastMessage(false, message)
+            const msg = error?.response?.data?.message
+            message.warning(msg)
             return
         }
     }, [])

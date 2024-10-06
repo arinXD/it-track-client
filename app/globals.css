@@ -15,3 +15,10 @@ html {
 * {
   font-family: "Sarabun", sans-serif !important;
 }
+
+.ant-qs-ck span.ant-checkbox{
+  width: 16px;
+}
+.ant-qs-ck span:nth-child(2){
+  width: 100%;
+}
