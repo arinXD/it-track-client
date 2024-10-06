@@ -145,13 +145,13 @@ const SuggestionForm = ({ form, email, setResultData }) => {
                 reverseButtons: true
             }).then(result => {
                 if (result.isConfirmed) {
-                    window.open(process.env.FEEDBACK_SUGGESTION_URL)
+                    window.open(`https://forms.gle/q2zNnbxfDXxv1R4d6`)
                 }
             })
         }
         const type = detectDeviceType()
         if (type == "mobile") {
-            window.scrollTo(0, 650)
+            window.scrollTo(0, 680)
         } else if (type == "tablet") {
             window.scrollTo(0, 700)
         }
