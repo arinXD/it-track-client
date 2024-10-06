@@ -107,7 +107,7 @@ const Page = () => {
                             Discover Your Experience with KKU IT
                         </h2>
                         <h3 className='text-center text-xs text-default-500'>
-                            เปิดเว็บไซต์นี่ผ่านบราวเซอร์ปกติ เพื่อแก้ปัญหา Google access blocked
+                            เปิดเว็บไซต์นี้ผ่านบราวเซอร์ปกติ เพื่อแก้ปัญหา Google access blocked
                             <FaInfoCircle onClick={onOpen} className='inline-block w-3 h-3 ms-2 active:scale-80' />
                         </h3>
                     </div>
