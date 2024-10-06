@@ -20,7 +20,7 @@ const Questions = ({ setQuestions, allQuestions, next }) => {
                          <div
                               key={q.id}
                               className="mb-6">
-                              <div className="flex gap-2 items-center mb-1">
+                              <div className="flex gap-2 items-start mb-2 md:mb-1">
                                    <p className="font-bold">{index + 1}. </p>
                                    <p>{q.question}</p>
                                    {q.desc &&
@@ -43,6 +43,7 @@ const Questions = ({ setQuestions, allQuestions, next }) => {
                                    }
                               </div>
                               <Radio.Group
+                                   className="ms-5"
                                    onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                               >
                                    <Space direction="vertical">

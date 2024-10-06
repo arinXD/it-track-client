@@ -4,8 +4,8 @@ import axios from "axios";
 import { createRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MdOutlineInventory2 } from "react-icons/md";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spinner, Chip } from "@nextui-org/react"
-import { Checkbox, Empty } from 'antd';
-import { PlusIcon, SearchIcon } from "@/app/components/icons";
+import { Checkbox, Empty, message } from 'antd';
+import { DeleteIcon, DeleteIcon2, PlusIcon, SearchIcon } from "@/app/components/icons";
 import { SELECT_STYLE, thinInputClass } from "@/src/util/ComponentClass";
 import { IoCloseOutline } from "react-icons/io5";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -54,6 +54,27 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
                setDefaultQuestionBank([])
           } finally {
                setFetching(false)
+          }
+     }, [])
+
+     const updateQuestionInventory = useCallback(async (formId) => {
+          if (!formId) {
+               try {
+                    const option = await getOptions(`/api/questions`, "get")
+                    const res = await axios(option)
+                    const allQuestions = res.data.data
+                    setQuestionsBank(allQuestions)
+               } catch (error) {
+                    setQuestionsBank([])
+               }
+               return
+          }
+          try {
+               const option = await getOptions(`/api/questions/not-in-form/${formId}`, "get")
+               const questionsNotInForm = (await axios(option)).data.data
+               setQuestionsBank(questionsNotInForm)
+          } catch (error) {
+               setQuestionsBank([])
           }
      }, [])
 
@@ -106,12 +127,8 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
                     desc: null
                }
 
-               const updatedQuestions = [...prevQuestions, newQuestion]
+               const updatedQuestions = [newQuestion, ...prevQuestions]
                questionRefs.current = updatedQuestions.map((_, i) => questionRefs.current[i] || createRef())
-
-               setTimeout(() => {
-                    questionRefs.current[updatedQuestions.length - 1].current.scrollIntoView({ behavior: 'smooth' })
-               }, 100)
 
                return updatedQuestions
           })
@@ -220,6 +237,17 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
           );
      }, []);
 
+     const deleteQuestion = useCallback(async (qid) => {
+          try {
+               const option = await getOptions(`/api/questions/${qid}`, "delete")
+               const { message: msg } = (await axios(option)).data
+               await updateQuestionInventory(formId)
+               message.success(msg)
+          } catch (error) {
+               message.warning("ไม่สามารถลบคำถามได้")
+          }
+     }, [formId])
+
      return (
           <>
                <section style={formStyle}>
@@ -269,19 +297,28 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
                                                        filteredItems?.length > 0 ?
                                                             filteredItems.map((q, index) => (
                                                                  <div key={index} className="first-of-type:mt-4 last-of-type:mb-4 my-2">
-                                                                      <Checkbox
-                                                                           onChange={(e) => selectQuestion(e, q.id)}
-                                                                           key={index}
-                                                                           className="w-[80%] mx-auto relative cursor-pointer flex gap-2 border border-gray-0 shadow p-4 rounded-[5px]"
-                                                                           name={`questionBank[]`}
-                                                                      >
-                                                                           <Chip
-                                                                                className="!absolute !p-1 !text-xs top-2 right-2"
-                                                                                color={q?.track?.split(" ")[0]?.toLowerCase() === "bit" ? "secondary" : q?.track?.split(" ")[0]?.toLowerCase() === "network" ? "primary" : "success"} variant="flat">
-                                                                                {q?.track?.split(" ")[0]}
-                                                                           </Chip>
-                                                                           <div className="w-full flex flex-col gap-2 relative">
-                                                                                <p>{q.question}</p>
+                                                                      <div className="w-[80%] mx-auto border p-4 rounded-[5px]">
+                                                                           <div className="w-full flex justify-between items-center border-b pb-4 mb-4">
+                                                                                <p className="w-[80%] whitespace-break-spaces mb-0 text-sm">{q.question}</p>
+                                                                                <div className="w-[20%] flex justify-end items-center gap-4">
+                                                                                     <Chip
+                                                                                          className="!p-1 !text-xs rounded-md"
+                                                                                          color={q?.track?.split(" ")[0]?.toLowerCase() === "bit" ? "secondary" : q?.track?.split(" ")[0]?.toLowerCase() === "network" ? "primary" : "success"} variant="flat">
+                                                                                          {q?.track?.split(" ")[0]}
+                                                                                     </Chip>
+                                                                                     <Button
+                                                                                          onClick={() => deleteQuestion(q.id)}
+                                                                                          isIconOnly size="sm" className="bg-red-100 text-red-500">
+                                                                                          <DeleteIcon className={"w-4 h-4"} />
+                                                                                     </Button>
+                                                                                </div>
+                                                                           </div>
+                                                                           <Checkbox
+                                                                                onChange={(e) => selectQuestion(e, q.id)}
+                                                                                key={index}
+                                                                                className="w-full ant-qs-ck relative cursor-pointer flex gap-4"
+                                                                                name={`questionBank[]`}
+                                                                           >
                                                                                 <ol className="text-start">
                                                                                      {q?.Answers.map((ans, j) => (
                                                                                           <li
@@ -292,8 +329,8 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
                                                                                           </li>
                                                                                      ))}
                                                                                 </ol>
-                                                                           </div>
-                                                                      </Checkbox>
+                                                                           </Checkbox>
+                                                                      </div>
                                                                  </div>
                                                             ))
                                                             :

@@ -1,6 +1,6 @@
 "use client"
 import { inputClass } from "@/src/util/ComponentClass";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Spinner } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Spinner, Textarea, Skeleton } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { BsFillImageFill } from "react-icons/bs";
 import { UploadOutlined } from '@ant-design/icons';
@@ -28,16 +28,18 @@ const EditCareerModal = ({ isOpen, onClose, careerId, getCareers }) => {
           const option = await getOptions(`/api/careers/${careerId}`)
           try {
                const res = await axios(option)
-               const { image, name_th, name_en, track } = res.data.data
+               const { image, name_th, name_en, track, desc } = res.data.data
                setPreviewImage(image)
                setDefaultImage(image)
                setNameTh(name_th)
                setNameEn(name_en)
+               setDesc(desc)
                setTrack(track)
           } catch (error) {
                setPreviewImage("")
                setNameTh("")
                setNameEn("")
+               setDesc(null)
                setTrack("")
           } finally {
                setFetching(false)
@@ -141,19 +143,23 @@ const EditCareerModal = ({ isOpen, onClose, careerId, getCareers }) => {
                                         <div className="flex gap-6">
                                              <div className={`${previewImage ? "border-0 !h-auto" : "border-1"} border-solid w-1/2 h-[300px] mt-1 mb-3 grid grid-cols-1 place-items-center`}>
                                                   {
-                                                       previewImage ?
-                                                            <Image
-                                                                 src={previewImage || "/image/user.png"}
-                                                                 width={350}
-                                                                 height={350}
-                                                                 alt='cover image'
-                                                                 className={`w-full object-contain h-auto rounded-[10px]`}
-                                                            />
-                                                            :
-                                                            <div className='flex flex-col justify-center items-center gap-1 text-[#E5E7EB]'>
-                                                                 <BsFillImageFill className='w-14 h-14' />
-                                                                 <p className='text-sm text-[#d5d9df]'>Preview รูปภาพ</p>
-                                                            </div>
+                                                       fetching ?
+                                                            <Skeleton className="rounded-lg">
+                                                                 <div className="w-[350px] h-[350px] rounded-lg bg-default-100"></div>
+                                                            </Skeleton>
+                                                            : previewImage ?
+                                                                 <Image
+                                                                      src={previewImage || "/image/user.png"}
+                                                                      width={350}
+                                                                      height={350}
+                                                                      alt='cover image'
+                                                                      className={`w-full object-contain h-auto rounded-[10px]`}
+                                                                 />
+                                                                 :
+                                                                 <div className='flex flex-col justify-center items-center gap-1 text-[#E5E7EB]'>
+                                                                      <BsFillImageFill className='w-14 h-14' />
+                                                                      <p className='text-sm text-[#d5d9df]'>Preview รูปภาพ</p>
+                                                                 </div>
                                                   }
                                              </div>
                                              <div className="w-1/2 flex flex-col">
@@ -196,7 +202,7 @@ const EditCareerModal = ({ isOpen, onClose, careerId, getCareers }) => {
                                                                       className='mb-4'
                                                                       isRequired
                                                                  />
-                                                                 <Input
+                                                                 <Textarea
                                                                       name='desc'
                                                                       type="text"
                                                                       variant="bordered"

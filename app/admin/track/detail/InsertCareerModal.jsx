@@ -1,6 +1,6 @@
 "use client"
 import { inputClass } from "@/src/util/ComponentClass";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Textarea } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { BsFillImageFill } from "react-icons/bs";
 import { UploadOutlined } from '@ant-design/icons';
@@ -154,7 +154,7 @@ const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => 
                                                        className='mb-4'
                                                        isRequired
                                                   />
-                                                  <Input
+                                                  <Textarea
                                                        name='desc'
                                                        type="text"
                                                        variant="bordered"

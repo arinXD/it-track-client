@@ -23,6 +23,7 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
     const [expiredValue, setExpiredValue] = useState("")
     const [announcementDate, setAnnouncementDate] = useState("");
     const [trackSubj, setTrackSubj] = useState([])
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         const nextWeek = new Date(currentDateTime);
@@ -114,7 +115,8 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
         setTrackSubj(data)
     }, [trackSubj])
 
-    const createAcad = useCallback(function (e) {
+    const createAcad = useCallback(async function (e) {
+        setSubmitting(true)
         e.preventDefault();
         const formData = {
             acadyear: acadValue,
@@ -124,7 +126,8 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
             announcementDate,
             trackSubj: trackSubj.map((sbj) => sbj.subject_code),
         }
-        handleSubmit(formData)
+        await handleSubmit(formData)
+        setSubmitting(false)
     }, [
         acadValue,
         title,
@@ -314,6 +317,8 @@ export default function CreateModal({ acadyear, subjects, handleSubmit, isOpen, 
                                     ยกเลิก
                                 </Button>
                                 <Button
+                                    isDisabled={submitting}
+                                    isLoading={submitting}
                                     className='py-4 ms-4'
                                     radius='sm'
                                     color="primary"

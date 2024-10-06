@@ -22,7 +22,7 @@ const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
      return (
           <section className="flex flex-col flex-wrap gap-4">
                <p className="mt-4 mb-2">อาชีพที่ชอบหรือคาดหวัง</p>
-               <section className="grid grid-cols-4 gap-4 mb-4" >
+               <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4" >
                     {
                          allCareers?.map((career, index) => (
                               <div key={index} className="relative group">
@@ -60,7 +60,7 @@ const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
                                              alt={career.name_en}
                                              className="rounded-[2px] h-[100px] w-[120px] object-cover !select-none"
                                         />
-                                        <div className="mt-4 w-full">
+                                        <div className="mt-4 text-sm md:text-base w-full">
                                              <p>{career.name_th}</p>
                                         </div>
                                    </div>

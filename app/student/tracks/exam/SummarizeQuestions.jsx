@@ -41,7 +41,7 @@ const SummarizeQuestions = ({ next, data }) => {
                     style: {
                         fontSize: '12px',
                         colors: ['#333'],
-                        
+
                     },
                 },
                 title: {
@@ -50,7 +50,7 @@ const SummarizeQuestions = ({ next, data }) => {
                         paddingTop: "10px",
                         fontSize: '10px',
                         colors: ['#333'],
-                        
+
                     }
                 },
             },
@@ -61,7 +61,7 @@ const SummarizeQuestions = ({ next, data }) => {
                         paddingTop: "10px",
                         fontSize: '10px',
                         colors: ['#333'],
-                        
+
                     }
                 },
             },
@@ -70,36 +70,36 @@ const SummarizeQuestions = ({ next, data }) => {
 
     return (
         <section>
-            <section className='bg-gray-100 min-h-screen p-8 rounded-sm'>
-                <section className='max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden'>
+            <section className='bg-gray-100 min-h-screen lg:p-8 rounded-sm'>
+                <section className='max-w-4xl mx-auto bg-white md:shadow-lg rounded-lg overflow-hidden'>
                     <header className="bg-blue-600 text-white p-6">
-                        <h1 className="text-3xl font-bold">ผลสรุปการตอบคำถาม</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold">ผลสรุปการตอบคำถาม</h1>
                     </header>
-                    <div className="p-6 space-y-6">
+                    <div className="p-2 space-y-4 md:p-6 md:space-y-6">
                         <section className="bg-blue-50 p-4 rounded-lg">
-                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">การตอบคำถาม</h2>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white p-3 rounded shadow">
+                            <h2 className="text-xl md:text-2xl font-semibold text-blue-800 mb-4">การตอบคำถาม</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="bg-white p-4 rounded shadow">
                                     <p className="text-xs text-gray-600 mb-1">คำถามทั้งหมด</p>
-                                    <p className="text-xl font-bold">{totalQuestions} ข้อ</p>
+                                    <p className="text-lg md:text-xl font-bold">{totalQuestions} ข้อ</p>
                                 </div>
-                                <div className="bg-white p-3 rounded shadow">
+                                <div className="bg-white p-4 rounded shadow">
                                     <p className="text-xs text-gray-600 mb-1">ตอบถูกทั้งหมด</p>
-                                    <p className="text-xl font-bold">{totalCorrectAnswers} / {totalQuestions} ข้อ</p>
+                                    <p className="text-lg md:text-xl font-bold">{totalCorrectAnswers} / {totalQuestions} ข้อ</p>
                                 </div>
-                                <div className="bg-white p-3 rounded shadow">
+                                <div className="bg-white p-4 rounded shadow">
                                     <p className="text-xs text-gray-600 mb-1">คะแนนทั้งหมด</p>
-                                    <p className="text-xl font-bold">{totalQuestionScore} / {totalQuestions * 10} คะแนน</p>
+                                    <p className="text-lg md:text-xl font-bold">{totalQuestionScore} / {totalQuestions * 10} คะแนน</p>
                                 </div>
-                                <div className="bg-white p-3 rounded shadow">
+                                <div className="bg-white p-4 rounded shadow">
                                     <p className="text-xs text-gray-600 mb-1">ความถูกต้อง</p>
-                                    <p className="text-xl font-bold">{overallCorrectPercentage} %</p>
+                                    <p className="text-lg md:text-xl font-bold">{overallCorrectPercentage} %</p>
                                 </div>
                             </div>
                         </section>
 
-                        <section className='p-6 bg-blue-50 rounded-lg '>
-                            <h2 className="text-2xl font-semibold text-blue-800 mb-4">คำถามทั้งหมด</h2>
+                        <section className='p-4 md:p-6 bg-blue-50 rounded-lg'>
+                            <h2 className="text-xl md:text-2xl font-semibold text-blue-800 mb-4">คำถามทั้งหมด</h2>
                             <div className="bg-white shadow overflow-auto rounded-lg">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
@@ -110,8 +110,8 @@ const SummarizeQuestions = ({ next, data }) => {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {questionScores.map((qs) => (
-                                            <tr key={`q_tr_${qs.qId}`}>
+                                        {questionScores.map((qs, index) => (
+                                            <tr key={`q_tr_${qs.index}`}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">{qs.question}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-center text-sm">{qs.score}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -126,10 +126,10 @@ const SummarizeQuestions = ({ next, data }) => {
                             </div>
                         </section>
 
-                        <section className='flex flex-col gap-6 p-6 bg-blue-50 rounded-lg'>
+                        <section className='flex flex-col gap-4 md:gap-6 p-4 md:p-6 bg-blue-50 rounded-lg'>
                             <section>
-                                <h2 className="text-2xl font-semibold text-blue-800 mb-6">สรุปผลคะแนนในแต่ละแทร็ก</h2>
-                                <div className="grid grid-cols-3 gap-4">
+                                <h2 className="text-xl md:text-2xl font-semibold text-blue-800 mb-6">สรุปผลคะแนนในแต่ละแทร็ก</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     {trackSummaries.map((ts) => (
                                         <div key={ts.track} className="bg-white p-4 rounded shadow">
                                             <h3 className="text-lg font-semibold text-blue-600 mb-3">{ts.track}</h3>
@@ -156,14 +156,14 @@ const SummarizeQuestions = ({ next, data }) => {
                 </section>
             </section>
             <div
-                className="w-full flex justify-end mt-8">
+                className="w-full flex justify-end p-4 md:p-0 md:mt-8">
                 <div
                     onClick={next}
-                    className="cursor-pointer flex flex-row items-center gap-4 opacity-60 hover:opacity-100 transition-all rounded-none p-4"
+                    className="cursor-pointer flex flex-row items-center gap-2 md:gap-4 opacity-60 hover:opacity-100 transition-all rounded-none pb-4 md:p-0"
                 >
                     <div className="flex flex-col">
-                        <span className="text-sm text-default-400">Step 2</span>
-                        <span className="text-base">ผลสรุปความชอบ</span>
+                        <span className="text-xs md:text-sm text-default-400">Step 2</span>
+                        <span className="text-xs md:text-base">ผลสรุปความชอบ</span>
                     </div>
                     <MdKeyboardArrowRight className="w-5 h-5" />
                 </div>
