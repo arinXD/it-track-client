@@ -5,13 +5,13 @@ const hostNameStage = {
 };
 
 const getHostname = () => {
-    const stage = process.env.NEXT_PUBLIC_STAGE || 'dev';
-    return hostNameStage[stage] || hostNameStage.dev;
+    const stage = process.env.STAGE || 'prod';
+    return hostNameStage[stage];
 };
 
 export const hostname = getHostname();
 
 export const getServerSideHostname = () => {
-    const stage = process.env.STAGE || 'dev';
-    return hostNameStage[stage] || hostNameStage.dev;
+    const stage = process.env.STAGE || 'prod';
+    return hostNameStage[stage];
 };
