@@ -28,6 +28,7 @@ import { useSession } from 'next-auth/react';
 import { Drawer, Space } from 'antd';
 import { Accordion, AccordionItem } from "@nextui-org/react";
 import { TbMessage2Exclamation } from "react-icons/tb";
+import { AiOutlineInfoCircle } from "react-icons/ai";
 
 const Page = ({ params }) => {
     const { id } = params
@@ -359,6 +360,116 @@ const Page = ({ params }) => {
         return groupedSubjects;
     }, [subgroupData, groupData, semisubgroupData]);
 
+    const [insertData, setInsertData] = useState([]);
+    const [insideTrack, setInsideTrack] = useState([]);
+    const [outsideTrack, setOutsideTrack] = useState([]);
+    const [insideTrackStats, setInsideTrackStats] = useState({ totalCredits: 0, totalScores: 0, averageScore: 0 });
+    const [outsideTrackStats, setOutsideTrackStats] = useState({ totalCredits: 0, totalScores: 0, averageScore: 0 });
+
+
+    useEffect(() => {
+        const newInsertData = Object.keys(groupedSubjectsByCategory).reduce((acc, categoryId) => {
+            const categoryData = groupedSubjectsByCategory[categoryId];
+
+            const processSubjects = (subjects) => {
+                return subjects.map(subject => ({
+                    subject,
+                    grade: subject.grade,
+                    track: subject?.Track?.track || null,
+                    credit: subject.credit
+                }));
+            };
+
+            // Process groups
+            Object.keys(categoryData.groups).forEach(groupId => {
+                const group = categoryData.groups[groupId];
+                acc.push({ type: 'group', subjects: processSubjects(group.subjects) });
+            });
+
+            // Process subgroups
+            Object.keys(categoryData.subgroups).forEach(subgroupId => {
+                const subgroup = categoryData.subgroups[subgroupId];
+                acc.push({ type: 'subgroup', subjects: processSubjects(subgroup.subjects) });
+            });
+
+            // Process semisubgroups
+            Object.keys(categoryData.semisubgroups).forEach(semisubgroupId => {
+                const semisubgroup = categoryData.semisubgroups[semisubgroupId];
+                acc.push({ type: 'semisubgroup', subjects: processSubjects(semisubgroup.subjects) });
+            });
+
+            return acc;
+        }, []);
+
+        setInsertData(newInsertData);
+
+        const insideTrackData = [];
+        const outsideTrackData = [];
+        const validSubjects = [];
+
+
+        newInsertData.forEach(data => {
+            data?.subjects.forEach(subjectData => {
+                if (subjectData.track && subjectData.grade && subjectData.grade !== undefined) {
+                    const calculatedGrade = calGrade(subjectData.grade);
+
+                    // Check if calculatedGrade is a number before multiplication
+                    const gradeValue = isNumber(calculatedGrade) ? calculatedGrade * subjectData.credit : 0;
+
+                    const subjectEntry = {
+                        subject: subjectData.subject,
+                        grade: gradeValue, // Store numeric value instead of string
+                        track: subjectData.track,
+                        credit: Number(subjectData.credit) || 0 // Ensure credit is a number
+                    };
+
+                    validSubjects.push(subjectEntry);
+                }
+            });
+        });
+
+        validSubjects.sort((a, b) => b.grade - a.grade);
+
+        validSubjects.forEach((subjectEntry) => {
+            if (userData?.Selection?.result === subjectEntry.track) {
+                if (insideTrackData.length < 4) {
+                    insideTrackData.push(subjectEntry);
+                } else {
+                    outsideTrackData.push(subjectEntry);
+                }
+            } else {
+                outsideTrackData.push(subjectEntry);
+            }
+        });
+
+        // Set the state with the filtered data
+        setInsideTrack(insideTrackData);
+        setOutsideTrack(outsideTrackData);
+
+        // Calculate stats for insideTrack
+        const insideTotalCredits = insideTrackData.reduce((sum, subject) => sum + subject.credit, 0);
+        const insideTotalScores = insideTrackData.reduce((sum, subject) => sum + subject.grade, 0);
+        const insideAverageScore = insideTotalCredits ? insideTotalScores / insideTotalCredits : 0;
+
+        setInsideTrackStats({
+            totalCredits: insideTotalCredits,
+            totalScores: insideTotalScores,
+            averageScore: insideAverageScore,
+        });
+
+        // Calculate stats for outsideTrack
+        const outsideTotalCredits = outsideTrackData.reduce((sum, subject) => sum + subject.credit, 0);
+        const outsideTotalScores = outsideTrackData.reduce((sum, subject) => sum + subject.grade, 0);
+        const outsideAverageScore = outsideTotalCredits ? outsideTotalScores / outsideTotalCredits : 0;
+
+        setOutsideTrackStats({
+            totalCredits: outsideTotalCredits,
+            totalScores: outsideTotalScores,
+            averageScore: outsideAverageScore,
+        });
+
+    }, [groupedSubjectsByCategory, userData]);
+
     useEffect(() => {
         const groupDatatest = [];
 
@@ -470,19 +581,37 @@ const Page = ({ params }) => {
                 const credit = subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null // Store numeric grade if valid
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject?.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject?.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
+
             })
             .filter(subject => subject !== null);
 
@@ -507,19 +636,36 @@ const Page = ({ params }) => {
                 const grade = subject.grade;
                 const credit = subject.credit;
 
-                if (grade === null || grade === undefined ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null // Store numeric grade if valid
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject?.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject?.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
             })
             .filter(subject => subject !== null);
 
@@ -546,19 +692,36 @@ const Page = ({ params }) => {
                 const grade = subject.grade;
                 const credit = subject.credit;
 
-                if (grade === null || grade === undefined ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject?.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject?.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
             })
             .filter(subject => subject !== null);
 
@@ -598,19 +761,36 @@ const Page = ({ params }) => {
             const grade = prev.grade
             const credit = prev.credit;
 
-            if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
-                (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+            if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                 return null;
             }
 
-            const calculatedGrade = calGrade(grade);
+            const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+            const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-            return {
-                subject_code: prev.subject_code,
-                grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                credit: credit,
-                numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
-            };
+            let calculatedGrade = null;
+            let numericGrade = null;
+
+            if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                // Only count credits, not grades
+                return {
+                    subject_code: prev?.subject_code,
+                    grade: grade,  // Keep the original grade
+                    credit: credit,
+                    numericGrade: null // Do not calculate grade
+                };
+            } else if (gradeAndCreditGrades.includes(grade)) {
+                // Count both credits and grades
+                calculatedGrade = calGrade(grade);
+                numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                return {
+                    subject_code: prev?.subject_code,
+                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                    credit: credit,
+                    numericGrade: numericGrade
+                };
+            }
         }).filter(item => item !== null);
 
         // Calculate total credits, total grades, and average grade
@@ -634,19 +814,36 @@ const Page = ({ params }) => {
                 const credit = subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject?.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject?.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
             })
             .filter(subject => subject !== null)
             : []; // Return an empty array if 'subjects' is not an array
@@ -676,19 +873,36 @@ const Page = ({ params }) => {
                 const credit = subject.Subject.credit;
 
                 // Check for invalid grades or low credits
-                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined ||
-                    (credit <= 1 && ["I", "P", "R", "S", "T", "U", "W"].includes(grade))) {
+                if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
                     return null;
                 }
 
-                const calculatedGrade = calGrade(grade);
+                const creditOnlyGrades = ["I", "P", "R", "S", "T", "U", "W"];
+                const gradeAndCreditGrades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
-                return {
-                    subject_code: subject.Subject.subject_code,
-                    grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
-                    credit: credit,
-                    numericGrade: isNumber(calculatedGrade) ? calculatedGrade * credit : null
-                };
+                let calculatedGrade = null;
+                let numericGrade = null;
+
+                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                    // Only count credits, not grades
+                    return {
+                        subject_code: subject?.Subject?.subject_code,
+                        grade: grade,  // Keep the original grade
+                        credit: credit,
+                        numericGrade: null // Do not calculate grade
+                    };
+                } else if (gradeAndCreditGrades.includes(grade)) {
+                    // Count both credits and grades
+                    calculatedGrade = calGrade(grade);
+                    numericGrade = isNumber(calculatedGrade) ? calculatedGrade * credit : null;
+
+                    return {
+                        subject_code: subject?.Subject.subject_code,
+                        grade: isNumber(calculatedGrade) ? String(calculatedGrade * credit) : calculatedGrade,
+                        credit: credit,
+                        numericGrade: numericGrade
+                    };
+                }
             })
             .filter(subject => subject !== null);
 
@@ -708,6 +922,25 @@ const Page = ({ params }) => {
     }).filter(category => category.subjects.length > 0);
 
     const combinedSubjectCategories = subjectCategorytest.concat(subjectCategory);
+
+    ////////////////// รวมค่าคะแนนหมวดหมู่วิชา///////////////////////
+
+
+    const [sumCate, setSumCate] = useState([]);
+
+    useEffect(() => {
+        const sum = []; // Initialize a new array to collect the results
+
+        cateData.forEach((ceta) => {
+            const categoryDatas = combinedSubjectCategories.find(category => category.id === ceta.category.id) || {};
+            const { totalCredits = 0, totalGrades = 0 } = categoryDatas;
+            sum.push({ totalCredits, totalGrades });
+        });
+
+        if (JSON.stringify(sum) !== JSON.stringify(sumCate)) {
+            setSumCate(sum);
+        }
+    }, [cateData, combinedSubjectCategories, sumCate]);
 
     ///////////////////////รวมค่าคะแนน///////////////////////
 
@@ -789,7 +1022,7 @@ const Page = ({ params }) => {
                 const res = await axios(option);
                 // console.log(res);
                 const des = res.data.data;
-                console.log(des);
+                // console.log(des);
 
                 setDesAll(des);
             } catch (error) {
@@ -1163,15 +1396,43 @@ const Page = ({ params }) => {
                 {Object.keys(groupedSubgroups).map((groupTitle, groupIndex) => {
                     const subgroupsWithSameGroupTitle = groupedSubgroups[groupTitle];
 
+                    // const { totalCredits, totalGrades } = combinedsubjectCodesByGroup[groupIndex] || { totalCredits: 0, totalGrades: 0 };
+
                     return (
-                        <div key={groupIndex}>
-                            <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
-                                <h3 className='text-lg text-default-800 px-4'><li>{groupTitle}</li></h3>
-                                {/* <h2 className='text-sm text-default-800'>จำนวน {creditsubgroup} หน่วยกิต</h2> */}
+                        <div key={groupTitle}>
+                            <div>
+                                <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
+                                    <h3 className='text-lg text-default-800 px-4'><li>{groupTitle}</li></h3>
+                                    {/* <h2 className='text-sm text-default-800'>จำนวน {creditsubgroup} หน่วยกิต</h2> */}
+                                </div>
+                                {subgroupsWithSameGroupTitle.map((subgroup, subgroupIndex) => (
+                                    getSubTrack(subgroup, subgroupIndex)
+                                ))}
                             </div>
-                            {subgroupsWithSameGroupTitle.map((subgroup, subgroupIndex) => (
-                                getSubTrack(subgroup, subgroupIndex)
-                            ))}
+                            {/* {groupTitle !== "กลุ่มวิชาเลือกสาขา" && (
+                                <Table aria-label="Sum" classNames={tableClass} removeWrapper color="primary">
+                                    <TableHeader>
+                                        <TableColumn>#</TableColumn>
+                                        <TableColumn></TableColumn>
+                                        <TableColumn></TableColumn>
+                                        <TableColumn>หน่วยกิต</TableColumn>
+                                        <TableColumn>ค่าคะแนน</TableColumn>
+                                        <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell className='font-bold'>รวมคะแนน {groupTitle}</TableCell>
+                                            <TableCell className="w-1/3"></TableCell>
+                                            <TableCell></TableCell>
+                                            <TableCell>{totalCredits}</TableCell>
+                                            <TableCell>{totalGrades}</TableCell>
+                                            <TableCell>
+                                                {totalCredits > 0 ? (totalGrades / totalCredits).toFixed(2) : 'N/A'}
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            )} */}
                         </div>
                     );
                 })}
@@ -1262,66 +1523,95 @@ const Page = ({ params }) => {
                                                         setHighestIndex(index);
                                                     }
                                                     const { category, groups, subgroups, semisubgroups } = groupedSubjectsByCategory[categoryId];
+
+                                                    const { totalCredits, totalGrades } = sumCate[index] || { totalCredits: 0, totalGrades: 0 };
+
                                                     return (
-                                                        <div key={categoryId} className='mb-5'>
-                                                            <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
-                                                                <h2 className='text-lg text-default-800'>{index + 1}. {category?.category_title}</h2>
-                                                            </div>
-                                                            {Object.keys(groups).map((groupId) => {
-                                                                const group = groups[groupId];
-                                                                return (
-                                                                    <div key={groupId}>
-                                                                        <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
-                                                                            <h3 className='text-lg text-default-800 px-4'>
-                                                                                <li>{group?.group_title}</li>
-                                                                            </h3>
+                                                        <div key={index} className='mb-5'>
+                                                            <div>
+                                                                <div className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-md'>
+                                                                    <h2 className='text-lg text-default-800'>{index + 1}. {category?.category_title}</h2>
+                                                                </div>
+                                                                {Object.keys(groups).map((groupId) => {
+                                                                    const group = groups[groupId];
+                                                                    return (
+                                                                        <div key={groupId}>
+                                                                            <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center'>
+                                                                                <h3 className='text-lg text-default-800 px-4'>
+                                                                                    <li>{group?.group_title}</li>
+                                                                                </h3>
+                                                                            </div>
+                                                                            <Table
+                                                                                classNames={tableClass}
+                                                                                removeWrapper
+                                                                                onRowAction={() => { }}
+                                                                                aria-label="subjects table"
+                                                                            >
+                                                                                <TableHeader>
+                                                                                    <TableColumn>รหัสวิชา</TableColumn>
+                                                                                    <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                                                    <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                                                    <TableColumn>หน่วยกิต</TableColumn>
+                                                                                    <TableColumn></TableColumn>
+                                                                                </TableHeader>
+                                                                                <TableBody>
+                                                                                    {group.subjects && group.subjects.map((subject) => (
+                                                                                        <TableRow key={subject.subject_id || subject.subject_code}>
+                                                                                            <TableCell>{subject.subject_code}</TableCell>
+                                                                                            <TableCell className="w-1/3">{subject.title_en}</TableCell>
+                                                                                            <TableCell className="w-1/3">{subject.title_th}</TableCell>
+                                                                                            <TableCell>{subject.credit}</TableCell>
+                                                                                            <TableCell>
+                                                                                                {subject.grade ? (
+                                                                                                    <div className="relative ml-2 w-[70px]">
+                                                                                                        <input
+                                                                                                            className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                                                                                                            placeholder=" "
+                                                                                                            type="text"
+                                                                                                            value={subject.grade}
+                                                                                                            onChange={(e) => setCumLaude()}
+                                                                                                        />
+                                                                                                        <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-fit w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[4.1] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                                                                                            เกรด
+                                                                                                        </label>
+                                                                                                    </div>
+                                                                                                ) : (
+                                                                                                    <p></p>
+                                                                                                )}
+                                                                                            </TableCell>
+                                                                                        </TableRow>
+                                                                                    ))}
+                                                                                </TableBody>
+                                                                            </Table>
                                                                         </div>
-                                                                        <Table
-                                                                            classNames={tableClass}
-                                                                            removeWrapper
-                                                                            onRowAction={() => { }}
-                                                                            aria-label="subjects table"
-                                                                        >
-                                                                            <TableHeader>
-                                                                                <TableColumn>รหัสวิชา</TableColumn>
-                                                                                <TableColumn>ชื่อวิชา EN</TableColumn>
-                                                                                <TableColumn>ชื่อวิชา TH</TableColumn>
-                                                                                <TableColumn>หน่วยกิต</TableColumn>
-                                                                                <TableColumn></TableColumn>
-                                                                            </TableHeader>
-                                                                            <TableBody>
-                                                                                {group.subjects && group.subjects.map((subject) => (
-                                                                                    <TableRow key={subject.subject_id || subject.subject_code}>
-                                                                                        <TableCell>{subject.subject_code}</TableCell>
-                                                                                        <TableCell className="w-1/3">{subject.title_en}</TableCell>
-                                                                                        <TableCell className="w-1/3">{subject.title_th}</TableCell>
-                                                                                        <TableCell>{subject.credit}</TableCell>
-                                                                                        <TableCell>
-                                                                                            {subject.grade ? (
-                                                                                                <div className="relative ml-2 w-[70px]">
-                                                                                                    <input
-                                                                                                        className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
-                                                                                                        placeholder=" "
-                                                                                                        type="text"
-                                                                                                        value={subject.grade}
-                                                                                                        onChange={(e) => setCumLaude()}
-                                                                                                    />
-                                                                                                    <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-fit w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[4.1] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                                                                                                        เกรด
-                                                                                                    </label>
-                                                                                                </div>
-                                                                                            ) : (
-                                                                                                <p></p>
-                                                                                            )}
-                                                                                        </TableCell>
-                                                                                    </TableRow>
-                                                                                ))}
-                                                                            </TableBody>
-                                                                        </Table>
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                            {getSubg(subgroups, semisubgroups)}
+                                                                    );
+                                                                })}
+                                                                {getSubg(subgroups, semisubgroups)}
+                                                            </div>
+                                                            <Table aria-label="Sum"
+                                                                classNames={tableClass}
+                                                                removeWrapper
+                                                                color="primary"
+                                                            >
+                                                                <TableHeader>
+                                                                    <TableColumn>#</TableColumn>
+                                                                    <TableColumn></TableColumn>
+                                                                    <TableColumn></TableColumn>
+                                                                    <TableColumn>หน่วยกิต</TableColumn>
+                                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                                </TableHeader>
+                                                                <TableBody>
+                                                                    <TableRow>
+                                                                        <TableCell className='font-bold'>รวมคะแนน{category?.category_title}</TableCell>
+                                                                        <TableCell className="w-1/3"></TableCell>
+                                                                        <TableCell></TableCell>
+                                                                        <TableCell>{totalCredits}</TableCell>
+                                                                        <TableCell>{totalGrades}</TableCell>
+                                                                        <TableCell>{totalCredits > 0 ? (totalGrades / totalCredits).toFixed(2) : 'N/A'}</TableCell>
+                                                                    </TableRow>
+                                                                </TableBody>
+                                                            </Table>
                                                         </div>
                                                     );
                                                 })}
@@ -1397,6 +1687,155 @@ const Page = ({ params }) => {
                                                         </ul>
                                                     </>
                                                 )}
+
+                                                {userData.program === "IT" && (
+                                                    <>
+                                                        <div className='bg-orange-100 border-orange-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                            <h2 className='text-lg text-default-800'>เงื่อนไขในแทร็ก</h2>
+                                                            <div>
+                                                                <Tooltip showArrow={true}
+                                                                    content={
+                                                                        <div className="px-1 py-2">
+                                                                            <div className="text-small font-bold">วิชาภายในเงื่อนไข</div>
+                                                                            {insideTrack.map((subject, index) => (
+                                                                                <div key={index} className='flex justify-between items-center mt-3 gap-3'>
+                                                                                    <div className="text-tiny">{subject?.subject?.subject_code}</div>
+                                                                                    <div className="text-tiny">{subject?.subject?.title_en}</div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    }
+                                                                    size='lg'
+                                                                >
+                                                                    <div>
+                                                                        <AiOutlineInfoCircle />
+                                                                    </div>
+                                                                </Tooltip>
+                                                            </div>
+                                                        </div>
+                                                        <Table
+                                                            aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
+                                                            className={tableClassCondition}
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>#</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                            </TableHeader>
+
+                                                            <TableBody>
+                                                                {(() => {
+                                                                    const creditClassName = insideTrackStats.totalCredits < 12 ? 'bg-red-200' : '';
+                                                                    const creditClass = insideTrackStats.totalCredits < 9 ? '' : 'bg-green-200';
+
+                                                                    return (
+                                                                        <TableRow>
+                                                                            <TableCell>รวม</TableCell>
+                                                                            <TableCell className={creditClassName}>{insideTrackStats.totalCredits}</TableCell>
+                                                                            <TableCell>{insideTrackStats.totalScores}</TableCell>
+                                                                            <TableCell className={creditClass}>{(insideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
+                                                                        </TableRow>
+                                                                    );
+                                                                })()}
+                                                            </TableBody>
+                                                        </Table>
+
+                                                        <div className='bg-orange-100 border-orange-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                            <h2 className='text-lg text-default-800'>เงื่อนไขนอกแทร็ก</h2>
+                                                            <div>
+                                                                <Tooltip showArrow={true}
+                                                                    content={
+                                                                        <div className="px-1 py-2">
+                                                                            <div className="text-small font-bold">วิชาภายในเงื่อนไข</div>
+                                                                            {outsideTrack.map((subject, index) => (
+                                                                                <div key={index} className='flex justify-between items-center gap-3 mt-3'>
+                                                                                    <div className="text-tiny">{subject?.subject?.subject_code}</div>
+                                                                                    <div className="text-tiny">{subject?.subject?.title_en}</div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    }
+                                                                    size='lg'
+                                                                >
+                                                                    <div>
+                                                                        <AiOutlineInfoCircle />
+                                                                    </div>
+                                                                </Tooltip>
+                                                            </div>
+                                                        </div>
+
+                                                        <Table
+                                                            aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
+                                                            className={tableClassCondition}
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>#</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                            </TableHeader>
+
+                                                            <TableBody>
+                                                                {(() => {
+                                                                    const creditClassName = outsideTrackStats.totalCredits < 12 ? 'bg-red-200' : '';
+                                                                    const creditClass = outsideTrackStats.totalCredits < 9 ? '' : 'bg-green-200';
+
+                                                                    return (
+                                                                        <TableRow>
+                                                                            <TableCell>รวม</TableCell>
+                                                                            <TableCell className={creditClassName}>{outsideTrackStats.totalCredits}</TableCell>
+                                                                            <TableCell>{outsideTrackStats.totalScores}</TableCell>
+                                                                            <TableCell className={creditClass}>{(outsideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
+                                                                        </TableRow>
+                                                                    );
+                                                                })()}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </>
+                                                )}
+
+                                                {userData.program === "IT" && (
+                                                    <>
+                                                        <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                            <h2 className='text-lg text-default-800'>เงื่อนไขเฉพาะหลักสูตร IT</h2>
+                                                        </div>
+                                                        <Table
+                                                            aria-label="เงื่อนไขเฉพาะหลักสูตร IT"
+                                                            className={tableClassCondition}
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                            </TableHeader>
+
+                                                            <TableBody>
+                                                                {(() => {
+
+                                                                    const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrack);
+
+                                                                    const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
+                                                                    const creditClass = totalCredits < 21 ? '' : 'bg-green-200';
+
+                                                                    return (
+                                                                        <TableRow>
+                                                                            <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
+                                                                            <TableCell>21</TableCell>
+                                                                            <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                            <TableCell>{totalGrades}</TableCell>
+                                                                            <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
+                                                                        </TableRow>
+                                                                    );
+                                                                })()}
+                                                            </TableBody>
+
+                                                        </Table>
+                                                    </>
+                                                )}
+
                                                 {conditionCategory.length > 0 ? (
                                                     <>
                                                         <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
@@ -1531,46 +1970,6 @@ const Page = ({ params }) => {
                                                     </>
                                                 ) : (
                                                     <></>
-                                                )}
-                                                {userData.program === "IT" && (
-                                                    <>
-                                                        <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
-                                                            <h2 className='text-lg text-default-800'>เงื่อนไขเฉพาะหลักสูตร IT</h2>
-                                                        </div>
-                                                        <Table
-                                                            aria-label="เงื่อนไขเฉพาะหลักสูตร IT"
-                                                            className={tableClassCondition}
-                                                        >
-                                                            <TableHeader>
-                                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                            </TableHeader>
-
-                                                            <TableBody>
-                                                                {(() => {
-
-                                                                    const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrack);
-
-                                                                    const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
-                                                                    const creditClass = totalCredits < 21 ? '' : 'bg-green-200';
-
-                                                                    return (
-                                                                        <TableRow>
-                                                                            <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
-                                                                            <TableCell>21</TableCell>
-                                                                            <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                                            <TableCell>{totalGrades}</TableCell>
-                                                                            <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
-                                                                        </TableRow>
-                                                                    );
-                                                                })()}
-                                                            </TableBody>
-
-                                                        </Table>
-                                                    </>
                                                 )}
 
                                                 <>
