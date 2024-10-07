@@ -145,6 +145,8 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
                                 },
                             }}
                             classNames={minimalTableClass}
+                            isLoading={loading}
+                            loadingContent={<Spinner />}
                             isStriped
                             removeWrapper
                             selectionMode="multiple"
