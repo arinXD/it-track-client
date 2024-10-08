@@ -33,6 +33,8 @@ import {
 } from '@ant-design/icons';
 import { Divider, notification, Space } from 'antd';
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import { BsCheckCircle } from "react-icons/bs";
+import { BsBan } from "react-icons/bs";
 
 const Page = () => {
     ////////////////////////from///////////////////////////////////
@@ -315,6 +317,7 @@ const Page = () => {
             const option = await getOptions(URL, "GET");
             const response = await axios(option);
             const data = response.data.data;
+            console.log(data);
 
             setUserData(data);
 
@@ -392,7 +395,7 @@ const Page = () => {
         let calculatedGrade = null;
         let numericGrade = null;
 
-        if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+        if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
             // Only count credits, not grades
             return {
                 subject_code: prev?.Subject?.subject_code,
@@ -943,6 +946,7 @@ const Page = () => {
         }
     });
 
+
     const combinedGroups = filteredGo.reduce((acc, curr) => {
         const groupId = curr.Group.id;
         const existingGroup = acc.find(group => group.Group.id === groupId);
@@ -973,7 +977,7 @@ const Page = () => {
     //////////////////////////////////// เงื่อนไขกลุ่มวิชา  //////////////////////////////////////////////////////////////
 
     const subjectCodesByGroupFirst = combinedGroupfirst.map(group => {
-        const subjectsWithGrades = group.subjects
+        const subjectsWithGrades = group?.subjects
             .map(subject => {
                 const grade = groupDataGrade.length > 0 ? subject.grade : getEnrollmentGrade(subject.subject_code);
                 const credit = subject.credit;
@@ -989,7 +993,7 @@ const Page = () => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject.subject_code,
@@ -1028,7 +1032,7 @@ const Page = () => {
     }).filter(group => group.subjects.length > 0);
 
     const subjectCodesByGroup = combinedGroups.map(group => {
-        const subjectsWithGrades = group.subjects
+        const subjectsWithGrades = group?.subjects
             .map(subject => {
                 const grade = groupDataGrade.length > 0 ? subject.grade : getEnrollmentGrade(subject.subject_code);
                 const credit = subject.credit;
@@ -1044,7 +1048,7 @@ const Page = () => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject.subject_code,
@@ -1068,8 +1072,8 @@ const Page = () => {
             .filter(subject => subject !== null);
 
         // Calculate total credits and grades
-        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject.credit, 0);
-        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
+        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject?.credit, 0);
+        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject?.numericGrade || 0), 0);
         const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
 
         return {
@@ -1102,7 +1106,7 @@ const Page = () => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject.subject_code,
@@ -1160,7 +1164,7 @@ const Page = () => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject.subject_code,
@@ -1184,8 +1188,8 @@ const Page = () => {
             .filter(subject => subject !== null)
             : []; // Return an empty array if 'subjects' is not an array
 
-        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject.credit, 0);
-        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
+        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject?.credit, 0);
+        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject?.numericGrade || 0), 0);
         const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
 
         return {
@@ -1216,7 +1220,7 @@ const Page = () => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject.Subject.subject_code,
@@ -1271,7 +1275,7 @@ const Page = () => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject.subject_code,
@@ -1369,7 +1373,7 @@ const Page = () => {
             let calculatedGrade = null;
             let numericGrade = null;
 
-            if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+            if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                 // Only count credits, not grades
                 return {
                     subject_code: prev.subject_code,
@@ -1743,8 +1747,10 @@ const Page = () => {
     // console.log(studentcategory);
     // console.log(subData);
 
-    console.log(insideTrack);
-    console.log(outsideTrack);
+    // console.log(insideTrack);
+    // console.log(outsideTrack);
+    // console.log(insideTrackStats);
+    // console.log(outsideTrackStats);
 
 
     /////////////////////////////////////////sent to verify_selection////////////////////////////////////////////////////////////////
@@ -1868,10 +1874,16 @@ const Page = () => {
         insideTrackStats.totalCredits,
         outsideTrackStats.totalCredits,
     ]);
+    console.log(statusVerify);
+
 
     const handleSubmitAgain = useCallback(async function () {
         try {
             const url = `/api/verify/selects/again/${ids}/${userData.stu_id}`;
+
+            const hasConditionCategoryData = conditionCategory && conditionCategory.length > 0;
+            const hasConditionSubgroupData = conditionSubgroup && conditionSubgroup.length > 0;
+            const hasConditionsData = conditions && conditions.length > 0;
 
             if (!term) {
                 openNotification('top');
@@ -2093,8 +2105,15 @@ const Page = () => {
                     </div>
                     {trackSubjects && Object.keys(trackSubjects).map((track, trackIndex) => (
                         <div key={trackIndex}>
-                            <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
-                                <h3 className='text-md text-default-800 px-16'><li>กลุ่มย่อยที่ {trackIndex + 1} {track} test</li></h3>
+                            <div
+                                className={`border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center 
+        ${userData?.Selection?.Track?.title_th === track ? 'bg-blue-100' : 'bg-gray-50'}`}>
+                                <h3 className='text-md text-default-800 px-16'>
+                                    <li>กลุ่มย่อยที่ {trackIndex + 1} {track}</li>
+                                </h3>
+                                {userData?.Selection?.Track?.title_th === track && (
+                                    <span className="text-blue-600 font-bold">แทร็กของคุณ</span>
+                                )}
                             </div>
                             <Table
                                 classNames={tableClass}
@@ -2723,7 +2742,7 @@ const Page = () => {
                                                 <TableBody>
                                                     {(() => {
                                                         const creditClassName = insideTrackStats.totalCredits < 12 ? 'bg-red-200' : '';
-                                                        const creditClass = insideTrackStats.totalCredits < 9 ? '' : 'bg-green-200';
+                                                        const creditClass = insideTrackStats.totalCredits < 12 ? '' : 'bg-green-200';
 
                                                         return (
                                                             <TableRow>
@@ -2796,8 +2815,9 @@ const Page = () => {
 
                                                 <TableBody>
                                                     {(() => {
-                                                        const creditClassName = outsideTrackStats.totalCredits < 12 ? 'bg-red-200' : '';
-                                                        const creditClass = outsideTrackStats.totalCredits < 9 ? '' : 'bg-green-200';
+                                                        const creditClassName = outsideTrackStats.totalCredits < 9 ? 'bg-red-200' : '';
+                                                        const creditClass = outsideTrackStats.totalCredits < 9 ? 'bg-white' : 'bg-green-200';
+
 
                                                         return (
                                                             <TableRow>
@@ -3073,150 +3093,17 @@ const Page = () => {
                                         }
                                     >
                                         {statusVerify.length > 0 ? (
-                                            <Accordion selectionMode="multiple">
-                                                {statusVerify.length > 0 ? (
-                                                    statusVerify.map((statuss, index) => (
-                                                        <AccordionItem
-                                                            key={index}
-                                                            aria-label={`Accordion ${index + 1}`}
-                                                            title={
-                                                                statuss.User.role === 'admin'
-                                                                    ? 'งานทะเบียนเรียน'
-                                                                    : statuss.User.role === 'teacher'
-                                                                        ? 'อาจารย์ที่ปรึกษา'
-                                                                        : 'Untitled'
-                                                            }>
-                                                            <div>
-                                                                {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
-                                                                    // Case 1: Teacher
-                                                                    <h1>
-                                                                        {statuss.User.Teacher.prefix} {statuss.User.Teacher.name} {statuss.User.Teacher.surname}
-                                                                    </h1>
-                                                                ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
-                                                                    // Case 2: Admin
-                                                                    <h1>
-                                                                        {statuss.User.Admin.prefix} {statuss.User.Admin.name} {statuss.User.Admin.surname}
-                                                                    </h1>
-                                                                ) : (
-                                                                    // Case 3: Fallback to email
-                                                                    <p>{statuss.User.email}</p>
-                                                                )}
-
-                                                                {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
-                                                                    // Case 1: Teacher is present
-                                                                    <div>
-                                                                        <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
-                                                                        <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
-                                                                        {statuss.desc && (
-                                                                            <Textarea
-                                                                                label="ความคิดเห็น"
-                                                                                variant="bordered"
-                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
-                                                                                size="lg"
-                                                                                value={statuss.desc}
-                                                                                placeholder="เพิ่มความคิดเห็น..."
-                                                                                disableAnimation
-                                                                                disableAutosize
-                                                                                classNames={{
-                                                                                    base: "w-full my-3",
-                                                                                    input: "resize-y min-h-[80px]",
-                                                                                }}
-                                                                                isReadOnly
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
-                                                                    // Case 2: Admin is present
-                                                                    <div>
-                                                                        <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Admin.name} {statuss.User.Admin.surname}</p>
-                                                                        <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
-                                                                        {statuss.desc && (
-                                                                            <Textarea
-                                                                                label="ความคิดเห็น"
-                                                                                variant="bordered"
-                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
-                                                                                size="lg"
-                                                                                value={statuss.desc}
-                                                                                placeholder="เพิ่มความคิดเห็น..."
-                                                                                disableAnimation
-                                                                                disableAutosize
-                                                                                classNames={{
-                                                                                    base: "w-full my-3",
-                                                                                    input: "resize-y min-h-[80px]",
-                                                                                }}
-                                                                                isReadOnly
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                ) : (
-                                                                    // Case 3: Fallback to email
-                                                                    <div>
-                                                                        <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
-                                                                        <p className='my-2'><strong>เวลา :</strong> {simpleDMYHM(statuss.approver_time)}</p>
-                                                                        {statuss.desc && (
-                                                                            <Textarea
-                                                                                label="ความคิดเห็น"
-                                                                                variant="bordered"
-                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
-                                                                                size="lg"
-                                                                                value={statuss.desc}
-                                                                                placeholder="เพิ่มความคิดเห็น..."
-                                                                                disableAnimation
-                                                                                disableAutosize
-                                                                                classNames={{
-                                                                                    base: "w-full my-3",
-                                                                                    input: "resize-y min-h-[80px]",
-                                                                                }}
-                                                                                isReadOnly
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </AccordionItem>
-                                                    ))
-                                                ) : (
-                                                    <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
-                                                )}
-                                            </Accordion>
-                                        ) : (
-                                            <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
-                                        )}
-                                    </Drawer>
-                                </div>
-                                {(status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3) && (
-                                    <div
-                                        className={`${status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3 ? 'w-[20%]' : 'w-[20%]w-0'} fixed left-auto right-0 max-xl:hidden h-screen border-l border-l-gray-200/80`}
-                                    >
-                                        <div className='relative top-16 px-5'>
-                                            <div className='flex justify-between items-center mb-5'>
-                                                <h1 className='text-2xl'>สถานะการอนุมัติ</h1>
-                                                {status?.status === 0 && (
-                                                    <div className='inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300'>
-                                                        <span className='w-3 h-3 inline-block bg-red-500 rounded-full mr-2'></span>
-                                                        ไม่อนุมัติ
-                                                    </div>
-                                                )}
-                                                {(status?.status === 1 || status?.status === 2) && (
-                                                    <div className='inline-flex items-center bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-orange-900 dark:text-orange-300'>
-                                                        <span className='w-3 h-3 inline-block bg-yellow-500 rounded-full mr-2'></span>
-                                                        รอการยืนยัน
-                                                    </div>
-                                                )}
-                                                {status?.status === 3 && (
-                                                    <div className='inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300'>
-                                                        <span className='w-3 h-3 inline-block bg-green-500 rounded-full mr-2'></span>
-                                                        อนุมัติ
-                                                    </div>
-                                                )}
-                                            </div>
-                                            {statusVerify.length > 0 ? (
+                                            <>
                                                 <Accordion selectionMode="multiple">
                                                     {statusVerify.length > 0 ? (
                                                         statusVerify.map((statuss, index) => (
                                                             <AccordionItem
                                                                 key={index}
                                                                 aria-label={`Accordion ${index + 1}`}
+                                                                className='px-2 mt-3 rounded-md shadow drop-shadow-md'
+                                                                startContent={status?.status === 0
+                                                                    ? <BsBan size={25} className='text-red-500' />
+                                                                    : <BsCheckCircle size={25} className='text-green-500' />}
                                                                 title={
                                                                     statuss.User.role === 'admin'
                                                                         ? 'งานทะเบียนเรียน'
@@ -3319,8 +3206,185 @@ const Page = () => {
                                                         <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
                                                     )}
                                                 </Accordion>
+                                                {statusVerify.length !== 2 && (
+                                                    <div className='flex items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md mt-3'>
+                                                        <BsCheckCircle size={25} className='text-gray-400' />
+                                                        <p className='text-foreground text-large'>งานทะเบียนเรียน</p>
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <div className=''>
+                                                <div className='flex items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md'>
+                                                    <BsCheckCircle size={25} className='text-gray-400' />
+                                                    <p className='text-foreground text-large'>อาจารย์ที่ปรึกษา</p>
+                                                </div>
+                                                <div className='flex  items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md mt-3'>
+                                                    <BsCheckCircle size={25} className='text-gray-400' />
+                                                    <p className='text-foreground text-large'>งานทะเบียนเรียน</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </Drawer>
+                                </div>
+                                {(status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3) && (
+                                    <div
+                                        className={`${status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3 ? 'w-[20%]' : 'w-[20%]w-0'} fixed left-auto right-0 max-xl:hidden h-screen border-l border-l-gray-200/80`}
+                                    >
+                                        <div className='relative top-16 px-5'>
+                                            <div className='flex justify-between items-center mb-5'>
+                                                <h1 className='text-2xl'>สถานะการอนุมัติ</h1>
+                                                {status?.status === 0 && (
+                                                    <div className='inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300'>
+                                                        <span className='w-3 h-3 inline-block bg-red-500 rounded-full mr-2'></span>
+                                                        ไม่อนุมัติ
+                                                    </div>
+                                                )}
+                                                {(status?.status === 1 || status?.status === 2) && (
+                                                    <div className='inline-flex items-center bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-orange-900 dark:text-orange-300'>
+                                                        <span className='w-3 h-3 inline-block bg-yellow-500 rounded-full mr-2'></span>
+                                                        รอการยืนยัน
+                                                    </div>
+                                                )}
+                                                {status?.status === 3 && (
+                                                    <div className='inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300'>
+                                                        <span className='w-3 h-3 inline-block bg-green-500 rounded-full mr-2'></span>
+                                                        อนุมัติ
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {statusVerify.length > 0 ? (
+                                                <>
+                                                    <Accordion selectionMode="multiple">
+                                                        {statusVerify.length > 0 ? (
+                                                            statusVerify.map((statuss, index) => (
+                                                                <AccordionItem
+                                                                    key={index}
+                                                                    aria-label={`Accordion ${index + 1}`}
+                                                                    className='px-2 mt-3 rounded-md shadow drop-shadow-md'
+                                                                    startContent={status?.status === 0
+                                                                        ? <BsBan size={25} className='text-red-500' />
+                                                                        : <BsCheckCircle size={25} className='text-green-500' />}
+                                                                    title={
+                                                                        statuss.User.role === 'admin'
+                                                                            ? 'งานทะเบียนเรียน'
+                                                                            : statuss.User.role === 'teacher'
+                                                                                ? 'อาจารย์ที่ปรึกษา'
+                                                                                : 'Untitled'
+                                                                    }>
+                                                                    <div>
+                                                                        {/* Only show Teacher's information if all necessary fields are present and Teacher is not null */}
+                                                                        {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
+                                                                            // Case 1: Teacher
+                                                                            <h1>
+                                                                                {statuss.User.Teacher.prefix} {statuss.User.Teacher.name} {statuss.User.Teacher.surname}
+                                                                            </h1>
+                                                                        ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
+                                                                            // Case 2: Admin
+                                                                            <h1>
+                                                                                {statuss.User.Admin.prefix} {statuss.User.Admin.name} {statuss.User.Admin.surname}
+                                                                            </h1>
+                                                                        ) : (
+                                                                            // Case 3: Fallback to email
+                                                                            <p>{statuss.User.email}</p>
+                                                                        )}
+
+                                                                        {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
+                                                                            // Case 1: Teacher is present
+                                                                            <div>
+                                                                                <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
+                                                                                <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                                {statuss.desc && (
+                                                                                    <Textarea
+                                                                                        label="ความคิดเห็น"
+                                                                                        variant="bordered"
+                                                                                        color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                        size="lg"
+                                                                                        value={statuss.desc}
+                                                                                        placeholder="เพิ่มความคิดเห็น..."
+                                                                                        disableAnimation
+                                                                                        disableAutosize
+                                                                                        classNames={{
+                                                                                            base: "w-full my-3",
+                                                                                            input: "resize-y min-h-[80px]",
+                                                                                        }}
+                                                                                        isReadOnly
+                                                                                    />
+                                                                                )}
+                                                                            </div>
+                                                                        ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
+                                                                            // Case 2: Admin is present
+                                                                            <div>
+                                                                                <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Admin.name} {statuss.User.Admin.surname}</p>
+                                                                                <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                                {statuss.desc && (
+                                                                                    <Textarea
+                                                                                        label="ความคิดเห็น"
+                                                                                        variant="bordered"
+                                                                                        color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                        size="lg"
+                                                                                        value={statuss.desc}
+                                                                                        placeholder="เพิ่มความคิดเห็น..."
+                                                                                        disableAnimation
+                                                                                        disableAutosize
+                                                                                        classNames={{
+                                                                                            base: "w-full my-3",
+                                                                                            input: "resize-y min-h-[80px]",
+                                                                                        }}
+                                                                                        isReadOnly
+                                                                                    />
+                                                                                )}
+                                                                            </div>
+                                                                        ) : (
+                                                                            // Case 3: Fallback to email
+                                                                            <div>
+                                                                                <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
+                                                                                <p className='my-2'><strong>เวลา :</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                                {statuss.desc && (
+                                                                                    <Textarea
+                                                                                        label="ความคิดเห็น"
+                                                                                        variant="bordered"
+                                                                                        color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                        size="lg"
+                                                                                        value={statuss.desc}
+                                                                                        placeholder="เพิ่มความคิดเห็น..."
+                                                                                        disableAnimation
+                                                                                        disableAutosize
+                                                                                        classNames={{
+                                                                                            base: "w-full my-3",
+                                                                                            input: "resize-y min-h-[80px]",
+                                                                                        }}
+                                                                                        isReadOnly
+                                                                                    />
+                                                                                )}
+                                                                            </div>
+                                                                        )}
+
+                                                                    </div>
+                                                                </AccordionItem>
+                                                            ))
+                                                        ) : (
+                                                            <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                        )}
+                                                    </Accordion>
+                                                    {statusVerify.length !== 2 && (
+                                                        <div className='flex items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md mt-3'>
+                                                            <BsCheckCircle size={25} className='text-gray-400' />
+                                                            <p className='text-foreground text-large'>งานทะเบียนเรียน</p>
+                                                        </div>
+                                                    )}
+                                                </>
                                             ) : (
-                                                <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                <div className=''>
+                                                    <div className='flex items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md'>
+                                                        <BsCheckCircle size={25} className='text-gray-400' />
+                                                        <p className='text-foreground text-large'>อาจารย์ที่ปรึกษา</p>
+                                                    </div>
+                                                    <div className='flex  items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md mt-3'>
+                                                        <BsCheckCircle size={25} className='text-gray-400' />
+                                                        <p className='text-foreground text-large'>งานทะเบียนเรียน</p>
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
