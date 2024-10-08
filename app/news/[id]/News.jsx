@@ -8,7 +8,7 @@ import "./news.css"
 const News = ({ news = {}, allNews = [] }) => {
      return (
           news && Object?.keys(news).length > 0 ?
-               <article className="bg-white max-w-4xl mx-auto overflow-hidden">
+               <article className="news-article bg-white max-w-4xl mx-auto overflow-hidden">
                     <div className="relative h-[400px]">
                          <Image
                               src={news?.image}
