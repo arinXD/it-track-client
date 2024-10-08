@@ -208,12 +208,6 @@ export default function Program() {
                                     endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มหลักสูตร
                                 </Button>
-                                <Button
-                                    radius="sm"
-                                    color="danger"
-                                    endContent={<DeleteIcon2 width={16} height={16} />}>
-                                    ลบรายการที่เลือก
-                                </Button>
                                 <Link href={'/admin/program/restore'}>
                                     <Button
                                         radius="sm"
@@ -227,7 +221,6 @@ export default function Program() {
                     </div>
                     <Table
                         removeWrapper
-                        selectionMode="multiple"
                         onRowAction={() => { }}
                         aria-label="program table"
                     >

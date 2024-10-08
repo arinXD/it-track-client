@@ -124,7 +124,7 @@ export default function GroupInsert({ isOpen, onClose, onDataInserted }) {
                             <span className='text-base font-normal'>แบบฟอร์มเพิ่มกลุ่มวิชา</span>
                         </ModalHeader>
                         <ModalBody>
-                            <label htmlFor="category">เลือกหมวดหมู๋รายวิชา</label>
+                            <label htmlFor="category">เลือกหมวดหมู่รายวิชา</label>
                             <Select
                                 className="z-50"
                                 id="category"

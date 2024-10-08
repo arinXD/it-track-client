@@ -125,21 +125,7 @@ const Page = () => {
                 <BreadCrumb />
                 <ToastContainer />
                 <div className='my-[30px]'>
-                    <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-between items-center rounded-md mb-4'>
-                        <div className="flex justify-end w-[50%]">
-                            <div className="border-1 border-e-0 flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-black rounded-lg bg-white">
-                                <SearchIcon width={16} height={16} />
-                            </div>
-                            <input
-                                type="search"
-                                id="search"
-                                className="border-1 border-s-0 rounded-s-none pl-0 py-2 px-4 text-sm text-black rounded-lg bg-white focus:outline-none"
-                                placeholder="ค้นหาจาก ชื่อ, ปีการศึกษา"
-                                // value={searchQuery}
-                                style={{ width: '100%' }}
-                            // onChange={(e) => handleSearch(e.target.value)}
-                            />
-                        </div>
+                    <div className='bg-gray-100 border-gray-200 border-1 p-2 flex flex-row justify-end items-center rounded-md mb-4'>
                         <div className="flex md:flex-row gap-2">
                             <Button
                                 radius="sm"

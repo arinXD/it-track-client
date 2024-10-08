@@ -139,7 +139,7 @@ export default function GroupUpdate({ isOpen, onClose, onUpdate, groupId }) {
                     <span className='text-base font-normal'>แบบฟอร์มแก้ไขกลุ่มวิชา</span>
                 </ModalHeader>
                 <ModalBody>
-                    <label htmlFor="category">เลือกหมวดหมู๋รายวิชา</label>
+                    <label htmlFor="category">เลือกหมวดหมู่รายวิชา</label>
                     <Select
                         className="z-50"
                         id="category"

@@ -1488,12 +1488,12 @@ const Page = ({ params }) => {
                                                         <p>แบบฟอร์มตรวจสอบการสำเร็จการศึกษาของ <span className='text-blue-600 font-bold'>{userData.first_name} {userData.last_name}</span> รหัสประจำตัว <span className='text-blue-600 font-bold'>{userData.stu_id}</span></p>
                                                         <div className='flex justify-center items-center my-3'>
                                                             <p>คาดว่าจะได้รับปริญญาวิทยาศาสตรบัณฑิต  สาขาวิชา{verifySelect.Verify.Program.title_th} เกียรตินิยมอันดับ</p>
-                                                            <div className="relative ml-2 w-[130px]">
+                                                            <div className="relative ml-2 w-[80px]">
                                                                 <input
                                                                     className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                                                                     placeholder=" "
                                                                     type="text"
-                                                                    value={verifySelect.cum_laude === 0 ? "ไม่ได้รับเกียรตินิยม" : verifySelect.cum_laude}
+                                                                    value={verifySelect.cum_laude === 0 ? "-" : verifySelect.cum_laude}
                                                                     onChange={(e) => setCumLaude()}
                                                                     readOnly
                                                                 />
@@ -1625,7 +1625,7 @@ const Page = ({ params }) => {
                                                         highestIndex={highestIndex}
                                                     />
                                                 ))}
-                                                {userData.program === "IT" && (
+                                                {/* {userData.program === "IT" && (
                                                     <>
                                                         <h2 className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center mt-5 rounded-t-md text-lg text-default-800'>
                                                             กลุ่มเลือก 3 วิชา
@@ -1686,7 +1686,7 @@ const Page = ({ params }) => {
                                                             )}
                                                         </ul>
                                                     </>
-                                                )}
+                                                )} */}
 
                                                 {userData.program === "IT" && (
                                                     <>
