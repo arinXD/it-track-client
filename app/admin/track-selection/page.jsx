@@ -68,10 +68,14 @@ const Page = () => {
         setSubjects(filterSubjects)
     }, [])
 
-    useEffect(() => {
-        callTrackSelection()
-        callSubject()
+    const init = useCallback(async () => {
+        await callTrackSelection()
+        await callSubject()
         setLoading(false)
+    }, [])
+
+    useEffect(() => {
+        init()
     }, [])
 
     const handleOpen = useCallback(function () {
@@ -83,7 +87,7 @@ const Page = () => {
             const url = "/api/tracks/selects"
             const options = await getOptions(url, "POST", formData)
             const result = await axios(options)
-            const { message:msg } = result.data
+            const { message: msg } = result.data
 
             // refresh track selection data
             await callTrackSelection()

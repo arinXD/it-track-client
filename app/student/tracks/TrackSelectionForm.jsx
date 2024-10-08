@@ -256,7 +256,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                     margin: "auto"
                                 }}
                                 className="md:!mt-4 block font-semibold leading-snug tracking-normal text-gray-900 antialiased text-center text-2xl !mb-3">
-                                การคัดเลือกความเชี่ยวชาญ วิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ ปีการศึกษา 2566
+                                รอประกาศการคัดเลือกกลุ่มความเชี่ยวชาญจากอาจารย์ครับ/ค่ะ
                             </h4>
                             <p
                                 style={{
@@ -264,8 +264,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                     margin: "auto"
                                 }}
                                 className='text-center mb-3 text-lg text-default-600'>
-                                เริ่มคัดเลือกแทร็กตั้งแต่วันที่ 13 พฤษภาคม 2567 - 20 พฤษภาคม 2567 <br />
-                                ประกาศผลวันที่ 23 พฤษภาคม 2567
+                                ตอนนี้ยังไม่มีการคัดเลือกกลุ่มความเชี่ยวชาญ
                             </p>
                         </>
                         :

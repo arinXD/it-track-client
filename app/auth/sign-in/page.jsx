@@ -4,11 +4,14 @@ import { signIn } from "next-auth/react"
 import { useSearchParams } from 'next/navigation'
 import { Toaster } from 'react-hot-toast';
 import { thinInputClass } from '@/src/util/ComponentClass';
-import { Button, Input } from '@nextui-org/react';
+import { Button, Input, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
 import { message } from 'antd';
+import { FaInfoCircle } from 'react-icons/fa';
+import Image from 'next/image';
 
 const Page = () => {
     const searchParams = useSearchParams()
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const callbackUrl = searchParams.get('callbackUrl') ?? "/"
     const [isProcress, setIsProcress] = useState(false);
     const [formData, setFormData] = useState({});
@@ -66,6 +69,31 @@ const Page = () => {
 
     return (
         <section className="absolute w-full p-5 max-h-full max-w-full h-[calc(100%)]">
+            <Modal
+                size="xs"
+                isOpen={isOpen}
+                onClose={onClose}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className='text-sm font-normal'>ตัวอย่างรูป</ModalHeader>
+                            <ModalBody>
+                                <div className='w-full flex justify-center items-center'>
+                                    <img
+                                        src={"/image/google_access.png"}
+                                        alt='google-access-info'
+                                        width={250}
+                                        height={250}
+                                        className='object-cover'
+                                    />
+                                </div>
+                            </ModalBody>
+                            <ModalFooter></ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
             <Toaster />
             <div
                 style={{ transform: 'translate(-50%, -50%)' }}
@@ -75,9 +103,13 @@ const Page = () => {
                         <h1 className="font-bold text-4xl sm:text-5xl leading-tight tracking-tight text-blue-500 text-center">
                             KKU IT
                         </h1>
-                        <h2 className='mt-1'>
+                        <h2 className='my-1 text-center'>
                             Discover Your Experience with KKU IT
                         </h2>
+                        <h3 className='text-center text-xs text-default-500'>
+                            เปิดเว็บไซต์นี้ผ่านบราวเซอร์ปกติ เพื่อแก้ปัญหาการถูกปิดกั้นจาก Google
+                            <FaInfoCircle onClick={onOpen} className='inline-block w-3 h-3 ms-2 active:scale-80' />
+                        </h3>
                     </div>
                 </div>
                 <div className="max-h-full w-full sm:w-1/2 px-10 flex justify-start items-center">
@@ -119,7 +151,7 @@ const Page = () => {
                             className={`font-medium rounded-lg text-sm w-full mt-4 border-1 border-gray-500 text-gray-500 hover:text-blue-500 hover:border-blue-500`}
                             startContent={<img className='w-5 h-auto' src="/google.png" />}
                         >
-                            
+
                             <span className='hidden md:inline'>เข้าสู่ระบบด้วยบัญชี</span>
                             <span>Google หรือ KKU Mail</span>
                         </Button>

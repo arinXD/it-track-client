@@ -53,12 +53,16 @@ const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
                                         onClick={() => handleSelectCareer(career.id)}
                                         className={`relative flex flex-col justify-center items-center ${careers.includes(career.id) && "!border-blue-700"} text-center h-full border-2 p-4 rounded-[5px] cursor-pointer hover:border-blue-500/50 focus:scale-95 active:scale-95`}
                                    >
-                                        <Image
+                                        <img
                                              src={career.image}
                                              width={120}
                                              height={120}
                                              alt={career.name_en}
                                              className="rounded-[2px] h-[100px] w-[120px] object-cover !select-none"
+                                             onError={({ currentTarget }) => {
+                                                  currentTarget.onerror = null;
+                                                  currentTarget.src = "/image/error_image.png";
+                                             }}
                                         />
                                         <div className="mt-4 text-sm md:text-base w-full">
                                              <p>{career.name_th}</p>

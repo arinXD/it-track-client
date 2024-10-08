@@ -1,24 +1,17 @@
-"use client"
 import './globals.css'
 import { AuthProvider } from './components'
-import localFont from 'next/font/local'
 import '@radix-ui/themes/styles.css';
 import { Theme } from '@radix-ui/themes';
 
-// export const metadata = {
-//     title: 'IT Track',
-//     description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
-// }
-
-const prompt = localFont({ src: '../public/fonts/Prompt-Regular.woff2' })
+export const metadata = {
+    title: 'KKU IT',
+    description: 'คัดเลือกแทรคของนักศึกษาวิทยาลัยการคอมพิวเตอร์ หลักสูตรเทคโนโลยีสารสนเทศ',
+}
 
 export default function RootLayout({ children }) {
     return (
         <html>
-            <body
-                // className={prompt.className}
-                suppressHydrationWarning={true}
-            >
+            <body suppressHydrationWarning={true} >
                 <Theme>
                     <main>
                         <AuthProvider>
