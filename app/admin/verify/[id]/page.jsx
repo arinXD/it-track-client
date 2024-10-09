@@ -342,7 +342,7 @@ const Page = ({ params }) => {
                .catch(error => {
                     console.log(error);
                     message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
-                    
+
                })
      };
 
@@ -366,12 +366,12 @@ const Page = ({ params }) => {
      };
 
      const handleDeleteSemi = async (sgt, idtest) => {
-          console.log(idss);
           // console.log(`Deleting SubGroupSubjectAndTrack with id: ${sgt}`);
           // alert(ids)
 
           const url = `/api/verify/semisubgroup/${sgt}/${idss}`
           const options = await getOptions(url, 'DELETE')
+          
           axios(options)
                .then(async result => {
                     const { ok, message: msg } = result.data;
@@ -386,13 +386,12 @@ const Page = ({ params }) => {
                })
      };
 
-     const handleDeleteCategory = async (cat) => {
-          // console.log(`Deleting handleDeleteCategory with id: ${cat}`);
+     const handleDeleteCategory = async (cat, dsss) => {
+          const url = `/api/verify/category/${dsss}/${cat}`
+          const options = await getOptions(url, 'DELETE');
 
-          const url = `/api/verify/category/${cat}/${ids}`
-          const options = await getOptions(url, 'DELETE')
           axios(options)
-               .then(async result => {
+               .then(result => {
                     const { ok, message: msg } = result.data;
                     if (ok) {
                          message.success(msg);
@@ -401,9 +400,7 @@ const Page = ({ params }) => {
                })
                .catch(error => {
                     console.log(error);
-                    message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
-               })
-
+               });
      };
 
      ///////////////////////////////////////////////////////////
