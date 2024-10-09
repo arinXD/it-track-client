@@ -39,6 +39,7 @@ const BreadCrumb = () => {
         "users": "บัญชีผู้ใช้",
         "teachers": "ข้อมูลอาจารย์",
         "students-advisor": "รายชื่อนักศึกษาในที่ปรึกษา",
+        "create-news": "เพิ่มข่าว",
     }
     const url = usePathname();
     const urls = useMemo(() => (url.split("/").filter(e => e)), [url])
