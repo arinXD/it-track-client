@@ -29,6 +29,8 @@ import { Drawer, Space } from 'antd';
 import { Accordion, AccordionItem } from "@nextui-org/react";
 import { TbMessage2Exclamation } from "react-icons/tb";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import { BsCheckCircle } from "react-icons/bs";
+import { BsBan } from "react-icons/bs";
 
 const Page = ({ params }) => {
     const { id } = params
@@ -138,6 +140,7 @@ const Page = ({ params }) => {
             const result = response.data.data
 
             setVerifySelect(result);
+
             setUserData(result?.Student);
             setVerify(result?.Verify);
 
@@ -591,7 +594,7 @@ const Page = ({ params }) => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject?.subject_code,
@@ -646,7 +649,7 @@ const Page = ({ params }) => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject?.subject_code,
@@ -702,7 +705,7 @@ const Page = ({ params }) => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject?.subject_code,
@@ -771,7 +774,7 @@ const Page = ({ params }) => {
             let calculatedGrade = null;
             let numericGrade = null;
 
-            if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+            if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                 // Only count credits, not grades
                 return {
                     subject_code: prev?.subject_code,
@@ -824,7 +827,7 @@ const Page = ({ params }) => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject?.subject_code,
@@ -883,7 +886,7 @@ const Page = ({ params }) => {
                 let calculatedGrade = null;
                 let numericGrade = null;
 
-                if (credit <= 1 && creditOnlyGrades.includes(grade)) {
+                if (credit <= 1 || credit === 6 && creditOnlyGrades.includes(grade)) {
                     // Only count credits, not grades
                     return {
                         subject_code: subject?.Subject?.subject_code,
@@ -1163,13 +1166,23 @@ const Page = ({ params }) => {
     }, [id, verify?.id, desc, session?.user?.email]);
 
     useEffect(() => {
-        setLoading(false);
-        initVerify(id);
-        initItGrade(id)
-        if (verify?.id) fetchConditions(verify?.id)
-        if (verify?.id) fetchConditionSubgroups(verify?.id)
-        if (verify?.id) fetchConditionCategory(verify?.id)
-    }, [verify?.id, fetchConditions, fetchConditionSubgroups, fetchConditionCategory])
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                await initVerify(id);
+                await initItGrade(id);
+                if (verify?.id) {
+                    await fetchConditions(verify?.id);
+                    await fetchConditionSubgroups(verify?.id);
+                    await fetchConditionCategory(verify?.id);
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [verify?.id, fetchConditions, fetchConditionSubgroups, fetchConditionCategory, initVerify, initItGrade]);
 
     const getSubTrack = useCallback((subgroup, subgroupIndex) => {
         // console.log(subgroup);
@@ -1265,8 +1278,15 @@ const Page = ({ params }) => {
                     </div>
                     {trackSubjects && Object.keys(trackSubjects).map((track, trackIndex) => (
                         <div key={trackIndex}>
-                            <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
-                                <h3 className='text-md text-default-800 px-16'><li>กลุ่มย่อยที่ {trackIndex + 1} {track}</li></h3>
+                            <div
+                                className={`border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center 
+        ${userData?.Selection?.Track?.title_th === track ? 'bg-blue-100' : 'bg-gray-50'}`}>
+                                <h3 className='text-md text-default-800 px-16'>
+                                    <li>กลุ่มย่อยที่ {trackIndex + 1} {track}</li>
+                                </h3>
+                                {userData?.Selection?.Track?.title_th === track && (
+                                    <span className="text-blue-600 font-bold">แทร็กของนักศึกษา</span>
+                                )}
                             </div>
                             <Table
                                 classNames={tableClass}
@@ -1283,7 +1303,7 @@ const Page = ({ params }) => {
                                 </TableHeader>
                                 <TableBody>
                                     {trackSubjects[track].map((subject, subjectIndex) => (
-                                        <TableRow key={subjectIndex} className={subject.track !== null ? 'bg-green-50' : ''}>
+                                        <TableRow key={subjectIndex} className={subject.track !== null ? '' : ''}>
                                             {/* <TableCell className=''>{subject.subject_id}</TableCell> */}
                                             <TableCell className=''>{subject.subject_code}</TableCell>
                                             <TableCell className="w-1/3">{subject.title_en}</TableCell>
@@ -1335,7 +1355,7 @@ const Page = ({ params }) => {
                         </TableHeader>
                         <TableBody>
                             {subgroup.subjects && subgroup.subjects.map((subject, subjectIndex) => (
-                                <TableRow key={subjectIndex} className={subject.track == null ? 'bg-red-50' : ''}>
+                                <TableRow key={subjectIndex} className={subject.track == null ? '' : ''}>
                                     <TableCell className=''>{subject.subject_code}</TableCell>
                                     <TableCell className="w-1/3">{subject.title_en}</TableCell>
                                     <TableCell className="w-1/3">{subject.title_th}</TableCell>
@@ -1696,13 +1716,7 @@ const Page = ({ params }) => {
                                                                 <Tooltip showArrow={true}
                                                                     content={
                                                                         <div className="px-1 py-2">
-                                                                            <div className="text-small font-bold">วิชาภายในเงื่อนไข</div>
-                                                                            {insideTrack.map((subject, index) => (
-                                                                                <div key={index} className='flex justify-between items-center mt-3 gap-3'>
-                                                                                    <div className="text-tiny">{subject?.subject?.subject_code}</div>
-                                                                                    <div className="text-tiny">{subject?.subject?.title_en}</div>
-                                                                                </div>
-                                                                            ))}
+                                                                            <div className="text-small font-bold">เก็บวิชาในแทร็กที่เกรดมากที่สุดไว้ 12 หน่วยกิต นอกเหนือจากนั้นจะถูกนำมาเป็นวิชานอกแทร็ก</div>
                                                                         </div>
                                                                     }
                                                                     size='lg'
@@ -1714,11 +1728,38 @@ const Page = ({ params }) => {
                                                             </div>
                                                         </div>
                                                         <Table
+                                                            aria-label="วิชาในเงื่อนไข"
+                                                            className={tableClassCondition}
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>รหัสวิชา</TableColumn>
+                                                                <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                                <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                                <TableColumn>หน่วยกิต</TableColumn>
+                                                                <TableColumn>เกรด</TableColumn>
+                                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                            </TableHeader>
+
+                                                            <TableBody>
+                                                                {insideTrack.map((subject, index) => (
+                                                                    <TableRow key={index}>
+                                                                        <TableCell>{subject?.subject?.subject_code}</TableCell>
+                                                                        <TableCell>{subject?.subject?.title_en}</TableCell>
+                                                                        <TableCell>{subject?.subject?.title_th}</TableCell>
+                                                                        <TableCell>{subject?.subject?.credit}</TableCell>
+                                                                        <TableCell>{subject?.gradeTrue}</TableCell>
+                                                                        <TableCell>{subject?.grade}</TableCell>
+                                                                    </TableRow>
+                                                                ))}
+                                                            </TableBody>
+                                                        </Table>
+                                                        <Table
                                                             aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
                                                             className={tableClassCondition}
                                                         >
                                                             <TableHeader>
                                                                 <TableColumn>#</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
                                                                 <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
                                                                 <TableColumn>ค่าคะแนน</TableColumn>
                                                                 <TableColumn>คะแนนเฉลี่ย</TableColumn>
@@ -1727,11 +1768,12 @@ const Page = ({ params }) => {
                                                             <TableBody>
                                                                 {(() => {
                                                                     const creditClassName = insideTrackStats.totalCredits < 12 ? 'bg-red-200' : '';
-                                                                    const creditClass = insideTrackStats.totalCredits < 9 ? '' : 'bg-green-200';
+                                                                    const creditClass = insideTrackStats.totalCredits < 12 ? '' : 'bg-green-200';
 
                                                                     return (
                                                                         <TableRow>
                                                                             <TableCell>รวม</TableCell>
+                                                                            <TableCell>12</TableCell>
                                                                             <TableCell className={creditClassName}>{insideTrackStats.totalCredits}</TableCell>
                                                                             <TableCell>{insideTrackStats.totalScores}</TableCell>
                                                                             <TableCell className={creditClass}>{(insideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
@@ -1747,13 +1789,7 @@ const Page = ({ params }) => {
                                                                 <Tooltip showArrow={true}
                                                                     content={
                                                                         <div className="px-1 py-2">
-                                                                            <div className="text-small font-bold">วิชาภายในเงื่อนไข</div>
-                                                                            {outsideTrack.map((subject, index) => (
-                                                                                <div key={index} className='flex justify-between items-center gap-3 mt-3'>
-                                                                                    <div className="text-tiny">{subject?.subject?.subject_code}</div>
-                                                                                    <div className="text-tiny">{subject?.subject?.title_en}</div>
-                                                                                </div>
-                                                                            ))}
+                                                                            <div className="text-small font-bold">วิชานอกแทร็กอย่างน้อย 9 หน่วยกิต</div>
                                                                         </div>
                                                                     }
                                                                     size='lg'
@@ -1764,6 +1800,32 @@ const Page = ({ params }) => {
                                                                 </Tooltip>
                                                             </div>
                                                         </div>
+                                                        <Table
+                                                            aria-label="วิชานอกเงื่อนไข"
+                                                            className={tableClassCondition}
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>รหัสวิชา</TableColumn>
+                                                                <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                                <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                                <TableColumn>หน่วยกิต</TableColumn>
+                                                                <TableColumn>เกรด</TableColumn>
+                                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                            </TableHeader>
+
+                                                            <TableBody>
+                                                                {outsideTrack.map((subject, index) => (
+                                                                    <TableRow key={index}>
+                                                                        <TableCell>{subject?.subject?.subject_code}</TableCell>
+                                                                        <TableCell>{subject?.subject?.title_en}</TableCell>
+                                                                        <TableCell>{subject?.subject?.title_th}</TableCell>
+                                                                        <TableCell>{subject?.subject?.credit}</TableCell>
+                                                                        <TableCell>{subject?.gradeTrue}</TableCell>
+                                                                        <TableCell>{subject?.grade}</TableCell>
+                                                                    </TableRow>
+                                                                ))}
+                                                            </TableBody>
+                                                        </Table>
 
                                                         <Table
                                                             aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
@@ -1771,6 +1833,7 @@ const Page = ({ params }) => {
                                                         >
                                                             <TableHeader>
                                                                 <TableColumn>#</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
                                                                 <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
                                                                 <TableColumn>ค่าคะแนน</TableColumn>
                                                                 <TableColumn>คะแนนเฉลี่ย</TableColumn>
@@ -1778,12 +1841,13 @@ const Page = ({ params }) => {
 
                                                             <TableBody>
                                                                 {(() => {
-                                                                    const creditClassName = outsideTrackStats.totalCredits < 12 ? 'bg-red-200' : '';
+                                                                    const creditClassName = outsideTrackStats.totalCredits < 9 ? 'bg-red-200' : '';
                                                                     const creditClass = outsideTrackStats.totalCredits < 9 ? '' : 'bg-green-200';
 
                                                                     return (
                                                                         <TableRow>
                                                                             <TableCell>รวม</TableCell>
+                                                                            <TableCell>9</TableCell>
                                                                             <TableCell className={creditClassName}>{outsideTrackStats.totalCredits}</TableCell>
                                                                             <TableCell>{outsideTrackStats.totalScores}</TableCell>
                                                                             <TableCell className={creditClass}>{(outsideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
@@ -2126,115 +2190,137 @@ const Page = ({ params }) => {
                                                     }
                                                 >
                                                     {desAll.length > 0 ? (
-                                                        <Accordion selectionMode="multiple">
-                                                            {desAll.length > 0 ? (
-                                                                desAll.map((statuss, index) => (
-                                                                    <AccordionItem
-                                                                        key={index}
-                                                                        aria-label={`Accordion ${index + 1}`}
-                                                                        title={
-                                                                            statuss.User.role === 'admin'
-                                                                                ? 'งานทะเบียนเรียน'
-                                                                                : statuss.User.role === 'teacher'
-                                                                                    ? 'อาจารย์ที่ปรึกษา'
-                                                                                    : 'Untitled'
-                                                                        }>
-                                                                        <div>
-                                                                            {/* Only show Teacher's information if all necessary fields are present and Teacher is not null */}
-                                                                            {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
-                                                                                // Case 1: Teacher
-                                                                                <h1>
-                                                                                    {statuss.User.Teacher.prefix} {statuss.User.Teacher.name} {statuss.User.Teacher.surname}
-                                                                                </h1>
-                                                                            ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
-                                                                                // Case 2: Admin
-                                                                                <h1>
-                                                                                    {statuss.User.Admin.prefix} {statuss.User.Admin.name} {statuss.User.Admin.surname}
-                                                                                </h1>
-                                                                            ) : (
-                                                                                // Case 3: Fallback to email
-                                                                                <p>{statuss.User.email}</p>
-                                                                            )}
+                                                        <>
+                                                            <Accordion selectionMode="multiple">
+                                                                {desAll.length > 0 ? (
+                                                                    desAll.map((statuss, index) => (
+                                                                        <AccordionItem
+                                                                            key={index}
+                                                                            aria-label={`Accordion ${index + 1}`}
+                                                                            className='px-2 mt-3 rounded-md shadow drop-shadow-md'
+                                                                            startContent={status?.status === 0
+                                                                                ? <BsBan size={25} className='text-red-500' />
+                                                                                : <BsCheckCircle size={25} className='text-green-500' />}
+                                                                            title={
+                                                                                statuss.User.role === 'admin'
+                                                                                    ? 'งานทะเบียนเรียน'
+                                                                                    : statuss.User.role === 'teacher'
+                                                                                        ? 'อาจารย์ที่ปรึกษา'
+                                                                                        : 'Untitled'
+                                                                            }>
+                                                                            <div>
+                                                                                {/* Only show Teacher's information if all necessary fields are present and Teacher is not null */}
+                                                                                {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
+                                                                                    // Case 1: Teacher
+                                                                                    <h1>
+                                                                                        {statuss.User.Teacher.prefix} {statuss.User.Teacher.name} {statuss.User.Teacher.surname}
+                                                                                    </h1>
+                                                                                ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
+                                                                                    // Case 2: Admin
+                                                                                    <h1>
+                                                                                        {statuss.User.Admin.prefix} {statuss.User.Admin.name} {statuss.User.Admin.surname}
+                                                                                    </h1>
+                                                                                ) : (
+                                                                                    // Case 3: Fallback to email
+                                                                                    <p>{statuss.User.email}</p>
+                                                                                )}
 
-                                                                            {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
-                                                                                // Case 1: Teacher is present
-                                                                                <div>
-                                                                                    <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
-                                                                                    <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
-                                                                                    {statuss.desc && (
-                                                                                        <Textarea
-                                                                                            label="ความคิดเห็น"
-                                                                                            variant="bordered"
-                                                                                            color={status?.status === 0 ? 'danger' : 'primary'}
-                                                                                            size="lg"
-                                                                                            value={statuss.desc}
-                                                                                            placeholder="เพิ่มความคิดเห็น..."
-                                                                                            disableAnimation
-                                                                                            disableAutosize
-                                                                                            classNames={{
-                                                                                                base: "w-full my-3",
-                                                                                                input: "resize-y min-h-[80px]",
-                                                                                            }}
-                                                                                            isReadOnly
-                                                                                        />
-                                                                                    )}
-                                                                                </div>
-                                                                            ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
-                                                                                // Case 2: Admin is present
-                                                                                <div>
-                                                                                    <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Admin.name} {statuss.User.Admin.surname}</p>
-                                                                                    <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
-                                                                                    {statuss.desc && (
-                                                                                        <Textarea
-                                                                                            label="ความคิดเห็น"
-                                                                                            variant="bordered"
-                                                                                            color={status?.status === 0 ? 'danger' : 'primary'}
-                                                                                            size="lg"
-                                                                                            value={statuss.desc}
-                                                                                            placeholder="เพิ่มความคิดเห็น..."
-                                                                                            disableAnimation
-                                                                                            disableAutosize
-                                                                                            classNames={{
-                                                                                                base: "w-full my-3",
-                                                                                                input: "resize-y min-h-[80px]",
-                                                                                            }}
-                                                                                            isReadOnly
-                                                                                        />
-                                                                                    )}
-                                                                                </div>
-                                                                            ) : (
-                                                                                // Case 3: Fallback to email
-                                                                                <div>
-                                                                                    <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
-                                                                                    <p className='my-2'><strong>เวลา :</strong> {simpleDMYHM(statuss.approver_time)}</p>
-                                                                                    {statuss.desc && (
-                                                                                        <Textarea
-                                                                                            label="ความคิดเห็น"
-                                                                                            variant="bordered"
-                                                                                            color={status?.status === 0 ? 'danger' : 'primary'}
-                                                                                            size="lg"
-                                                                                            value={statuss.desc}
-                                                                                            placeholder="เพิ่มความคิดเห็น..."
-                                                                                            disableAnimation
-                                                                                            disableAutosize
-                                                                                            classNames={{
-                                                                                                base: "w-full my-3",
-                                                                                                input: "resize-y min-h-[80px]",
-                                                                                            }}
-                                                                                            isReadOnly
-                                                                                        />
-                                                                                    )}
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    </AccordionItem>
-                                                                ))
-                                                            ) : (
-                                                                <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                                                {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
+                                                                                    // Case 1: Teacher is present
+                                                                                    <div>
+                                                                                        <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
+                                                                                        <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                                        {statuss.desc && (
+                                                                                            <Textarea
+                                                                                                label="ความคิดเห็น"
+                                                                                                variant="bordered"
+                                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                                size="lg"
+                                                                                                value={statuss.desc}
+                                                                                                placeholder="เพิ่มความคิดเห็น..."
+                                                                                                disableAnimation
+                                                                                                disableAutosize
+                                                                                                classNames={{
+                                                                                                    base: "w-full my-3",
+                                                                                                    input: "resize-y min-h-[80px]",
+                                                                                                }}
+                                                                                                isReadOnly
+                                                                                            />
+                                                                                        )}
+                                                                                    </div>
+                                                                                ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
+                                                                                    // Case 2: Admin is present
+                                                                                    <div>
+                                                                                        <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Admin.name} {statuss.User.Admin.surname}</p>
+                                                                                        <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                                        {statuss.desc && (
+                                                                                            <Textarea
+                                                                                                label="ความคิดเห็น"
+                                                                                                variant="bordered"
+                                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                                size="lg"
+                                                                                                value={statuss.desc}
+                                                                                                placeholder="เพิ่มความคิดเห็น..."
+                                                                                                disableAnimation
+                                                                                                disableAutosize
+                                                                                                classNames={{
+                                                                                                    base: "w-full my-3",
+                                                                                                    input: "resize-y min-h-[80px]",
+                                                                                                }}
+                                                                                                isReadOnly
+                                                                                            />
+                                                                                        )}
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    // Case 3: Fallback to email
+                                                                                    <div>
+                                                                                        <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
+                                                                                        <p className='my-2'><strong>เวลา :</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                                        {statuss.desc && (
+                                                                                            <Textarea
+                                                                                                label="ความคิดเห็น"
+                                                                                                variant="bordered"
+                                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                                size="lg"
+                                                                                                value={statuss.desc}
+                                                                                                placeholder="เพิ่มความคิดเห็น..."
+                                                                                                disableAnimation
+                                                                                                disableAutosize
+                                                                                                classNames={{
+                                                                                                    base: "w-full my-3",
+                                                                                                    input: "resize-y min-h-[80px]",
+                                                                                                }}
+                                                                                                isReadOnly
+                                                                                            />
+                                                                                        )}
+                                                                                    </div>
+                                                                                )}
+
+                                                                            </div>
+                                                                        </AccordionItem>
+                                                                    ))
+                                                                ) : (
+                                                                    <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                                )}
+                                                            </Accordion>
+                                                            {desAll.length !== 2 && (
+                                                                <div className='flex items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md mt-3'>
+                                                                    <BsCheckCircle size={25} className='text-gray-400' />
+                                                                    <p className='text-foreground text-large'>งานทะเบียนเรียน</p>
+                                                                </div>
                                                             )}
-                                                        </Accordion>
+                                                        </>
                                                     ) : (
-                                                        <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                        <div className=''>
+                                                            <div className='flex items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md'>
+                                                                <BsCheckCircle size={25} className='text-gray-400' />
+                                                                <p className='text-foreground text-large'>อาจารย์ที่ปรึกษา</p>
+                                                            </div>
+                                                            <div className='flex  items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md mt-3'>
+                                                                <BsCheckCircle size={25} className='text-gray-400' />
+                                                                <p className='text-foreground text-large'>งานทะเบียนเรียน</p>
+                                                            </div>
+                                                        </div>
                                                     )}
                                                 </Drawer>
                                             </div>
@@ -2264,115 +2350,137 @@ const Page = ({ params }) => {
                                                         )}
                                                     </div>
                                                     {desAll.length > 0 ? (
-                                                        <Accordion selectionMode="multiple">
-                                                            {desAll.length > 0 ? (
-                                                                desAll.map((statuss, index) => (
-                                                                    <AccordionItem
-                                                                        key={index}
-                                                                        aria-label={`Accordion ${index + 1}`}
-                                                                        title={
-                                                                            statuss.User.role === 'admin'
-                                                                                ? 'งานทะเบียนเรียน'
-                                                                                : statuss.User.role === 'teacher'
-                                                                                    ? 'อาจารย์ที่ปรึกษา'
-                                                                                    : 'Untitled'
-                                                                        }>
-                                                                        <div>
-                                                                            {/* Only show Teacher's information if all necessary fields are present and Teacher is not null */}
-                                                                            {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
-                                                                                // Case 1: Teacher
-                                                                                <h1>
-                                                                                    {statuss.User.Teacher.prefix} {statuss.User.Teacher.name} {statuss.User.Teacher.surname}
-                                                                                </h1>
-                                                                            ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
-                                                                                // Case 2: Admin
-                                                                                <h1>
-                                                                                    {statuss.User.Admin.prefix} {statuss.User.Admin.name} {statuss.User.Admin.surname}
-                                                                                </h1>
-                                                                            ) : (
-                                                                                // Case 3: Fallback to email
-                                                                                <p>{statuss.User.email}</p>
-                                                                            )}
+                                                        <>
+                                                            <Accordion selectionMode="multiple">
+                                                                {desAll.length > 0 ? (
+                                                                    desAll.map((statuss, index) => (
+                                                                        <AccordionItem
+                                                                            key={index}
+                                                                            aria-label={`Accordion ${index + 1}`}
+                                                                            className='px-2 mt-3 rounded-md shadow drop-shadow-md'
+                                                                            startContent={status?.status === 0
+                                                                                ? <BsBan size={25} className='text-red-500' />
+                                                                                : <BsCheckCircle size={25} className='text-green-500' />}
+                                                                            title={
+                                                                                statuss.User.role === 'admin'
+                                                                                    ? 'งานทะเบียนเรียน'
+                                                                                    : statuss.User.role === 'teacher'
+                                                                                        ? 'อาจารย์ที่ปรึกษา'
+                                                                                        : 'Untitled'
+                                                                            }>
+                                                                            <div>
+                                                                                {/* Only show Teacher's information if all necessary fields are present and Teacher is not null */}
+                                                                                {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
+                                                                                    // Case 1: Teacher
+                                                                                    <h1>
+                                                                                        {statuss.User.Teacher.prefix} {statuss.User.Teacher.name} {statuss.User.Teacher.surname}
+                                                                                    </h1>
+                                                                                ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
+                                                                                    // Case 2: Admin
+                                                                                    <h1>
+                                                                                        {statuss.User.Admin.prefix} {statuss.User.Admin.name} {statuss.User.Admin.surname}
+                                                                                    </h1>
+                                                                                ) : (
+                                                                                    // Case 3: Fallback to email
+                                                                                    <p>{statuss.User.email}</p>
+                                                                                )}
 
-                                                                            {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
-                                                                                // Case 1: Teacher is present
-                                                                                <div>
-                                                                                    <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
-                                                                                    <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
-                                                                                    {statuss.desc && (
-                                                                                        <Textarea
-                                                                                            label="ความคิดเห็น"
-                                                                                            variant="bordered"
-                                                                                            color={status?.status === 0 ? 'danger' : 'primary'}
-                                                                                            size="lg"
-                                                                                            value={statuss.desc}
-                                                                                            placeholder="เพิ่มความคิดเห็น..."
-                                                                                            disableAnimation
-                                                                                            disableAutosize
-                                                                                            classNames={{
-                                                                                                base: "w-full my-3",
-                                                                                                input: "resize-y min-h-[80px]",
-                                                                                            }}
-                                                                                            isReadOnly
-                                                                                        />
-                                                                                    )}
-                                                                                </div>
-                                                                            ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
-                                                                                // Case 2: Admin is present
-                                                                                <div>
-                                                                                    <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Admin.name} {statuss.User.Admin.surname}</p>
-                                                                                    <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
-                                                                                    {statuss.desc && (
-                                                                                        <Textarea
-                                                                                            label="ความคิดเห็น"
-                                                                                            variant="bordered"
-                                                                                            color={status?.status === 0 ? 'danger' : 'primary'}
-                                                                                            size="lg"
-                                                                                            value={statuss.desc}
-                                                                                            placeholder="เพิ่มความคิดเห็น..."
-                                                                                            disableAnimation
-                                                                                            disableAutosize
-                                                                                            classNames={{
-                                                                                                base: "w-full my-3",
-                                                                                                input: "resize-y min-h-[80px]",
-                                                                                            }}
-                                                                                            isReadOnly
-                                                                                        />
-                                                                                    )}
-                                                                                </div>
-                                                                            ) : (
-                                                                                // Case 3: Fallback to email
-                                                                                <div>
-                                                                                    <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
-                                                                                    <p className='my-2'><strong>เวลา :</strong> {simpleDMYHM(statuss.approver_time)}</p>
-                                                                                    {statuss.desc && (
-                                                                                        <Textarea
-                                                                                            label="ความคิดเห็น"
-                                                                                            variant="bordered"
-                                                                                            color={status?.status === 0 ? 'danger' : 'primary'}
-                                                                                            size="lg"
-                                                                                            value={statuss.desc}
-                                                                                            placeholder="เพิ่มความคิดเห็น..."
-                                                                                            disableAnimation
-                                                                                            disableAutosize
-                                                                                            classNames={{
-                                                                                                base: "w-full my-3",
-                                                                                                input: "resize-y min-h-[80px]",
-                                                                                            }}
-                                                                                            isReadOnly
-                                                                                        />
-                                                                                    )}
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    </AccordionItem>
-                                                                ))
-                                                            ) : (
-                                                                <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                                                {statuss?.User?.Teacher?.name && statuss?.User?.Teacher?.surname ? (
+                                                                                    // Case 1: Teacher is present
+                                                                                    <div>
+                                                                                        <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Teacher.name} {statuss.User.Teacher.surname}</p>
+                                                                                        <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                                        {statuss.desc && (
+                                                                                            <Textarea
+                                                                                                label="ความคิดเห็น"
+                                                                                                variant="bordered"
+                                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                                size="lg"
+                                                                                                value={statuss.desc}
+                                                                                                placeholder="เพิ่มความคิดเห็น..."
+                                                                                                disableAnimation
+                                                                                                disableAutosize
+                                                                                                classNames={{
+                                                                                                    base: "w-full my-3",
+                                                                                                    input: "resize-y min-h-[80px]",
+                                                                                                }}
+                                                                                                isReadOnly
+                                                                                            />
+                                                                                        )}
+                                                                                    </div>
+                                                                                ) : statuss?.User?.Admin?.name && statuss?.User?.Admin?.surname ? (
+                                                                                    // Case 2: Admin is present
+                                                                                    <div>
+                                                                                        <p className='my-2'><strong>ลงนามโดย :</strong> {statuss.User.Admin.name} {statuss.User.Admin.surname}</p>
+                                                                                        <p className='my-2'><strong>เวลา:</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                                        {statuss.desc && (
+                                                                                            <Textarea
+                                                                                                label="ความคิดเห็น"
+                                                                                                variant="bordered"
+                                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                                size="lg"
+                                                                                                value={statuss.desc}
+                                                                                                placeholder="เพิ่มความคิดเห็น..."
+                                                                                                disableAnimation
+                                                                                                disableAutosize
+                                                                                                classNames={{
+                                                                                                    base: "w-full my-3",
+                                                                                                    input: "resize-y min-h-[80px]",
+                                                                                                }}
+                                                                                                isReadOnly
+                                                                                            />
+                                                                                        )}
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    // Case 3: Fallback to email
+                                                                                    <div>
+                                                                                        <p className='my-2'><strong>ลงนามโดย : </strong>{statuss.User.email}</p>
+                                                                                        <p className='my-2'><strong>เวลา :</strong> {simpleDMYHM(statuss.approver_time)}</p>
+                                                                                        {statuss.desc && (
+                                                                                            <Textarea
+                                                                                                label="ความคิดเห็น"
+                                                                                                variant="bordered"
+                                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                                size="lg"
+                                                                                                value={statuss.desc}
+                                                                                                placeholder="เพิ่มความคิดเห็น..."
+                                                                                                disableAnimation
+                                                                                                disableAutosize
+                                                                                                classNames={{
+                                                                                                    base: "w-full my-3",
+                                                                                                    input: "resize-y min-h-[80px]",
+                                                                                                }}
+                                                                                                isReadOnly
+                                                                                            />
+                                                                                        )}
+                                                                                    </div>
+                                                                                )}
+
+                                                                            </div>
+                                                                        </AccordionItem>
+                                                                    ))
+                                                                ) : (
+                                                                    <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                                )}
+                                                            </Accordion>
+                                                            {desAll.length !== 2 && (
+                                                                <div className='flex items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md mt-3'>
+                                                                    <BsCheckCircle size={25} className='text-gray-400' />
+                                                                    <p className='text-foreground text-large'>งานทะเบียนเรียน</p>
+                                                                </div>
                                                             )}
-                                                        </Accordion>
+                                                        </>
                                                     ) : (
-                                                        <div>รอการอนุมัติจากอาจารย์และเจ้าหน้าที่</div>
+                                                        <div className=''>
+                                                            <div className='flex items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md'>
+                                                                <BsCheckCircle size={25} className='text-gray-400' />
+                                                                <p className='text-foreground text-large'>อาจารย์ที่ปรึกษา</p>
+                                                            </div>
+                                                            <div className='flex  items-center gap-3 py-4 px-2 mx-2 rounded-md shadow drop-shadow-md mt-3'>
+                                                                <BsCheckCircle size={25} className='text-gray-400' />
+                                                                <p className='text-foreground text-large'>งานทะเบียนเรียน</p>
+                                                            </div>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
