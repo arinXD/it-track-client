@@ -2,7 +2,7 @@
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
 import { fetchData, fetchDataObj } from '../../action'
 import { useToggleSideBarStore } from '@/src/store'
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useState, useMemo, useRef } from 'react'
 import { format } from 'date-fns';
 import Swal from 'sweetalert2'
 import axios from 'axios';
@@ -31,6 +31,11 @@ import { TbMessage2Exclamation } from "react-icons/tb";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { BsCheckCircle } from "react-icons/bs";
 import { BsBan } from "react-icons/bs";
+import html2canvas from 'html2canvas-pro'; // Correct import
+import { jsPDF } from 'jspdf';
+import { FloatButton } from 'antd';
+import { CommentOutlined, CustomerServiceOutlined } from '@ant-design/icons';
+import { BsFiletypePdf } from "react-icons/bs";
 
 const Page = ({ params }) => {
     const { id } = params
@@ -998,6 +1003,126 @@ const Page = ({ params }) => {
 
     //////////////////////////////////////////////////////////
 
+    ///////////////////////// print to pdf ///////////////////////////////////////
+
+    const divToPrintRef = useRef(null);
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    const convertOklchToRgb = (oklchColor) => {
+        const match = oklchColor.match(/oklch\(([\d.]+)%?\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/);
+        if (!match) {
+            console.error('Invalid OKLCH color format:', oklchColor);
+            return 'rgb(0, 0, 0)'; // Return black as fallback
+        }
+
+        let [, l, c, h, alpha] = match;
+        l = parseFloat(l) / 100; // Convert percentage to 0-1 range
+        c = parseFloat(c);
+        h = parseFloat(h);
+        alpha = alpha ? parseFloat(alpha) : 1;
+
+        // Simple conversion from OKLCH to sRGB
+        // Note: This is a rough approximation and may not be accurate for all colors
+        const hueRadians = h * (Math.PI / 180);
+        const a = c * Math.cos(hueRadians);
+        const bs = c * Math.sin(hueRadians);
+
+        // Convert to XYZ
+        const x = 0.99999999845051981432 * l + 0.39633779217376785678 * a + 0.21580375806075880339 * bs;
+        const y = 1.0000000088817607767 * l - 0.1055613423236563494 * a - 0.063854174771705903402 * bs;
+        const z = 1.0000000546724109177 * l - 0.089484182094965759684 * a - 1.2914855378640917399 * bs;
+
+        // Convert XYZ to sRGB
+        const r = Math.max(0, Math.min(1, 3.2406 * x - 1.5372 * y - 0.4986 * z));
+        const g = Math.max(0, Math.min(1, -0.9689 * x + 1.8758 * y + 0.0415 * z));
+        const b = Math.max(0, Math.min(1, 0.0557 * x - 0.2040 * y + 1.0570 * z));
+
+        // Apply gamma correction
+        const gammaCorrect = (color) => {
+            return color <= 0.0031308 ? 12.92 * color : 1.055 * Math.pow(color, 1 / 2.4) - 0.055;
+        };
+
+        const rGamma = Math.round(gammaCorrect(r) * 255);
+        const gGamma = Math.round(gammaCorrect(g) * 255);
+        const bGamma = Math.round(gammaCorrect(b) * 255);
+
+        return `rgb(${rGamma}, ${gGamma}, ${bGamma})`;
+    };
+
+    const preprocessStyles = (element) => {
+        const styles = window.getComputedStyle(element);
+        const oklchProperties = ['color', 'backgroundColor'];
+
+        oklchProperties.forEach(prop => {
+            const value = styles[prop];
+            if (value.includes('oklch')) {
+                element.style[prop] = convertOklchToRgb(value);
+            }
+        });
+
+        Array.from(element.children).forEach(child => preprocessStyles(child));
+    };
+
+    const printDocument = () => {
+        if (!isClient) return;
+
+        const input = divToPrintRef.current;
+        if (!input) return;
+
+        // Clone the element to avoid modifying the original
+        const clonedInput = input.cloneNode(true);
+        document.body.appendChild(clonedInput);
+
+        // Preprocess styles
+        preprocessStyles(clonedInput);
+
+        // Adjust the scale for lower resolution
+        const lowResolutionScale = 1.2; // Adjust this value (e.g., 0.5 for half resolution)
+
+        html2canvas(clonedInput, { scale: lowResolutionScale }) // Use lower scale for lower quality
+            .then((canvas) => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', putOnlyUsedFonts: true, floatPrecision: 16 });
+
+                // A4 size in mm
+                const a4Width = 210; // A4 width
+                const a4Height = 297; // A4 height
+
+                // Calculate scaling to fit A4
+                const canvasWidth = canvas.width;  // in pixels
+                const canvasHeight = canvas.height; // in pixels
+
+                // Convert pixel dimensions to mm
+                const canvasWidthInMM = canvasWidth * 0.264583; // 1px = 0.264583mm
+                const canvasHeightInMM = canvasHeight * 0.264583;
+
+                // Calculate scale factor to fit A4
+                const scale = Math.min(a4Width / canvasWidthInMM, a4Height / canvasHeightInMM);
+
+                const imgWidth = canvasWidthInMM * scale; // Width in mm
+                const imgHeight = canvasHeightInMM * scale; // Height in mm
+
+                // Calculate offsets to center the image
+                const xOffset = (a4Width - imgWidth) / 2;
+                const yOffset = (a4Height - imgHeight) / 2;
+
+                // Add the image to the PDF
+                pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
+                pdf.save(`แบบฟอร์มตรวจสอบจบ${userData?.stu_id}.pdf`);
+
+                // Remove the cloned element
+                document.body.removeChild(clonedInput);
+            })
+            .catch((error) => console.error('Error generating PDF:', error));
+    };
+
+
+    ///////////////////////// print to pdf ///////////////////////////////////////
+
 
     const fetchAdStatus = useCallback(async (email, stu_id) => {
         try {
@@ -1478,20 +1603,31 @@ const Page = ({ params }) => {
                             </div>
                         ) : (
                             <>
-                                <div className='relative'>
-                                    <div className='hidden max-xl:block max-xl:fixed max-xl:top-16 max-xl:right-0 mt-5 z-50'>
-                                        {(verifySelect?.status === 0 || verifySelect.status === 1 || verifySelect.status === 2 || verifySelect.status === 3) && (
-                                            <Tooltip showArrow={true} placement='left-end' size='lg' content="สถานะการอนุมัติ">
-                                                <Button
-                                                    onClick={showDrawer}
-                                                    color="primary"
-                                                    radius="sm"
-                                                    variant="shadow"
-                                                    startContent={<TbMessage2Exclamation className='w-6 h-6' />}
-                                                />
-                                            </Tooltip>
+                                <div className={`${verifySelect?.status === 3 ? 'block' : 'hidden max-xl:block'}`}>
+                                    <FloatButton.Group
+                                        trigger="click"
+                                        type="primary"
+                                        style={{
+                                            insetInlineEnd: 24,
+                                        }}
+                                    >
+                                        {(verifySelect?.status === 0 || verifySelect?.status === 1 || verifySelect?.status === 2 || verifySelect?.status === 3) && (
+                                            <FloatButton
+                                                onClick={showDrawer}
+                                                icon={<TbMessage2Exclamation />}
+                                                tooltip={<div>สถานะการอนุมัติ</div>}
+                                                className='hidden max-xl:block'
+                                            />
                                         )}
-                                    </div>
+
+                                        {(verifySelect?.status === 3) && (
+                                            <FloatButton
+                                                icon={<BsFiletypePdf />}
+                                                onClick={printDocument}
+                                                tooltip={<div>Print to PDF</div>}
+                                            />
+                                        )}
+                                    </FloatButton.Group>
                                 </div>
                                 {loading ? (
                                     <div className='w-full flex justify-center h-[70vh]'>
@@ -1500,7 +1636,7 @@ const Page = ({ params }) => {
                                 ) : (
                                     Object.keys(verifySelect).length > 0 ? (
                                         <div className={`${verifySelect?.status === 0 || verifySelect?.status === 1 || verifySelect?.status === 2 || verifySelect?.status === 3 ? 'flex relative' : ''}`}>
-                                            <div className={`my-[30px] ${verifySelect?.status === 0 || verifySelect?.status === 1 || verifySelect?.status === 2 || verifySelect?.status === 3 ? 'w-[80%] 2xl:px-30 xl:pr-20' : 'w-[100%] 2xl:px-44 xl:px-20'} mt-16 max-xl:w-[100%] relative`}>
+                                            <div id="divToPrint" ref={divToPrintRef} className={`my-[30px] ${verifySelect?.status === 0 || verifySelect?.status === 1 || verifySelect?.status === 2 || verifySelect?.status === 3 ? 'w-[80%] 2xl:px-30 xl:pr-20' : 'w-[100%] 2xl:px-44 xl:px-20'} mt-16 max-xl:w-[100%] relative`}>
                                                 <BreadCrumb />
                                                 <div className=' text-xl text-black mb-5 px-5'>
                                                     <h1 className='text-3xl text-center  leading-relaxed'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br /> หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{verifySelect.Verify.Program.title_th} <br />(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.Verify.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
@@ -2198,7 +2334,7 @@ const Page = ({ params }) => {
                                                                             key={index}
                                                                             aria-label={`Accordion ${index + 1}`}
                                                                             className='px-2 mt-3 rounded-md shadow drop-shadow-md'
-                                                                            startContent={status?.status === 0
+                                                                            startContent={verifySelect?.status === 0
                                                                                 ? <BsBan size={25} className='text-red-500' />
                                                                                 : <BsCheckCircle size={25} className='text-green-500' />}
                                                                             title={
@@ -2257,7 +2393,7 @@ const Page = ({ params }) => {
                                                                                             <Textarea
                                                                                                 label="ความคิดเห็น"
                                                                                                 variant="bordered"
-                                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                                color={verifySelect?.status === 0 ? 'danger' : 'primary'}
                                                                                                 size="lg"
                                                                                                 value={statuss.desc}
                                                                                                 placeholder="เพิ่มความคิดเห็น..."
@@ -2280,7 +2416,7 @@ const Page = ({ params }) => {
                                                                                             <Textarea
                                                                                                 label="ความคิดเห็น"
                                                                                                 variant="bordered"
-                                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                                color={verifySelect?.status === 0 ? 'danger' : 'primary'}
                                                                                                 size="lg"
                                                                                                 value={statuss.desc}
                                                                                                 placeholder="เพิ่มความคิดเห็น..."
@@ -2358,7 +2494,7 @@ const Page = ({ params }) => {
                                                                             key={index}
                                                                             aria-label={`Accordion ${index + 1}`}
                                                                             className='px-2 mt-3 rounded-md shadow drop-shadow-md'
-                                                                            startContent={status?.status === 0
+                                                                            startContent={verifySelect?.status === 0
                                                                                 ? <BsBan size={25} className='text-red-500' />
                                                                                 : <BsCheckCircle size={25} className='text-green-500' />}
                                                                             title={
@@ -2417,7 +2553,7 @@ const Page = ({ params }) => {
                                                                                             <Textarea
                                                                                                 label="ความคิดเห็น"
                                                                                                 variant="bordered"
-                                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                                color={verifySelect?.status === 0 ? 'danger' : 'primary'}
                                                                                                 size="lg"
                                                                                                 value={statuss.desc}
                                                                                                 placeholder="เพิ่มความคิดเห็น..."
@@ -2440,7 +2576,7 @@ const Page = ({ params }) => {
                                                                                             <Textarea
                                                                                                 label="ความคิดเห็น"
                                                                                                 variant="bordered"
-                                                                                                color={status?.status === 0 ? 'danger' : 'primary'}
+                                                                                                color={verifySelect?.status === 0 ? 'danger' : 'primary'}
                                                                                                 size="lg"
                                                                                                 value={statuss.desc}
                                                                                                 placeholder="เพิ่มความคิดเห็น..."
