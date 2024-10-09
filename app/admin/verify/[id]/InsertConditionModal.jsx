@@ -463,14 +463,14 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
                                             {selectedGroup && subgroups.length > 0 && (
                                                 <>
                                                     <div className='col-span-4'>
-                                                        <label htmlFor="subgroup" className='pb-1'>กลุ่มรองวิชา</label>
+                                                        <label htmlFor="subgroup" className='pb-1'>กลุ่มย่อยวิชา</label>
                                                         <Select
                                                             className='z-30'
                                                             value={selectedSubgroup}
                                                             options={subgroups}
                                                             onChange={handleSubGroupChange}
                                                             isSearchable
-                                                            placeholder="เลือกกลุ่มรองวิชา"
+                                                            placeholder="เลือกกลุ่มย่อยวิชา"
                                                             isClearable
                                                         />
                                                     </div>
