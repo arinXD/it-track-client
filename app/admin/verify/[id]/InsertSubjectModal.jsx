@@ -390,7 +390,7 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                                                         options={subgroups}
                                                         onChange={handleSubGroupChange}
                                                         isSearchable
-                                                        placeholder="เลือกกลุ่มรองวิชา"
+                                                        placeholder="เลือกกลุ่มย่อยวิชา"
                                                         isClearable
                                                     />
                                                 </div>
