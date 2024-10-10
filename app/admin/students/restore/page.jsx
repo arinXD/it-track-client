@@ -226,7 +226,7 @@ const Page = () => {
                                 isIconOnly
                                 aria-label="แก้ไข"
                                 className={restoreColor.color}
-                                onClick={()=>restoreStudent(stu?.stu_id)}
+                                onClick={() => restoreStudent(stu?.stu_id)}
                             >
                                 <TbRestore className="w-4 h-4" />
                             </Button>
@@ -236,7 +236,7 @@ const Page = () => {
                             content="ลบ"
                         >
                             <Button
-                                onPress={() => openDeleteModal(stu?.stu_id)}     
+                                onPress={() => openDeleteModal(stu?.stu_id)}
                                 size='sm'
                                 color='danger'
                                 isIconOnly
@@ -518,150 +518,142 @@ const Page = () => {
 
     return (
         <>
-            <header>
-                <Navbar />
-            </header>
-            <Sidebar />
-            <ContentWrap>
-                <BreadCrumb />
-                <DeleteModal
-                    showToastMessage={showToastMessage}
-                    callData={getStudents}
-                    delIsOpen={delIsOpen}
-                    delOnClose={delOnClose}
-                    stuId={delStdId} />
-                <DeleteSelectModal
-                    setDisableSelectDelete={setDisableSelectDelete}
-                    setSelectedStudents={setSelectedStudents}
-                    showToastMessage={showToastMessage}
-                    getStudents={getStudents}
-                    delIsOpen={delsIsOpen}
-                    delOnClose={delsOnClose}
-                    stuIdList={selectedStudents}
-                    setSelectedKeys={setSelectedKeys} />
-                <div>
-                    <ToastContainer />
-                    {fetching ?
-                        <div className='w-full flex justify-center h-[70vh]'>
-                            <Spinner label="กำลังโหลด..." color="primary" />
+            <DeleteModal
+                showToastMessage={showToastMessage}
+                callData={getStudents}
+                delIsOpen={delIsOpen}
+                delOnClose={delOnClose}
+                stuId={delStdId} />
+            <DeleteSelectModal
+                setDisableSelectDelete={setDisableSelectDelete}
+                setSelectedStudents={setSelectedStudents}
+                showToastMessage={showToastMessage}
+                getStudents={getStudents}
+                delIsOpen={delsIsOpen}
+                delOnClose={delsOnClose}
+                stuIdList={selectedStudents}
+                setSelectedKeys={setSelectedKeys} />
+            <div>
+                <ToastContainer />
+                {fetching ?
+                    <div className='w-full flex justify-center h-[70vh]'>
+                        <Spinner label="กำลังโหลด..." color="primary" />
+                    </div>
+                    :
+                    <>
+                        <div className='border p-4 rounded-[10px] w-full flex flex-row justify-between items-center gap-4 mb-4'>
+                            <div className="flex gap-4">
+                                <Dropdown>
+                                    <DropdownTrigger className="hidden sm:flex">
+                                        <Button
+                                            size="sm"
+                                            className="bg-blue-100 text-blue-500"
+                                            radius="sm"
+                                            endContent={<ChevronDownIcon className="text-small" />}
+                                            variant="flat">
+                                            สถานะภาพ
+                                        </Button>
+                                    </DropdownTrigger>
+                                    <DropdownMenu
+                                        disallowEmptySelection
+                                        aria-label="Table Columns"
+                                        closeOnSelect={false}
+                                        selectedKeys={statusFilter}
+                                        selectionMode="multiple"
+                                        onSelectionChange={setStatusFilter}
+                                        className="h-[500px] overflow-y-auto"
+                                    >
+                                        {statusOptions.map((status) => (
+                                            <DropdownItem key={status.id} className="capitalize">
+                                                {status.id} {status.description}
+                                            </DropdownItem>
+                                        ))}
+                                    </DropdownMenu>
+                                </Dropdown>
+                                <Dropdown>
+                                    <DropdownTrigger className="hidden sm:flex">
+                                        <Button
+                                            radius="sm"
+                                            size="sm"
+                                            className="bg-blue-100 text-blue-500"
+                                            endContent={<ChevronDownIcon className="text-small" />}
+                                            variant="flat">
+                                            คอลัมน์
+                                        </Button>
+                                    </DropdownTrigger>
+                                    <DropdownMenu
+                                        disallowEmptySelection
+                                        aria-label="Table Columns"
+                                        closeOnSelect={false}
+                                        selectedKeys={visibleColumns}
+                                        selectionMode="multiple"
+                                        onSelectionChange={setVisibleColumns}
+                                    >
+                                        {columns.map((column) => (
+                                            <DropdownItem key={column.uid} className="capitalize">
+                                                {capitalize(column.name)}
+                                            </DropdownItem>
+                                        ))}
+                                    </DropdownMenu>
+                                </Dropdown>
+                            </div>
                         </div>
-                        :
-                        <>
-                            <div className='border p-4 rounded-[10px] w-full flex flex-row justify-between items-center gap-4 mb-4'>
-                                <div className="flex gap-4">
-                                    <Dropdown>
-                                        <DropdownTrigger className="hidden sm:flex">
-                                            <Button
-                                                size="sm"
-                                                className="bg-blue-100 text-blue-500"
-                                                radius="sm"
-                                                endContent={<ChevronDownIcon className="text-small" />}
-                                                variant="flat">
-                                                สถานะภาพ
-                                            </Button>
-                                        </DropdownTrigger>
-                                        <DropdownMenu
-                                            disallowEmptySelection
-                                            aria-label="Table Columns"
-                                            closeOnSelect={false}
-                                            selectedKeys={statusFilter}
-                                            selectionMode="multiple"
-                                            onSelectionChange={setStatusFilter}
-                                            className="h-[500px] overflow-y-auto"
+                        <div className="border p-4 rounded-[10px] w-full">
+                            <Table
+                                aria-label="Student Table"
+                                checkboxesProps={{
+                                    classNames: {
+                                        wrapper: "after:bg-blue-500 after:text-background text-background",
+                                    },
+                                }}
+                                classNames={minimalTableClass}
+
+                                topContent={topContent}
+                                topContentPlacement="outside"
+
+                                bottomContent={bottomContent}
+                                bottomContentPlacement="outside"
+
+                                isCompact
+                                removeWrapper
+                                selectionMode="multiple"
+                                sortDescriptor={sortDescriptor}
+                                onSortChange={setSortDescriptor}
+                                selectedKeys={selectedKeys}
+                                onSelectionChange={setSelectedKeys}
+                            >
+                                <TableHeader columns={headerColumns}>
+                                    {(column) => (
+                                        <TableColumn
+                                            key={column.uid}
+                                            align={column.uid === "actions" ? "center" : "start"}
+                                            allowsSorting={column.sortable}
                                         >
-                                            {statusOptions.map((status) => (
-                                                <DropdownItem key={status.id} className="capitalize">
-                                                    {status.id} {status.description}
-                                                </DropdownItem>
-                                            ))}
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                    <Dropdown>
-                                        <DropdownTrigger className="hidden sm:flex">
-                                            <Button
-                                                radius="sm"
-                                                size="sm"
-                                                className="bg-blue-100 text-blue-500"
-                                                endContent={<ChevronDownIcon className="text-small" />}
-                                                variant="flat">
-                                                คอลัมน์
-                                            </Button>
-                                        </DropdownTrigger>
-                                        <DropdownMenu
-                                            disallowEmptySelection
-                                            aria-label="Table Columns"
-                                            closeOnSelect={false}
-                                            selectedKeys={visibleColumns}
-                                            selectionMode="multiple"
-                                            onSelectionChange={setVisibleColumns}
-                                        >
-                                            {columns.map((column) => (
-                                                <DropdownItem key={column.uid} className="capitalize">
-                                                    {capitalize(column.name)}
-                                                </DropdownItem>
-                                            ))}
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                </div>
-                            </div>
-                            <div className="border p-4 rounded-[10px] w-full">
-                                <Table
-                                    aria-label="Student Table"
-                                    checkboxesProps={{
-                                        classNames: {
-                                            wrapper: "after:bg-blue-500 after:text-background text-background",
-                                        },
-                                    }}
-                                    classNames={minimalTableClass}
-
-                                    topContent={topContent}
-                                    topContentPlacement="outside"
-
-                                    bottomContent={bottomContent}
-                                    bottomContentPlacement="outside"
-
-                                    isCompact
-                                    removeWrapper
-                                    selectionMode="multiple"
-                                    sortDescriptor={sortDescriptor}
-                                    onSortChange={setSortDescriptor}
-                                    selectedKeys={selectedKeys}
-                                    onSelectionChange={setSelectedKeys}
-                                >
-                                    <TableHeader columns={headerColumns}>
-                                        {(column) => (
-                                            <TableColumn
-                                                key={column.uid}
-                                                align={column.uid === "actions" ? "center" : "start"}
-                                                allowsSorting={column.sortable}
-                                            >
-                                                {column.name}
-                                            </TableColumn>
-                                        )}
-                                    </TableHeader>
-                                    <TableBody
-                                        emptyContent={
-                                            <Empty
-                                                className='my-4'
-                                                description={
-                                                    <span className='text-gray-300'>ไม่มีข้อมูลนักศึกษาที่ถูกลบ</span>
-                                                }
-                                            />
-                                        }
-                                        items={sortedItems}>
-                                        {(item) => (
-                                            <TableRow key={item.id}>
-                                                {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                        </>
-                    }
-                </div>
-            </ContentWrap>
-
+                                            {column.name}
+                                        </TableColumn>
+                                    )}
+                                </TableHeader>
+                                <TableBody
+                                    emptyContent={
+                                        <Empty
+                                            className='my-4'
+                                            description={
+                                                <span className='text-gray-300'>ไม่มีข้อมูลนักศึกษาที่ถูกลบ</span>
+                                            }
+                                        />
+                                    }
+                                    items={sortedItems}>
+                                    {(item) => (
+                                        <TableRow key={item.id}>
+                                            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </>
+                }
+            </div>
         </>
     )
 }
