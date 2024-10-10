@@ -383,14 +383,14 @@ export default function InsertSubjectModal({ isOpen, onClose, onDataInserted, ve
                                         {selectedGroup && subgroups.length > 0 && (
                                             <>
                                                 <div className='col-span-4'>
-                                                    <label htmlFor="subgroup">กลุ่มรองวิชา</label>
+                                                    <label htmlFor="subgroup">กลุ่มย่อยวิชา</label>
                                                     <Select
                                                         className='z-30'
                                                         value={selectedSubgroup}
                                                         options={subgroups}
                                                         onChange={handleSubGroupChange}
                                                         isSearchable
-                                                        placeholder="เลือกกลุ่มรองวิชา"
+                                                        placeholder="เลือกกลุ่มย่อยวิชา"
                                                         isClearable
                                                     />
                                                 </div>
