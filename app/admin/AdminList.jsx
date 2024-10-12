@@ -28,8 +28,6 @@ const AdminList = ({ }) => {
           {
                title: "แทร็ก",
                links: [
-                    { href: "/admin/track", label: "ข้อมูลแทร็ก", icon: HiOutlineUserGroup },
-                    { href: "/admin/track-selection", label: "คัดเลือกแทร็ก", icon: LuTextSelect },
                     { href: "/admin/trackstudent", label: "รายชื่อนักศึกษาภายในแทร็ก", icon: BsPerson },
                     { href: "/admin/track-dashboard", label: "สรุปผลการคัดเลือกแทร็ก", icon: IoBarChartOutline },
                ]
