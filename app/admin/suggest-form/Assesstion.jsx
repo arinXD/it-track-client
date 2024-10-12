@@ -4,8 +4,8 @@ import axios from "axios";
 import { createRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MdOutlineInventory2 } from "react-icons/md";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spinner, Chip } from "@nextui-org/react"
-import { Checkbox, Empty } from 'antd';
-import { PlusIcon, SearchIcon } from "@/app/components/icons";
+import { Checkbox, Empty, message } from 'antd';
+import { DeleteIcon, PlusIcon, SearchIcon } from "@/app/components/icons";
 import { SELECT_STYLE, thinInputClass } from "@/src/util/ComponentClass";
 import { FaRegTrashAlt } from "react-icons/fa";
 
@@ -56,6 +56,27 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
         }
     }, [])
 
+    const updateAssessmentsInventory = useCallback(async (formId) => {
+        if (!formId) {
+            try {
+                const option = await getOptions(`/api/assessments`, "get")
+                const res = await axios(option)
+                const allQuestions = res.data.data
+                setQuestionsBank(allQuestions)
+            } catch (error) {
+                setQuestionsBank([])
+            }
+            return
+        }
+        try {
+            const option = await getOptions(`/api/assessments/not-in-form/${formId}`, "get")
+            const questionsNotInForm = (await axios(option)).data.data
+            setQuestionsBank(questionsNotInForm)
+        } catch (error) {
+            setQuestionsBank([])
+        }
+    }, [])
+
 
     useEffect(() => {
         getQuestions(formId)
@@ -100,7 +121,7 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                 desc: null
             }
 
-            const updatedQuestions = [newQuestion, ...prevQuestions, ]
+            const updatedQuestions = [newQuestion, ...prevQuestions,]
             questionRefs.current = updatedQuestions.map((_, i) => questionRefs.current[i] || createRef())
 
             return updatedQuestions
@@ -168,9 +189,36 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
         onClose()
     }, [])
 
+    const [messageApi, contextHolder] = message.useMessage();
+    const deleteQuestion = useCallback(async (aid) => {
+        if (confirm("ต้องการลบคำถามหรือไม่ ?")) {
+            try {
+                messageApi.open({
+                    key: 'updatable',
+                    type: 'loading',
+                    content: 'กำลังลบคำถาม',
+                });
+                const option = await getOptions(`/api/assessments/${aid}`, "delete")
+                const { message: msg } = (await axios(option)).data
+
+                await updateAssessmentsInventory(formId)
+
+                messageApi.open({
+                    key: 'updatable',
+                    type: 'success',
+                    content: msg,
+                    duration: 2,
+                });
+            } catch (error) {
+                message.warning("ไม่สามารถลบคำถามความชอบได้")
+            }
+        }
+    }, [formId])
+
     return (
         <>
             <section style={formStyle}>
+                {contextHolder}
                 <Modal
                     size={"5xl"}
                     isOpen={isOpen}
@@ -220,18 +268,21 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                                                         <Checkbox
                                                             onChange={(e) => selectQuestion(e, q.id)}
                                                             key={index}
-                                                            className="w-full relative cursor-pointer flex gap-2 border p-4 rounded-[5px]"
+                                                            className="w-full ant-qs-ck ant-qs-ck-assessments cursor-pointer flex items-center gap-2 border p-4 rounded-[5px]"
                                                             name={`questionBank[]`}
                                                         >
-                                                            <Chip
-                                                                className="!absolute !p-1 !text-xs top-2 right-2"
-                                                                color={q?.track?.split(" ")[0]?.toLowerCase() === "bit" ? "secondary" : q?.track?.split(" ")[0]?.toLowerCase() === "network" ? "primary" : "success"} variant="flat">
-                                                                {q?.track?.split(" ")[0]}
-                                                            </Chip>
-                                                            <div className="w-full flex flex-col gap-2">
-                                                                <p>
-                                                                    {q.question}
-                                                                </p>
+                                                            <p className="w-[80%] whitespace-break-spaces mb-0 text-sm">{q.question}</p>
+                                                            <div className="w-[20%] flex flex-row justify-end items-center gap-4">
+                                                                <Chip
+                                                                    className="!p-1 !text-xs"
+                                                                    color={q?.track?.split(" ")[0]?.toLowerCase() === "bit" ? "secondary" : q?.track?.split(" ")[0]?.toLowerCase() === "network" ? "primary" : "success"} variant="flat">
+                                                                    {q?.track?.split(" ")[0]}
+                                                                </Chip>
+                                                                <Button
+                                                                    onClick={() => deleteQuestion(q.id)}
+                                                                    isIconOnly size="sm" className="bg-red-100 text-red-500">
+                                                                    <DeleteIcon className={"w-4 h-4"} />
+                                                                </Button>
                                                             </div>
                                                         </Checkbox>
                                                     </div>

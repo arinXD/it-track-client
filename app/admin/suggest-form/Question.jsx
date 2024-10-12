@@ -237,20 +237,37 @@ const Question = ({ formId, tracks, questions, setQuestions, next, prev, formSty
           );
      }, []);
 
+     const [messageApi, contextHolder] = message.useMessage();
      const deleteQuestion = useCallback(async (qid) => {
-          try {
-               const option = await getOptions(`/api/questions/${qid}`, "delete")
-               const { message: msg } = (await axios(option)).data
-               await updateQuestionInventory(formId)
-               message.success(msg)
-          } catch (error) {
-               message.warning("ไม่สามารถลบคำถามได้")
+          if (confirm("ต้องการลบคำถามหรือไม่ ?")) {
+               try {
+                    messageApi.open({
+                         key: 'updatable',
+                         type: 'loading',
+                         content: 'กำลังลบคำถาม',
+                    });
+                    const option = await getOptions(`/api/questions/${qid}`, "delete")
+                    const { message: msg } = (await axios(option)).data
+
+                    await updateQuestionInventory(formId)
+
+                    messageApi.open({
+                         key: 'updatable',
+                         type: 'success',
+                         content: msg,
+                         duration: 2,
+                    });
+               } catch (error) {
+                    message.warning("ไม่สามารถลบคำถามได้")
+               }
           }
+
      }, [formId])
 
      return (
           <>
                <section style={formStyle}>
+                    {contextHolder}
                     <Modal
                          size={"5xl"}
                          isOpen={isOpen}
