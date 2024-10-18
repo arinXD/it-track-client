@@ -50,7 +50,7 @@ const Track = ({ tracks }) => {
 
                                 return (
                                     <Link
-                                        href={`/tracks/${track.track?.toLowerCase()}`}
+                                        href={`/tracks/${String(track?.track).toLowerCase().replace(/ /g, "-")}`}
                                         data-aos="fade-up"
                                         data-aos-duration={duration}
                                         key={index}

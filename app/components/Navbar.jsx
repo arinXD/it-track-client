@@ -29,51 +29,49 @@ const Navbar = () => {
     const links = useMemo(() => [
         {
             href: "/",
-            activeIcon: <GoHomeFill className="w-5 h-5" />,
-            icon: <GoHome className="w-5 h-5" />,
             label: "หน้าหลัก",
             condition: true
         },
         {
             href: "/admin",
-            activeIcon: <MdAdminPanelSettings className="w-5 h-5 text-white" />,
-            icon: <MdOutlineAdminPanelSettings className="w-5 h-5" />,
             label: session?.user?.role === "admin" ? "Admin Panel" : "Teacher Panel",
             condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
         },
         {
             href: "/student/verify",
-            activeIcon: <HiAcademicCap className="w-5 h-5" />,
-            icon: <HiOutlineAcademicCap className="w-5 h-5" />,
             label: "ตรวจสอบสำเร็จการศึกษา",
             condition: session?.user?.role === "student"
         },
         {
             href: "/tracks",
-            activeIcon: <HiUserGroup className="w-5 h-5" />,
-            icon: <HiOutlineUserGroup className="w-5 h-5" />,
             label: "แทร็ก",
             condition: true
         },
         {
             href: "/student/tracks",
-            activeIcon: <AiFillEdit className="w-5 h-5" />,
-            icon: <AiOutlineEdit className="w-5 h-5" />,
             label: "คัดเลือกแทร็ก",
             condition: session?.user?.role === "student"
         },
         {
             href: "/student/tracks/exam",
-            activeIcon: <MdQuiz className="w-5 h-5" />,
-            icon: <MdOutlineQuiz className="w-5 h-5" />,
             label: "แนะนำแทร็ก",
+            condition: true
+        },
+        {
+            href: "/petition/request",
+            label: "ยื่นคำร้องย้ายแทร็ก",
+            condition: session?.user?.role === "student"
+        },
+        {
+            href: "/summary-history",
+            label: "ประวัติการแนะนำแทร็ก",
             condition: true
         },
     ], [session]);
 
-    const navstupid = useCallback(function () {
+    const mobileNav = useCallback(function () {
         setOpenToggle(prevOpenToggle => !prevOpenToggle);
-        document.querySelector('#navstupid').classList.toggle('!top-0')
+        document.querySelector('#mobileNav').classList.toggle('!top-0')
     }, [])
 
     const renderUserProfile = useCallback(() => {
@@ -185,12 +183,19 @@ const Navbar = () => {
 
     const mobileProfile = useCallback(() => {
         return (
-            <div className="flex gap-4 items-start mb-1 border-b-1 border-b-gray-200 py-3 p-2">
+            <Link
+                href={"/profile"}
+                onClick={mobileNav}
+                className="flex gap-4 items-start mb-3 border-b-1 border-b-gray-200 py-3 p-2">
                 <Image
-                    className='rounded-full border-1 border-slate-300'
-                    src={session?.user?.image || "/image/user.png"}
+                    className='rounded-full'
+                    src={session?.user?.image || "/image/admin.png"}
                     width={45} height={45}
                     alt="user image"
+                    onError={({ currentTarget }) => {
+                        currentTarget.onerror = null;
+                        currentTarget.src = "/image/admin.png";
+                    }}
                 />
                 <div className='w-full'>
                     <div>
@@ -198,7 +203,7 @@ const Navbar = () => {
                         <div className='text-sm text-gray-500'>{session?.user?.email}</div>
                     </div>
                 </div>
-            </div>
+            </Link>
         )
     }, [session])
 
@@ -230,7 +235,7 @@ const Navbar = () => {
                     </div>
                     <div className="absolute inset-y-0 left-0 flex items-center md:hidden">
                         <button
-                            onClick={() => navstupid()}
+                            onClick={() => mobileNav()}
                             className={`hamburger hamburger--spin${openToggle ? " is-active " : " "}`}
                             type="button">
                             <span className="hamburger-box">
@@ -238,13 +243,16 @@ const Navbar = () => {
                             </span>
                         </button>
                     </div>
-                    <div className="absolute inset-y-0 right-0 hidden md:flex items-center pr-2 sm:static sm:inset-auto sm:pr-0">
+                    {/* <div className='absolute inset-y-0 right-0 flex items-center md:hidden'>
+                        <Notification email={session?.user?.email} />
+                    </div> */}
+                    <div className="absolute inset-y-0 right-0 flex items-center md:pr-2 sm:static sm:inset-auto sm:pr-0">
 
                         {/* Noti */}
                         <Notification email={session?.user?.email} />
 
                         {/* User profile */}
-                        <div className="relative ml-3 flex flex-row gap-3">
+                        <div className="relative hidden ml-3 md:flex flex-row gap-3">
                             {renderUserProfile()}
                         </div>
 
@@ -253,7 +261,7 @@ const Navbar = () => {
             </div>
             {
                 <div className={`md:hidden relative w-50`} id="mobile-menu">
-                    <div className="h-fit absolute space-y-1 p-2 border-y-1 w-full border-y-gray-200" id='navstupid'
+                    <div className="h-fit absolute space-y-1 p-2 w-full border-b" id='mobileNav'
                         style={{
                             background: 'white',
                             transform: openToggle ? 'translateY(0)' : 'translateY(-100%)',
@@ -272,16 +280,15 @@ const Navbar = () => {
                                 <Link
                                     href={link.href}
                                     className={`${isActive ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-gray-900 hover:bg-gray-200"} py-3 flex items-center p-2 rounded-lg group`}
-                                    onClick={() => navstupid()}
+                                    onClick={() => mobileNav()}
                                     key={index}
                                 >
-                                    {isActive ? link.activeIcon : link.icon}
                                     <span className="ml-3 text-sm">{link.label}</span>
                                 </Link>)
                         })}
-                        <div className='border-t-1 border-t-gray-200 cursor-pointer'
+                        <div className='border-t-1 !mt-3  cursor-pointer'
                             onClick={() => signOut()}>
-                            <div className='flex rounded-md p-2 py-3 hover:bg-gray-200 mt-1'>
+                            <div className='flex rounded-md p-2 py-3 hover:bg-gray-200 mt-2'>
                                 <div className='text-gray-900'>
                                     <MdOutlineLogout className='w-5 h-5' />
                                 </div>

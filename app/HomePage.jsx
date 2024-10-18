@@ -4,8 +4,7 @@ import SidebarDrawer from './components/NavbarDrawer'
 import './homepage.css';
 import Footer from './components/Footer';
 import Link from 'next/link';
-import { Button } from '@nextui-org/react';
-import { simpleDMY, simpleDMYHM } from '@/src/util/simpleDateFormatter';
+import { simpleDMY } from '@/src/util/simpleDateFormatter';
 
 const tracks = [
      { name: 'BIT', icon: '💼', description: 'เทคโนโลยีสารสนเทศทางธุรกิจ ' },

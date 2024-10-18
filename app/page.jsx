@@ -12,6 +12,8 @@ async function getNews() {
     }
 }
 
+export const revalidate = 60
+
 const Page = async () => {
     const news = await getNews()
     return (

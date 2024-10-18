@@ -11,7 +11,7 @@ const TeacherList = ({ teachers }) => {
         AOS.init();
     }, []);
     return (
-        <section className="my-16 md:mt-10">
+        <section className="mt-16 md:mt-10">
             <h2 className="text-center font-bold text-3xl text-[#1C75BC] mb-3">คณาจารย์ประจำแทร็ก</h2>
             <div className="flex justify-center items-center">
                 <hr className='w-12 my-3 border-1 border-[#cbcbcb]'></hr>
@@ -23,7 +23,7 @@ const TeacherList = ({ teachers }) => {
                     </div>
                     :
                     <>
-                        <div className="flex flex-wrap justify-center items-center gap-10 w-full my-9 max-2xl:px-0">
+                        <div className="flex flex-wrap justify-center items-center gap-10 w-full my-4 max-2xl:px-0">
                             {teachers.length > 0 && teachers?.map((teacher, index) => (
                                 <div
                                     data-aos="fade-up"

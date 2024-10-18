@@ -12,11 +12,12 @@ export default function Page() {
      const current = useMemo(() => (url.split("/").filter(e => e).slice(-1)), [url])
      const { data: session } = useSession();
      const [requests, setRequests] = useState([]);
-     const [fetching, setFetching] = useState(false);
+     const [fetching, setFetching] = useState(true);
 
-     const getPetitions = useCallback(async () => {
+     const getPetitions = async () => {
           setFetching(true)
           try {
+               // session?.user?.email
                const option = await getOptions(`/api/petitions/users/${session?.user?.email}`, "get")
                const data = (await axios(option)).data.data
                setRequests(data)
@@ -25,7 +26,7 @@ export default function Page() {
           } finally {
                setFetching(false)
           }
-     }, [session?.user?.email])
+     }
 
      useEffect(() => {
           if (session?.user?.email != undefined && requests?.length == 0) {

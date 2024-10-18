@@ -24,14 +24,14 @@ const PetitionList = ({
      }, [data])
 
      useEffect(() => {
-          const newCheckList = petitions.map(pet => ({ id: pet.id, checked: false }));
+          const newCheckList = petitions.map(pet => ({ id: pet.id, checked: false, canDelete: pet.status === 0 }));
           setCheckList(newCheckList);
      }, [petitions]);
 
      const handleSingleCheck = useCallback((id) => {
           setCheckList(prevList =>
                prevList.map(item =>
-                    item.id === id ? { ...item, checked: !item.checked } : item
+                    item.id === id && item.canDelete ? { ...item, checked: !item.checked } : item
                )
           );
      }, [])
@@ -39,11 +39,11 @@ const PetitionList = ({
      const handleSelectAll = useCallback((e) => {
           const isChecked = e.target.checked;
           setCheckList(prevList =>
-               prevList.map(item => ({ ...item, checked: isChecked }))
+               prevList.map(item => item.canDelete ? { ...item, checked: isChecked } : item)
           );
      }, [])
 
-     const isAllChecked = useMemo(() => (checkList.every(item => item.checked) && checkList.length), [checkList])
+     const isAllChecked = useMemo(() => (checkList.every(item => item.canDelete ? item.checked : true) && checkList.some(item => item.canDelete)), [checkList])
      const someChecked = useMemo(() => (checkList.some(item => item.checked)), [checkList])
 
      const handleDeleteSelected = useCallback(async () => {
@@ -59,7 +59,7 @@ const PetitionList = ({
           }).then(async (result) => {
                if (result.isConfirmed) {
                     setPending(true)
-                    const selectedIds = checkList.filter(item => item.checked).map(item => item.id);
+                    const selectedIds = checkList.filter(item => item.checked && item.canDelete).map(item => item.id);
                     await handleDelete(selectedIds);
                     setCheckList([])
                     setPending(false)
@@ -138,6 +138,7 @@ const PetitionList = ({
                                                             checked={checkList.find(item => item.id === petition.id)?.checked || false}
                                                             onChange={() => handleSingleCheck(petition.id)}
                                                             className="text-blue-600 mr-4"
+                                                            disabled={petition.status !== 0}
                                                        />
                                                        <Link
                                                             className="w-full grid grid-cols-8 gap-4 items-center"

@@ -6,6 +6,7 @@ import CoverImage from './CoverImage'
 import TeacherList from './TeacherList'
 import { Empty } from 'antd'
 import TrackSection from './TrackSection'
+import { trackApply } from './apply'
 
 const getTrack = async (track) => {
     try {
@@ -50,7 +51,9 @@ const getCareers = async (track) => {
 }
 
 const Page = async ({ params }) => {
-    const { track } = params
+    const { track: trackParam } = params
+    const track = trackParam.replaceAll("-", " ")
+    const applyList = trackApply[String(trackParam)?.split("-")[0]]
     const [trackData, teachers, subjects, careers] = await Promise.all([getTrack(track), getTeachers(track), getSubjects(track), getCareers(track)])
     return (
         <>
@@ -64,12 +67,29 @@ const Page = async ({ params }) => {
                         <CoverImage track={trackData} />
                         <TrackSection>
                             <BreadCrumb />
-                            <section className=''>
+                            <TeacherList teachers={teachers} />
+
+                            {/* information section */}
+                            <section className='max-w-4xl mx-auto px-4 mt-10'>
                                 {trackData?.information}
                             </section>
-                            <TeacherList teachers={teachers} />
+
+                            {/* รูปอธิบายเพิ่มเติม */}
+
+                            {/* การประยุกต์ใช้งาน */}
+                            <section className='max-w-4xl mx-auto px-4 mt-10'>
+                                <h3 className="text-lg font-semibold mb-2">ตัวอย่างการทำงาน</h3>
+                                <ul className="list-disc pl-5 space-y-1">
+                                    {applyList?.map((apply, index) => (
+                                        <li key={index} className="text-sm text-gray-600">
+                                            {apply}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </section>
+
+                            {/* วิชา อาชีพ */}
                             <SubjectList
-                                track={trackData}
                                 subjects={subjects}
                                 careers={careers} />
                         </TrackSection>

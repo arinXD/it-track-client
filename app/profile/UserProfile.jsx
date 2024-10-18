@@ -77,7 +77,7 @@ const UserProfile = ({ userData, tracks }) => {
      return (
           <div className='w-full h-full flex flex-col gap-4'>
                <div className='w-full h-full grid grid-cols-2 gap-4'>
-                    <Card className={`w-full h-full col-span-1`}>
+                    <div className={`bg-white p-[24px] border border-[#f0f0f0] rounded-[8px] w-full h-full col-span-2 lg:col-span-1`}>
                          <div className='mb-4 flex gap-4'>
                               <Image
                                    className='rounded-[5px] object-cover'
@@ -97,7 +97,7 @@ const UserProfile = ({ userData, tracks }) => {
                          </div>
                          <div className="flex gap-6">
                               <div className='flex flex-col gap-4 w-full'>
-                                   <div className='flex gap-2 items-center justify-between'>
+                                   <div className='flex flex-col md:flex-row gap-2 md:items-center md:justify-between'>
                                         <div className='flex gap-2 items-center'>
                                              <Tooltip color="foreground" content="ลงชื่อเข้าใช้โดย" className='rounded-[5px]'>
                                                   <Chip size="sm" className={`${insertColor.color} border-1 border-[#46bcaa] cursor-pointer rounded-[5px]`}>
@@ -110,7 +110,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                   </Chip>
                                              </Tooltip>
                                         </div>
-                                        <p className='text-right text-xs text-default-500'>เข้าสู่ระบบ {dmy(createdAt)}</p>
+                                        <p className='md:text-right text-xs text-default-500'>เข้าสู่ระบบ {dmy(createdAt)}</p>
                                    </div>
                                    <div className={`flex ${Student ? "flex-col" : "flex-row"}  gap-4`}>
                                         <Input
@@ -142,10 +142,10 @@ const UserProfile = ({ userData, tracks }) => {
                                    </div>
                               </div>
                          </div>
-                    </Card>
+                    </div>
                     {Admin && (
-                         <form onSubmit={handleEdit}>
-                              <Card className='w-full h-full !flex flex-col col-span-1 justify-between'>
+                         <form className='col-span-2 lg:col-span-1' onSubmit={handleEdit}>
+                              <div className='bg-white p-[24px] border border-[#f0f0f0] rounded-[8px] w-full h-full !flex flex-col justify-between'>
                                    <div className='mb-4 flex gap-4'>
                                         <MdOutlinePersonOutline className={`text-5xl border-[${insertColor.onlyColor}] text-[${insertColor.onlyColor}] ${insertColor.bg} pointer-events-none flex-shrink-0`} />
                                         <div>
@@ -162,7 +162,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                   inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                   input: "text-[1em]"
                                              }}
-                                             className='w-full text-sm col-span-1'
+                                             className='w-full text-sm col-span-5 md:col-span-1'
                                              variant="bordered"
                                              type="text"
                                              label="คำนำหน้า"
@@ -176,7 +176,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                   inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                   input: "text-[1em]"
                                              }}
-                                             className='w-full text-sm col-span-2'
+                                             className='w-full text-sm col-span-5 md:col-span-2'
                                              variant="bordered"
                                              type="text"
                                              name='name'
@@ -190,7 +190,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                   inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                   input: "text-[1em]"
                                              }}
-                                             className='w-full text-sm col-span-2'
+                                             className='w-full text-sm col-span-5 md:col-span-2'
                                              variant="bordered"
                                              type="text"
                                              label="นามสกุล"
@@ -211,12 +211,12 @@ const UserProfile = ({ userData, tracks }) => {
                                              บันทึก
                                         </Button>
                                    </div>
-                              </Card>
+                              </div>
                          </form>
                     )}
                     {Teacher && (
-                         <form onSubmit={handleEdit}>
-                              <div className='bg-white p-[24px] border border-[#f0f0f0] rounded-[8px] w-full h-full col-span-1 flex flex-col justify-between'>
+                         <form className='col-span-2 lg:col-span-1' onSubmit={handleEdit}>
+                              <div className='bg-white p-[24px] border border-[#f0f0f0] rounded-[8px] w-full h-full col-span-2 md:col-span-1 flex flex-col justify-between'>
                                    <div className='flex flex-col'>
                                         <div className='mb-4 flex gap-4'>
                                              <MdOutlinePersonOutline className={`text-5xl border-[${insertColor.onlyColor}] text-[${insertColor.onlyColor}] ${insertColor.bg} pointer-events-none flex-shrink-0`} />
@@ -234,7 +234,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                        inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                        input: "text-[1em]"
                                                   }}
-                                                  className='w-full text-sm col-span-1'
+                                                  className='w-full text-sm col-span-5 lg:col-span-1'
                                                   variant="bordered"
                                                   type="text"
                                                   label="คำนำหน้า"
@@ -248,7 +248,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                        inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                        input: "text-[1em]"
                                                   }}
-                                                  className='w-full text-sm col-span-2'
+                                                  className='w-full text-sm col-span-5 lg:col-span-2'
                                                   variant="bordered"
                                                   type="text"
                                                   name='name'
@@ -262,7 +262,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                        inputWrapper: ["rounded-md", "p-2", "border-1"],
                                                        input: "text-[1em]"
                                                   }}
-                                                  className='w-full text-sm col-span-2'
+                                                  className='w-full text-sm col-span-5 lg:col-span-2'
                                                   variant="bordered"
                                                   type="text"
                                                   label="นามสกุล"
@@ -282,7 +282,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                        placeholder="เลือกแทร็ก"
                                                        label="แทร็ก"
                                                        labelPlacement="outside"
-                                                       className="col-span-3 !text-black"
+                                                       className="col-span-5 !text-black"
                                                        selectedKeys={[teacherTrack]}
                                                        onChange={(e) => setTeacherTrack(e.target.value || "")}
                                                   >
@@ -311,7 +311,7 @@ const UserProfile = ({ userData, tracks }) => {
                          </form>
                     )}
                     {Student && (
-                         <Card className='w-full col-span-1'>
+                         <div className='bg-white p-[24px] border border-[#f0f0f0] rounded-[8px] w-full h-full col-span-2 lg:col-span-1'>
                               <div className='mb-4 flex gap-4'>
                                    <MdOutlinePersonOutline className={`text-5xl border-[${insertColor.onlyColor}] text-[${insertColor.onlyColor}] ${insertColor.bg} pointer-events-none flex-shrink-0`} />
                                    <div>
@@ -326,7 +326,7 @@ const UserProfile = ({ userData, tracks }) => {
                                              inputWrapper: ["rounded-none", "p-2"],
                                              input: "text-[1em]"
                                         }}
-                                        className='w-full text-sm'
+                                        className='w-full text-sm max-lg:order-1 col-span-2 lg:col-span-1'
                                         type="text"
                                         label="รหัสนักศึกษา"
                                         value={Student.stu_id}
@@ -339,7 +339,7 @@ const UserProfile = ({ userData, tracks }) => {
                                              inputWrapper: ["rounded-none", "p-2"],
                                              input: "text-[1em]"
                                         }}
-                                        className='w-full text-sm'
+                                        className='w-full text-sm max-lg:order-4 col-span-1 md:col-span-2 lg:col-span-1'
                                         type="text"
                                         label="GPA"
                                         value={floorGpa(Student.gpa)}
@@ -352,7 +352,7 @@ const UserProfile = ({ userData, tracks }) => {
                                              inputWrapper: ["rounded-none", "p-2"],
                                              input: "text-[1em]"
                                         }}
-                                        className='w-full text-sm'
+                                        className='w-full text-sm max-lg:order-2 col-span-2 lg:col-span-1'
                                         type="text"
                                         label="ชื่อ"
                                         value={Student.first_name}
@@ -365,7 +365,7 @@ const UserProfile = ({ userData, tracks }) => {
                                              inputWrapper: ["rounded-none", "p-2"],
                                              input: "text-[1em]"
                                         }}
-                                        className='w-full text-sm'
+                                        className='w-full text-sm max-lg:order-3 col-span-2 lg:col-span-1'
                                         type="text"
                                         label="สกุล"
                                         value={Student.last_name}
@@ -378,7 +378,7 @@ const UserProfile = ({ userData, tracks }) => {
                                              inputWrapper: ["rounded-none", "p-2"],
                                              input: "text-[1em]"
                                         }}
-                                        className='w-full text-sm'
+                                        className='w-full text-sm max-lg:order-5 col-span-1 md:col-span-2 lg:col-span-1'
                                         type="text"
                                         label="หลักสูตร"
                                         value={Student.Program.title_th}
@@ -393,7 +393,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                   inputWrapper: ["rounded-none", "p-2"],
                                                   input: "text-[1em]"
                                              }}
-                                             className='w-full text-sm'
+                                             className='w-full text-sm max-lg:order-6 col-span-2 lg:col-span-1'
                                              type="text"
                                              label="แทร็ก"
                                              value={Student.track || "ยังไม่มีแทร็ก"}
@@ -409,7 +409,7 @@ const UserProfile = ({ userData, tracks }) => {
                                                   inputWrapper: ["rounded-none", "p-2"],
                                                   input: "text-[1em]"
                                              }}
-                                             className='w-full text-sm col-span-2'
+                                             className='w-full text-sm max-lg:order-7 col-span-2'
                                              type="text"
                                              label="อาจารย์ที่ปรึกษา"
                                              value={`${Student.Advisor.prefix || ""}${Student.Advisor.name || ""}${Student.Advisor.surname ? " " + Student.Advisor.surname : ""}`}
@@ -418,12 +418,12 @@ const UserProfile = ({ userData, tracks }) => {
                                         />
                                    }
                               </div>
-                         </Card>
+                         </div>
                     )}
 
                </div>
                {Student && (
-                    <Card>
+                    <div className='bg-white p-[24px] border border-[#f0f0f0] rounded-[8px] w-full h-full'>
                          <div className='mb-4 flex gap-4'>
                               <CiStar className={`text-5xl text-[#ffcf52] bg-[#fff5dc] pointer-events-none flex-shrink-0`} />
                               <div>
@@ -432,10 +432,11 @@ const UserProfile = ({ userData, tracks }) => {
                               </div>
                          </div>
                          <Tabs
+                              className='overflow-auto'
                               defaultActiveKey="1"
                               items={enrollItems}
                          />
-                    </Card>
+                    </div>
                )}
           </div>
 

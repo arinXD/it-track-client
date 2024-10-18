@@ -29,7 +29,7 @@ const BreadCrumb = () => {
         "verify-selection": "อนุมัติจบการศึกษา",
         "detail": "รายละเอียด",
         "tracks": "แทร็ก",
-        "web%20and%20mobile": "Mobile and Web Application Development",
+        "web-and-mobile": "Mobile and Web Application Development",
         "network": "Network Systems, Information Technology Security, and Internet of Things (IoT)",
         "bit": "Business Information Technology",
         "insert-track": "เพิ่มแทร็ก",

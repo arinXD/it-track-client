@@ -12,7 +12,7 @@ export default function Page() {
      const current = useMemo(() => (url.split("/").filter(e => e).slice(-1)), [url])
      const { data: session } = useSession();
      const [traches, setTraches] = useState([]);
-     const [fetching, setFetching] = useState(false);
+     const [fetching, setFetching] = useState(true);
 
      const getTrashPetitions = useCallback(async () => {
           setFetching(true)
