@@ -8,7 +8,7 @@ const layout = ({ children }) => {
                </header>
                <Sidebar />
                <ContentWrap>
-                    <BreadCrumb />
+                    {/* <BreadCrumb /> */}
                     {children}
                </ContentWrap>
           </>

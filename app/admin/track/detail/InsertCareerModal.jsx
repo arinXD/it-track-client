@@ -57,6 +57,7 @@ const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => 
 
      const handleSubmit = useCallback(async (e) => {
           e.preventDefault()
+          setInserting(true)
           const formData = new FormData(e.target);
           const formDataObject = Object.fromEntries(formData.entries());
           const URL = "/api/careers"
@@ -68,7 +69,6 @@ const InsertCareerModal = ({ isOpen, onClose, src = "", track, getCareers }) => 
 
           if (uploadImageFile instanceof Blob || uploadImageFile instanceof File) {
                try {
-                    setInserting(true)
                     await axios.post(`${hostname}${URL}`, formDataObject, {
                          headers,
                          onUploadProgress: (progressObj) => {

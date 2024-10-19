@@ -106,8 +106,8 @@ const CareerTable = ({ track }) => {
                     return (
                          <div className="w-full flex justify-center p-2">
                               <Image
-                                   width={160}
-                                   height={160}
+                                   width={100}
+                                   height={100}
                                    src={cellValue}
                                    onError={({ currentTarget }) => {
                                         currentTarget.onerror = null

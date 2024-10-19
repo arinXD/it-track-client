@@ -233,7 +233,7 @@ const TeacherTrack = ({ track }) => {
                                                     height={80}
                                                     src={item?.TeacherTrack?.image || ""}
                                                     fallback="/image/error_image.png"
-                                                    className="rounded-full border border-gray-200"
+                                                    className="rounded-md object-cover "
                                                     alt={item.name} />
                                             </div>
                                         </TableCell>

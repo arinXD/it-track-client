@@ -1,7 +1,7 @@
 "use client"
 import React, { useCallback, useEffect, useState } from 'react'
 import { fetchData, fetchDataObj } from '../../action'
-import { BreadCrumb, ContentWrap, Navbar, Sidebar } from '@/app/components'
+import { BreadCrumb } from '@/app/components'
 import Image from 'next/image'
 import { dmy } from '@/src/util/dateFormater'
 import { Button, useDisclosure } from '@nextui-org/react'
@@ -205,6 +205,8 @@ export default function Page({ params }) {
                 delIsOpen={isOpenDeleteEnroll}
                 delOnClose={onCloseDeleteEnroll}
                 enroll={editEnroll} />
+
+            <BreadCrumb />
 
             <div>
                 {

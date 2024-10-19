@@ -48,6 +48,7 @@ const TrackForm = ({ track }) => {
     }, [trackData]);
 
     const handleSubmit = useCallback(async (e) => {
+        setInserting(true)
         e.preventDefault()
         const formData = new FormData(e.target);
         const formDataObject = Object.fromEntries(formData.entries());
@@ -59,7 +60,6 @@ const TrackForm = ({ track }) => {
         }
 
         try {
-            setInserting(true)
             await axios(option)
 
             if (trackImageFile instanceof Blob || trackImageFile instanceof File) {
@@ -112,9 +112,18 @@ const TrackForm = ({ track }) => {
                         {trackData && Object.keys(trackData).length !== 0 ?
                             <>
                                 <div className='flex flex-col gap-6'>
-                                    <div className='w-full flex flex-row gap-6'>
+                                    <div className='w-full flex flex-col-reverse md:flex-row gap-6'>
                                         <UploadCover
-                                            containerWidth="w-[100%]"
+                                            containerWidth="w-full md:w-[20%]"
+                                            src={trackData?.img}
+                                            label="ภาพแทร็ก"
+                                            displayLabel={false}
+                                            width="w-full"
+                                            setImageFile={setTrackImageFile}
+                                            uploadProgress={uploadProgressImg}
+                                        />
+                                        <UploadCover
+                                            containerWidth="w-full md:w-[80%]"
                                             src={trackData?.coverImg}
                                             label="ภาพหน้าปก"
                                             displayLabel={false}
@@ -122,22 +131,12 @@ const TrackForm = ({ track }) => {
                                             setImageFile={setCoverImageFile}
                                             uploadProgress={uploadProgressCover}
                                         />
+
                                     </div>
-                                    <div className='flex flex-col sm:flex-row gap-6'>
-                                        <div className='flex justify-center w-full md:w-1/2'>
-                                            <UploadCover
-                                                containerWidth="w-[100%]"
-                                                src={trackData?.img}
-                                                label="ภาพแทร็ก"
-                                                displayLabel={false}
-                                                width="w-full"
-                                                setImageFile={setTrackImageFile}
-                                                uploadProgress={uploadProgressImg}
-                                            />
-                                        </div>
+                                    <div className='flex flex-col justify-center sm:flex-row gap-6'>
                                         <form
                                             onSubmit={handleSubmit}
-                                            className='w-full md:w-[50%] flex flex-col'>
+                                            className='w-full grid grid-cols-2 gap-4'>
                                             <Input
                                                 name='track'
                                                 type="text"
@@ -148,7 +147,7 @@ const TrackForm = ({ track }) => {
                                                 value={trackData.track}
                                                 isReadOnly
                                                 classNames={inputClass}
-                                                className='mb-4'
+                                                className='col-span-2'
                                                 isRequired
                                             />
                                             <Input
@@ -161,7 +160,7 @@ const TrackForm = ({ track }) => {
                                                 value={titleTh}
                                                 onValueChange={setTitleTh}
                                                 classNames={inputClass}
-                                                className='mb-4'
+                                                className='col-span-2 md:col-span-1'
                                                 isRequired
                                             />
                                             <Input
@@ -174,7 +173,7 @@ const TrackForm = ({ track }) => {
                                                 value={titleEn}
                                                 onValueChange={setTitleEn}
                                                 classNames={inputClass}
-                                                className='mb-4'
+                                                className='col-span-2 md:col-span-1'
                                                 isRequired
                                             />
                                             <Textarea
@@ -185,7 +184,7 @@ const TrackForm = ({ track }) => {
                                                 value={desc}
                                                 onValueChange={setDesc}
                                                 classNames={inputClass}
-                                                className='mb-4'
+                                                className='col-span-2'
                                             />
                                             <Textarea
                                                 name='information'
@@ -195,24 +194,25 @@ const TrackForm = ({ track }) => {
                                                 value={information}
                                                 onValueChange={setInformation}
                                                 classNames={inputClass}
-                                                className='mb-4'
+                                                className='col-span-2'
                                             />
-                                            <Button
-                                                type='submit'
-                                                radius='sm'
-                                                color='primary'
-                                                className='bg-primary-500'
-                                                isDisabled={inserting}
-                                                isLoading={inserting}
-                                            >
-
-                                                {
-                                                    inserting ?
-                                                        "กำลังบันทึก..."
-                                                        :
-                                                        "บันทึก"
-                                                }
-                                            </Button>
+                                            <div className='col-span-2 flex justify-end'>
+                                                <Button
+                                                    type='submit'
+                                                    radius='sm'
+                                                    color='primary'
+                                                    className='bg-primary-500 rounded-[5px] mt-4'
+                                                    isDisabled={inserting}
+                                                    isLoading={inserting}
+                                                >
+                                                    {
+                                                        inserting ?
+                                                            "กำลังบันทึก..."
+                                                            :
+                                                            "บันทึก"
+                                                    }
+                                                </Button>
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
