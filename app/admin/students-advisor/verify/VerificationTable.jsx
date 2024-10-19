@@ -2139,35 +2139,7 @@ const VerificationTable = ({ stdID }) => {
                                              );
                                         })}
 
-                                        {status?.status === 0 && categoryverifyGrade && categoryverifyGrade.length > 0 ? (
-                                             // Case 1: status is 0 and categoryverifyGrade has items
-                                             categoryverify.map((categorie, catIndex) => (
-                                                  <InsertSubject
-                                                       key={catIndex}
-                                                       catIndex={catIndex}
-                                                       categorie={categorie}
-                                                       category_id={categorie.category_id}
-                                                       subjects={subjects}
-                                                       highestIndex={highestIndex}
-                                                       enrollments={enrollments}
-                                                       onVerifySubjChange={(verifySubj) => handleVerifySubjChange(catIndex, categorie.id, verifySubj, categorie.category_title)}
-                                                  />
-                                             ))
-                                        ) : status?.status === 0 && categoryverify && categoryverify.length > 0 ? (
-                                             // Case 2: status is 0 but categoryverifyGrade is not available, show InsertSubject
-                                             categoryverify.map((categorie, catIndex) => (
-                                                  <InsertSubject
-                                                       key={catIndex}
-                                                       catIndex={catIndex}
-                                                       categorie={categorie}
-                                                       category_id={categorie.category_id}
-                                                       subjects={subjects}
-                                                       highestIndex={highestIndex}
-                                                       enrollments={enrollments}
-                                                       onVerifySubjChange={(verifySubj) => handleVerifySubjChange(catIndex, categorie.id, verifySubj, categorie.category_title)}
-                                                  />
-                                             ))
-                                        ) : categoryverifyGrade && categoryverifyGrade.length > 0 ? (
+                                        {categoryverifyGrade && categoryverifyGrade.length > 0 && (
                                              // Case 3: default case when status is not 0 but categoryverifyGrade is available
                                              categoryverifyGrade.map((categorie, catIndex) => (
                                                   <CategoryGrade
@@ -2175,19 +2147,6 @@ const VerificationTable = ({ stdID }) => {
                                                        catIndex={catIndex}
                                                        categorie={categorie}
                                                        highestIndex={highestIndex}
-                                                  />
-                                             ))
-                                        ) : (
-                                             categoryverify.map((categorie, catIndex) => (
-                                                  <InsertSubject
-                                                       key={catIndex}
-                                                       catIndex={catIndex}
-                                                       categorie={categorie}
-                                                       category_id={categorie.category_id}
-                                                       subjects={subjects}
-                                                       highestIndex={highestIndex}
-                                                       enrollments={enrollments}
-                                                       onVerifySubjChange={(verifySubj) => handleVerifySubjChange(catIndex, categorie.id, verifySubj, categorie.category_title)}
                                                   />
                                              ))
                                         )}

@@ -67,14 +67,6 @@ export default function Page({ params }) {
 
     const [editEnroll, setEditEnroll] = useState({});
 
-    useEffect(() => {
-        if (fetching == false && Object.keys(student).length == 0) {
-            setTimeout(() => {
-                window.location.href = "/admin/students"
-            }, 3000)
-        }
-    }, [fetching, student])
-
     async function getStudentData() {
         const student = await fetchDataObj(`/api/students/${stu_id}`)
         setStudent(student)

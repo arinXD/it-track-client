@@ -309,7 +309,7 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                 </motion.div>
 
                                                 <Link
-                                                    href={`/tracks/${trackResult?.track?.toLowerCase()}`}
+                                                    href={`/tracks/${String(trackResult?.track)?.toLowerCase()?.replaceAll(" ","-")}`}
                                                     className="inline-block bg-blue-500 text-white font-semibold px-6 py-3 rounded-full hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105"
                                                 >
                                                     รายละเอียดแทร็ก

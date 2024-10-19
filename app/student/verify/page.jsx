@@ -2407,14 +2407,14 @@ const Page = () => {
             </>
         );
     }
-
+    const toggleSideBar = useToggleSideBarStore((state) => state.toggle)
     return (
         <>
             <header>
                 <Navbar />
             </header>
             <Sidebar />
-            <div className={`p-4 md:p-8 md:ml-[240px]`}>
+            <div className={`p-4 md:p-8 ${toggleSideBar ? 'md:ml-[240px]' : 'md:ml-[77px]'}`}>
                 {contextHolder}
                 {loading ?
                     <div className='w-full flex justify-center h-[70vh]'>

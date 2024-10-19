@@ -2,7 +2,7 @@
 import { tableClass } from '@/src/util/ComponentClass'
 import { useCallback, useEffect, useState } from "react";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
-import { DeleteIcon, VerticalDotsIcon } from '@/app/components/icons';
+import { DeleteIcon, EditIcon2, VerticalDotsIcon } from '@/app/components/icons';
 import { calGrade, isNumber } from '@/src/util/grade';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import axios from 'axios';
@@ -78,15 +78,16 @@ const EnrollmentsTable = ({ year, enrollments, callBack, showToastMessage,
 
     return (
         <div>
-            <div className='bg-gray-100 border-gray-200 border-1 flex justify-between items-center p-3 mb-2 rounded-md'>
+            <div className='bg-gray-100 border-gray-200 border-1 flex justify-between items-center p-3 mb-2 rounded-[10px]'>
                 <p>ปีการศึกษา {year}</p>
                 <div className={`${disableDeleteBtn ? "cursor-no-drop" : ""}`}>
                     <Button
                         isDisabled={disableDeleteBtn}
                         type='button'
-                        className={""}
+                        className="bg-red-400"
                         radius='sm'
-                        color="default"
+                        size='sm'
+                        color="danger"
                         variant='solid'
                         startContent={<DeleteIcon className="w-4 h-4" />}
                         onPress={() => deletedEnroll(selectEnroll)}>
@@ -94,67 +95,68 @@ const EnrollmentsTable = ({ year, enrollments, callBack, showToastMessage,
                     </Button>
                 </div>
             </div>
-            <Table
-                isCompact
-                removeWrapper
-                aria-label="รายวิชาที่ลงทะเบียน"
-                checkboxesProps={{
-                    classNames: {
-                        wrapper: "after:bg-blue-500 after:text-background text-background",
-                    },
-                }}
-                classNames={tableClass}
-                selectionMode="multiple"
-                selectedKeys={selectedKeysByYear}
-                onSelectionChange={setSelectedKeysByYear}
-            >
-                <TableHeader>
-                    <TableColumn className='hidden' key={"id"}>ID</TableColumn>
-                    <TableColumn>รหัสวิชา</TableColumn>
-                    <TableColumn>ชื่อวิชา</TableColumn>
-                    <TableColumn>หน่วยกิต</TableColumn>
-                    <TableColumn>เกรด</TableColumn>
-                    <TableColumn>เกรด</TableColumn>
-                    <TableColumn align="center">Action</TableColumn>
-                </TableHeader>
-                <TableBody emptyContent={"ไม่มีรายวิชาที่ลงทะเบียน"} items={enrollments}>
-                    {(item) => (
-                        <TableRow key={item.id}>
-                            <TableCell className='hidden'>{item?.id}</TableCell>
-                            <TableCell>{item?.Subject?.subject_code}</TableCell>
-                            <TableCell>{item?.Subject?.title_en} <br /> {item?.Subject?.title_th}</TableCell>
-                            <TableCell>{item?.Subject?.credit}</TableCell>
-                            <TableCell>{item?.grade || "-"}</TableCell>
-                            <TableCell>{calGrade(item?.grade) == null ? "-" : isNumber(calGrade(item?.grade)) ? String(calGrade(item?.grade)) : calGrade(item?.grade)}</TableCell>
-                            <TableCell>
-                                <div className="relative flex justify-center items-center gap-2">
-                                    <Dropdown>
-                                        <DropdownTrigger>
-                                            <Button isIconOnly size="sm" variant="light">
-                                                <VerticalDotsIcon className="text-default-300" />
-                                            </Button>
-                                        </DropdownTrigger>
-                                        <DropdownMenu
-                                            aria-label="Action event enroll"
-                                            onAction={(key) => {
-                                                if (key == "edit") editEnrollment(item);
-                                                else deleteEnroll(item)
-                                            }}
-                                        >
-                                            <DropdownItem key={"edit"}>
-                                                แก้ไข
-                                            </DropdownItem>
-                                            <DropdownItem key="delete" className="text-danger" color="danger">
-                                                ลบ
-                                            </DropdownItem>
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+            <div className='overflow-auto'>
+                <Table
+                    isCompact
+                    removeWrapper
+                    aria-label="รายวิชาที่ลงทะเบียน"
+                    checkboxesProps={{
+                        classNames: {
+                            wrapper: "after:bg-blue-500 after:text-background text-background",
+                        },
+                    }}
+                    selectionMode="multiple"
+                    selectedKeys={selectedKeysByYear}
+                    onSelectionChange={setSelectedKeysByYear}
+                >
+                    <TableHeader>
+                        <TableColumn className='hidden' key={"id"}>ID</TableColumn>
+                        <TableColumn>รหัสวิชา</TableColumn>
+                        <TableColumn>ชื่อวิชา</TableColumn>
+                        <TableColumn>หน่วยกิต</TableColumn>
+                        <TableColumn>เกรด</TableColumn>
+                        <TableColumn>เกรด</TableColumn>
+                        <TableColumn className='text-center'>Action</TableColumn>
+                    </TableHeader>
+                    <TableBody emptyContent={"ไม่มีรายวิชาที่ลงทะเบียน"} items={enrollments}>
+                        {(item) => (
+                            <TableRow key={item.id}>
+                                <TableCell className='hidden'>{item?.id}</TableCell>
+                                <TableCell>{item?.Subject?.subject_code}</TableCell>
+                                <TableCell>{item?.Subject?.title_en} <br /> {item?.Subject?.title_th}</TableCell>
+                                <TableCell>{item?.Subject?.credit}</TableCell>
+                                <TableCell>{item?.grade || "-"}</TableCell>
+                                <TableCell>{calGrade(item?.grade) == null ? "-" : isNumber(calGrade(item?.grade)) ? String(calGrade(item?.grade)) : calGrade(item?.grade)}</TableCell>
+                                <TableCell>
+                                    <div className="relative flex justify-center items-center gap-2">
+                                        <Dropdown>
+                                            <DropdownTrigger>
+                                                <Button isIconOnly size="sm" variant="light">
+                                                    <VerticalDotsIcon className="text-default-300" />
+                                                </Button>
+                                            </DropdownTrigger>
+                                            <DropdownMenu
+                                                aria-label="Action event enroll"
+                                                onAction={(key) => {
+                                                    if (key == "edit") editEnrollment(item);
+                                                    else deleteEnroll(item)
+                                                }}
+                                            >
+                                                <DropdownItem key={"edit"}>
+                                                    แก้ไข
+                                                </DropdownItem>
+                                                <DropdownItem key="delete" className="text-danger" color="danger">
+                                                    ลบ
+                                                </DropdownItem>
+                                            </DropdownMenu>
+                                        </Dropdown>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     )
 }
