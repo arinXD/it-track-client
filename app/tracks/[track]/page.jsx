@@ -4,7 +4,7 @@ import axios from 'axios'
 import SubjectList from './SubjectList'
 import CoverImage from './CoverImage'
 import TeacherList from './TeacherList'
-import { Empty } from 'antd'
+import { Empty, Image } from 'antd'
 import TrackSection from './TrackSection'
 import { trackApply } from './apply'
 
@@ -75,6 +75,19 @@ const Page = async ({ params }) => {
                             </section>
 
                             {/* รูปอธิบายเพิ่มเติม */}
+                            <section className='max-w-4xl mx-auto px-4 mt-10 gap-1 grid grid-cols-6'>
+                                {[1, 2, 3, 4, 5, 6].map(number => (
+                                    <div
+                                        key={`image-${number}`}
+                                        className={`${number == 1 ? "col-span-4" : "col-span-2"} border border-black h-[200px]`}>
+                                        <Image
+                                            src={`/image/tracks/${String(trackParam)?.split("-")[0]}/${number}.png`}
+                                            alt={`image-${String(trackParam)?.split("-")[0]}-${number}`}
+                                            className='w-full h-full object-cover'
+                                        />
+                                    </div>
+                                ))}
+                            </section>
 
                             {/* การประยุกต์ใช้งาน */}
                             <section className='max-w-4xl mx-auto px-4 mt-10'>
