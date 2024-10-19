@@ -43,14 +43,14 @@ const Page = async () => {
                     <h1 className='text-2xl font-bold mb-6'>ข้อมูลส่วนตัวผิดพลาด แจ้งปัญหาได้ที่</h1>
                     <div className='space-y-4'>
                          <ContactInfo
-                              name="Arin Chawut"
-                              facebookUrl="https://www.facebook.com/Arinchawut"
-                              email="arinchawut.k@kkumail.com"
+                              name="เจ้าหน้าที่ 1"
+                              facebookUrl="https://www.facebook.com/admin1"
+                              email="admin1k@kkumail.com"
                          />
                          <ContactInfo
-                              name="Phubes Komutiban"
-                              facebookUrl="https://www.facebook.com/kiok127523"
-                              email="pubes.k@kkumail.com"
+                              name="เจ้าหน้าที่ 2"
+                              facebookUrl="https://www.facebook.com/admin2"
+                              email="admin2@kkumail.com"
                          />
                     </div>
                </ContentWrap>

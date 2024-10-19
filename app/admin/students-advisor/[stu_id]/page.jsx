@@ -4,8 +4,8 @@ import { fetchData, fetchDataObj } from '../../action'
 import { BreadCrumb } from '@/app/components'
 import Image from 'next/image'
 import { dmy } from '@/src/util/dateFormater'
-import { Button, useDisclosure } from '@nextui-org/react'
-import { DeleteIcon2, EditIcon2, PlusIcon } from '@/app/components/icons'
+import { Button, Input, useDisclosure } from '@nextui-org/react'
+import { DeleteIcon, DeleteIcon2, EditIcon2, PlusIcon } from '@/app/components/icons'
 import { Spinner } from "@nextui-org/react";
 import Link from 'next/link'
 import EditModal from './EditModal'
@@ -18,6 +18,11 @@ import InsertEnrollmentForm from './InsertEnrollmentForm'
 import EditEnrollmentForm from './EditEnrollmentForm'
 import DeleteEnrollModal from './DeleteEnrollModal'
 import DeleteModal from '../DeleteModal'
+import { useSession } from 'next-auth/react'
+import { getCurrentUserEmail } from '@/src/util/userData'
+import { insertColor } from '@/src/util/ComponentClass'
+import { MdOutlinePersonOutline } from 'react-icons/md'
+import { CiStar } from 'react-icons/ci'
 
 export default function Page({ params }) {
 
@@ -64,19 +69,11 @@ export default function Page({ params }) {
     const [programs, setPrograms] = useState([])
     const [status, setStatus] = useState([])
     const [updateData, setUpdateData] = useState({})
-
     const [editEnroll, setEditEnroll] = useState({});
 
-    useEffect(() => {
-        if (fetching == false && Object.keys(student).length == 0) {
-            setTimeout(() => {
-                window.location.href = "/admin/students"
-            }, 1500)
-        }
-    }, [fetching, student])
-
     async function getStudentData() {
-        const student = await fetchDataObj(`/api/students/${stu_id}`)
+        const email = await getCurrentUserEmail()
+        const student = await fetchDataObj(`/api/advisors/${email}/students/${stu_id}`)
         setStudent(student)
         if (student?.Enrollments?.length) {
             let enrollments = student?.Enrollments
@@ -210,42 +207,57 @@ export default function Page({ params }) {
 
             <div>
                 {
-                    fetching ?
+                    false ?
                         <div className='w-full flex justify-center h-[70vh]'>
                             <Spinner label="กำลังโหลด..." color="primary" />
                         </div>
                         :
                         Object.keys(student).length ?
                             <>
-                                <div className='bg-gray-100 border-gray-200 border-1 p-3 flex flex-row justify-between items-center rounded-md'>
-                                    <h1>ข้อมูลของนักศึกษา</h1>
-                                    <div className='flex flex-2 gap-3'>
+                                <div className='border p-4 rounded-tr-[10px] rounded-tl-[10px] flex flex-col justify-between items-start gap-4 md:gap-0 md:flex-row md:items-center'>
+                                    <div className='flex gap-4'>
+                                        <MdOutlinePersonOutline className={`text-5xl border-[${insertColor.onlyColor}] text-[${insertColor.onlyColor}] ${insertColor.bg} pointer-events-none flex-shrink-0`} />
+                                        <div>
+                                            <p className='font-bold text-base'>Student Information</p>
+                                            <p className='text-sm text-default-600'>ข้อมูลนักศึกษา</p>
+                                        </div>
+                                    </div>
+                                    <div className='flex flex-col md:flex-row gap-3'>
                                         <Button
                                             type='button'
-                                            className=''
+                                            className={`${insertColor.color} border border-[${insertColor.onlyColor}]`}
                                             radius='sm'
                                             size='sm'
-                                            color="default"
-                                            variant='solid'
-                                            startContent={<EditIcon2 className={"w-5 h-5"} />}
-                                            onPress={handleEdit}>
-                                            แก้ไขรายชื่อนักศึกษา
+                                            startContent={<PlusIcon width={4} height={4} />}
+                                            onPress={onOpenEnroll}>
+                                            เพิ่มรายวิชาที่ลงทะเบียน
                                         </Button>
                                         <Button
                                             type='button'
-                                            className=''
+                                            className='text-yellow-700 border border-yellow-700'
                                             radius='sm'
                                             size='sm'
-                                            color="default"
-                                            startContent={<DeleteIcon2 className={"w-5 h-5"} />}
+                                            color='warning'
+                                            variant='solid'
+                                            startContent={<EditIcon2 className={"w-5 h-5 text-yellow-700"} />}
+                                            onPress={handleEdit}>
+                                            แก้ไขข้อมูลนักศึกษา
+                                        </Button>
+                                        <Button
+                                            type='button'
+                                            className='bg-red-400'
+                                            radius='sm'
+                                            size='sm'
+                                            color="danger"
+                                            startContent={<DeleteIcon className={"w-5 h-5"} />}
                                             variant='solid'
                                             onPress={delOnOpen}>
                                             ลบรายชื่อนักศึกษา
                                         </Button>
                                     </div>
                                 </div>
-                                <div className='flex gap-8 py-6'>
-                                    <div className="w-[30%] flex flex-col justify-center items-center">
+                                <div className='bg-white flex flex-col gap-8 p-6 border border-t-0 rounded-br-[10px] rounded-bl-[10px] md:flex-row'>
+                                    <div className="w-full md:w-[30%] flex flex-col justify-center items-center">
                                         <Image
                                             className='rounded-lg'
                                             priority={true}
@@ -259,43 +271,126 @@ export default function Page({ params }) {
                                             }}
                                         />
                                     </div>
-                                    <div className='w-[70%] flex flex-col space-y-2'>
-                                        <h1 className='text-lg'>{student.first_name} {student.last_name}</h1>
-                                        <div className='space-y-1'>
-                                            <p>
-                                                อีเมล:
-                                                <Link className='text-blue-500 ms-2' target='_blank' href={`https://mail.google.com/mail/?view=cm&fs=1&to=${student.email}&authuser=1`} >
-                                                    {student.email}
-                                                </Link>
-                                            </p>
-                                            <p>นักศึกษาหลักสูตร {student?.Program?.title_th} {student?.courses_type}</p>
-                                            <p>สถานะภาพ: <span className='ms-1'>{student?.StudentStatus?.description} ({student?.StudentStatus?.id})</span></p>
-                                            <p>
-                                                ปีการศึกษา: <span className='ms-1'>{student?.acadyear} </span>
-                                                {student?.acadyear_desc && <span className='text-xs'>({student?.acadyear_desc})</span>}
-                                            </p>
-                                            <p>GPA: <span className='ms-1'>{gpa}</span></p>
+                                    <div className='w-full md:w-[70%] flex flex-col space-y-2'>
+                                        <div className='grid grid-cols-2 gap-4'>
+                                            <Input
+                                                classNames={{
+                                                    label: "text-black/50 text-[.9em]",
+                                                    inputWrapper: ["rounded-md", "p-2"],
+                                                    input: "text-[1em]"
+                                                }}
+                                                className='w-full text-sm max-lg:order-1 col-span-2 lg:col-span-1'
+                                                type="text"
+                                                label="รหัสนักศึกษา"
+                                                value={student.stu_id}
+                                                isReadOnly
+                                                labelPlacement="outside"
+                                            />
+                                            <Input
+                                                classNames={{
+                                                    label: "text-black/50 text-[.9em]",
+                                                    inputWrapper: ["rounded-md", "p-2"],
+                                                    input: "text-[1em]"
+                                                }}
+                                                className='w-full text-sm max-lg:order-1 col-span-2 lg:col-span-1'
+                                                type="text"
+                                                label="อีเมล"
+                                                value={student.email}
+                                                isReadOnly
+                                                labelPlacement="outside"
+                                            />
+                                            <Input
+                                                classNames={{
+                                                    label: "text-black/50 text-[.9em]",
+                                                    inputWrapper: ["rounded-md", "p-2"],
+                                                    input: "text-[1em]"
+                                                }}
+                                                className='w-full text-sm max-lg:order-2 col-span-2 lg:col-span-1'
+                                                type="text"
+                                                label="ชื่อ"
+                                                value={student.first_name}
+                                                isReadOnly
+                                                labelPlacement="outside"
+                                            />
+                                            <Input
+                                                classNames={{
+                                                    label: "text-black/50 text-[.9em]",
+                                                    inputWrapper: ["rounded-md", "p-2"],
+                                                    input: "text-[1em]"
+                                                }}
+                                                className='w-full text-sm max-lg:order-3 col-span-2 lg:col-span-1'
+                                                type="text"
+                                                label="สกุล"
+                                                value={student.last_name}
+                                                isReadOnly
+                                                labelPlacement="outside"
+                                            />
+                                            <Input
+                                                classNames={{
+                                                    label: "text-black/50 text-[.9em]",
+                                                    inputWrapper: ["rounded-md", "p-2"],
+                                                    input: "text-[1em]"
+                                                }}
+                                                className='w-full text-sm max-lg:order-3 col-span-2 lg:col-span-1'
+                                                type="text"
+                                                label="หลักสูตร"
+                                                value={`${student?.Program?.title_th} ${student?.courses_type}`}
+                                                isReadOnly
+                                                labelPlacement="outside"
+                                            />
+                                            <Input
+                                                classNames={{
+                                                    label: "text-black/50 text-[.9em]",
+                                                    inputWrapper: ["rounded-md", "p-2"],
+                                                    input: "text-[1em]"
+                                                }}
+                                                className='w-full text-sm max-lg:order-3 col-span-2 lg:col-span-1'
+                                                type="text"
+                                                label="สถานะภาพ"
+                                                value={`${student?.StudentStatus?.description} (${student?.StudentStatus?.id})`}
+                                                isReadOnly
+                                                labelPlacement="outside"
+                                            />
+                                            <Input
+                                                classNames={{
+                                                    label: "text-black/50 text-[.9em]",
+                                                    inputWrapper: ["rounded-md", "p-2"],
+                                                    input: "text-[1em]"
+                                                }}
+                                                className='w-full text-sm max-lg:order-3 col-span-2 lg:col-span-1'
+                                                type="text"
+                                                label="ปีการศึกษา"
+                                                value={student?.acadyear}
+                                                isReadOnly
+                                                labelPlacement="outside"
+                                            />
+                                            <Input
+                                                classNames={{
+                                                    label: "text-black/50 text-[.9em]",
+                                                    inputWrapper: ["rounded-md", "p-2"],
+                                                    input: "text-[1em]"
+                                                }}
+                                                className='w-full text-sm max-lg:order-3 col-span-2 lg:col-span-1'
+                                                type="text"
+                                                label="GPA"
+                                                value={gpa}
+                                                isReadOnly
+                                                labelPlacement="outside"
+                                            />
                                             {
                                                 student?.User?.createdAt &&
-                                                <p>เข้าใช้เมื่อ {dmy(student?.User?.createdAt) || "-"}</p>
+                                                <p className='text-sm text-default-500 max-md:col-span-2'>เข้าสู่ระบบเมื่อ {dmy(student?.User?.createdAt)}</p>
                                             }
                                         </div>
                                     </div>
                                 </div>
-                                <div className='my-3 space-y-3'>
-                                    <div className='flex gap-3 items-center'>
-                                        <p>รายวิชาที่ลงทะเบียน</p>
-                                        <Button
-                                            type='button'
-                                            className=''
-                                            radius='sm'
-                                            size='sm'
-                                            color="default"
-                                            variant='solid'
-                                            startContent={<PlusIcon width={4} height={4} />}
-                                            onPress={onOpenEnroll}>
-                                            เพิ่มรายวิชาที่ลงทะเบียน
-                                        </Button>
+                                <div className='p-4 border rounded-[10px] my-4 space-y-4'>
+                                    <div className='flex gap-4'>
+                                        <CiStar className={`text-5xl text-[#ffcf52] bg-[#fff5dc] pointer-events-none flex-shrink-0`} />
+                                        <div>
+                                            <p className='font-bold text-base'>Enrollments</p>
+                                            <p className='text-sm text-default-600'>ข้อมูลการลงทะเบียน</p>
+                                        </div>
                                     </div>
                                     {
                                         Object.keys(enrollmentsByYear).length == 0 ?

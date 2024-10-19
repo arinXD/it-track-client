@@ -287,7 +287,7 @@ const InsertEnrollmentForm = ({ }) => {
                               Object.keys(subject) == 0 || subjectData?.length != 0 ? undefined :
                                    <>
                                         <div>
-                                             <p className='text-sm font-bold'>ข้อมูลนักศึกษา</p>
+                                             <p className='text-sm font-bold'>ข้อมูลวิชา</p>
                                              <p>
                                                   {subject?.subject_code} <span>{subject?.title_en}</span> <span>{subject?.title_th}</span> {subject?.credit} หน่วยกิต
                                              </p>
