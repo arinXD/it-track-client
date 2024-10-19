@@ -74,21 +74,6 @@ const Page = async ({ params }) => {
                                 {trackData?.information}
                             </section>
 
-                            {/* รูปอธิบายเพิ่มเติม */}
-                            <section className='max-w-4xl mx-auto px-4 mt-10 gap-1 grid grid-cols-6'>
-                                {[1, 2, 3, 4, 5, 6].map(number => (
-                                    <div
-                                        key={`image-${number}`}
-                                        className={`${number == 1 ? "col-span-4" : "col-span-2"} border border-black h-[200px]`}>
-                                        <Image
-                                            src={`/image/tracks/${String(trackParam)?.split("-")[0]}/${number}.png`}
-                                            alt={`image-${String(trackParam)?.split("-")[0]}-${number}`}
-                                            className='w-full h-full object-cover'
-                                        />
-                                    </div>
-                                ))}
-                            </section>
-
                             {/* การประยุกต์ใช้งาน */}
                             <section className='max-w-4xl mx-auto px-4 mt-10'>
                                 <h3 className="text-lg font-semibold mb-2">ตัวอย่างการทำงาน</h3>
@@ -99,6 +84,23 @@ const Page = async ({ params }) => {
                                         </li>
                                     ))}
                                 </ul>
+                            </section>
+
+                            {/* รูปอธิบายเพิ่มเติม */}
+                            <section className='max-w-4xl mx-auto px-4 mt-10 gap-1 grid grid-cols-6'>
+                                {[1, 2, 3, 4, 5, 6, 7].map(number => (
+                                    <div
+                                        key={`image-${number}`}
+                                        className={`${[1, 7].includes(number) ? "col-span-4" : "col-span-2"} h-[200px]`}>
+                                        <Image
+                                            src={`/image/tracks/${String(trackParam)?.split("-")[0]}/${number}.png`}
+                                            alt={`image-${String(trackParam)?.split("-")[0]}-${number}`}
+                                            className='w-full h-full object-cover'
+                                            width={"100%"}
+                                            height={200}
+                                        />
+                                    </div>
+                                ))}
                             </section>
 
                             {/* วิชา อาชีพ */}
