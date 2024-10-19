@@ -34,7 +34,7 @@ const SubjectList = ({ subjects, careers }) => {
                 </ModalContent>
             </Modal>
 
-            <div className="flex flex-col md:flex-row gap-20">
+            <div className="flex flex-col md:flex-row gap-10 md:gap-20">
                 <div className="w-full md:w-1/2">
                     <h3 className="text-lg font-semibold mb-2">วิชาประจำกลุ่มและขอบเขตความรู้</h3>
                     <ul className="list-disc pl-5 space-y-1">
