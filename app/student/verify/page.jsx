@@ -2413,6 +2413,7 @@ const Page = () => {
             </>
         );
     }
+    console.log(verifySelect);
 
     return (
         <>
@@ -2435,32 +2436,34 @@ const Page = () => {
                         </>
                         :
                         <>
-                            <div className={`${status?.status === 3 ? 'block' : 'hidden max-xl:block'}`}>
-                                <FloatButton.Group
-                                    trigger="click"
-                                    type="primary"
-                                    style={{
-                                        insetInlineEnd: 24,
-                                    }}
-                                >
-                                    {(status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3) && (
-                                        <FloatButton
-                                            onClick={showDrawer}
-                                            icon={<TbMessage2Exclamation />}
-                                            tooltip={<div>สถานะการอนุมัติ</div>}
-                                            className='hidden max-xl:block'
-                                        />
-                                    )}
+                            {(status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3) && (
+                                <div className={`${status?.status === 3 ? 'block' : 'hidden max-xl:block'}`}>
+                                    <FloatButton.Group
+                                        trigger="click"
+                                        type="primary"
+                                        style={{
+                                            insetInlineEnd: 24,
+                                        }}
+                                    >
+                                        {(status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3) && (
+                                            <FloatButton
+                                                onClick={showDrawer}
+                                                icon={<TbMessage2Exclamation />}
+                                                tooltip={<div>สถานะการอนุมัติ</div>}
+                                                className='hidden max-xl:block'
+                                            />
+                                        )}
 
-                                    {(status?.status === 3) && (
-                                        <FloatButton
-                                            icon={<BsFiletypePdf />}
-                                            onClick={printDocument}
-                                            tooltip={<div>Print to PDF</div>}
-                                        />
-                                    )}
-                                </FloatButton.Group>
-                            </div>
+                                        {(status?.status === 3) && (
+                                            <FloatButton
+                                                icon={<BsFiletypePdf />}
+                                                onClick={printDocument}
+                                                tooltip={<div>Print to PDF</div>}
+                                            />
+                                        )}
+                                    </FloatButton.Group>
+                                </div>
+                            )}
 
                             <div className={`${status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3 ? 'flex relative' : ''}`}>
                                 <div id="divToPrint" ref={divToPrintRef} className={`my-[30px] ${status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3 ? 'w-[80%] 2xl:px-30 xl:pr-20' : 'w-[100%] 2xl:px-44 xl:px-20'} mt-16 max-xl:w-[100%] relative`}>
