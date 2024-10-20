@@ -399,7 +399,7 @@ const Page = ({ params }) => {
                     }
                })
                .catch(error => {
-                    console.log(error);
+                    message.error('ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้');
                });
      };
 
