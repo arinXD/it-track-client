@@ -33,7 +33,7 @@ const Petitionbar = ({ className }) => {
      ];
 
      return (
-          <aside className={`${className} bg-white shadow-sm border rounded-lg overflow-hidden rounded-tr-none rounded-br-none border-r-0`}>
+          <aside className={`${className} bg-white shadow-sm border rounded-lg overflow-hidden lg:rounded-tr-none lg:rounded-br-none lg:border-r-0 max-lg:mb-4`}>
                <nav className="p-4">
                     <ul className="space-y-1">
                          {menuItems.map((item) => {

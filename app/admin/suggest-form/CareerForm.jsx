@@ -116,25 +116,23 @@ const CareerForm = ({ prev, formStyle, tracks, formId, setCareers, creating, set
                               </div>
                               :
                               <>
-                                   <div className="flex justify-between">
-                                        <h2 className="text-black">อาชีพภายในแบบฟอร์ม</h2>
-                                        <div className="flex justify-end gap-4">
-                                             <Button
-                                                  isIconOnly
-                                                  radius="full"
-                                                  className={`text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
-                                                  onClick={onOpen}
-                                                  aria-label="create">
-                                                  <PlusIcon />
-                                             </Button>
-                                             <Button
-                                                  className={`rounded-[5px] text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
-                                                  startContent={<MdOutlineInventory2 />}
-                                                  onClick={onOpenInventory}
-                                             >
-                                                  คลังอาชีพ
-                                             </Button>
-                                        </div>
+                                   <h2 className="text-black mb-4">อาชีพภายในแบบฟอร์ม ({filterCareer?.length} อาชีพ)</h2>
+                                   <div className="flex gap-4 md:justify-end">
+                                        <Button
+                                             isIconOnly
+                                             radius="full"
+                                             className={`text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
+                                             onClick={onOpen}
+                                             aria-label="create">
+                                             <PlusIcon />
+                                        </Button>
+                                        <Button
+                                             className={`max-md:w-full rounded-[5px] text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
+                                             startContent={<MdOutlineInventory2 />}
+                                             onClick={onOpenInventory}
+                                        >
+                                             คลังอาชีพ
+                                        </Button>
                                    </div>
                                    {filterCareer?.length > 0 ?
                                         <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">

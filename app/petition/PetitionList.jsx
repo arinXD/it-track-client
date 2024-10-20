@@ -88,8 +88,8 @@ const PetitionList = ({
           <section className="w-full">
                <h1 className="text-2xl font-semibold mb-6 text-gray-800">{title}</h1>
                <div className="grid grid-cols-6">
-                    <Petitionbar className="col-span-1" />
-                    <div className="col-span-5 bg-white rounded-lg shadow-sm border rounded-tl-none rounded-bl-none">
+                    <Petitionbar className="col-span-6 xl:col-span-1" />
+                    <div className="col-span-6 xl:col-span-5 bg-white rounded-lg shadow-sm border xl:rounded-tl-none xl:rounded-bl-none">
                          <div className="flex items-center justify-between p-4 border-b">
                               <div className="flex items-center">
                                    <Checkbox
@@ -143,13 +143,13 @@ const PetitionList = ({
                                                        <Link
                                                             className="w-full grid grid-cols-8 gap-4 items-center"
                                                             href={`/petition/${current}/${petition.id}`}>
-                                                            <span className="w-full col-span-2 font-medium text-gray-900 truncate">
+                                                            <span className="w-full text-xs col-span-8 lg:col-span-2 font-medium text-gray-900 truncate">
                                                                  {petition.title}
                                                             </span>
-                                                            <span className="w-full col-span-4 text-gray-500 truncate overflow-hidden">
+                                                            <span className="w-full text-xs col-span-8 lg:col-span-4 text-gray-500 truncate overflow-hidden">
                                                                  {petition.detail}
                                                             </span>
-                                                            <span className="w-full col-span-1 justify-start flex text-gray-500 truncate text-center">
+                                                            <span className="w-full col-span-4 lg:col-span-1 justify-start flex text-gray-500 truncate text-center">
                                                                  <div className="flex items-center gap-1">
                                                                       <div className={`rounded-full w-2 h-2 ${petition?.status == 0 ? "bg-yellow-600" : petition?.status == 1 ? "bg-green-600" : "bg-red-600"}`}></div>
                                                                       <p className="text-xs">
@@ -157,7 +157,7 @@ const PetitionList = ({
                                                                       </p>
                                                                  </div>
                                                             </span>
-                                                            <span className="w-full col-span-1 text-right text-sm text-gray-400">
+                                                            <span className="w-full col-span-4 lg:col-span-1 text-right text-sm text-gray-400">
                                                                  {simpleDM(petition.createdAt)}
                                                             </span>
                                                        </Link>

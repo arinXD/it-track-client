@@ -100,25 +100,26 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                 icon: "success",
                 confirmButtonColor: "#3085d6",
                 confirmButtonText: "ตกลง"
-            }).then(result => {
-                if (result.isConfirmed) {
-                    swal.fire({
-                        title: "ขออนุญาตผู้ใช้ทำแบบสอบถาม",
-                        text: `ขออนุญาตผู้ใช้ทำแบบสอบถามเพื่อนำ feedback มาปรับปรุงแก้ไขเว็บไซต์ให้มีประสิทธิภาพต่อไป`,
-                        icon: "question",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "ยินยอม",
-                        cancelButtonText: "ไม่ยินยอม",
-                        reverseButtons: true
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            window.open("https://docs.google.com/forms/d/e/1FAIpQLSdJ2NQilMU1IGdekQIkiZZ3uvZ09Ef1XXA7MOuNHhDptqjnHg/viewform?usp=sf_link")
-                        }
-                    })
-                }
             })
+            // .then(result => {
+            //     if (result.isConfirmed) {
+            //         swal.fire({
+            //             title: "ขออนุญาตผู้ใช้ทำแบบสอบถาม",
+            //             text: `ขออนุญาตผู้ใช้ทำแบบสอบถามเพื่อนำ feedback มาปรับปรุงแก้ไขเว็บไซต์ให้มีประสิทธิภาพต่อไป`,
+            //             icon: "question",
+            //             showCancelButton: true,
+            //             confirmButtonColor: "#3085d6",
+            //             cancelButtonColor: "#d33",
+            //             confirmButtonText: "ยินยอม",
+            //             cancelButtonText: "ไม่ยินยอม",
+            //             reverseButtons: true
+            //         }).then(result => {
+            //             if (result.isConfirmed) {
+            //                 window.open("https://docs.google.com/forms/d/e/1FAIpQLSdJ2NQilMU1IGdekQIkiZZ3uvZ09Ef1XXA7MOuNHhDptqjnHg/viewform?usp=sf_link")
+            //             }
+            //         })
+            //     }
+            // })
         } else {
             Swal.fire({
                 title: "Warning!",
@@ -316,17 +317,6 @@ const TrackSelectionForm = ({ enrollments, userData }) => {
                                                 </Link>
                                             </motion.div>
                                         </div>
-                                        // <div className='flex flex-col justify-center items-center h-[70vh]'>
-                                        //     {/* <Result
-                                        //         icon={<SmileOutlined />}
-                                        //         title={`แทร็กของคุณ คือ ${trackResult?.title_en}`}
-                                        //         subTitle={<p className='text-lg'>{trackResult?.title_th}</p>}
-                                        //     /> */}
-                                        //     <h1>ยินดีด้วย</h1>
-                                        //     <h2>แทร็กของคุณ คือ {trackResult?.title_en}</h2>
-                                        //     <p className='text-lg'>{trackResult?.title_th}</p>
-                                        //     <Link href={`/tracks/${trackResult?.track?.toLowerCase()}`} className='text-blue-500 block'>รายละเอียดแทร็ก</Link>
-                                        // </div>
                                     )
                                     :
                                     <div className="max-w-4xl mx-auto px-6 py-6">
