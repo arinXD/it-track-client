@@ -1,12 +1,13 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Spinner } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import axios from 'axios';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import { SearchIcon } from '@/app/components/icons';
 import { getAcadyears } from '@/src/util/academicYear';
 import { getGrades } from '@/src/util/grade';
 import Swal from 'sweetalert2';
+import { SELECT_STYLE } from '@/src/util/ComponentClass';
 
 const swal = Swal.mixin({
     customClass: {
@@ -171,11 +172,7 @@ const InsertEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, call
                                 <span className='text-base font-normal'>แบบฟอร์มเพิ่มการลงทะเบียนเรียนของนักศึกษา</span>
                             </ModalHeader>
                             <ModalBody>
-                                <div
-                                    style={{
-                                        boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px"
-                                    }}
-                                    className='mb-3 space-y-2 rounded-md p-2'>
+                                <div className='mb-3 space-y-2'>
                                     <div>
                                         {
                                             Object.keys(student) == 0 || studentData?.length != 0 ? undefined :
@@ -188,11 +185,10 @@ const InsertEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, call
                                         }
                                     </div>
                                 </div>
-                                <div
-                                    style={{
-                                        boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px"
-                                    }}
-                                    className='mb-3 space-y-2 rounded-md p-2'>
+
+                                <hr />
+
+                                <div className='my-3 space-y-2 rounded-md'>
                                     <div className='flex flex-row gap-3 justify-start items-end'>
                                         <Input
                                             label="ค้นหาวิชา"
@@ -222,7 +218,7 @@ const InsertEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, call
                                             Object.keys(subject) == 0 || subjectData?.length != 0 ? undefined :
                                                 <>
                                                     <div>
-                                                        <p className='text-sm font-bold'>ข้อมูลนักศึกษา</p>
+                                                        <p className='text-sm font-bold'>ข้อมูลวิชา</p>
                                                         <p>
                                                             {subject?.subject_code} <span>{subject?.title_en}</span> <span>{subject?.title_th}</span> {subject?.credit} หน่วยกิต
                                                         </p>
@@ -232,53 +228,45 @@ const InsertEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, call
                                         {subjectData?.length == 0 ? undefined :
                                             searchingSubject ?
                                                 <div className='w-full flex justify-center'>
-                                                    <Spinner label="กำลังโหลด..." color="primary" />
+                                                    Loading...
                                                 </div>
                                                 :
-                                                <div className='h-[150px] overflow-y-auto border-1'>
-                                                    <table className='w-[100%]'>
-                                                        <thead>
-                                                            <tr className='border-b-1'>
-                                                                <th className='px-2 py-1 text-start'>รหัสวิชา</th>
-                                                                <th className='px-2 py-1 text-start'>ชื่อวิชา</th>
-                                                                <th className='px-2 py-1 text-start'>หน่วยกิต</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className=''>
-                                                            {subjectData.map(subject => (
-                                                                <tr
-                                                                    onClick={() => selectSubject(subject)}
-                                                                    key={subject?.subject_code}
-                                                                    className='cursor-pointer border-b-1 w-full hover:bg-gray-200'
-                                                                >
-                                                                    <td className='px-2 py-1 text-start'>{subject?.subject_code}</td>
-                                                                    <td className='px-2 py-1 text-start'>
-                                                                        <div className='flex flex-col'>
-                                                                            <span>{subject?.title_en}</span>
-                                                                            <span>{subject?.title_th}</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td className='px-2 py-1 text-start'>{subject?.credit}</td>
-                                                                </tr>
-                                                            ))
-                                                            }
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                <Table
+                                                    removeWrapper
+                                                    aria-label="Student table"
+                                                    className="max-h-[150px] overflow-y-auto border p-2 rounded-lg"
+                                                    selectionMode="single"
+                                                    onRowAction={(key) => selectSubject(subjectData.find(subject => subject.subject_code === key))}
+                                                >
+                                                    <TableHeader>
+                                                        <TableColumn>รหัสวิชา</TableColumn>
+                                                        <TableColumn>ชื่อวิชา</TableColumn>
+                                                        <TableColumn>หน่วยกิต</TableColumn>
+                                                    </TableHeader>
+                                                    <TableBody items={subjectData}>
+                                                        {(subject) => (
+                                                            <TableRow key={subject.subject_code}>
+                                                                <TableCell>{subject.subject_code}</TableCell>
+                                                                <TableCell>{`${subject.title_en} ${subject.title_th}`}</TableCell>
+                                                                <TableCell>{subject.credit}</TableCell>
+                                                            </TableRow>
+                                                        )}
+                                                    </TableBody>
+                                                </Table>
                                         }
                                     </div>
                                 </div>
-                                <div className='flex flex-row gap-3 items-end'>
+
+                                <hr />
+
+                                <div className='mt-3 flex flex-row gap-6 items-end'>
                                     <div className='flex flex-col w-[50%]'>
                                         <label className='text-xs mb-0.5'>ปีการศึกษา</label>
                                         <select
                                             defaultValue={""}
                                             id="select-acadyear"
                                             className="border-1 text-sm rounded-lg block w-full p-2.5"
-                                            style={{
-                                                lineHeight: "40px",
-                                                height: "40px",
-                                            }}
+                                            style={SELECT_STYLE}
                                         >
                                             <option value="" className='' disabled hidden>เลือกปีการศึกษา</option>
                                             {acadyears.map(acadyear => (
@@ -289,6 +277,7 @@ const InsertEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, call
                                     <div className='flex flex-col w-[50%]'>
                                         <label className='text-xs mb-0.5'>เกรด</label>
                                         <select
+                                            style={SELECT_STYLE}
                                             id="select-grade"
                                             defaultValue={""}
                                             className="border-1 text-sm rounded-lg block w-full p-2.5">
@@ -308,21 +297,6 @@ const InsertEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, call
                                                 ))
                                             }
                                         </select>
-                                        {/* <label className='text-xs mb-0.5'>เกรด</label>
-                                        <select
-                                            defaultValue={""}
-                                            id=""
-                                            className='border-1 w-full rounded-lg px-1'
-                                            style={{
-                                                lineHeight: "40px",
-                                                height: "40px",
-                                            }}
-                                        >
-                                            <option value="" className='' disabled hidden>เลือกเกรด</option>
-                                            {grades.map(gradeType => (
-                                                
-                                            ))}
-                                        </select> */}
                                     </div>
                                 </div>
                             </ModalBody>

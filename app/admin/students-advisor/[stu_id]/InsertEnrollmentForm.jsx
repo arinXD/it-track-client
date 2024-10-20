@@ -297,21 +297,6 @@ const InsertEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, call
                                                 ))
                                             }
                                         </select>
-                                        {/* <label className='text-xs mb-0.5'>เกรด</label>
-                                        <select
-                                            defaultValue={""}
-                                            id=""
-                                            className='border-1 w-full rounded-lg px-1'
-                                            style={{
-                                                lineHeight: "40px",
-                                                height: "40px",
-                                            }}
-                                        >
-                                            <option value="" className='' disabled hidden>เลือกเกรด</option>
-                                            {grades.map(gradeType => (
-                                                
-                                            ))}
-                                        </select> */}
                                     </div>
                                 </div>
                             </ModalBody>

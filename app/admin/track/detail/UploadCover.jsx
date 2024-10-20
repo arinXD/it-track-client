@@ -42,7 +42,7 @@ const UploadCover = ({ setImageFile, label, width, src = "", uploadProgress, con
         <div className={`flex flex-col ${containerWidth}`}>
             {
                 displayLabel &&
-                <p className='text-center mb-1'>{label}</p>
+                <p className='text-start text-xs mb-1'>{label}</p>
             }
             <div className={`relative rounded-[10px] ${previewImage ? "border-0 !h-auto" : "border-1"} mx-auto border-solid ${width} h-[180px] grid grid-cols-1 place-items-center`}>
                 {

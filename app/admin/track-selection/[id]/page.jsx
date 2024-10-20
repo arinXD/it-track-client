@@ -643,278 +643,256 @@ const Page = ({ params }) => {
                             :
                             Object.keys(trackSelect).length > 0 ?
                                 <div className='space-y-6 mt-6'>
-                                    {/* <Button className='fixed bottom-1 right-1 z-50'>UP</Button> */}
-                                    <div className='bg-gray-100 border-gray-200 border-1 p-4 flex flex-col justify-start items-center gap-2 rounded-md'>
+
+                                    <div className='bg-white border-1 p-4 flex flex-col justify-start items-center gap-2 rounded-[10px]'>
                                         <h1 className='w-[100%] font-bold text-base'>
                                             {title}
                                         </h1>
-                                    </div>
-                                    <div className='my-4 grid grid-cols-3 justify-stretch justify-items-stretch gap-4 w-full'>
-                                        <div className='bg-gray-100 border-gray-200 border-1 space-y-3 rounded-md p-3 w-full col-span-3 max-lg:col-span-3'>
-                                            <div className='w-full flex justify-start items-center gap-4'>
-                                                <Input
-                                                    type="text"
-                                                    variant="bordered"
-                                                    radius='sm'
-                                                    label="ปีการศึกษา"
-                                                    placeholder="กรอกปีการศึกษา"
-                                                    labelPlacement="outside"
-                                                    value={trackSelect.acadyear}
-                                                    isReadOnly
-                                                    classNames={inputClass}
-                                                />
-                                            </div>
-                                            <div className='w-full flex gap-4 justify-between items-center'>
+                                        <hr className='my-3 w-full border-t-1 border-t-gray-300 ' />
+                                        <div className='grid grid-cols-3 justify-stretch justify-items-stretch gap-4 w-full'>
+                                            <div className='space-y-3 rounded-md w-full col-span-3 max-lg:col-span-3'>
                                                 <div className='w-full flex justify-start items-center gap-4'>
                                                     <Input
-                                                        type='datetime-local'
-                                                        label="เริ่มต้น"
+                                                        type="text"
                                                         variant="bordered"
                                                         radius='sm'
-                                                        placeholder="เดือน/วัน/ปี"
+                                                        label="ปีการศึกษา"
+                                                        placeholder="กรอกปีการศึกษา"
                                                         labelPlacement="outside"
-                                                        value={startAt}
+                                                        value={trackSelect.acadyear}
+                                                        isReadOnly
                                                         classNames={inputClass}
-                                                        onChange={(e) => {
-                                                            setStartAt(e.target.value)
-                                                            const nextWeek = new Date(e.target.value);
-                                                            nextWeek.setDate(nextWeek.getDate() + 7);
-                                                            setExpiredAt(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
-
-                                                            nextWeek.setDate(nextWeek.getDate() + 7);
-                                                            setAnnouncementDate(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
-
-                                                            handleValueChange({ startAt: e.target.value })
-                                                        }}
-                                                        min={getCurrentDate()}
                                                     />
                                                 </div>
-                                                <div className='w-full flex justify-start items-center gap-4'>
-                                                    <Input
-                                                        type='datetime-local'
-                                                        label="สิ้นสุด"
-                                                        variant="bordered"
-                                                        radius='sm'
-                                                        placeholder="เดือน/วัน/ปี"
-                                                        labelPlacement="outside"
-                                                        value={expiredAt}
-                                                        classNames={inputClass}
-                                                        onChange={(e) => {
-                                                            setExpiredAt(e.target.value)
-                                                            const nextWeek = new Date(e.target.value);
-                                                            nextWeek.setDate(nextWeek.getDate() + 7);
-                                                            setAnnouncementDate(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
-                                                            handleValueChange({ expiredAt: e.target.value })
-                                                        }}
-                                                        min={startAt}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className='w-full flex gap-4 justify-between items-center'>
-                                                <div className='w-full flex justify-start items-center'>
-                                                    <Input
-                                                        id='announcementDate'
-                                                        type='datetime-local'
-                                                        label="วันประกาศผล"
-                                                        variant="bordered"
-                                                        radius='sm'
-                                                        placeholder="วันประกาศผล"
-                                                        labelPlacement="outside"
-                                                        value={announcementDate || null}
-                                                        classNames={inputClass}
-                                                        onChange={(e) => {
-                                                            setAnnouncementDate(e.target.value)
-                                                            handleValueChange({ startAt: e.target.value })
-                                                        }}
-                                                        min={expiredAt}
-                                                    />
-                                                </div>
-                                                <div className='w-full'>
+                                                <div className='w-full flex gap-4 justify-between items-center'>
+                                                    <div className='w-full flex justify-start items-center gap-4'>
+                                                        <Input
+                                                            type='datetime-local'
+                                                            label="เริ่มต้น"
+                                                            variant="bordered"
+                                                            radius='sm'
+                                                            placeholder="เดือน/วัน/ปี"
+                                                            labelPlacement="outside"
+                                                            value={startAt}
+                                                            classNames={inputClass}
+                                                            onChange={(e) => {
+                                                                setStartAt(e.target.value)
+                                                                const nextWeek = new Date(e.target.value);
+                                                                nextWeek.setDate(nextWeek.getDate() + 7);
+                                                                setExpiredAt(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
 
+                                                                nextWeek.setDate(nextWeek.getDate() + 7);
+                                                                setAnnouncementDate(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
+
+                                                                handleValueChange({ startAt: e.target.value })
+                                                            }}
+                                                            min={getCurrentDate()}
+                                                        />
+                                                    </div>
+                                                    <div className='w-full flex justify-start items-center gap-4'>
+                                                        <Input
+                                                            type='datetime-local'
+                                                            label="สิ้นสุด"
+                                                            variant="bordered"
+                                                            radius='sm'
+                                                            placeholder="เดือน/วัน/ปี"
+                                                            labelPlacement="outside"
+                                                            value={expiredAt}
+                                                            classNames={inputClass}
+                                                            onChange={(e) => {
+                                                                setExpiredAt(e.target.value)
+                                                                const nextWeek = new Date(e.target.value);
+                                                                nextWeek.setDate(nextWeek.getDate() + 7);
+                                                                setAnnouncementDate(format(nextWeek, 'yyyy-MM-dd\'T\'HH:mm'));
+                                                                handleValueChange({ expiredAt: e.target.value })
+                                                            }}
+                                                            min={startAt}
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className='w-full flex justify-start items-center gap-2'>
-                                                <span className='block text-sm'>สถานะ: </span>
-                                                <span className='text-sm'>
-                                                    <Chip color={`${hasFinished ? "danger" : "warning"}`} variant="solid">
-                                                        {hasFinished ?
-                                                            <>สิ้นสุดการคัดเลือก</>
-                                                            :
-                                                            <>กำลังดำเนินการ</>
-                                                        }
-                                                    </Chip>
-                                                </span>
-                                            </div>
-                                            <div className='flex flex-row justify-start items-center gap-3 border-t-1 border-gray-300 pt-3 flex-wrap'>
-                                                <div className={!valueChange ? "cursor-not-allowed" : ""}>
+                                                <div className='w-full flex gap-4 justify-between items-center'>
+                                                    <div className='w-full flex justify-start items-center'>
+                                                        <Input
+                                                            id='announcementDate'
+                                                            type='datetime-local'
+                                                            label="วันประกาศผล"
+                                                            variant="bordered"
+                                                            radius='sm'
+                                                            placeholder="วันประกาศผล"
+                                                            labelPlacement="outside"
+                                                            value={announcementDate || null}
+                                                            classNames={inputClass}
+                                                            onChange={(e) => {
+                                                                setAnnouncementDate(e.target.value)
+                                                                handleValueChange({ startAt: e.target.value })
+                                                            }}
+                                                            min={expiredAt}
+                                                        />
+                                                    </div>
+                                                    <div className='w-full'>
+
+                                                    </div>
+                                                </div>
+                                                <div className='w-full flex justify-start items-center gap-2'>
+                                                    <span className='block text-sm'>สถานะ: </span>
+                                                    <span className='text-sm'>
+                                                        <Chip color={`${hasFinished ? "danger" : "warning"}`} variant="solid">
+                                                            {hasFinished ?
+                                                                <>สิ้นสุดการคัดเลือก</>
+                                                                :
+                                                                <>กำลังดำเนินการ</>
+                                                            }
+                                                        </Chip>
+                                                    </span>
+                                                </div>
+                                                <div className='flex flex-row justify-start items-center gap-3 border-t-1 border-gray-300 pt-3 flex-wrap'>
+                                                    <div className={!valueChange ? "cursor-not-allowed" : ""}>
+                                                        <Button
+                                                            size='sm'
+                                                            radius='sm'
+                                                            color="default"
+                                                            isLoading={updating}
+                                                            isDisabled={!valueChange}
+                                                            onClick={handleUpdate}
+                                                            startContent={<FaSave className='w-3 h-3' />}
+                                                            className='bg-gray-300'>
+                                                            {updating ? "ยืนยันการแก้ไข..." : "ยืนยันการแก้ไข"}
+                                                        </Button>
+                                                    </div>
+                                                    <div className={!valueChange ? "cursor-not-allowed" : ""}>
+                                                        <Button
+                                                            size='sm'
+                                                            radius='sm'
+                                                            color="default"
+                                                            isDisabled={!valueChange}
+                                                            onClick={handleUnsave}
+                                                            startContent={<CiUndo className='w-4 h-4' />}
+                                                            className='bg-gray-300'>
+                                                            ยกเลิกการแก้ไข
+                                                        </Button>
+                                                    </div>
+                                                    {!(trackSelect.has_finished) ?
+                                                        <Button
+                                                            size='sm'
+                                                            radius='sm'
+                                                            color="default"
+                                                            isLoading={starting}
+                                                            onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
+                                                            variant="solid"
+                                                            startContent={<FaRegCircleStop />}
+                                                            className='bg-gray-300'>
+                                                            {starting ? "ปิดการคัดเลือก..." : "ปิดการคัดเลือก"}
+                                                        </Button>
+                                                        :
+                                                        <Button
+                                                            size='sm'
+                                                            radius='sm'
+                                                            color="default"
+                                                            isLoading={starting}
+                                                            onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
+                                                            variant="solid"
+                                                            startContent={<FaPlay className='' />}
+                                                            className='bg-gray-300'>
+                                                            {starting ? "เปิดการคัดเลือก..." : "เปิดการคัดเลือก"}
+                                                        </Button>}
                                                     <Button
                                                         size='sm'
                                                         radius='sm'
                                                         color="default"
-                                                        isLoading={updating}
-                                                        isDisabled={!valueChange}
-                                                        onClick={handleUpdate}
-                                                        startContent={<FaSave className='w-3 h-3' />}
-                                                        className='bg-gray-300'>
-                                                        {updating ? "ยืนยันการแก้ไข..." : "ยืนยันการแก้ไข"}
-                                                    </Button>
-                                                </div>
-                                                <div className={!valueChange ? "cursor-not-allowed" : ""}>
-                                                    <Button
-                                                        size='sm'
-                                                        radius='sm'
-                                                        color="default"
-                                                        isDisabled={!valueChange}
-                                                        onClick={handleUnsave}
-                                                        startContent={<CiUndo className='w-4 h-4' />}
-                                                        className='bg-gray-300'>
-                                                        ยกเลิกการแก้ไข
-                                                    </Button>
-                                                </div>
-                                                {!(trackSelect.has_finished) ?
-                                                    <Button
-                                                        size='sm'
-                                                        radius='sm'
-                                                        color="default"
-                                                        isLoading={starting}
-                                                        onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
+                                                        isDisabled={deleting}
+                                                        isLoading={deleting}
+                                                        onPress={handleDelete}
                                                         variant="solid"
-                                                        startContent={<FaRegCircleStop />}
+                                                        startContent={<DeleteIcon2 className="w-5 h-5" />}
                                                         className='bg-gray-300'>
-                                                        {starting ? "ปิดการคัดเลือก..." : "ปิดการคัดเลือก"}
+                                                        ลบ
                                                     </Button>
-                                                    :
                                                     <Button
                                                         size='sm'
                                                         radius='sm'
                                                         color="default"
-                                                        isLoading={starting}
-                                                        onPress={() => handleStartSelect({ id: trackSelect.id, hasFinished: trackSelect.has_finished })}
+                                                        isDisabled={sendingEmail}
+                                                        isLoading={sendingEmail}
+                                                        onPress={() => handleSendingEmail(trackSelect?.acadyear)}
                                                         variant="solid"
-                                                        startContent={<FaPlay className='' />}
+                                                        startContent={<RiMailSendLine className="w-4 h-4" />}
                                                         className='bg-gray-300'>
-                                                        {starting ? "เปิดการคัดเลือก..." : "เปิดการคัดเลือก"}
-                                                    </Button>}
-                                                <Button
-                                                    size='sm'
-                                                    radius='sm'
-                                                    color="default"
-                                                    isDisabled={deleting}
-                                                    isLoading={deleting}
-                                                    onPress={handleDelete}
-                                                    variant="solid"
-                                                    startContent={<DeleteIcon2 className="w-5 h-5" />}
-                                                    className='bg-gray-300'>
-                                                    ลบ
-                                                </Button>
-                                                {/* sendingEmail
-                                                setSendingEmail */}
-                                                <Button
-                                                    size='sm'
-                                                    radius='sm'
-                                                    color="default"
-                                                    isDisabled={sendingEmail}
-                                                    isLoading={sendingEmail}
-                                                    onPress={() => handleSendingEmail(trackSelect?.acadyear)}
-                                                    variant="solid"
-                                                    startContent={<RiMailSendLine className="w-4 h-4" />}
-                                                    className='bg-gray-300'>
-                                                    ส่งอีเมลแจ้งเตือน
-                                                </Button>
+                                                        ส่งอีเมลแจ้งเตือน
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+
                                     {
                                         !parseInt(studentsBit?.normal + studentsNetwork?.normal + studentsWeb?.normal) ? null :
                                             <div className='grid grid-cols-3 gap-8 max-xl:grid-cols-2 max-lg:grid-cols-1'>
-                                                <div className="flex flex-row text-center rounded-l-full">
-                                                    <div className={`bg-purple-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div className="rounded-full flex relative justify-center items-center">
-                                                            <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
-                                                                <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
+
+                                                {/* 1 */}
+                                                <div className="bg-gradient-to-br from-gray-50 border rounded-large p-6">
+
+                                                    <div style={{ boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px" }}
+                                                        className="mx-auto  w-[6em] h-[6em] bg-white rounded-full flex justify-center items-center">
+                                                        <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
+                                                    </div>
+                                                    <div className='mt-6 w-full grid grid-cols-1'>
+                                                        <h1 className='font-bold text-center'>Business Information Technology</h1>
+                                                        <div className='mt-3 flex flex-col md:flex-row items-center gap-4'>
+                                                            <div className='w-full flex flex-col justify-center items-center'>
+                                                                <p>โครงการปกติ</p>
+                                                                <p>{studentsBit?.normal}</p>
+                                                            </div>
+                                                            <hr className='h-12 border' />
+                                                            <div className='w-full flex flex-col justify-center items-center'>
+                                                                <p>โครงการพิเศษ</p>
+                                                                <p>{studentsBit?.vip}</p>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-purple-400 text-white`}>
-                                                        <table className='table-auto mx-auto'>
-                                                            <thead>
-                                                                <tr className=''>
-                                                                    <th className='text-base'>Business Information Technology</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className='flex flex-col gap-2 mt-3'>
-                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsBit?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsBit?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
                                                     </div>
                                                 </div>
-                                                <div className="flex flex-row text-center rounded-l-full">
-                                                    <div className={`bg-emerald-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div className="rounded-full flex relative justify-center items-center">
-                                                            <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
-                                                                <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
+
+                                                {/* 2 */}
+                                                <div className="bg-gradient-to-br from-gray-50 border rounded-large p-6">
+                                                    <div style={{ boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px" }}
+                                                        className="mx-auto w-[6em] h-[6em] bg-white rounded-full flex justify-center items-center">
+                                                        <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
+                                                    </div>
+                                                    <div className='mt-6 w-full grid grid-cols-1'>
+                                                        <h1 className='font-bold text-center'>Network Systems, Information Technology Security, and Internet of Things (IoT)</h1>
+                                                        <div className='mt-3 flex flex-col md:flex-row items-center gap-4'>
+                                                            <div className='w-full flex flex-col justify-center items-center'>
+                                                                <p>โครงการปกติ</p>
+                                                                <p>{studentsNetwork?.normal}</p>
+                                                            </div>
+                                                            <hr className='h-12 border' />
+                                                            <div className='w-full flex flex-col justify-center items-center'>
+                                                                <p>โครงการพิเศษ</p>
+                                                                <p>{studentsNetwork?.vip}</p>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-emerald-400 text-white`}>
-                                                        <table className='table-auto mx-auto'>
-                                                            <thead>
-                                                                <tr className='w-full'>
-                                                                    <th
-                                                                        style={{
-                                                                            whiteSpace: "nowrap",
-                                                                            overflow: "hidden",
-                                                                            textOverflow: "ellipsis",
-                                                                        }}
-                                                                        className='text-base'>Network</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className='flex flex-col gap-2 mt-3'>
-                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsNetwork?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsNetwork?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
                                                     </div>
                                                 </div>
-                                                <div className="flex flex-row text-center rounded-l-full">
-                                                    <div className={`bg-indigo-500 p-4 rounded-l-full grid place-content-center`}>
-                                                        <div className="rounded-full flex relative justify-center items-center">
-                                                            <div className="w-[5.5em] h-[5.5em] bg-white rounded-full flex justify-center items-center">
-                                                                <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
+
+                                                {/* 3 */}
+                                                <div className="bg-gradient-to-br from-gray-50 border rounded-large p-6">
+
+                                                    <div style={{ boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px" }}
+                                                        className="mx-auto w-[6em] h-[6em] bg-white rounded-full flex justify-center items-center">
+                                                        <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
+                                                    </div>
+                                                    <div className='mt-6 w-full grid grid-cols-1'>
+                                                        <h1 className='font-bold text-center'>Mobile and Web Application Development</h1>
+                                                        <div className='mt-3 flex flex-col md:flex-row items-center gap-4'>
+                                                            <div className='w-full flex flex-col justify-center items-center'>
+                                                                <p>โครงการปกติ</p>
+                                                                <p>{studentsWeb?.normal}</p>
+                                                            </div>
+                                                            <hr className='h-12 border' />
+                                                            <div className='w-full flex flex-col justify-center items-center'>
+                                                                <p>โครงการพิเศษ</p>
+                                                                <p>{studentsWeb?.vip}</p>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div className={`w-full py-4 pr-4 ps-2 col-span-2 flex rounded-e-lg bg-indigo-400 text-white`}>
-                                                        <table className='table-auto mx-auto'>
-                                                            <thead>
-                                                                <tr className=''>
-                                                                    <th className='text-base'>Web Application & Mobile</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className='flex flex-col gap-2 mt-3'>
-                                                                            <div className='flex justify-between items-center'><span>โครงการปกติ </span> <span>{studentsWeb?.normal} <span className='ms-3'>คน</span></span></div>
-                                                                            <div className='flex justify-between items-center'><span>โครงการพิเศษ</span> <span> {studentsWeb?.vip} <span className='ms-3'>คน</span></span></div>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
                                                     </div>
                                                 </div>
                                             </div>

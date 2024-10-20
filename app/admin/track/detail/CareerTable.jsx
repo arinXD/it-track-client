@@ -145,7 +145,7 @@ const CareerTable = ({ track }) => {
                                         aria-label="ลบ"
                                         className='p-2 bg-red-400'
                                    >
-                                        <DeleteIcon className="w-5 h-5" />
+                                        <DeleteIcon className="w-4 h-4" />
                                    </Button>
                               </Tooltip>
                          </div>
@@ -278,7 +278,7 @@ const CareerTable = ({ track }) => {
                               onPress={() => handleDelete(selectedCareers)}
                               color='danger'
                               className='bg-red-400'
-                              startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                              startContent={<DeleteIcon className="w-4 h-4" />}>
                               ลบ
                          </Button>
                     </div>

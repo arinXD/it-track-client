@@ -47,7 +47,7 @@ const AdminList = ({ }) => {
                links: [
                     { href: "/admin/users", label: "จัดการบัญชี", icon: RiUserSettingsLine },
                     { href: "/admin/teachers", label: "จัดการข้อมูลอาจารย์", icon: RiUserSettingsLine },
-                    { href: "/admin/news", label: "จัดการข่าวสาร", icon: IoNewspaperOutline },
+                    { href: "/admin/news", label: "จัดการข่าวประชาสัมพันธ์", icon: IoNewspaperOutline },
                ]
           },
           {
@@ -109,7 +109,7 @@ const AdminList = ({ }) => {
           return (
                <div key={index} className="mb-10">
                     <h2 className="mb-5 text-2xl font-bold text-gray-800 border-b border-b-gray-300 pb-2">{category.title}</h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                          {category.links.map(renderMenuItem)}
                     </div>
                </div>

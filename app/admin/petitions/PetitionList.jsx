@@ -32,8 +32,8 @@ const PetitionList = ({ current, fetching, title, data, emptyContent }) => {
           <section className="w-full">
                <h1 className="text-2xl font-semibold mb-6 text-gray-800">{title}</h1>
                <div className="grid grid-cols-6">
-                    <Petitionbar className="col-span-1" />
-                    <div className="col-span-5 bg-white rounded-lg shadow-sm border rounded-tl-none rounded-bl-none">
+                    <Petitionbar className="col-span-6 lg:col-span-1" />
+                    <div className="col-span-6 lg:col-span-5 bg-white rounded-lg shadow-sm border lg:rounded-tl-none lg:rounded-bl-none">
                          <div className="flex items-center justify-between p-4 border-b">
                               <div className="flex items-center">
                                    <span className="text-sm text-gray-600">กล่องคำร้อง</span>
@@ -81,10 +81,10 @@ const PetitionList = ({ current, fetching, title, data, emptyContent }) => {
                                                        <span className="w-full col-span-2 text-sm font-normal text-gray-900 truncate">
                                                             {petition.title}
                                                        </span>
-                                                       <span className="w-full col-span-3 text-sm  text-gray-500 truncate overflow-hidden">
+                                                       <span className="w-full col-span-2 xl:col-span-3 text-sm  text-gray-500 truncate overflow-hidden">
                                                             {petition.detail}
                                                        </span>
-                                                       <span className="w-full col-span-1 justify-center flex text-gray-500 truncate text-center">
+                                                       <span className="w-full col-span-2 xl:col-span-1 justify-center flex text-gray-500 truncate text-center">
                                                             <div className="flex items-center gap-1">
                                                                  <div className={`rounded-full w-2 h-2 ${petition?.status == 0 ? "bg-yellow-600" : petition?.status == 1 ? "bg-green-600" : "bg-red-600"}`}></div>
                                                                  <p className="text-xs">

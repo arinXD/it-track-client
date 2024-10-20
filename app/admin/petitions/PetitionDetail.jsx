@@ -84,7 +84,7 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                :
                petition && Object?.keys(petition).length > 0 && petition?.deletedAt == null ?
                     <section className="grid grid-cols-8 gap-6">
-                         <section className="border rounded-lg col-span-5 shadow">
+                         <section className="col-span-8 border rounded-lg xl:col-span-5 shadow">
                               <div className="p-2 bg-white border-b flex items-center rounded-tr-lg rounded-tl-lg">
                                    <Link href={`/admin/petitions/${current}`}>
                                         <Button
@@ -103,16 +103,16 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                                         <p className="text-center my-2">Loading...</p>
                                         :
                                         <form>
-                                             <div className="flex justify-start items-start gap-6 mb-2">
+                                             <div className="flex flex-col lg:flex-row justify-start items-start gap-6 mb-6 lg:mb-2">
                                                   <div
-                                                       className="w-10 h-10"
+                                                       className="w-10 h-10 max-lg:hidden"
                                                   />
                                                   <h1 className="text-2xl ">{petition?.title}</h1>
                                              </div>
 
-                                             <div className="flex justify-start items-start gap-6">
+                                             <div className="flex flex-col lg:flex-row justify-start items-start gap-6">
                                                   <Image
-                                                       className="w-10 h-10 rounded-full"
+                                                       className="w-10 h-10 rounded-full max-lg:hidden"
                                                        src={petition?.Sender?.image}
                                                        width={200}
                                                        height={200}
@@ -123,12 +123,24 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                                                   />
                                                   <div
                                                        className="w-full">
-                                                       <div className="flex justify-between items-center">
+                                                       <div className="flex max-lg:gap-2 flex-col lg:flex-row lg:justify-between items-start lg:items-center">
                                                             <input type="hidden" name="id" readOnly value={petition?.id} />
-                                                            <h1 className="flex gap-2 items-center">
-                                                                 <span className="font-bold">{petition?.Sender?.Student?.first_name} {petition?.Sender?.Student?.last_name}</span>
-                                                                 <span className="text-sm text-default-400">{`<${petition?.Sender?.email}>`}</span>
-                                                            </h1>
+                                                            <div className="w-full flex gap-4">
+                                                                 <Image
+                                                                      className="w-10 h-10 rounded-full hidden max-lg:block"
+                                                                      src={petition?.Sender?.image}
+                                                                      width={200}
+                                                                      height={200}
+                                                                      onError={({ currentTarget }) => {
+                                                                           currentTarget.onerror = null;
+                                                                           currentTarget.src = "/image/error_image.png";
+                                                                      }}
+                                                                 />
+                                                                 <div className="w-full flex flex-col lg:flex-row lg:gap-2 items-start lg:items-center overflow-x-clip">
+                                                                      <p className="w-full font-bold">{petition?.Sender?.Student?.first_name} {petition?.Sender?.Student?.last_name}</p>
+                                                                      <p className="w-full text-sm text-default-400 text-ellipsis">{`<${petition?.Sender?.email}>`}</p>
+                                                                 </div>
+                                                            </div>
                                                             <div>
                                                                  <div className="flex items-center gap-1">
                                                                       <div className={`rounded-full w-3 h-3 ${petition?.status == 0 ? "bg-yellow-600" : petition?.status == 1 ? "bg-green-600" : "bg-red-600"}`}></div>
@@ -139,7 +151,7 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                                                             </div>
                                                        </div>
                                                        <div className="space-y-4">
-                                                            <p className="text-sm text-default-800">{petition?.createdAt && simpleDmyhm(petition?.createdAt)}</p>
+                                                            <p className="max-lg:mt-4 max-lg:text-xs text-sm text-default-800">{petition?.createdAt && simpleDmyhm(petition?.createdAt)}</p>
                                                             <p className="py-4">{petition?.detail}</p>
 
                                                             <hr />
@@ -164,7 +176,7 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                               </div>
                          </section>
                          {/* parent */}
-                         <section className="col-span-3 border rounded-lg shadow flex flex-col">
+                         <section className="col-span-8 xl:col-span-3 border rounded-lg shadow flex flex-col">
                               <div className="flex p-2 border-b items-center h-[55px]">
                                    <h1 className="mx-4">{isApprovableState ? "การอนุมัติ" : "สถานะการอนุมัติ"}</h1>
                               </div>
@@ -218,19 +230,19 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                                                        onInput={e => setResponseText(e.target.value)}
                                                   ></textarea>
                                              </div>
-                                             <div className="flex justify-between gap-4 mt-auto">
+                                             <div className="flex justify-between md:justify-end gap-4 mt-auto">
                                                   <Button
                                                        onClick={() => handleApprove(petition.id, session?.user?.email, 2, responseText)}
                                                        variant="bordered"
                                                        type="button"
-                                                       className="w-full rounded-[5px] border-1 border-blue-700 text-blue-700 hover:bg-gray-100"
+                                                       className="max-md:w-full rounded-[5px] border-1 border-blue-700 text-blue-700 hover:bg-gray-100"
                                                        isLoading={isRejecting}>
                                                        ปฎิเสธ
                                                   </Button>
                                                   <Button
                                                        onClick={() => handleApprove(petition.id, session?.user?.email, 1, responseText)}
                                                        type="button"
-                                                       className="w-full rounded-[5px] bg-blue-500 text-white"
+                                                       className="max-md:w-full rounded-[5px] bg-blue-500 text-white"
                                                        isLoading={isApproving}>
                                                        อนุมัติ
                                                   </Button>

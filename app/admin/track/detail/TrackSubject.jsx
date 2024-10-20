@@ -1,5 +1,5 @@
 "use client"
-import { DeleteIcon2, PlusIcon } from "@/app/components/icons";
+import { DeleteIcon, DeleteIcon2, PlusIcon } from "@/app/components/icons";
 import { getOptions } from "@/app/components/serverAction/TokenAction";
 import { Button, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useDisclosure } from "@nextui-org/react";
 import { Empty, message } from "antd";
@@ -123,7 +123,7 @@ const TrackSubject = ({ track }) => {
                         onPress={() => handleSelectDelete(selectSubjects)}
                         color='danger'
                         className='bg-red-400'
-                        startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                        startContent={<DeleteIcon className="w-4 h-4" />}>
                         ลบ
                     </Button>
                 </div>

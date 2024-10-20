@@ -3,7 +3,7 @@ import { getOptions } from "@/app/components/serverAction/TokenAction";
 import axios from "axios";
 import { createRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MdOutlineInventory2 } from "react-icons/md";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spinner, Chip } from "@nextui-org/react"
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spinner, Chip, Select, SelectItem } from "@nextui-org/react"
 import { Checkbox, Empty, message } from 'antd';
 import { DeleteIcon, PlusIcon, SearchIcon } from "@/app/components/icons";
 import { SELECT_STYLE, thinInputClass } from "@/src/util/ComponentClass";
@@ -17,6 +17,7 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
     const [defaultQuestionBank, setDefaultQuestionBank] = useState([]);
     const [questionsBank, setQuestionsBank] = useState([]);
     const [searchTrack, setSearchTrack] = useState("all");
+    const [searchValue, setSearchValue] = useState("");
 
     const getQuestions = useCallback(async (formId) => {
         if (!formId) {
@@ -215,6 +216,25 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
         }
     }, [formId])
 
+    const handleSearch = useCallback((value) => {
+        setSearchValue(value);
+    }, [])
+
+    const trackItems = useMemo(() => ["all", ...tracks.map(t => t.track)], [tracks])
+    const [trackFilter, setTrackFilter] = useState('all');
+
+    const filteredAssessments = useMemo(() => {
+        return assesstion.filter((q) => {
+            const matchesSearch = q.question.toLowerCase().includes(searchValue.toLowerCase());
+            const matchesTrack = trackFilter === 'all' || q.track === trackFilter;
+            return matchesSearch && matchesTrack;
+        });
+    }, [assesstion, searchValue, trackFilter]);
+
+    const handleTrackFilter = useCallback((value) => {
+        setTrackFilter(value);
+    }, [])
+
     return (
         <>
             <section style={formStyle}>
@@ -324,40 +344,73 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                         </div>
                         :
                         <>
-                            <div className="flex justify-between">
-                                <h2 className="text-black">คำถามความชอบภายในแบบฟอร์ม</h2>
-                                <div className="flex justify-end gap-4">
+                            <h2 className="text-black mb-4">คำถามความชอบภายในแบบฟอร์ม ({assesstion?.length} ข้อ)</h2>
+                            <div className="w-full grid grid-cols-8 gap-4">
+                                <Input
+                                    type="text"
+                                    placeholder="ค้นหาคำถาม"
+                                    value={searchValue}
+                                    classNames={{
+                                        ...thinInputClass,
+                                        innerWrapper: [
+                                            "bg-white",
+                                        ],
+                                    }}
+                                    onValueChange={handleSearch}
+                                    onClear={() => handleSearch("")}
+                                    className="col-span-8 md:col-span-4 !w-full !text-xs"
+                                    startContent={<SearchIcon />}
+                                />
+
+                                <Select
+                                    classNames={{
+                                        label: "!text-xs",
+                                        trigger: "border-1 h-10 !text-xs bg-white",
+                                    }}
+                                    variant="bordered"
+                                    placeholder="เลือกแทร็ก"
+                                    className="col-span-8 md:col-span-2 w-full"
+                                    selectedKeys={[trackFilter]}
+                                    onChange={(e) => handleTrackFilter(e.target.value)}
+                                >
+                                    {trackItems.map(track => (
+                                        <SelectItem key={track} value={track}>
+                                            {track === 'all' ? 'ทั้งหมด' : track}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+                                <div className="col-span-8 md:col-span-2 grid grid-cols-4 max-md:place-items-center">
                                     <Button
                                         isIconOnly
                                         radius="full"
-                                        className={`text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
+                                        className={`col-span-1 text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
                                         onClick={createQuestion}
                                         aria-label="create">
                                         <PlusIcon />
                                     </Button>
                                     <Button
-                                        className={`rounded-[5px] text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
+                                        className={`col-span-3 w-full rounded-[5px] text-blue-700 bg-white border border-blue-700 hover:bg-gray-200 transition-all`}
                                         startContent={<MdOutlineInventory2 />}
                                         onClick={onOpen}
                                     >
-                                        คลังคำถามประเมินตนเอง
+                                        คลังคำถาม
                                     </Button>
                                 </div>
                             </div>
                             <div id="questionsWrap">
                                 {
-                                    assesstion?.length > 0 ?
+                                    filteredAssessments?.length > 0 ?
                                         <div className="flex flex-col gap-4 mt-4">
                                             {
-                                                assesstion.map((q, index) => (
+                                                filteredAssessments.map((q, index) => (
                                                     <div
                                                         key={index}
                                                         ref={questionRefs.current[index]}
-                                                        className="w-full bg-white border-1 p-4 flex flex-col rounded-lg shadow-md justify-between items-center">
-                                                        <div className="w-full flex items-center justify-between gap-4">
+                                                        className="w-full bg-white border-1 p-4 flex flex-col rounded-lg shadow-md justify-between items-center max-md:gap-2 max-md:flex-col">
+                                                        <div className="w-full flex items-center justify-between gap-4 max-md:flex-col-reverse">
                                                             <input readOnly type="hidden" name="assesstion_ID[]" defaultValue={q.id} />
                                                             <input
-                                                                className="text-black p-2 border-b-black border-b bg-blue-50 w-[80%] outline-none focus:border-b-blue-500 focus:border-b-2"
+                                                                className="text-black p-2 border-b-black border-b bg-blue-50 w-full md:w-[80%] outline-none focus:border-b-blue-500 focus:border-b-2"
                                                                 type="text"
                                                                 name={`assesstion_title_${q.id}`}
                                                                 value={q.question}
@@ -368,7 +421,7 @@ const Assesstion = ({ prev, next, formStyle, tracks, formId, assesstion, setAsse
                                                                 }}
                                                             />
                                                             <select
-                                                                className="border-1 border-gray-200 rounded-[5px] p-2"
+                                                                className="border-1 border-gray-200 rounded-[5px] p-2  max-md:w-full"
                                                                 name={`trackOf_${q.id}`}
                                                                 style={{
                                                                     ...SELECT_STYLE
