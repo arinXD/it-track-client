@@ -449,12 +449,13 @@ const Page = () => {
                 const categoryverifies = data.CategoryVerifies.map(categoryVerify => categoryVerify.Categorie);
                 setCategoryVerifies(categoryverifies);
 
+                // console.log(data.SubjectVerifies);
                 const subjectsByCategory = data.SubjectVerifies.reduce((acc, subjectVerify) => {
                     const subject = subjectVerify.Subject;
                     const categories = [...new Set([
-                        ...subject.SubgroupSubjects.map(subgroup => subgroup.SubGroup.Group.Categorie),
                         ...subject.GroupSubjects.map(group => group.Group.Categorie),
-                        ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SubGroup.Group.Categorie)
+                        ...subject.SubgroupSubjects.map(subgroup => subgroup.SubGroup.Group.Categorie),
+                        ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SemiSubGroup.SubGroup.Group.Categorie)
                     ])];
 
                     categories.forEach(categorie => {
@@ -471,10 +472,10 @@ const Page = () => {
                 }, {});
 
                 const categoryData = Object.values(subjectsByCategory);
+                console.log(categoryData);
 
                 setCategoryData(categoryData);
 
-                // console.log(categoryData);
 
                 const subgroupData = data.SubjectVerifies.map(subjectVerify => {
                     const subject = subjectVerify.Subject;
@@ -492,32 +493,10 @@ const Page = () => {
 
                 const semisubgroupData = data.SubjectVerifies.map(subjectVerify => {
                     const subject = subjectVerify.Subject;
-                    const semisubgroups = subject.SemiSubgroupSubjects.map(semisubgroupSubject => {
-                        // Create a new object without circular references
-                        const { SemiSubGroup, ...rest } = semisubgroupSubject;
-                        return {
-                            ...SemiSubGroup,
-                            ...rest,
-                            SubGroup: SemiSubGroup.SubGroup ? {
-                                id: SemiSubGroup.SubGroup.id,
-                                name: SemiSubGroup.SubGroup.name,
-                                Group: SemiSubGroup.SubGroup.Group ? {
-                                    id: SemiSubGroup.SubGroup.Group.id,
-                                    name: SemiSubGroup.SubGroup.Group.name,
-                                    Categorie: SemiSubGroup.SubGroup.Group.Categorie ? {
-                                        id: SemiSubGroup.SubGroup.Group.Categorie.id,
-                                        name: SemiSubGroup.SubGroup.Group.Categorie.name
-                                    } : null
-                                } : null
-                            } : null
-                        };
-                    });
-
-                    return { subject: { subject_id: subject.subject_id, subject_code: subject.subject_code }, semisubgroups };
-                });
-                // console.log(semisubgroupData);
-
-                setSemiSubgroupData(semisubgroupData);
+                    const semisubgroups = subject.SemiSubgroupSubjects?.map(semisubgroupSubject => semisubgroupSubject.SemiSubGroup);
+                    return { subject, semisubgroups };
+               });
+               setSemiSubgroupData(semisubgroupData);
 
                 if (data?.Subjects) {
                     setVerifySubjects(data.Subjects);
@@ -724,7 +703,7 @@ const Page = () => {
                     const categories = [
                         ...subject.SubgroupSubjects.map(subgroup => subgroup.SubGroup.Group.Categorie),
                         ...subject.GroupSubjects.map(group => group.Group.Categorie),
-                        ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SubGroup.Group.Categorie)
+                        ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SemiSubGroup.SubGroup.Group.Categorie)
                     ];
 
                     categories.forEach(categorie => {
@@ -2151,6 +2130,8 @@ const Page = () => {
     // console.log(statusVerify);
 
     const getSubTrack = (subgroup, subgroupIndex) => {
+        // console.log(subgroup);
+
         if (subgroup?.subjects?.every(subject => subject?.SemiSubgroupSubjects?.some(e => e?.SemiSubGroup))) {
             const subjects = subgroup.subjects || [];
             const SemiSubjects = {};

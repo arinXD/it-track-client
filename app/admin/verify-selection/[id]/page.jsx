@@ -186,7 +186,7 @@ const Page = ({ params }) => {
                 const categories = [
                     ...subject.SubgroupSubjects.map(subgroup => subgroup.SubGroup.Group.Categorie),
                     ...subject.GroupSubjects.map(group => group.Group.Categorie),
-                    ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SubGroup.Group.Categorie)
+                    ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SemiSubGroup.SubGroup.Group.Categorie)
                 ];
 
                 categories.forEach(categorie => {
