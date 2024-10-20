@@ -25,18 +25,18 @@ export default function Notification({ email = null }) {
           }
      }, [])
 
-     // useEffect(() => {
-     //      if (email) {
+     useEffect(() => {
+          if (email) {
 
-     //           getNotificationByEmail(email)
+               getNotificationByEmail(email)
 
-     //           const interval = setInterval(() => {
-     //                getNotificationByEmail(email)
-     //           }, 15000)
+               const interval = setInterval(() => {
+                    getNotificationByEmail(email)
+               }, 15000)
 
-     //           return () => clearInterval(interval)
-     //      }
-     // }, [email, getNotificationByEmail])
+               return () => clearInterval(interval)
+          }
+     }, [email, getNotificationByEmail])
 
      const updateNotiRead = useCallback(async (id, destination) => {
           try {
