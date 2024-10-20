@@ -251,7 +251,10 @@ const InsertAdvisor = () => {
                          </div>
                     </div>
                     <div></div>
-                    <div className='flex gap-4 justify-start'>
+                    <div className='flex gap-4 justify-end'>
+                         <Button type='button' className='border-1 rounded-lg' color="primary" variant='bordered' onPress={closeForm}>
+                              ยกเลิก
+                         </Button>
                          <Button
                               onPress={() => handleCreated(student?.stu_id, selectAdvisor)}
                               isDisabled={inserting}
@@ -261,9 +264,6 @@ const InsertAdvisor = () => {
                               color="primary"
                               variant='solid'>
                               บันทึก
-                         </Button>
-                         <Button type='button' className='border-1 rounded-lg' color="primary" variant='bordered' onPress={closeForm}>
-                              เคลียร์
                          </Button>
                     </div>
                </div>

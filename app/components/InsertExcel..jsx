@@ -345,7 +345,7 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                                    <h1 className="text-xs mb-2">ข้อมูลที่ต้องการ ( <span className="text-red-500">*</span> หมายถึงจำเป็นต้องมี )</h1>
                                    <div className={`grid grid-cols-3 gap-4`}>
                                         {headers.map((header, index) => (
-                                             <div key={index} className="w-full border rounded-md p-2 col-span-1 text-sm text-left rtl:text-right text-gray-500">
+                                             <div key={index} className="w-full border rounded-md p-2 col-span-3 lg:col-span-1 text-sm text-left rtl:text-right text-gray-500">
                                                   <div>
                                                        <p className="text-black mb-1 text-sm">{header.groupTitle}</p>
                                                        <ul>
