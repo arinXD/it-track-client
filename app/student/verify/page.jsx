@@ -2413,7 +2413,6 @@ const Page = () => {
             </>
         );
     }
-    console.log(verifySelect);
 
     return (
         <>
@@ -2432,6 +2431,9 @@ const Page = () => {
                         <>
                             <p className='text-center font-bold text-lg my-28'>
                                 เร็วๆ นี้!
+                            </p>
+                            <p>
+                                {JSON.stringify(verifySelect)}
                             </p>
                         </>
                         :
