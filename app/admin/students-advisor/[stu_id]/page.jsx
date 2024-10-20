@@ -207,7 +207,7 @@ export default function Page({ params }) {
 
             <div>
                 {
-                    false ?
+                    fetching ?
                         <div className='w-full flex justify-center h-[70vh]'>
                             <Spinner label="กำลังโหลด..." color="primary" />
                         </div>

@@ -6,6 +6,7 @@ import { getOptions } from '@/app/components/serverAction/TokenAction';
 import { getAcadyears } from '@/src/util/academicYear';
 import { getGrades } from '@/src/util/grade';
 import Swal from 'sweetalert2';
+import { SELECT_STYLE } from '@/src/util/ComponentClass';
 
 const swal = Swal.mixin({
     customClass: {
@@ -96,57 +97,46 @@ const EditEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, callBa
                     {(onClose) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">
-                                <h2>เพิ่มการลงทะเบียนเรียนของนักศึกษา</h2>
-                                <span className='text-base font-normal'>แบบฟอร์มเพิ่มการลงทะเบียนเรียนของนักศึกษา</span>
+                                <h2>แก้ไขการลงทะเบียนเรียนของนักศึกษา</h2>
+                                <span className='text-base font-normal'>แบบฟอร์มแก้ไขการลงทะเบียนเรียนของนักศึกษา</span>
                             </ModalHeader>
                             <ModalBody>
-                                <div
-                                    style={{
-                                        boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px"
-                                    }}
-                                    className='mb-3 space-y-2 rounded-md p-2'>
-                                    <div>
-                                        {
-                                            Object.keys(student) == 0 ? undefined :
-                                                <div>
-                                                    <p className='text-sm font-bold'>ข้อมูลนักศึกษา</p>
-                                                    <p>
-                                                        {student?.stu_id} {student?.first_name} {student?.last_name} {student?.Program?.title_th} ({student?.courses_type})
-                                                    </p>
-                                                </div>
-                                        }
-                                    </div>
+                                <div className='mb-3 space-y-2'>
+                                    {
+                                        Object.keys(student) == 0 ? undefined :
+                                            <>
+                                                <p className='text-sm font-bold'>ข้อมูลนักศึกษา</p>
+                                                <p>
+                                                    {student?.stu_id} {student?.first_name} {student?.last_name} {student?.Program?.title_th} ({student?.courses_type})
+                                                </p>
+                                            </>
+                                    }
                                 </div>
-                                <div
-                                    style={{
-                                        boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px"
-                                    }}
-                                    className='mb-3 space-y-2 rounded-md p-2'>
-                                    <div>
-                                        {
-                                            Object.keys(subject) == 0 ? undefined :
-                                                <>
-                                                    <div>
-                                                        <p className='text-sm font-bold'>ข้อมูลนักศึกษา</p>
-                                                        <p>
-                                                            {subject?.subject_code} <span>{subject?.title_en}</span> <span>{subject?.title_th}</span> {subject?.credit} หน่วยกิต
-                                                        </p>
-                                                    </div>
-                                                </>
-                                        }
-                                    </div>
+
+                                <hr />
+
+                                <div className='my-3 space-y-2'>
+                                    {
+                                        Object.keys(subject) == 0 ? undefined :
+                                            <>
+                                                <p className='text-sm font-bold'>ข้อมูลนักศึกษา</p>
+                                                <p>
+                                                    {subject?.subject_code} <span>{subject?.title_en}</span> <span>{subject?.title_th}</span> {subject?.credit} หน่วยกิต
+                                                </p>
+                                            </>
+                                    }
                                 </div>
-                                <div className='flex flex-row gap-3 items-end'>
+
+                                <hr />
+
+                                <div className='mt-3 flex flex-row gap-6 items-end'>
                                     <div className='flex flex-col w-[50%]'>
                                         <label className='text-xs mb-0.5'>ปีการศึกษา</label>
                                         <select
                                             defaultValue={enrollYear}
                                             id="select-acadyear"
                                             className="border-1 text-sm rounded-lg block w-full p-2.5"
-                                            style={{
-                                                lineHeight: "40px",
-                                                height: "40px",
-                                            }}
+                                            style={SELECT_STYLE}
                                         >
                                             <option value="" className='' disabled hidden>เลือกปีการศึกษา</option>
                                             {acadyears.map(acadyear => (
@@ -159,6 +149,7 @@ const EditEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, callBa
                                         <select
                                             id="select-grade"
                                             defaultValue={grade}
+                                            style={SELECT_STYLE}
                                             className="border-1 text-sm rounded-lg block w-full p-2.5">
                                             <option value="" className='' disabled hidden>เลือกเกรด</option>
                                             {

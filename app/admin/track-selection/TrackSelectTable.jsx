@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Tooltip, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Spinner, Input } from "@nextui-org/react";
-import { PlusIcon, CheckIcon, DeleteIcon2, SearchIcon } from "@/app/components/icons";
+import { PlusIcon, CheckIcon, DeleteIcon2, SearchIcon, DeleteIcon } from "@/app/components/icons";
 import { Icon } from '@iconify/react';
 import { Loading } from '@/app/components';
 import axios from 'axios';
@@ -98,8 +98,9 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
     }, [])
 
     return (
-        <div className='my-[30px]'>
-            <div className='border p-4 rounded-[10px] w-full'>
+        <div className="space-y-4 p-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+                <h2 className="text-2xl font-bold">ตารางข้อมูลการคัดเลือกแทร็ก</h2>
                 <div className="flex gap-4">
                     <Button
                         radius='sm'
@@ -117,119 +118,109 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
                         onPress={() => handleSelectedDel(selectedTrackSelect)}
                         color='danger'
                         className='bg-red-400'
-                        startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                        startContent={<DeleteIcon className="w-4 h-4" />}>
                         ลบ
                     </Button>
                 </div>
-                <Input
-                    isClearable
-                    className="w-full h-fit my-4"
-                    placeholder="ค้นหาการคัดเลือกแทร็ก"
-                    size="sm"
-                    classNames={inputClass}
-                    startContent={<SearchIcon />}
-                    value={searchQuery}
-                    onClear={() => onClear()}
-                    onChange={(e) => handleSearch(e.target.value)}
-                />
-                {
-                    loading ?
-                        <div className='w-fit mx-auto mt-14'>
-                            <Loading />
-                        </div>
-                        :
-                        <Table
-                            checkboxesProps={{
-                                classNames: {
-                                    wrapper: "after:bg-blue-500 after:text-background text-background",
-                                },
-                            }}
-                            classNames={minimalTableClass}
-                            isLoading={loading}
-                            loadingContent={<Spinner />}
-                            isStriped
-                            removeWrapper
-                            selectionMode="multiple"
-                            selectedKeys={selectedKey}
-                            onSelectionChange={setSelectedKey}
-                            onRowAction={() => { }}
-                            aria-label="track selection table">
-                            <TableHeader>
-                                <TableColumn></TableColumn>
-                                <TableColumn></TableColumn>
-                                <TableColumn>ปีการศึกษา</TableColumn>
-                                <TableColumn>ชื่อ</TableColumn>
-                                <TableColumn>สถานะ</TableColumn>
-                                <TableColumn>เริ่มต้น</TableColumn>
-                                <TableColumn>สิ้นสุด</TableColumn>
-                            </TableHeader>
-                            <TableBody
-                                isLoading={loading}
-                                loadingContent={<Spinner />}
-                                emptyContent={
-                                    <Empty
-                                        className='my-4 w-1/'
-                                        description={
-                                            <span className='text-gray-300'>ไม่มีข้อมูลคัดเลือกแทร็ก</span>
-                                        }
-                                    />
+            </div>
+            <Input
+                isClearable
+                className="w-full h-fit my-4"
+                placeholder="ค้นหาการคัดเลือกแทร็ก"
+                size="sm"
+                classNames={inputClass}
+                startContent={<SearchIcon />}
+                value={searchQuery}
+                onClear={() => handleSearch("")}
+                onChange={(e) => handleSearch(e.target.value)}
+            />
+            <div className='border p-4 rounded-[10px] w-full'>
+                <Table
+                    checkboxesProps={{
+                        classNames: {
+                            wrapper: "after:bg-blue-500 after:text-background text-background",
+                        },
+                    }}
+                    classNames={minimalTableClass}
+                    isStriped
+                    removeWrapper
+                    selectionMode="multiple"
+                    selectedKeys={selectedKey}
+                    onSelectionChange={setSelectedKey}
+                    onRowAction={() => { }}
+                    aria-label="track selection table">
+                    <TableHeader>
+                        <TableColumn>ปีการศึกษา</TableColumn>
+                        <TableColumn>ชื่อ</TableColumn>
+                        <TableColumn>สถานะ</TableColumn>
+                        <TableColumn>เริ่มต้น</TableColumn>
+                        <TableColumn>สิ้นสุด</TableColumn>
+                        <TableColumn className='text-center'>Actions</TableColumn>
+                    </TableHeader>
+                    <TableBody
+                        isLoading={loading}
+                        loadingContent={<Spinner />}
+                        emptyContent={
+                            <Empty
+                                className='my-4 w-1/'
+                                description={
+                                    <span className='text-gray-300'>ไม่มีข้อมูลคัดเลือกแทร็ก</span>
                                 }
-                                items={filteredData}
-                            >
-                                {(item, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>
-                                            {!(item.has_finished) ?
-                                                <Button
-                                                    size='sm'
-                                                    onPress={() => handleStartSelect({ id: item.id, hasFinished: item.has_finished })}
-                                                    color="warning" variant="solid" className='bg-amber-400'>
-                                                    ปิดการคัดเลือก
-                                                </Button>
-                                                :
-                                                <Button
-                                                    size='sm'
-                                                    onPress={() => handleStartSelect({ id: item.id, hasFinished: item.has_finished })}
-                                                    color="primary" variant="solid" className=''>
-                                                    เปิดการคัดเลือก
-                                                </Button>
-                                            }
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="relative flex items-center gap-4">
-                                                <Tooltip color="danger" content="ลบ">
-                                                    <span onClick={() => handleDelete(item.acadyear)} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                        <DeleteIcon2 />
-                                                    </span>
-                                                </Tooltip>
-                                            </div>
-                                        </TableCell>
-
-                                        <TableCell>{item.acadyear}</TableCell>
-
-                                        <TableCell className="w-1/3">
-                                            <Link
-                                                href={`/admin/track-selection/${item.acadyear}`}
-                                                className='text-blue-500'
-                                            >{item.title}
-                                            </Link>
-                                        </TableCell>
-
-                                        <TableCell>
-                                            {item.has_finished ?
-                                                <Chip startContent={<CheckIcon size={18} />} color="success" variant="flat">เสร็จสิ้น</Chip>
-                                                :
-                                                <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">กำลังดำเนินการ</Chip>
-                                            }
-                                        </TableCell>
-
-                                        <TableCell>{simpleDMYHM(item.startAt)}</TableCell>
-                                        <TableCell>{simpleDMYHM(item.expiredAt)}</TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                }
+                            />
+                        }
+                        items={filteredData}
+                    >
+                        {(item, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{item.acadyear}</TableCell>
+                                <TableCell className="w-1/3">
+                                    <Link
+                                        href={`/admin/track-selection/${item.acadyear}`}
+                                        className='text-blue-500'
+                                    >{item.title}
+                                    </Link>
+                                </TableCell>
+                                <TableCell>
+                                    {item.has_finished ?
+                                        <Chip startContent={<CheckIcon size={18} />} color="success" variant="flat">เสร็จสิ้น</Chip>
+                                        :
+                                        <Chip startContent={<Icon icon="mingcute:time-fill" className='w-[1.3em] h-[1.3em]' />} color="warning" variant="flat">กำลังดำเนินการ</Chip>
+                                    }
+                                </TableCell>
+                                <TableCell>{simpleDMYHM(item.startAt)}</TableCell>
+                                <TableCell>{simpleDMYHM(item.expiredAt)}</TableCell>
+                                <TableCell>
+                                    <div className="relative flex items-center gap-4">
+                                        {!(item.has_finished) ?
+                                            <Button
+                                                size='sm'
+                                                onPress={() => handleStartSelect({ id: item.id, hasFinished: item.has_finished })}
+                                                color="warning" variant="solid" className='bg-amber-400'>
+                                                ปิดการคัดเลือก
+                                            </Button>
+                                            :
+                                            <Button
+                                                size='sm'
+                                                onPress={() => handleStartSelect({ id: item.id, hasFinished: item.has_finished })}
+                                                color="primary" variant="solid" className=''>
+                                                เปิดการคัดเลือก
+                                            </Button>
+                                        }
+                                        <Button
+                                            onClick={() => handleDelete(item.acadyear)}
+                                            isIconOnly
+                                            size='sm'
+                                            radius='sm'
+                                            color='danger'
+                                            className="text-lg active:opacity-50">
+                                            <DeleteIcon className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </div>
         </div >
     )

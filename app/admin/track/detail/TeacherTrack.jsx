@@ -1,5 +1,5 @@
 "use client"
-import { DeleteIcon2, EditIcon2, PlusIcon } from "@/app/components/icons";
+import { DeleteIcon, DeleteIcon2, EditIcon2, PlusIcon } from "@/app/components/icons";
 import { getOptions } from "@/app/components/serverAction/TokenAction";
 import { Button, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip, useDisclosure } from "@nextui-org/react";
 import axios from "axios";
@@ -184,7 +184,7 @@ const TeacherTrack = ({ track }) => {
                         onPress={() => handleDelete(selectedTeachers)}
                         color='danger'
                         className='bg-red-400'
-                        startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                        startContent={<DeleteIcon className="w-4 h-4" />}>
                         ลบ
                     </Button>
                 </div>

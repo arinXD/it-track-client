@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DeleteIcon, DeleteIcon2, EditIcon2, PlusIcon, SearchIcon } from '@/app/components/icons'
 import { Button, Chip, Input, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@nextui-org/react'
 import Link from 'next/link'
-import { inputClass, minimalTableClass } from '@/src/util/ComponentClass'
+import { inputClass, minimalTableClass, thinInputClass } from '@/src/util/ComponentClass'
 import { getOptions } from '@/app/components/serverAction/TokenAction'
 import axios from 'axios'
 import Swal from 'sweetalert2'
@@ -185,7 +185,7 @@ const Page = () => {
                     );
                default:
                     return (
-                         <div className='w-[500px] whitespace-nowrap overflow-hidden text-ellipsis'>
+                         <div className='w-[550px] whitespace-nowrap overflow-hidden text-ellipsis'>
                               {cellValue}
                          </div>
                     )
@@ -282,7 +282,7 @@ const Page = () => {
      const bottomContent = useMemo(() => {
           return (
                Object.keys(news).length > 0 ?
-                    <div className="py-2 px-2 flex justify-center items-center">
+                    <div className="py-2 px-2 flex justify-end items-center">
                          <Pagination
                               isCompact
                               showControls
@@ -299,13 +299,21 @@ const Page = () => {
      }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
      return (
-          <div className='border p-4 rounded-[10px] w-full'>
-               <div className="flex flex-col gap-4 mb-4">
-                    <div className="flex gap-4">
+          <div className="space-y-4 p-4">
+               <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+                    <h2 className="text-2xl font-bold">ตารางข่าวประชาสัมพันธ์</h2>
+                    <div className="flex space-x-4">
+                         <Input
+                              className="w-[350px] !text-xs"
+                              placeholder="ค้นหาข่าว (หัวข้อข่าว, เนื้อหาแบบย่อ)"
+                              classNames={thinInputClass}
+                              value={filterValue}
+                              onClear={() => onClear()}
+                              startContent={<SearchIcon />}
+                              onValueChange={onSearchChange}
+                         />
                          <Link href="/admin/news/create-news">
                               <Button
-                                   radius='sm'
-                                   size='sm'
                                    className='bg-[#edf8f7] text-[#46bcaa]'
                                    startContent={<PlusIcon className="w-5 h-5" />}>
                                    เพิ่มข่าว
@@ -314,97 +322,84 @@ const Page = () => {
                          <Button
                               isDisabled={disableDeleteBtn || deleting}
                               isLoading={deleting}
-                              radius='sm'
-                              size='sm'
                               onClick={() => handleDelete(selectedTracks)}
                               color='danger'
                               className='bg-red-400'
-                              startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                              startContent={<DeleteIcon className="w-4 h-4" />}>
                               ลบ
                          </Button>
                     </div>
-                    <Input
-                         isClearable
-                         className="w-full h-fit"
-                         placeholder="ค้นหาข่าว (หัวข้อข่าว, เนื้อหาแบบย่อ)"
-                         size="sm"
-                         classNames={inputClass}
-                         startContent={<SearchIcon />}
-                         value={filterValue}
-                         onClear={() => onClear()}
-                         onValueChange={onSearchChange}
-                    />
                </div>
-               <Table
-                    aria-label="Student Table"
-                    checkboxesProps={{
-                         classNames: {
-                              wrapper: "after:bg-blue-500 after:text-background text-background",
-                         },
-                    }}
-                    classNames={{
-                         wrapper: ["block", "w-full", "overflow-x-auto"],
-                         table: ["w-full"],
-                         th: ["bg-[#F6F6F6]", "text-black", "last:text-center"],
-                         td: [
-                              // first
-                              "group-data-[first=true]:first:before:rounded-none",
-                              "group-data-[first=true]:last:before:rounded-none",
-                              // middle
-                              "group-data-[middle=true]:before:rounded-none",
-                              // last
-                              "group-data-[last=true]:first:before:rounded-none",
-                              "group-data-[last=true]:last:before:rounded-none",
-                              "mb-4",
-                         ],
-                    }}
+               <div className='p-4 rounded-[10px] border'>
+                    <Table
+                         aria-label="Student Table"
+                         checkboxesProps={{
+                              classNames: {
+                                   wrapper: "after:bg-blue-500 after:text-background text-background",
+                              },
+                         }}
+                         classNames={{
+                              wrapper: ["block", "w-full", "overflow-x-auto"],
+                              table: ["w-full"],
+                              th: ["bg-[#F6F6F6]", "text-black", "last:text-center"],
+                              td: [
+                                   // first
+                                   "group-data-[first=true]:first:before:rounded-none",
+                                   "group-data-[first=true]:last:before:rounded-none",
+                                   // middle
+                                   "group-data-[middle=true]:before:rounded-none",
+                                   // last
+                                   "group-data-[last=true]:first:before:rounded-none",
+                                   "group-data-[last=true]:last:before:rounded-none",
+                                   "mb-4",
+                              ],
+                         }}
+                         isStriped
+                         removeWrapper
+                         selectionMode="multiple"
+                         sortDescriptor={sortDescriptor}
+                         onSortChange={setSortDescriptor}
+                         selectedKeys={selectedKeys}
+                         onSelectionChange={setSelectedKeys}
+                         onRowAction={() => { }}
+                    >
+                         <TableHeader columns={headerColumns}>
+                              {(column) => (
+                                   <TableColumn
+                                        key={column.uid}
+                                        className={`${column.uid !== "title" && "text-center"}`}
+                                        allowsSorting={column.sortable}
+                                   >
+                                        {column.name}
+                                   </TableColumn>
+                              )}
+                         </TableHeader>
+                         <TableBody
+                              isLoading={fetching || deleting}
+                              loadingContent={<Spinner />}
+                              emptyContent={
+                                   <Empty
+                                        className='my-4'
+                                        description={
+                                             <span className='text-gray-300'>ไม่มีข้อมูลข่าวสาร</span>
+                                        }
+                                   />
+                              }
+                              items={items}>
+                              {(item) => (
+                                   <TableRow
+                                        key={item.track}>
+                                        {(columnKey) =>
+                                             <TableCell className={`${columnKey !== "title" && "text-center"}`}>
+                                                  {renderCell(item, columnKey)}
+                                             </TableCell>}
+                                   </TableRow>
+                              )}
+                         </TableBody>
+                    </Table>
+               </div>
+               {bottomContent}
 
-                    bottomContent={bottomContent}
-                    bottomContentPlacement="outside"
-
-                    isStriped
-                    removeWrapper
-                    selectionMode="multiple"
-                    sortDescriptor={sortDescriptor}
-                    onSortChange={setSortDescriptor}
-                    selectedKeys={selectedKeys}
-                    onSelectionChange={setSelectedKeys}
-                    onRowAction={() => { }}
-               >
-                    <TableHeader columns={headerColumns}>
-                         {(column) => (
-                              <TableColumn
-                                   key={column.uid}
-                                   className={`${column.uid !== "title" && "text-center"}`}
-                                   allowsSorting={column.sortable}
-                              >
-                                   {column.name}
-                              </TableColumn>
-                         )}
-                    </TableHeader>
-                    <TableBody
-                         isLoading={fetching || deleting}
-                         loadingContent={<Spinner />}
-                         emptyContent={
-                              <Empty
-                                   className='my-4'
-                                   description={
-                                        <span className='text-gray-300'>ไม่มีข้อมูลข่าวสาร</span>
-                                   }
-                              />
-                         }
-                         items={items}>
-                         {(item) => (
-                              <TableRow
-                                   key={item.track}>
-                                   {(columnKey) =>
-                                        <TableCell className={`${columnKey !== "title" && "text-center"}`}>
-                                             {renderCell(item, columnKey)}
-                                        </TableCell>}
-                              </TableRow>
-                         )}
-                    </TableBody>
-               </Table>
           </div>
      )
 };

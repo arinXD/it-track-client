@@ -13,8 +13,8 @@ const NewsCard = ({ news }) => (
                className="w-full h-48 object-cover"
           />
           <div className="p-4">
-               <p className='text-default-500 text-xs mb-1'>เผยแพร่เมื่อ {simpleDMY(news.updatedAt)}</p>
-               <h3 className="text-xl font-semibold"> {news.title} </h3>
+               <p className='text-default-500 text-xs mb-2'>เผยแพร่เมื่อ {simpleDMY(news.updatedAt)}</p>
+               <h3 className="text-xl font-semibold mb-4"> {news.title} </h3>
                <p className="text-gray-600 text-sm line-clamp-2">{news.desc}</p>
           </div>
      </Link>

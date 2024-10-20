@@ -117,7 +117,6 @@ const TrackForm = ({ track }) => {
                                             containerWidth="w-full md:w-[20%]"
                                             src={trackData?.img}
                                             label="ภาพแทร็ก"
-                                            displayLabel={false}
                                             width="w-full"
                                             setImageFile={setTrackImageFile}
                                             uploadProgress={uploadProgressImg}
@@ -126,7 +125,6 @@ const TrackForm = ({ track }) => {
                                             containerWidth="w-full md:w-[80%]"
                                             src={trackData?.coverImg}
                                             label="ภาพหน้าปก"
-                                            displayLabel={false}
                                             width="w-full"
                                             setImageFile={setCoverImageFile}
                                             uploadProgress={uploadProgressCover}
