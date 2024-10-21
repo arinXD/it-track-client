@@ -647,7 +647,7 @@ const Page = ({ params }) => {
 
                                     <div className='bg-white border-1 p-4 flex flex-col justify-start items-center gap-2 rounded-[10px]'>
                                         <h1 className='w-[100%] font-bold text-base'>
-                                            {title} 
+                                            {title}
                                         </h1>
                                         <hr className='my-3 w-full border-t-1 border-t-gray-300 ' />
                                         <div className='grid grid-cols-3 justify-stretch justify-items-stretch gap-4 w-full'>
@@ -861,7 +861,7 @@ const Page = ({ params }) => {
                                                             <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
                                                         </div>
                                                         <div className='mt-6 w-full grid grid-cols-1'>
-                                                            <h1 className='font-bold text-center'>Network Systems, Information Technology Security, and Internet of Things (IoT)</h1>
+                                                            <h1 className='font-bold text-center'>Systems, Network, Security and IoTs </h1>
                                                             <div className='mt-3 flex flex-col items-center gap-2 md:gap-4 md:flex-row'>
                                                                 <div className='w-full flex flex-col justify-center items-center max-md:flex-row max-md:gap-2'>
                                                                     <p>โครงการปกติ</p>
