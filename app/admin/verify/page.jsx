@@ -149,6 +149,7 @@ const Page = () => {
                                 <Table
                                     removeWrapper
                                     onRowAction={() => { }}
+                                    className='overflow-x-auto'
                                     aria-label="programcode table">
                                     <TableHeader>
                                         <TableColumn></TableColumn>

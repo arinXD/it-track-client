@@ -189,8 +189,8 @@ export default function SubGroup() {
                 <BreadCrumb />
                 <ToastContainer />
                 <div className='my-[30px]'>
-                    <div className="flex flex-col md:flex-row justify-end gap-3 mb-3">
-                        <div className='flex justify-end'>
+                    <div className="flex justify-end gap-3 mb-3">
+                        <div className='flex justify-end max-md:w-full'>
                             <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
                                 <SearchIcon width={16} height={16} />
                             </div>
@@ -202,18 +202,20 @@ export default function SubGroup() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <div className="flex md:flex-row gap-3 ml-3">
+                            <div className="flex md:flex-row w-full gap-3 ml-3">
                                 <Button
                                     radius="sm"
                                     onPress={handleInsertModalOpen}
                                     color="primary"
+                                    className='max-md:w-1/2'
                                     endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มกลุ่มย่อยวิชา
                                 </Button>
-                                <Link href={'/admin/subgroup/restore'}>
+                                <Link href={'/admin/subgroup/restore'} className='max-md:w-1/2'>
                                     <Button
                                         radius="sm"
                                         color="default"
+                                        className='max-md:w-full'
                                         endContent={<TbRestore className="w-[18px] h-[18px]" />}>
                                         รายการที่ถูกลบ
                                     </Button>
@@ -223,6 +225,7 @@ export default function SubGroup() {
                     </div>
                     <Table
                         removeWrapper
+                        className='overflow-x-auto'
                         onRowAction={() => { }}
                         aria-label="subgroup table">
                         <TableHeader>
