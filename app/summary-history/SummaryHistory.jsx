@@ -49,6 +49,7 @@ const SummaryHistory = ({ histories, fetching, fn }) => {
                <div className='p-4 rounded-[10px] border'>
                     <h2 className="text-2xl font-bold mb-4">ประวัติการแนะนำแทร็ก</h2>
                     <Table
+                         className='overflow-x-auto'
                          aria-label="Summary Histories Table"
                          removeWrapper
                     >

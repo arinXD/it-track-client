@@ -458,8 +458,8 @@ const StudentTable = ({ }) => {
 
      const topContent = useMemo(() => {
           return (
-               <div className="flex flex-col gap-4">
-                    <div className="flex flex-row justify-between items-end text-small text-default-400 gap-2">
+               <div className="flex flex-col gap-4 mb-4">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end text-small text-default-400 gap-2">
                          <div>
                               <p className="mb-1">คอลัมน์: </p>
                               <div className="flex gap-2 flex-wrap">
@@ -475,7 +475,7 @@ const StudentTable = ({ }) => {
                                    ))}
                               </div>
                          </div>
-                         <div>
+                         <div className="max-md:hidden">
                               <Button
                                    size="sm"
                                    radius="sm"
@@ -487,10 +487,11 @@ const StudentTable = ({ }) => {
                     </div>
                     {selections?.length > 0 &&
                          (<>
-                              <div className="flex justify-between items-center">
+                              <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                                    <span className="text-default-400 text-small">นักศึกษาทั้งหมด {countStudent} คน</span>
-                                   <div className="flex items-center gap-4 flex-row-reverse">
+                                   <div className="flex items-center gap-4 flex-row-reverse max-md:w-full max-md:flex-col-reverse max-md:items-start max-md:mt-4">
                                         <Pagination
+                                             className="max-md:hidden"
                                              isCompact
                                              showControls
                                              showShadow
@@ -499,14 +500,14 @@ const StudentTable = ({ }) => {
                                              total={pages}
                                              onChange={setPage}
                                         />
-                                        <div className="flex items-center text-default-400 text-small">
+                                        <div className="flex items-center text-default-400 text-small max-md:w-full">
                                              Rows per page:
                                              <select
                                                   style={{
                                                        height: "32px",
                                                        ...selectStyle
                                                   }}
-                                                  className="ms-2 px-2 pe-3 py-1 border-1 rounded-lg text-sm"
+                                                  className="ms-2 px-2 pe-3 py-1 border-1 rounded-lg text-sm max-md:w-full"
                                                   onChange={onRowsPerPageChange}
                                              >
                                                   <option value="50">50</option>
@@ -517,7 +518,7 @@ const StudentTable = ({ }) => {
                                         </div>
                                    </div>
                               </div>
-                              <div className='flex flex-row justify-between items-center gap-4'>
+                              <div className='flex flex-row justify-between items-center gap-4 max-md:w-full max-md:flex-col'>
                                    <Input
                                         isClearable
                                         className="w-full h-fit"
@@ -530,13 +531,13 @@ const StudentTable = ({ }) => {
                                         onValueChange={onSearchChange}
                                    />
                                    {session?.user?.role === "admin" &&
-                                        <div className="flex gap-4">
+                                        <div className="flex gap-4 max-md:w-full">
                                              <Button
                                                   size="sm"
-                                                  className={insertColor.color}
+                                                  className={`${insertColor.color} max-md:w-full`}
                                                   radius="sm"
                                                   onClick={onInsertOpen}
-                                                  startContent={<PlusIcon className="w-5 h-5" />}>
+                                                  startContent={<PlusIcon className="w-5 h-5 max-md:hidden" />}>
                                                   เพิ่มข้อมูล
                                              </Button>
                                              <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
@@ -548,7 +549,7 @@ const StudentTable = ({ }) => {
                                                        onPress={() => handleDeleted(selectedRecords)}
                                                        color="danger"
                                                        className={deleteColor.color}
-                                                       startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                                                       startContent={<DeleteIcon2 className="w-5 h-5 max-md:hidden" />}>
                                                        ลบรายการที่เลือก
                                                   </Button>
                                              </div>
@@ -614,36 +615,34 @@ const StudentTable = ({ }) => {
                     tracks={tracks}
                />
 
-               <div className='border p-4 rounded-[10px] w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-4 flex-wrap'>
-                    <div className="flex gap-4 flex-wrap">
-                         <Dropdown>
-                              <DropdownTrigger className="hidden sm:flex">
-                                   <Button
-                                        size="sm"
-                                        className="bg-blue-100 text-blue-500"
-                                        radius="sm"
-                                        endContent={<ChevronDownIcon className="text-small" />}
-                                        variant="flat">
-                                        คอลัมน์
-                                   </Button>
-                              </DropdownTrigger>
-                              <DropdownMenu
-                                   disallowEmptySelection
-                                   aria-label="Table Columns"
-                                   closeOnSelect={false}
-                                   selectedKeys={visibleColumns}
-                                   selectionMode="multiple"
-                                   onSelectionChange={setVisibleColumns}
-                              >
-                                   {columns.map((column) => (
-                                        <DropdownItem key={column.uid} className="capitalize">
-                                             {capitalize(column.name)}
-                                        </DropdownItem>
-                                   ))}
-                              </DropdownMenu>
-                         </Dropdown>
-                    </div>
-                    <div className="flex gap-4 items-center flex-wrap">
+               <div className='border p-4 rounded-[10px] w-full flex flex-col md:flex-row justify-between items-center gap-4 mb-4'>
+                    <Dropdown>
+                         <DropdownTrigger className="max-md:w-full">
+                              <Button
+                                   size="sm"
+                                   className="bg-blue-100 text-blue-500"
+                                   radius="sm"
+                                   endContent={<ChevronDownIcon className="text-small" />}
+                                   variant="flat">
+                                   คอลัมน์
+                              </Button>
+                         </DropdownTrigger>
+                         <DropdownMenu
+                              disallowEmptySelection
+                              aria-label="Table Columns"
+                              closeOnSelect={false}
+                              selectedKeys={visibleColumns}
+                              selectionMode="multiple"
+                              onSelectionChange={setVisibleColumns}
+                         >
+                              {columns.map((column) => (
+                                   <DropdownItem key={column.uid} className="capitalize">
+                                        {capitalize(column.name)}
+                                   </DropdownItem>
+                              ))}
+                         </DropdownMenu>
+                    </Dropdown>
+                    <div className="max-md:w-full flex gap-4 items-center">
                          <select
                               name="select-acadyear"
                               id="selectAcadyear"
@@ -653,7 +652,7 @@ const StudentTable = ({ }) => {
                                    height: "32px",
                                    ...selectStyle
                               }}
-                              className="px-2 pe-3 py-1 border-1 rounded-lg text-sm"
+                              className="px-2 pe-3 py-1 border-1 rounded-lg text-sm max-md:w-full"
                          >
                               <option value="" disabled hidden>ปีการศึกษา</option>
                               {acadyears.map((acadyear) => (
@@ -670,7 +669,7 @@ const StudentTable = ({ }) => {
                               isLoading={searching}
                               isDisabled={searching}
                               className="bg-blue-100 text-blue-500"
-                              startContent={<SearchIcon />}
+                              startContent={<SearchIcon className="max-md:hidden" />}
                          >
                               ค้นหา
                          </Button>
@@ -712,6 +711,7 @@ const StudentTable = ({ }) => {
                               </Tabs>
                          </div>
                     }
+                    {topContent}
                     <Table
                          aria-label="Student Table"
                          checkboxesProps={{
@@ -719,14 +719,8 @@ const StudentTable = ({ }) => {
                                    wrapper: "after:bg-blue-500 after:text-background text-background",
                               },
                          }}
+                         className="overflow-x-auto"
                          classNames={minimalTableClass}
-
-                         bottomContent={bottomContent}
-                         bottomContentPlacement="outside"
-
-                         topContent={topContent}
-                         topContentPlacement="outside"
-
                          isCompact
                          isStriped
                          removeWrapper
@@ -764,6 +758,7 @@ const StudentTable = ({ }) => {
                               )}
                          </TableBody>
                     </Table>
+                    {bottomContent}
                </div>
           </>
      )

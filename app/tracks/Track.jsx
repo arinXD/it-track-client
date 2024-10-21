@@ -31,7 +31,7 @@ const Track = ({ tracks }) => {
                                 fontSize: "clamp(8px, 3.5vw, 16px)",
                             }}
                             className='text-center md:text-start text-default-600 text-lg mb-8'>
-                            ค้นพบแทร็กหลักสูตรไอทีล่าสุด! ยกระดับทักษะของคุณด้วยความเชี่ยวชาญที่ล้ำสมัย นำทางไปสู่อนาคตของความสำเร็จทางเทคโนโลยี
+                            พัฒนาทักษะ IT สู่ความเป็นเลิศ - เรียนรู้เทคโนโลยีล่าสุด สร้างอาชีพที่มั่นคง เปิดประตูสู่อนาคตดิจิทัลที่สดใส
                         </p>
                         <div className='grid grid-cols-12 gap-4'>
                             {tracks.map((track, index) => {

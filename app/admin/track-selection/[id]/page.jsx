@@ -1,6 +1,6 @@
 "use client"
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
-import { fetchData, fetchDataObj } from '../../action'
+import { fetchData } from '../../action'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Button, Tab, Tabs, Input, Spinner, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useDisclosure } from "@nextui-org/react";
 import { format } from 'date-fns';
@@ -90,10 +90,9 @@ const Page = ({ params }) => {
 
     const initTrackSelect = useCallback(async function (id) {
         try {
-            moment.tz.setDefault('Asia/Bangkok');
-            const result = await fetchDataObj(`/api/tracks/selects/${id}/subjects/students`)
-            result.startAt = moment(result?.startAt).format('yyyy-MM-DD HH:mm')
-            result.expiredAt = moment(result?.expiredAt).format('yyyy-MM-DD HH:mm')
+            // moment.tz.setDefault('Asia/Bangkok');
+            const option = await getOptions(`/api/tracks/selects/${id}/subjects/students`, "GET")
+            const result = (await axios(option)).data.data
             setTrackSelect(result)
             setTrackSubj(result?.Subjects)
         } catch (err) {
@@ -146,11 +145,9 @@ const Page = ({ params }) => {
 
     useEffect(() => {
         if (Object.keys(trackSelect).length > 0) {
-            // moment.tz.setDefault('Asia/Bangkok');
             setTitle(trackSelect.title)
-
-            setStartAt(moment(trackSelect?.startAt).format('YYYY-MM-DD HH:mm'));
-            setExpiredAt(moment(trackSelect?.expiredAt).format('YYYY-MM-DD HH:mm'));
+            setStartAt(format(new Date(trackSelect?.startAt), 'yyyy-MM-dd HH:mm'))
+            setExpiredAt(format(new Date(trackSelect?.expiredAt), 'yyyy-MM-dd HH:mm'))
             const announcement = trackSelect?.announcementDate ? moment(trackSelect?.announcementDate).format('YYYY-MM-DD HH:mm') : null
             setAnnouncementDate(announcement)
             setHasFinished(trackSelect.has_finished)
@@ -650,9 +647,7 @@ const Page = ({ params }) => {
 
                                     <div className='bg-white border-1 p-4 flex flex-col justify-start items-center gap-2 rounded-[10px]'>
                                         <h1 className='w-[100%] font-bold text-base'>
-                                            {title} {JSON.stringify(moment(trackSelect?.startAt).format('YYYY-MM-DD HH:mm'))}
-                                            <br />
-                                            {JSON.stringify(trackSelect.startAt)}
+                                            {title} 
                                         </h1>
                                         <hr className='my-3 w-full border-t-1 border-t-gray-300 ' />
                                         <div className='grid grid-cols-3 justify-stretch justify-items-stretch gap-4 w-full'>
