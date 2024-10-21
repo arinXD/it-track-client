@@ -300,11 +300,11 @@ const Page = () => {
 
      return (
           <div className="space-y-4 p-4">
-               <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 space-y-2 lg:space-y-0">
                     <h2 className="text-2xl font-bold">ตารางข่าวประชาสัมพันธ์</h2>
-                    <div className="flex space-x-4">
+                    <div className="max-lg:w-full flex flex-col max-lg:items-end lg:flex-row max-lg:gap-2 lg:space-x-4">
                          <Input
-                              className="w-[350px] !text-xs"
+                              className="w-full lg:w-[350px] !text-xs"
                               placeholder="ค้นหาข่าว (หัวข้อข่าว, เนื้อหาแบบย่อ)"
                               classNames={thinInputClass}
                               value={filterValue}
@@ -312,26 +312,29 @@ const Page = () => {
                               startContent={<SearchIcon />}
                               onValueChange={onSearchChange}
                          />
-                         <Link href="/admin/news/create-news">
+                         <div className='max-lg:w-full flex flex-row gap-2 max-lg:justify-end'>
+                              <Link href="/admin/news/create-news">
+                                   <Button
+                                        className='bg-[#edf8f7] text-[#46bcaa]'
+                                        startContent={<PlusIcon className="w-5 h-5" />}>
+                                        เพิ่มข่าว
+                                   </Button>
+                              </Link>
                               <Button
-                                   className='bg-[#edf8f7] text-[#46bcaa]'
-                                   startContent={<PlusIcon className="w-5 h-5" />}>
-                                   เพิ่มข่าว
+                                   isDisabled={disableDeleteBtn || deleting}
+                                   isLoading={deleting}
+                                   onClick={() => handleDelete(selectedTracks)}
+                                   color='danger'
+                                   className='bg-red-400'
+                                   startContent={<DeleteIcon className="w-4 h-4" />}>
+                                   ลบ
                               </Button>
-                         </Link>
-                         <Button
-                              isDisabled={disableDeleteBtn || deleting}
-                              isLoading={deleting}
-                              onClick={() => handleDelete(selectedTracks)}
-                              color='danger'
-                              className='bg-red-400'
-                              startContent={<DeleteIcon className="w-4 h-4" />}>
-                              ลบ
-                         </Button>
+                         </div>
                     </div>
                </div>
                <div className='p-4 rounded-[10px] border'>
                     <Table
+                    className='overflow-x-auto'
                          aria-label="Student Table"
                          checkboxesProps={{
                               classNames: {

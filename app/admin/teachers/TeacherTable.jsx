@@ -102,9 +102,9 @@ export default function TeacherTable({ tracks }) {
                     tracks={tracks}
                     fn={fetchTeachers}
                />
-               <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 space-y-2 lg:space-y-0">
                     <h2 className="text-2xl font-bold">ตารางข้อมูลอาจารย์</h2>
-                    <div className="flex space-x-4">
+                    <div className="max-lg:w-full flex flex-col max-lg:items-end lg:flex-row max-lg:gap-2 lg:space-x-4">
                          <Input
                               classNames={thinInputClass}
                               placeholder="ค้นหาข้อมูลอาจารย์ อีเมล ชื่อ นามสกุล"
@@ -112,42 +112,44 @@ export default function TeacherTable({ tracks }) {
                               startContent={<SearchIcon />}
                               onClear={() => onClear()}
                               onChange={(e) => setSearch(e.target.value)}
-                              className="w-[350px] !text-xs"
+                              className="w-full lg:w-[350px] !text-xs"
                          />
-                         <Select
-                              classNames={{
-                                   label: "!text-xs",
-                                   trigger: "border-1 h-10 !text-xs",
-                              }}
-                              variant="bordered"
-                              placeholder="เลือกแทร็ก"
-                              className="max-w-[150px]"
-                              selectedKeys={[trackFilter]}
-                              onChange={(e) => handleTrackFilter(e.target.value || "all")}
-                         >
-                              {trackItems.map(track => (
-                                   <SelectItem key={track} value={track}>
-                                        {track === 'all' ? 'ทั้งหมด' : track}
-                                   </SelectItem>
-                              ))}
-                         </Select>
-                         <Select
-                              variant='bordered'
-                              classNames={{
-                                   label: "!text-xs",
-                                   trigger: "border-1 h-10 !text-xs",
-                              }}
-                              className="w-[150px]"
-                              selectedKeys={[rowsPerPage.toString()]}
-                              value={rowsPerPage}
-                              onChange={(e) => setRowsPerPage(Number(e.target.value) || 5)}
-                         >
-                              <SelectItem key="5">5 per page</SelectItem>
-                              <SelectItem key="10">10 per page</SelectItem>
-                              <SelectItem key="20">20 per page</SelectItem>
-                              <SelectItem key="50">50 per page</SelectItem>
-                         </Select>
-                         <div>
+                         <div className='max-lg:w-full flex flex-row gap-2'>
+                              <Select
+                                   classNames={{
+                                        label: "!text-xs",
+                                        trigger: "border-1 h-10 !text-xs",
+                                   }}
+                                   variant="bordered"
+                                   placeholder="เลือกแทร็ก"
+                                   className="w-full lg:max-w-[150px]"
+                                   selectedKeys={[trackFilter]}
+                                   onChange={(e) => handleTrackFilter(e.target.value || "all")}
+                              >
+                                   {trackItems.map(track => (
+                                        <SelectItem key={track} value={track}>
+                                             {track === 'all' ? 'ทั้งหมด' : track}
+                                        </SelectItem>
+                                   ))}
+                              </Select>
+                              <Select
+                                   variant='bordered'
+                                   classNames={{
+                                        label: "!text-xs",
+                                        trigger: "border-1 h-10 !text-xs",
+                                   }}
+                                   className="w-full lg:w-[150px]"
+                                   selectedKeys={[rowsPerPage.toString()]}
+                                   value={rowsPerPage}
+                                   onChange={(e) => setRowsPerPage(Number(e.target.value) || 5)}
+                              >
+                                   <SelectItem key="5">5 per page</SelectItem>
+                                   <SelectItem key="10">10 per page</SelectItem>
+                                   <SelectItem key="20">20 per page</SelectItem>
+                                   <SelectItem key="50">50 per page</SelectItem>
+                              </Select>
+                         </div>
+                         <div className='max-lg:w-1/2 max-lg:flex max-lg:justify-end'>
                               <Button
                                    onClick={() => {
                                         setTeacher({})
@@ -165,7 +167,7 @@ export default function TeacherTable({ tracks }) {
                          isStriped
                          removeWrapper
                          aria-label="Teachers table"
-                         className="min-w-full"
+                         className="min-w-full overflow-x-auto"
                     >
                          <TableHeader>
                               <TableColumn>EMAIL</TableColumn>

@@ -343,7 +343,7 @@ const Page = () => {
 
     const topContent = useMemo(() => {
         return (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 mb-4">
                 {
                     students.length > 0 &&
                     <div className="flex flex-col text-small">
@@ -414,7 +414,7 @@ const Page = () => {
                         </div>
                     </div>
                 }
-                <div className='flex flex-row justify-between items-center gap-4'>
+                <div className='flex flex-col lg:flex-row justify-between items-center gap-4'>
                     <Input
                         isClearable
                         className="w-full h-fit"
@@ -426,12 +426,12 @@ const Page = () => {
                         onClear={() => onClear()}
                         onValueChange={onSearchChange}
                     />
-                    <div className="flex gap-4">
-                        <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
+                    <div className="max-lg:w-full flex max-lg:flex-col gap-4">
+                        <div className={`${disableSelectDelete ? "cursor-not-allowed" : ""} max-lg:w-full`}>
                             <Button
                                 radius="sm"
                                 size="sm"
-                                className={restoreColor.color}
+                                className={`${restoreColor.color} max-lg:w-full`}
                                 isLoading={restoring}
                                 isDisabled={disableSelectDelete || restoring}
                                 onPress={handleSelectRestore}
@@ -439,14 +439,14 @@ const Page = () => {
                                 กู้คืนรายการที่เลือก
                             </Button>
                         </div>
-                        <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
+                        <div className={`${disableSelectDelete ? "cursor-not-allowed" : ""} max-lg:w-full`}>
                             <Button
                                 radius="sm"
                                 size="sm"
                                 isDisabled={disableSelectDelete}
                                 onPress={handleSelectDelete}
                                 color="danger"
-                                className={deleteColor.color}
+                                className={`${deleteColor.color} max-lg:w-full`}
                                 startContent={<DeleteIcon2 className="w-5 h-5" />}>
                                 ลบรายการที่เลือก
                             </Button>
@@ -542,9 +542,9 @@ const Page = () => {
                     :
                     <>
                         <div className='border p-4 rounded-[10px] w-full flex flex-row justify-between items-center gap-4 mb-4'>
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 max-lg:w-full">
                                 <Dropdown>
-                                    <DropdownTrigger className="hidden sm:flex">
+                                    <DropdownTrigger className="max-lg:w-1/2">
                                         <Button
                                             size="sm"
                                             className="bg-blue-100 text-blue-500"
@@ -571,7 +571,7 @@ const Page = () => {
                                     </DropdownMenu>
                                 </Dropdown>
                                 <Dropdown>
-                                    <DropdownTrigger className="hidden sm:flex">
+                                    <DropdownTrigger className="max-lg:w-1/2">
                                         <Button
                                             radius="sm"
                                             size="sm"
@@ -599,6 +599,7 @@ const Page = () => {
                             </div>
                         </div>
                         <div className="border p-4 rounded-[10px] w-full">
+                            {topContent}
                             <Table
                                 aria-label="Student Table"
                                 checkboxesProps={{
@@ -606,10 +607,9 @@ const Page = () => {
                                         wrapper: "after:bg-blue-500 after:text-background text-background",
                                     },
                                 }}
-                                classNames={minimalTableClass}
 
-                                topContent={topContent}
-                                topContentPlacement="outside"
+                                className="overflow-x-auto"
+                                classNames={minimalTableClass}
 
                                 bottomContent={bottomContent}
                                 bottomContentPlacement="outside"

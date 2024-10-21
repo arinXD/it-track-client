@@ -259,8 +259,8 @@ const InsertEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, call
 
                                 <hr />
 
-                                <div className='mt-3 flex flex-row gap-6 items-end'>
-                                    <div className='flex flex-col w-[50%]'>
+                                <div className='mt-3 flex flex-row max-md:flex-col gap-6 items-end'>
+                                    <div className='flex flex-col w-[50%] max-md:w-full'>
                                         <label className='text-xs mb-0.5'>ปีการศึกษา</label>
                                         <select
                                             defaultValue={""}
@@ -274,7 +274,7 @@ const InsertEnrollmentForm = ({ showToastMessage, isOpen, onClose, student, call
                                             ))}
                                         </select>
                                     </div>
-                                    <div className='flex flex-col w-[50%]'>
+                                    <div className='flex flex-col w-[50%] max-md:w-full'>
                                         <label className='text-xs mb-0.5'>เกรด</label>
                                         <select
                                             style={SELECT_STYLE}

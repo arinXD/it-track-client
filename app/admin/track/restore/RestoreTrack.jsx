@@ -293,9 +293,9 @@ const RestoreTrack = ({ tracks, fetching, callBack }) => {
 
      return (
           <div className="space-y-4 p-4 w-full">
-               <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+               <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-2 md:space-y-0">
                     <h2 className="text-2xl font-bold">ข้อมูลแทร็กที่ถูกลบ</h2>
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 max-md:w-full max-md:flex-col">
                          <Button
                               isDisabled={disableDeleteBtn || restoring}
                               isLoading={restoring}
@@ -353,6 +353,8 @@ const RestoreTrack = ({ tracks, fetching, callBack }) => {
                                    "mb-4",
                               ],
                          }}
+
+                         className='overflow-x-auto'
 
                          bottomContent={bottomContent}
                          bottomContentPlacement="outside"

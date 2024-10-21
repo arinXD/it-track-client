@@ -99,9 +99,9 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
 
     return (
         <div className="space-y-4 p-4">
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+            <div className="flex flex-col lg:flex-row justify-between items-center mb-4 space-y-2 lg:space-y-0">
                 <h2 className="text-2xl font-bold">ตารางข้อมูลการคัดเลือกแทร็ก</h2>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row sm:justify-end gap-4 max-lg:w-full">
                     <Button
                         radius='sm'
                         size='sm'
@@ -148,6 +148,7 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
                     selectedKeys={selectedKey}
                     onSelectionChange={setSelectedKey}
                     onRowAction={() => { }}
+                    className='overflow-x-auto'
                     aria-label="track selection table">
                     <TableHeader>
                         <TableColumn>ปีการศึกษา</TableColumn>

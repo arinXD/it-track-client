@@ -1,6 +1,6 @@
 "use client"
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { DeleteIcon, DeleteIcon2, EditIcon2, PlusIcon, SearchIcon } from '@/app/components/icons'
+import { DeleteIcon, EditIcon2, PlusIcon, SearchIcon } from '@/app/components/icons'
 import { Button, Input, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@nextui-org/react'
 import Link from 'next/link'
 import { TbRestore } from 'react-icons/tb'
@@ -262,24 +262,24 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
 
     return (
         <div className="space-y-4 p-4">
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
-                <h2 className="text-2xl font-bold">ตารางข้อมูลแทร็ก</h2>
-                <div className="flex gap-4">
-                    <Link href="/admin/track/insert-track">
+            <div className="flex flex-col lg:flex-row justify-between items-center mb-4 space-y-2 lg:space-y-0">
+                <h2 className="text-2xl font-bold ">ตารางข้อมูลแทร็ก</h2>
+                <div className="max-lg:w-full flex max-lg:flex-col gap-4">
+                    <Link className='max-lg:w-full' href="/admin/track/insert-track">
                         <Button
                             radius='sm'
                             size='sm'
-                            className='bg-[#edf8f7] text-[#46bcaa]'
+                            className='bg-[#edf8f7] text-[#46bcaa] max-lg:w-full'
                             startContent={<PlusIcon className="w-5 h-5" />}>
                             เพิ่มแทร็ก
                         </Button>
                     </Link>
-                    <Link href="/admin/track/restore">
+                    <Link className='max-lg:w-full' href="/admin/track/restore">
                         <Button
                             size="sm"
                             radius="sm"
                             color="default"
-                            className='bg-[#edf0ff] text-[#4d69fa]'
+                            className='bg-[#edf0ff] text-[#4d69fa] max-lg:w-full'
                             startContent={<TbRestore className="w-4 h-4" />}>
                             รายการที่ถูกลบ
                         </Button>
@@ -317,7 +317,7 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
                         },
                     }}
                     classNames={minimalTableClass}
-
+                    className='overflow-x-auto'
                     isStriped
                     removeWrapper
                     selectionMode="multiple"

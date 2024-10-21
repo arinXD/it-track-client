@@ -217,7 +217,7 @@ export default function Page({ params }) {
                                             <p className='text-sm text-default-600'>ข้อมูลนักศึกษา</p>
                                         </div>
                                     </div>
-                                    <div className='flex flex-col md:flex-row gap-3'>
+                                    <div className='flex flex-col lg:flex-row gap-3 max-md:items-end max-md:ms-auto'>
                                         <Button
                                             type='button'
                                             className={`${insertColor.color} border border-[${insertColor.onlyColor}]`}
@@ -229,7 +229,7 @@ export default function Page({ params }) {
                                         </Button>
                                         <Button
                                             type='button'
-                                            className='text-yellow-700 border border-yellow-700'
+                                            className='text-yellow-700 border border-yellow-700 max-md:w-full'
                                             radius='sm'
                                             size='sm'
                                             color='warning'
@@ -240,7 +240,7 @@ export default function Page({ params }) {
                                         </Button>
                                         <Button
                                             type='button'
-                                            className='bg-red-400'
+                                            className='bg-red-400 max-md:w-full'
                                             radius='sm'
                                             size='sm'
                                             color="danger"
