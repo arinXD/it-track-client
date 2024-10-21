@@ -2033,7 +2033,7 @@ const VerificationTable = ({ stdID }) => {
                                                             value={term}
                                                             onChange={handleChange}
                                                             orientation="horizontal"
-                                                            isDisabled={isDisabled}
+                                                            isDisabled={true}
                                                        >
                                                             <Radio value="ต้น" className='ml-2'>ต้น</Radio>
                                                             <Radio value="ปลาย" className='ml-2' >ปลาย</Radio>

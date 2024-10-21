@@ -302,8 +302,8 @@ export default function AccountCreationForm({ tracks, programs }) {
                               }}
                               label="เลือกโรล"
                               placeholder="Choose a role"
-                              selectedKeys={[selectedRole]}
-                              onChange={(e) => handleRoleChange(e.target.value)}
+                              selectedKeys={[selectedRole || "admin"]}
+                              onChange={(e) => handleRoleChange(e.target.value || "admin")}
                          >
                               {roles.map((role) => (
                                    <SelectItem key={role.key} value={role.key}>
