@@ -556,7 +556,7 @@ const Page = () => {
                                 size="md"
                                 selectedKey={activeTab}
                                 onSelectionChange={handleTabChange}
-                                className='mt-3'
+                                className='mt-3 flex p-1 h-fit gap-2 items-center flex-nowrap overflow-x-scroll scrollbar-hide bg-default-100 rounded-medium'
                             >
                                 <Tab
                                     key="new"

@@ -365,13 +365,14 @@ const Page = ({ params }) => {
                })
      };
 
-     const handleDeleteSemi = async (sgt, idtest) => {
+     const handleDeleteSemi = async (sgt, idtest, semiId) => {
           // console.log(`Deleting SubGroupSubjectAndTrack with id: ${sgt}`);
-          // alert(ids)
+          console.log(semiId);
+
 
           const url = `/api/verify/semisubgroup/${sgt}/${idss}`
           const options = await getOptions(url, 'DELETE')
-          
+
           axios(options)
                .then(async result => {
                     const { ok, message: msg } = result.data;
@@ -408,19 +409,41 @@ const Page = ({ params }) => {
      const getSubTrack = useCallback((subgroup, subgroupIndex) => {
           // console.log(subgroup);
           if (subgroup?.subjects?.every(subject => subject?.SemiSubgroupSubjects?.some(e => e?.SemiSubGroup))) {
+               // const subjects = subgroup.subjects || [];
+               // const SemiSubjects = {};
+
+               // subjects.forEach(subject => {
+               //      const semiSubGroup = subject.SemiSubgroupSubjects?.find(e => e.SemiSubGroup);
+               //      if (semiSubGroup) {
+               //           const name = semiSubGroup.SemiSubGroup.semi_sub_group_title;
+               //           if (!SemiSubjects[name]) {
+               //                SemiSubjects[name] = [];
+               //           }
+               //           SemiSubjects[name].push(subject);
+               //      }
+               // });
+
                const subjects = subgroup.subjects || [];
                const SemiSubjects = {};
 
                subjects.forEach(subject => {
-                    const semiSubGroup = subject.SemiSubgroupSubjects?.find(e => e.SemiSubGroup);
-                    if (semiSubGroup) {
-                         const name = semiSubGroup.SemiSubGroup.semi_sub_group_title;
-                         if (!SemiSubjects[name]) {
-                              SemiSubjects[name] = [];
+                    subject.SemiSubgroupSubjects?.forEach(semiSubGroupObj => {
+                         const semiSubGroup = semiSubGroupObj?.SemiSubGroup;
+                         if (semiSubGroup) {
+                              const name = semiSubGroup.semi_sub_group_title;
+                              if (!SemiSubjects[name]) {
+                                   SemiSubjects[name] = [];
+                              }
+                              // Check if the subject already exists under the correct semi-group
+                              if (!SemiSubjects[name].some(s => s.subject_id === subject.subject_id)) {
+                                   SemiSubjects[name].push(subject);
+                              }
                          }
-                         SemiSubjects[name].push(subject);
-                    }
+                    });
                });
+
+               // console.log(SemiSubjects);
+               
 
                return (
                     <div key={subgroupIndex}>
@@ -432,8 +455,11 @@ const Page = ({ params }) => {
                                    <div className='bg-gray-50 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center '>
                                         <h3 className='text-md text-default-800 px-16'><li>{semi}</li></h3>
                                    </div>
+
+                                   {/* {console.log(SemiSubjects[semi].map(subject => subject))} */}
                                    <Table
                                         classNames={tableClass}
+                                        className='overflow-x-auto'
                                         removeWrapper
                                         onRowAction={() => { }}
                                         aria-label="subjects table">
@@ -471,7 +497,6 @@ const Page = ({ params }) => {
                          ))}
                     </div>
                );
-
           } else if (subgroup?.subjects.every(subject => subject?.Track)) {
                const subjects = subgroup?.subjects
                const trackSubjects = {}
@@ -497,6 +522,7 @@ const Page = ({ params }) => {
                                    </div>
                                    <Table
                                         classNames={tableClass}
+                                        className='overflow-x-auto'
                                         removeWrapper
                                         onRowAction={() => { }}
                                         aria-label="subjects table">
@@ -543,6 +569,7 @@ const Page = ({ params }) => {
                          </div>
                          <Table
                               classNames={tableClass}
+                              className='overflow-x-auto'
                               removeWrapper
                               onRowAction={() => { }}
                               aria-label="subjects table">
@@ -617,6 +644,7 @@ const Page = ({ params }) => {
                                    {subgroupsWithSameGroupTitle.map((subgroup, subgroupIndex) => (
                                         getSubTrack(subgroup, subgroupIndex)
                                    ))}
+                                   {/* { getSubTrack(subgroupsWithSameGroupTitle[1], 0)} */}
                               </div>
                          );
                     })}
@@ -701,6 +729,7 @@ const Page = ({ params }) => {
                                                                            </div>
                                                                            <Table
                                                                                 classNames={tableClass}
+                                                                                className='overflow-x-auto'
                                                                                 removeWrapper
                                                                                 onRowAction={() => { }}
                                                                                 aria-label="subjects table">

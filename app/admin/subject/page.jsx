@@ -384,47 +384,51 @@ export default function Subject() {
                 <BreadCrumb />
                 <ToastContainer />
                 <div className='my-[30px]'>
-                    <div className="flex flex-col md:flex-row justify-between gap-3 mb-3 ">
-                        <div className='flex justify-start'>
-                            <div className="flex md:flex-row gap-3">
-                                <Button
-                                    radius="sm"
-                                    onPress={handleExportExcel}
-                                    style={{ backgroundColor: '#107C41', color: 'white' }}
-                                    endContent={<RiFileExcel2Line width={16} height={16} />}>
-                                    Export to Excel
-                                </Button>
-                                <Button
-                                    radius="sm"
-                                    onPress={handleExportCSV}
-                                    style={{ backgroundColor: '#149403', color: 'white' }}
-                                    endContent={<TbFileImport width={16} height={16} />}>
-                                    Export to CSV
-                                </Button>
-                            </div>
+                    <div className='flex flex-col justify-between items-center gap-3 mb-3 lg:flex-row'>
+                        <div className="flex gap-3 w-full">
+                            <Button
+                                radius="sm"
+                                className='max-lg:w-1/2'
+                                onPress={handleExportExcel}
+                                style={{ backgroundColor: '#107C41', color: 'white' }}
+                                endContent={<RiFileExcel2Line width={16} height={16} />}>
+                                Export to Excel
+                            </Button>
+                            <Button
+                                radius="sm"
+                                className='max-lg:w-1/2'
+                                onPress={handleExportCSV}
+                                style={{ backgroundColor: '#149403', color: 'white' }}
+                                endContent={<TbFileImport width={16} height={16} />}>
+                                Export to CSV
+                            </Button>
                         </div>
-                        <div className='flex justify-end'>
-                            <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
-                                <SearchIcon width={16} height={16} />
+                        <div className='flex max-lg:w-full'>
+                            <div className='flex'>
+                                <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
+                                    <SearchIcon width={16} height={16} />
+                                </div>
+                                <input
+                                    type="search"
+                                    id="search"
+                                    className="rounded-s-none pl-0 py-2 px-4 text-sm text-gray-900 rounded-lg bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Search..."
+                                    value={searchQuery}
+                                    onChange={(e) => handleSearchChange(e.target.value)}
+                                />
                             </div>
-                            <input
-                                type="search"
-                                id="search"
-                                className="rounded-s-none pl-0 py-2 px-4 text-sm text-gray-900 rounded-lg bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Search..."
-                                value={searchQuery}
-                                onChange={(e) => handleSearchChange(e.target.value)}
-                            />
-                            <div className="flex md:flex-row gap-3 ml-3">
+                            <div className="flex gap-3 ml-3 w-full justify-end">
                                 <Button
                                     radius="sm"
                                     onPress={handleInsertModalOpen}
+                                    className='max-lg:w-1/2'
                                     color="primary"
                                     endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มวิชา
                                 </Button>
                                 <Button
                                     radius="sm"
+                                    className='max-lg:w-1/2'
                                     onPress={handleImportModalOpen}
                                     onDataInsertXlsx={handleDataInserted}
                                     isOpen={isImportModalOpen}
@@ -438,8 +442,8 @@ export default function Subject() {
                     </div>
                     <Table
                         removeWrapper
-                        selectionMode="multiple"
                         onRowAction={() => { }}
+                        className='overflow-x-auto'
                         aria-label="subject table">
                         <TableHeader>
                             <TableColumn>Actions</TableColumn>

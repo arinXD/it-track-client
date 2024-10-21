@@ -73,13 +73,12 @@ export default function SemiSubGroup() {
         const options = await getOptions(url, 'DELETE')
         axios(options)
             .then(async result => {
-                const { ok, message:msg } = result.data
+                const { ok, message: msg } = result.data
                 message.success(msg)
                 callSemi();
             })
             .catch(error => {
-                const { ok, message:msg } = result.data
-                message.success(msg)
+                message.error("ข้อมูลถูกใช้งานอยู่ ไม่สามารถลบได้");
             })
     };
 
@@ -93,24 +92,25 @@ export default function SemiSubGroup() {
                 <BreadCrumb />
                 <ToastContainer />
                 <div className='my-[30px]'>
-                    <div className="flex flex-col md:flex-row justify-end gap-3 mb-3">
-                        <div className='flex justify-end'>
+                    <div className="flex justify-end gap-3 mb-3">
+                        <div className='flex justify-end max-md:w-full'>
                             <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
                                 <SearchIcon width={16} height={16} />
                             </div>
                             <input
                                 type="search"
                                 id="search"
-                                className="rounded-s-none pl-0 py-2 px-4 text-sm text-gray-900 rounded-lg bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full rounded-s-none pl-0 py-2 px-4 text-sm text-gray-900 rounded-lg bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Search..."
                             // value={searchQuery}
                             // onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <div className="flex md:flex-row gap-3 ml-3">
+                           <div className="flex md:flex-row w-full gap-3 ml-3">
                                 <Button
                                     radius="sm"
                                     onPress={handleInsertModalOpen}
                                     color="primary"
+                                    className='max-md:w-full'
                                     endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มกลุ่มรองวิชา
                                 </Button>
@@ -119,6 +119,7 @@ export default function SemiSubGroup() {
                     </div>
                     <Table
                         removeWrapper
+                        className='overflow-x-auto'
                         onRowAction={() => { }}
                         aria-label="subgroup table">
                         <TableHeader>

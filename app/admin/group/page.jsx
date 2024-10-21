@@ -193,8 +193,8 @@ export default function Group() {
                 <BreadCrumb />
                 <ToastContainer />
                 <div className='my-[30px]'>
-                    <div className="flex flex-col md:flex-row justify-end gap-3 mb-3">
-                        <div className='flex justify-end'>
+                    <div className="flex justify-end gap-3 mb-3">
+                        <div className='flex justify-end max-md:w-full'>
                             <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
                                 <SearchIcon width={16} height={16} />
                             </div>
@@ -206,17 +206,19 @@ export default function Group() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)} // Step 2
                             />
-                            <div className="flex md:flex-row gap-3 ml-3">
+                            <div className="flex md:flex-row w-full gap-3 ml-3">
                                 <Button
                                     radius="sm"
                                     onPress={handleInsertModalOpen}
                                     color="primary"
+                                    className='max-md:w-1/2'
                                     endContent={<PlusIcon width={16} height={16} />}>
                                     เพิ่มกลุ่มวิชา
                                 </Button>
-                                <Link href={'/admin/group/restore'}>
+                                <Link href={'/admin/group/restore'} className='max-md:w-1/2'>
                                     <Button
                                         radius="sm"
+                                        className='max-md:w-full'
                                         color="default"
                                         endContent={<TbRestore className="w-[18px] h-[18px]" />}>
                                         รายการที่ถูกลบ
@@ -227,6 +229,7 @@ export default function Group() {
                     </div>
                     <Table
                         removeWrapper
+                        className='overflow-x-auto'
                         onRowAction={() => { }}
                         aria-label="group table">
                         <TableHeader>

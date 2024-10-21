@@ -1313,18 +1313,36 @@ const Page = ({ params }) => {
     const getSubTrack = useCallback((subgroup, subgroupIndex) => {
         // console.log(subgroup);
         if (subgroup?.subjects?.every(subject => subject?.SemiSubgroupSubjects?.some(e => e?.SemiSubGroup))) {
+            // const subjects = subgroup.subjects || [];
+            // const SemiSubjects = {};
+
+            // subjects.forEach(subject => {
+            //     const semiSubGroup = subject.SemiSubgroupSubjects?.find(e => e.SemiSubGroup);
+            //     if (semiSubGroup) {
+            //         const name = semiSubGroup.SemiSubGroup.semi_sub_group_title;
+            //         if (!SemiSubjects[name]) {
+            //             SemiSubjects[name] = [];
+            //         }
+            //         SemiSubjects[name].push(subject);
+            //     }
+            // });
             const subjects = subgroup.subjects || [];
             const SemiSubjects = {};
 
             subjects.forEach(subject => {
-                const semiSubGroup = subject.SemiSubgroupSubjects?.find(e => e.SemiSubGroup);
-                if (semiSubGroup) {
-                    const name = semiSubGroup.SemiSubGroup.semi_sub_group_title;
-                    if (!SemiSubjects[name]) {
-                        SemiSubjects[name] = [];
+                subject.SemiSubgroupSubjects?.forEach(semiSubGroupObj => {
+                    const semiSubGroup = semiSubGroupObj?.SemiSubGroup;
+                    if (semiSubGroup) {
+                        const name = semiSubGroup.semi_sub_group_title;
+                        if (!SemiSubjects[name]) {
+                            SemiSubjects[name] = [];
+                        }
+                        // Check if the subject already exists under the correct semi-group
+                        if (!SemiSubjects[name].some(s => s.subject_id === subject.subject_id)) {
+                            SemiSubjects[name].push(subject);
+                        }
                     }
-                    SemiSubjects[name].push(subject);
-                }
+                });
             });
 
             return (
@@ -1339,6 +1357,7 @@ const Page = ({ params }) => {
                             </div>
                             <Table
                                 classNames={tableClass}
+                                className='overflow-x-auto'
                                 removeWrapper
                                 onRowAction={() => { }}
                                 aria-label="subjects table">
@@ -1416,6 +1435,7 @@ const Page = ({ params }) => {
                             </div>
                             <Table
                                 classNames={tableClass}
+                                className='overflow-x-auto'
                                 removeWrapper
                                 onRowAction={() => { }}
                                 aria-label="subjects table">
@@ -1469,6 +1489,7 @@ const Page = ({ params }) => {
                     </div>
                     <Table
                         classNames={tableClass}
+                        className='overflow-x-auto'
                         removeWrapper
                         onRowAction={() => { }}
                         aria-label="subjects table">
@@ -1556,7 +1577,8 @@ const Page = ({ params }) => {
                                 ))}
                             </div>
                             {/* {groupTitle !== "กลุ่มวิชาเลือกสาขา" && (
-                                <Table aria-label="Sum" classNames={tableClass} removeWrapper color="primary">
+                                <Table aria-label="Sum" classNames={tableClass}
+                                className='overflow-x-auto' removeWrapper color="primary">
                                     <TableHeader>
                                         <TableColumn>#</TableColumn>
                                         <TableColumn></TableColumn>
@@ -1700,6 +1722,7 @@ const Page = ({ params }) => {
                                                                             </div>
                                                                             <Table
                                                                                 classNames={tableClass}
+                                                                                className='overflow-x-auto'
                                                                                 removeWrapper
                                                                                 onRowAction={() => { }}
                                                                                 aria-label="subjects table"
@@ -1747,6 +1770,7 @@ const Page = ({ params }) => {
                                                             </div>
                                                             <Table aria-label="Sum"
                                                                 classNames={tableClass}
+                                                                className='overflow-x-auto'
                                                                 removeWrapper
                                                                 color="primary"
                                                             >
@@ -1792,6 +1816,7 @@ const Page = ({ params }) => {
                                                                 <div className='bg-gray-100 rounded-md relative gap-2'>
                                                                     <Table
                                                                         classNames={tableClass}
+                                                                        className='overflow-x-auto'
                                                                         removeWrapper
                                                                         onRowAction={() => { }}
                                                                         aria-label="subjects table">
@@ -2008,39 +2033,41 @@ const Page = ({ params }) => {
                                                         <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
                                                             <h2 className='text-lg text-default-800'>เงื่อนไขเฉพาะหลักสูตร IT</h2>
                                                         </div>
-                                                        <Table
-                                                            aria-label="เงื่อนไขเฉพาะหลักสูตร IT"
-                                                            className={tableClassCondition}
-                                                        >
-                                                            <TableHeader>
-                                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                            </TableHeader>
+                                                        <div className='p-4 border overflow-x-auto border-t-orange-100 rounded-br-lg rounded-bl-lg'>
+                                                            <Table
+                                                                aria-label="เงื่อนไขเฉพาะหลักสูตร IT"
+                                                                removeWrapper
+                                                                className={tableClassCondition}
+                                                            >
+                                                                <TableHeader>
+                                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                                </TableHeader>
 
-                                                            <TableBody>
-                                                                {(() => {
+                                                                <TableBody>
+                                                                    {(() => {
 
-                                                                    const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrack);
+                                                                        const { totalCredits, totalGrades, averageGrade } = getCalculatedValues(subjectTrack);
 
-                                                                    const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
-                                                                    const creditClass = totalCredits < 21 ? '' : 'bg-green-200';
+                                                                        const creditClassName = totalCredits < 21 ? 'bg-red-200' : '';
+                                                                        const creditClass = totalCredits < 21 ? '' : 'bg-green-200';
 
-                                                                    return (
-                                                                        <TableRow>
-                                                                            <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
-                                                                            <TableCell>21</TableCell>
-                                                                            <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                                            <TableCell>{totalGrades}</TableCell>
-                                                                            <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
-                                                                        </TableRow>
-                                                                    );
-                                                                })()}
-                                                            </TableBody>
-
-                                                        </Table>
+                                                                        return (
+                                                                            <TableRow>
+                                                                                <TableCell>กลุ่มเลือก 3 วิชา</TableCell>
+                                                                                <TableCell>21</TableCell>
+                                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                                <TableCell>{totalGrades}</TableCell>
+                                                                                <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
+                                                                            </TableRow>
+                                                                        );
+                                                                    })()}
+                                                                </TableBody>
+                                                            </Table>
+                                                        </div>
                                                     </>
                                                 )}
 
@@ -2049,41 +2076,44 @@ const Page = ({ params }) => {
                                                         <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
                                                             <h2 className='text-lg text-default-800'>เงื่อนไขหมวดหมู่วิชา</h2>
                                                         </div>
-                                                        <Table
-                                                            aria-label="เงื่อนไขหมวดหมู่วิชา"
-                                                            className={tableClassCondition}
-                                                        >
-                                                            <TableHeader>
-                                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                            </TableHeader>
-                                                            {conditionCategory.length > 0 ? (
-                                                                <TableBody>
-                                                                    {conditionCategory.map((conditionCategory, index) => {
-                                                                        const categoryDatas = combinedSubjectCategories.find(category => category.id === conditionCategory.Categorie.id) || {};
-                                                                        const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = categoryDatas;
+                                                        <div className='p-4 border overflow-x-auto border-t-orange-100 rounded-br-lg rounded-bl-lg'>
+                                                            <Table
+                                                                aria-label="เงื่อนไขหมวดหมู่วิชา"
+                                                                removeWrapper
+                                                                className={tableClassCondition}
+                                                            >
+                                                                <TableHeader>
+                                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                                </TableHeader>
+                                                                {conditionCategory.length > 0 ? (
+                                                                    <TableBody>
+                                                                        {conditionCategory.map((conditionCategory, index) => {
+                                                                            const categoryDatas = combinedSubjectCategories.find(category => category.id === conditionCategory.Categorie.id) || {};
+                                                                            const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = categoryDatas;
 
-                                                                        const creditClassName = totalCredits < conditionCategory.credit ? 'bg-red-200' : '';
-                                                                        const creditClass = totalCredits < conditionCategory.credit ? '' : 'bg-green-200';
+                                                                            const creditClassName = totalCredits < conditionCategory.credit ? 'bg-red-200' : '';
+                                                                            const creditClass = totalCredits < conditionCategory.credit ? '' : 'bg-green-200';
 
-                                                                        return (
-                                                                            <TableRow key={index}>
-                                                                                <TableCell >{conditionCategory?.Categorie?.category_title}</TableCell>
-                                                                                <TableCell>{conditionCategory.credit}</TableCell>
-                                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                                                <TableCell>{totalGrades}</TableCell>
-                                                                                <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
-                                                                            </TableRow>
-                                                                        );
-                                                                    })}
-                                                                </TableBody>
-                                                            ) : (
-                                                                <TableBody emptyContent={"ไม่มีเงื่อนไขหมวดหมู่วิชา"}>{[]}</TableBody>
-                                                            )}
-                                                        </Table>
+                                                                            return (
+                                                                                <TableRow key={index}>
+                                                                                    <TableCell >{conditionCategory?.Categorie?.category_title}</TableCell>
+                                                                                    <TableCell>{conditionCategory.credit}</TableCell>
+                                                                                    <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                                    <TableCell>{totalGrades}</TableCell>
+                                                                                    <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
+                                                                                </TableRow>
+                                                                            );
+                                                                        })}
+                                                                    </TableBody>
+                                                                ) : (
+                                                                    <TableBody emptyContent={"ไม่มีเงื่อนไขหมวดหมู่วิชา"}>{[]}</TableBody>
+                                                                )}
+                                                            </Table>
+                                                        </div>
                                                     </>
                                                 ) : (
                                                     <></>
@@ -2094,42 +2124,45 @@ const Page = ({ params }) => {
                                                         <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
                                                             <h2 className='text-lg text-default-800'>เงื่อนไขกลุ่มวิชา</h2>
                                                         </div>
-                                                        <Table
-                                                            aria-label="เงื่อนไขกลุ่มวิชา"
-                                                            className={tableClassCondition}
-                                                        >
-                                                            <TableHeader>
-                                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                            </TableHeader>
-                                                            {conditions.length > 0 ? (
-                                                                <TableBody>
-                                                                    {conditions.map((condition, index) => {
-                                                                        const groupData = combinedsubjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
-                                                                        const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = groupData;
+                                                        <div className='p-4 border overflow-x-auto border-t-orange-100 rounded-br-lg rounded-bl-lg'>
+                                                            <Table
+                                                                aria-label="เงื่อนไขกลุ่มวิชา"
+                                                                removeWrapper
+                                                                className={tableClassCondition}
+                                                            >
+                                                                <TableHeader>
+                                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                                </TableHeader>
+                                                                {conditions.length > 0 ? (
+                                                                    <TableBody>
+                                                                        {conditions.map((condition, index) => {
+                                                                            const groupData = combinedsubjectCodesByGroup.find(group => group.id === condition.Group.id) || {};
+                                                                            const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = groupData;
 
-                                                                        const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
-                                                                        const creditClass = totalCredits < condition.credit ? '' : 'bg-green-200';
+                                                                            const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
+                                                                            const creditClass = totalCredits < condition.credit ? '' : 'bg-green-200';
 
-                                                                        return (
-                                                                            <TableRow key={index}>
-                                                                                <TableCell>{condition?.Group?.group_title}</TableCell>
-                                                                                <TableCell>{condition.credit}</TableCell>
-                                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                                                <TableCell>{totalGrades}</TableCell>
-                                                                                <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
-                                                                            </TableRow>
-                                                                        );
+                                                                            return (
+                                                                                <TableRow key={index}>
+                                                                                    <TableCell>{condition?.Group?.group_title}</TableCell>
+                                                                                    <TableCell>{condition.credit}</TableCell>
+                                                                                    <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                                    <TableCell>{totalGrades}</TableCell>
+                                                                                    <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
+                                                                                </TableRow>
+                                                                            );
 
-                                                                    })}
-                                                                </TableBody>
-                                                            ) : (
-                                                                <TableBody emptyContent={"ไม่มีเงื่อนไขกลุ่มวิชา"}>{[]}</TableBody>
-                                                            )}
-                                                        </Table>
+                                                                        })}
+                                                                    </TableBody>
+                                                                ) : (
+                                                                    <TableBody emptyContent={"ไม่มีเงื่อนไขกลุ่มวิชา"}>{[]}</TableBody>
+                                                                )}
+                                                            </Table>
+                                                        </div>
                                                     </>
                                                 ) : (
                                                     <></>
@@ -2140,41 +2173,44 @@ const Page = ({ params }) => {
                                                         <div className='bg-blue-100 border-blue-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
                                                             <h2 className='text-lg text-default-800'>เงื่อนไขกลุ่มย่อยวิชา</h2>
                                                         </div>
-                                                        <Table
-                                                            aria-label="เงื่อนไขกลุ่มย่อยวิชา"
-                                                            className={tableClassCondition}
-                                                        >
-                                                            <TableHeader>
-                                                                <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                            </TableHeader>
-                                                            {conditionSubgroup.length > 0 ? (
-                                                                <TableBody>
-                                                                    {conditionSubgroup.map((condition, index) => {
-                                                                        const subgroupData = subjectCodesBySubgroup.find(subgroup => subgroup.id === condition.SubGroup.id) || {};
-                                                                        const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = subgroupData;
+                                                        <div className='p-4 border overflow-x-auto border-t-orange-100 rounded-br-lg rounded-bl-lg'>
+                                                            <Table
+                                                                aria-label="เงื่อนไขกลุ่มย่อยวิชา"
+                                                                removeWrapper
+                                                                className={tableClassCondition}
+                                                            >
+                                                                <TableHeader>
+                                                                    <TableColumn>รายวิชาที่คณะกำหนด</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                                </TableHeader>
+                                                                {conditionSubgroup.length > 0 ? (
+                                                                    <TableBody>
+                                                                        {conditionSubgroup.map((condition, index) => {
+                                                                            const subgroupData = subjectCodesBySubgroup.find(subgroup => subgroup.id === condition.SubGroup.id) || {};
+                                                                            const { totalCredits = 0, totalGrades = 0, averageGrade = 0 } = subgroupData;
 
-                                                                        const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
-                                                                        const creditClass = totalCredits < condition.credit ? '' : 'bg-green-200';
+                                                                            const creditClassName = totalCredits < condition.credit ? 'bg-red-200' : '';
+                                                                            const creditClass = totalCredits < condition.credit ? '' : 'bg-green-200';
 
-                                                                        return (
-                                                                            <TableRow key={index}>
-                                                                                <TableCell>{condition?.SubGroup?.sub_group_title}</TableCell>
-                                                                                <TableCell>{condition.credit}</TableCell>
-                                                                                <TableCell className={creditClassName}>{totalCredits}</TableCell>
-                                                                                <TableCell>{totalGrades}</TableCell>
-                                                                                <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
-                                                                            </TableRow>
-                                                                        );
-                                                                    })}
-                                                                </TableBody>
-                                                            ) : (
-                                                                <TableBody emptyContent={"ไม่มีเงื่อนไขกลุ่มย่อยวิชา"}>{[]}</TableBody>
-                                                            )}
-                                                        </Table>
+                                                                            return (
+                                                                                <TableRow key={index}>
+                                                                                    <TableCell>{condition?.SubGroup?.sub_group_title}</TableCell>
+                                                                                    <TableCell>{condition.credit}</TableCell>
+                                                                                    <TableCell className={creditClassName}>{totalCredits}</TableCell>
+                                                                                    <TableCell>{totalGrades}</TableCell>
+                                                                                    <TableCell className={creditClass}>{averageGrade.toFixed(2)}</TableCell>
+                                                                                </TableRow>
+                                                                            );
+                                                                        })}
+                                                                    </TableBody>
+                                                                ) : (
+                                                                    <TableBody emptyContent={"ไม่มีเงื่อนไขกลุ่มย่อยวิชา"}>{[]}</TableBody>
+                                                                )}
+                                                            </Table>
+                                                        </div>
                                                     </>
                                                 ) : (
                                                     <></>
@@ -2184,28 +2220,31 @@ const Page = ({ params }) => {
                                                     <div className='bg-blue-200 border-blue-200 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
                                                         <h2 className='text-lg text-default-800'>รวมหน่วยกิตและค่าคะแนนทั้งหมด</h2>
                                                     </div>
-                                                    <Table
-                                                        aria-label="รวมหน่วยกิตและค่าคะแนนทั้งหมด"
-                                                        className={tableClassCondition}
-                                                    >
-                                                        <TableHeader>
-                                                            <TableColumn>#</TableColumn>
-                                                            <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                            <TableColumn>ค่าคะแนน</TableColumn>
-                                                            <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                        </TableHeader>
+                                                    <div className='p-4 border overflow-x-auto border-t-orange-100 rounded-br-lg rounded-bl-lg'>
+                                                        <Table
+                                                            aria-label="รวมหน่วยกิตและค่าคะแนนทั้งหมด"
+                                                            removeWrapper
+                                                            className={tableClassCondition}
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>#</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                            </TableHeader>
 
-                                                        <TableBody>
-                                                            <TableRow>
-                                                                <TableCell>รวม</TableCell>
-                                                                <TableCell>{sumCredits}</TableCell>
-                                                                <TableCell>{sumGrades}</TableCell>
-                                                                <TableCell>
-                                                                    {sumCredits > 0 ? (sumGrades / sumCredits).toFixed(2) : 'N/A'}
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        </TableBody>
-                                                    </Table>
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell>รวม</TableCell>
+                                                                    <TableCell>{sumCredits}</TableCell>
+                                                                    <TableCell>{sumGrades}</TableCell>
+                                                                    <TableCell>
+                                                                        {sumCredits > 0 ? (sumGrades / sumCredits).toFixed(2) : 'N/A'}
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        </Table>
+                                                    </div>
                                                 </>
 
                                                 {(session.user.role === 'admin' ? verifySelect.status === 2 : verifySelect.status === 1) ? (
