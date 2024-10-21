@@ -4,21 +4,19 @@ import Link from 'next/link'
 const TMonlicaEmail = () => {
      return (
           <div className='inline-block'>
-               FB: <Link
+               <Link
                     className="text-blue-500"
-                    href="https://www.facebook.com/Arinchawut"
+                    href="https://www.facebook.com/"
                     target='_blank'
                >
-                    Arin Chawut</Link>
-               <span className='me-1'>
-               </span>
+                    เจ้าหน้าที่ 1 </Link>
+               <span className='me-1'> </span>
                หรือ
-               FB: <Link
+               <Link
                     className="text-blue-500"
-                    href="https://www.facebook.com/kiok127523"
+                    href="https://www.facebook.com/"
                     target='_blank'
-               >
-                    Phubes Komutiban</Link>
+               > เจ้าหน้าที่ 2</Link>
                <span className='ms-1'>
                </span>
           </div>
