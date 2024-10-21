@@ -1,7 +1,7 @@
 "use client"
 import { DeleteIcon2, PlusIcon } from '@/app/components/icons'
 import { getOptions } from '@/app/components/serverAction/TokenAction'
-import { minimalTableClass } from '@/src/util/ComponentClass'
+import { insertColor, minimalTableClass } from '@/src/util/ComponentClass'
 import { swal } from '@/src/util/sweetyAlert'
 import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip, useDisclosure } from '@nextui-org/react'
 import { Empty, message } from 'antd'
@@ -65,28 +65,28 @@ const TrackSubjectTable = ({
 
     return (
         <div className='border p-4 rounded-[10px] w-full'>
-            <div className='bg-gray-100 border-gray-200 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-md mb-3'>
+            <div className='flex flex-row justify-between items-center rounded-md mb-3'>
                 <h2 className='text-small text-default-900'>วิชาที่ใช้ในการคัดเลือก</h2>
-                <div className='flex gap-2'>
+                <div className='flex flex-col gap-2 md:flex-row'>
                     <Button
                         radius='sm'
                         size='sm'
                         color='default'
                         startContent={<PlusIcon className="w-5 h-5" />}
                         onClick={onOpen}
-                        className='bg-gray-300'>
+                        className={`bg-gray-300 ${insertColor.color}`}>
                         เพิ่มวิขา
                     </Button>
-                    <div className={disableDeleteBtn ? "cursor-not-allowed" : ""}>
+                    <div className={`${disableDeleteBtn ? "cursor-not-allowed" : ""} max-md:w-full`}>
                         <Button
                             isDisabled={disableDeleteBtn || isDeleting}
                             isLoading={isDeleting}
                             radius='sm'
                             size='sm'
-                            color='default'
+                            color='danger'
                             startContent={<DeleteIcon2 className="w-5 h-5" />}
                             onClick={() => handleDelete(trackId, selectedSubject)}
-                            className='bg-gray-300'>
+                            className='bg-red-400 max-md:w-full'>
                             ลบวิชา
                         </Button>
                     </div>
@@ -94,6 +94,7 @@ const TrackSubjectTable = ({
             </div>
             {trackSubj &&
                 <Table
+                    className='overflow-x-auto'
                     classNames={minimalTableClass}
                     removeWrapper
                     selectionMode="multiple"

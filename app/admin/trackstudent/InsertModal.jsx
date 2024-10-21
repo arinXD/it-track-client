@@ -103,7 +103,7 @@ const InsertModal = ({ cb, tracks, isOpen, onClose }) => {
                                         required
                                         isRequired
                                    />
-                                   <div className="flex mt-4 mb-3 gap-4">
+                                   <div className="flex mt-4 mb-3 gap-4 max-md:flex-col max-md:my-0">
                                         <div className="w-full">
                                              <label htmlFor="track_order_1" className="block text-sm mb-[6px]">เลือกอับดับ 1</label>
                                              <select

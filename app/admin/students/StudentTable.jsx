@@ -392,7 +392,7 @@ const StudentTable = () => {
                                         </div>
                                    </div>
                               </div>
-                              <div className="flex justify-between items-center">
+                              <div className="flex max-md:flex-col justify-between items-center max-md:items-start max-md:gap-2">
                                    <span className="text-default-400 text-small">นักศึกษาทั้งหมด {students.length} คน</span>
                                    <label className="flex items-center text-default-400 text-small">
                                         Rows per page
@@ -410,7 +410,7 @@ const StudentTable = () => {
                               </div>
                          </div>
                     }
-                    <div className='flex flex-row justify-between items-center gap-4'>
+                    <div className='flex flex-col lg:flex-row justify-between items-center gap-4'>
                          <Input
                               isClearable
                               className="w-full h-fit"
@@ -422,9 +422,9 @@ const StudentTable = () => {
                               onClear={() => onClear()}
                               onValueChange={onSearchChange}
                          />
-                         <div className={`${role === "admin" ? "flex" : "hidden"} gap-4`}>
+                         <div className={`${role === "admin" ? "flex" : "hidden"} gap-4 max-md:flex-row max-lg:w-full`}>
                               <Dropdown>
-                                   <DropdownTrigger>
+                                   <DropdownTrigger className="max-lg:w-1/3">
                                         <Button
                                              size="sm"
                                              className={insertColor.color}
@@ -487,23 +487,23 @@ const StudentTable = () => {
                                         </DropdownItem>
                                    </DropdownMenu>
                               </Dropdown>
-                              <Link href="/admin/students/restore">
+                              <Link className="max-lg:w-1/3" href="/admin/students/restore">
                                    <Button
                                         size="sm"
                                         radius="sm"
-                                        className={restoreColor.color}
+                                        className={`${restoreColor.color} max-lg:w-full`}
                                         startContent={<TbRestore className="w-4 h-4" />}>
                                         รายการที่ถูกลบ
                                    </Button>
                               </Link>
-                              <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
+                              <div className={`${disableSelectDelete ? "cursor-not-allowed" : ""} max-lg:w-1/3`}>
                                    <Button
                                         radius="sm"
                                         size="sm"
                                         isDisabled={disableSelectDelete}
                                         onPress={handleSelectDelete}
                                         color="danger"
-                                        className={deleteColor.color}
+                                        className={`${deleteColor.color} max-lg:w-full`}
                                         startContent={<DeleteIcon2 className="w-5 h-5" />}>
                                         ลบรายการที่เลือก
                                    </Button>
@@ -573,10 +573,10 @@ const StudentTable = () => {
                     stuIdList={selectedStudents} />
 
 
-               <div className='border p-4 rounded-[10px] w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-4 flex-wrap'>
-                    <div className="flex gap-4 flex-wrap">
+               <div className='border p-4 rounded-[10px] w-full flex flex-row justify-between items-center gap-4 mb-4 flex-wrap'>
+                    <div className="max-lg:w-full flex gap-4">
                          <Dropdown>
-                              <DropdownTrigger className="flex">
+                              <DropdownTrigger className="max-lg:w-1/2">
                                    <Button
                                         size="sm"
                                         radius="sm"
@@ -603,7 +603,7 @@ const StudentTable = () => {
                               </DropdownMenu>
                          </Dropdown>
                          <Dropdown>
-                              <DropdownTrigger className="hidden sm:flex">
+                              <DropdownTrigger className="max-lg:w-1/2">
                                    <Button
                                         size="sm"
                                         className="bg-blue-100 text-blue-500"
@@ -629,7 +629,7 @@ const StudentTable = () => {
                               </DropdownMenu>
                          </Dropdown>
                     </div>
-                    <div className="flex gap-4 items-center flex-wrap">
+                    <div className="max-lg:w-full flex gap-4 items-center">
                          <select
                               name="select-program"
                               id="selectProgram"
@@ -639,7 +639,7 @@ const StudentTable = () => {
                                    height: "32px",
                                    ...selectStyle
                               }}
-                              className="px-2 pe-3 py-1 border-1 rounded-lg text-sm "
+                              className="max-lg:w-1/2 px-2 pe-3 py-1 border-1 rounded-lg text-sm "
                          >
                               <option value="" disabled hidden>หลักสูตร</option>
                               {programs?.length && programs.map((program) => (
@@ -657,7 +657,7 @@ const StudentTable = () => {
                                    height: "32px",
                                    ...selectStyle
                               }}
-                              className="px-2 pe-3 py-1 border-1 rounded-lg text-sm"
+                              className="max-lg:w-1/2 px-2 pe-3 py-1 border-1 rounded-lg text-sm"
                          >
                               <option value="" disabled hidden>ปีการศึกษา</option>
                               {acadyears.map((acadyear) => (
@@ -672,7 +672,7 @@ const StudentTable = () => {
                               size="sm"
                               variant="solid"
                               className="bg-blue-100 text-blue-500"
-                              startContent={<SearchIcon />}
+                              startContent={<SearchIcon className="max-lg:hidden" />}
                          >
                               ค้นหา
                          </Button>
@@ -684,6 +684,7 @@ const StudentTable = () => {
                          {
                               !fetching && role ?
                                    <Table
+                                        className="overflow-x-auto"
                                         aria-label="Student Table"
                                         checkboxesProps={{
                                              classNames: {

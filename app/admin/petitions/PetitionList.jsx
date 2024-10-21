@@ -70,7 +70,7 @@ const PetitionList = ({ current, fetching, title, data, emptyContent }) => {
                                                   <Link
                                                        className="w-full grid grid-cols-9 gap-4 items-center p-4"
                                                        href={`/admin/petitions/${current}/${petition.id}`}>
-                                                       <span className="w-full col-span-2 font-normal text-gray-900 truncate">
+                                                       <span className="w-full col-span-2 font-normal text-gray-900 truncate max-md:col-span-3">
                                                             <p className="w-full text-xs truncate overflow-hidden">
                                                                  {petition?.Sender?.email}
                                                             </p>
@@ -78,13 +78,13 @@ const PetitionList = ({ current, fetching, title, data, emptyContent }) => {
                                                                  {petition?.Sender?.Student?.first_name}  {petition?.Sender?.Student?.last_name}
                                                             </p>
                                                        </span>
-                                                       <span className="w-full col-span-2 text-sm font-normal text-gray-900 truncate">
+                                                       <span className="w-full col-span-2 text-sm font-normal text-gray-900 truncate max-md:col-span-3">
                                                             {petition.title}
                                                        </span>
-                                                       <span className="w-full col-span-2 xl:col-span-3 text-sm  text-gray-500 truncate overflow-hidden">
+                                                       <span className="w-full col-span-2 xl:col-span-3 text-sm  text-gray-500 truncate overflow-hidden max-md:hidden">
                                                             {petition.detail}
                                                        </span>
-                                                       <span className="w-full col-span-2 xl:col-span-1 justify-center flex text-gray-500 truncate text-center">
+                                                       <span className="w-full col-span-2 xl:col-span-1 justify-center flex text-gray-500 truncate text-center max-md:hidden">
                                                             <div className="flex items-center gap-1">
                                                                  <div className={`rounded-full w-2 h-2 ${petition?.status == 0 ? "bg-yellow-600" : petition?.status == 1 ? "bg-green-600" : "bg-red-600"}`}></div>
                                                                  <p className="text-xs">
@@ -92,7 +92,7 @@ const PetitionList = ({ current, fetching, title, data, emptyContent }) => {
                                                                  </p>
                                                             </div>
                                                        </span>
-                                                       <span className="w-full col-span-1 text-right text-xs text-gray-400">
+                                                       <span className="w-full col-span-1 text-right text-xs text-gray-400 max-md:col-span-3">
                                                             {simpleDM(petition.createdAt)}
                                                        </span>
                                                   </Link>

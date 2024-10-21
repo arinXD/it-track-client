@@ -1,6 +1,6 @@
 "use client"
 import { Navbar, Sidebar, ContentWrap, BreadCrumb } from '@/app/components'
-import { fetchData, fetchDataObj } from '../../action'
+import { fetchData } from '../../action'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Button, Tab, Tabs, Input, Spinner, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useDisclosure } from "@nextui-org/react";
 import { format } from 'date-fns';
@@ -24,6 +24,7 @@ import { utils, writeFile } from "xlsx";
 import { Empty, message } from 'antd';
 import { RiMailSendLine } from "react-icons/ri";
 import InsertSubjectModal from './InsertSubjectModal';
+import moment from 'moment-timezone';
 
 const Page = ({ params }) => {
     const swal = useCallback(Swal.mixin({
@@ -89,9 +90,9 @@ const Page = ({ params }) => {
 
     const initTrackSelect = useCallback(async function (id) {
         try {
-            const result = await fetchDataObj(`/api/tracks/selects/${id}/subjects/students`)
-            result.startAt = format(new Date(result?.startAt), 'yyyy-MM-dd\'T\'HH:mm')
-            result.expiredAt = format(new Date(result?.expiredAt), 'yyyy-MM-dd\'T\'HH:mm')
+            // moment.tz.setDefault('Asia/Bangkok');
+            const option = await getOptions(`/api/tracks/selects/${id}/subjects/students`, "GET")
+            const result = (await axios(option)).data.data
             setTrackSelect(result)
             setTrackSubj(result?.Subjects)
         } catch (err) {
@@ -147,7 +148,7 @@ const Page = ({ params }) => {
             setTitle(trackSelect.title)
             setStartAt(format(new Date(trackSelect?.startAt), 'yyyy-MM-dd HH:mm'))
             setExpiredAt(format(new Date(trackSelect?.expiredAt), 'yyyy-MM-dd HH:mm'))
-            const announcement = trackSelect?.announcementDate ? format(new Date(trackSelect?.announcementDate), 'yyyy-MM-dd HH:mm') : null
+            const announcement = trackSelect?.announcementDate ? moment(trackSelect?.announcementDate).format('YYYY-MM-DD HH:mm') : null
             setAnnouncementDate(announcement)
             setHasFinished(trackSelect.has_finished)
 
@@ -271,9 +272,9 @@ const Page = ({ params }) => {
 
     const handleUnsave = useCallback(function () {
         setTitle(trackSelect.title)
-        setStartAt(format(new Date(trackSelect.startAt), 'yyyy-MM-dd HH:mm'))
-        setExpiredAt(format(new Date(trackSelect.expiredAt), 'yyyy-MM-dd HH:mm'))
-        const announcement = trackSelect.announcementDate ? format(new Date(trackSelect.announcementDate), 'yyyy-MM-dd HH:mm') : null
+        setStartAt(moment(trackSelect.startAt).format('YYYY-MM-DD HH:mm'))
+        setExpiredAt(moment(trackSelect.expiredAt).format('YYYY-MM-DD HH:mm'))
+        const announcement = trackSelect.announcementDate ? moment(trackSelect.announcementDate).format('YYYY-MM-DD HH:mm') : null
         setAnnouncementDate(announcement)
         document.querySelector("#announcementDate").value = null
         setHasFinished(trackSelect.has_finished)
@@ -664,7 +665,7 @@ const Page = ({ params }) => {
                                                         classNames={inputClass}
                                                     />
                                                 </div>
-                                                <div className='w-full flex gap-4 justify-between items-center'>
+                                                <div className='w-full flex flex-col md:flex-row gap-4 justify-between items-center'>
                                                     <div className='w-full flex justify-start items-center gap-4'>
                                                         <Input
                                                             type='datetime-local'
@@ -729,7 +730,7 @@ const Page = ({ params }) => {
                                                             min={expiredAt}
                                                         />
                                                     </div>
-                                                    <div className='w-full'>
+                                                    <div className='w-full hidden md:block'>
 
                                                     </div>
                                                 </div>
@@ -826,76 +827,79 @@ const Page = ({ params }) => {
 
                                     {
                                         !parseInt(studentsBit?.normal + studentsNetwork?.normal + studentsWeb?.normal) ? null :
-                                            <div className='grid grid-cols-3 gap-8 max-xl:grid-cols-2 max-lg:grid-cols-1'>
+                                            <>
+                                                <h2 className='mt-6 text-center text-2xl font-bold'>จำนวนนักศึกษาในแต่ละแทร็ก</h2>
+                                                <div className='grid grid-cols-3 gap-8 max-xl:grid-cols-2 max-lg:grid-cols-1'>
 
-                                                {/* 1 */}
-                                                <div className="bg-gradient-to-br from-gray-50 border rounded-large p-6">
+                                                    {/* 1 */}
+                                                    <div className="bg-gradient-to-br from-gray-50 border rounded-large p-6">
 
-                                                    <div style={{ boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px" }}
-                                                        className="mx-auto  w-[6em] h-[6em] bg-white rounded-full flex justify-center items-center">
-                                                        <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
-                                                    </div>
-                                                    <div className='mt-6 w-full grid grid-cols-1'>
-                                                        <h1 className='font-bold text-center'>Business Information Technology</h1>
-                                                        <div className='mt-3 flex flex-col md:flex-row items-center gap-4'>
-                                                            <div className='w-full flex flex-col justify-center items-center'>
-                                                                <p>โครงการปกติ</p>
-                                                                <p>{studentsBit?.normal}</p>
+                                                        <div style={{ boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px" }}
+                                                            className="mx-auto  w-[6em] h-[6em] bg-white rounded-full flex justify-center items-center">
+                                                            <p className='text-3xl text-black'>{studentsBit?.students?.length}</p>
+                                                        </div>
+                                                        <div className='mt-6 w-full grid grid-cols-1'>
+                                                            <h1 className='font-bold text-center'>Business Information Technology</h1>
+                                                            <div className='mt-3 flex flex-col items-center gap-2 md:gap-4 md:flex-row'>
+                                                                <div className='w-full flex flex-col justify-center items-center max-md:flex-row max-md:gap-2'>
+                                                                    <p>โครงการปกติ</p>
+                                                                    <p>{studentsBit?.normal}</p>
+                                                                </div>
+                                                                <hr className='h-12 border max-md:hidden' />
+                                                                <div className='w-full flex flex-col justify-center items-center max-md:flex-row max-md:gap-2'>
+                                                                    <p>โครงการพิเศษ</p>
+                                                                    <p>{studentsBit?.vip}</p>
+                                                                </div>
                                                             </div>
-                                                            <hr className='h-12 border' />
-                                                            <div className='w-full flex flex-col justify-center items-center'>
-                                                                <p>โครงการพิเศษ</p>
-                                                                <p>{studentsBit?.vip}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* 2 */}
+                                                    <div className="bg-gradient-to-br from-gray-50 border rounded-large p-6">
+                                                        <div style={{ boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px" }}
+                                                            className="mx-auto w-[6em] h-[6em] bg-white rounded-full flex justify-center items-center">
+                                                            <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
+                                                        </div>
+                                                        <div className='mt-6 w-full grid grid-cols-1'>
+                                                            <h1 className='font-bold text-center'>Systems, Network, Security and IoTs </h1>
+                                                            <div className='mt-3 flex flex-col items-center gap-2 md:gap-4 md:flex-row'>
+                                                                <div className='w-full flex flex-col justify-center items-center max-md:flex-row max-md:gap-2'>
+                                                                    <p>โครงการปกติ</p>
+                                                                    <p>{studentsNetwork?.normal}</p>
+                                                                </div>
+                                                                <hr className='h-12 border max-md:hidden' />
+                                                                <div className='w-full flex flex-col justify-center items-center max-md:flex-row max-md:gap-2'>
+                                                                    <p>โครงการพิเศษ</p>
+                                                                    <p>{studentsNetwork?.vip}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* 3 */}
+                                                    <div className="bg-gradient-to-br from-gray-50 border rounded-large p-6">
+
+                                                        <div style={{ boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px" }}
+                                                            className="mx-auto w-[6em] h-[6em] bg-white rounded-full flex justify-center items-center">
+                                                            <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
+                                                        </div>
+                                                        <div className='mt-6 w-full grid grid-cols-1'>
+                                                            <h1 className='font-bold text-center'>Mobile and Web Application Development</h1>
+                                                            <div className='mt-3 flex flex-col md:flex-row items-center gap-2 md:gap-4'>
+                                                                <div className='w-full flex flex-col justify-center items-center max-md:flex-row max-md:gap-2'>
+                                                                    <p>โครงการปกติ</p>
+                                                                    <p>{studentsWeb?.normal}</p>
+                                                                </div>
+                                                                <hr className='h-12 border max-md:hidden' />
+                                                                <div className='w-full flex flex-col justify-center items-center max-md:flex-row max-md:gap-2'>
+                                                                    <p>โครงการพิเศษ</p>
+                                                                    <p>{studentsWeb?.vip}</p>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                                {/* 2 */}
-                                                <div className="bg-gradient-to-br from-gray-50 border rounded-large p-6">
-                                                    <div style={{ boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px" }}
-                                                        className="mx-auto w-[6em] h-[6em] bg-white rounded-full flex justify-center items-center">
-                                                        <p className='text-3xl text-black'>{studentsNetwork?.students?.length}</p>
-                                                    </div>
-                                                    <div className='mt-6 w-full grid grid-cols-1'>
-                                                        <h1 className='font-bold text-center'>Network Systems, Information Technology Security, and Internet of Things (IoT)</h1>
-                                                        <div className='mt-3 flex flex-col md:flex-row items-center gap-4'>
-                                                            <div className='w-full flex flex-col justify-center items-center'>
-                                                                <p>โครงการปกติ</p>
-                                                                <p>{studentsNetwork?.normal}</p>
-                                                            </div>
-                                                            <hr className='h-12 border' />
-                                                            <div className='w-full flex flex-col justify-center items-center'>
-                                                                <p>โครงการพิเศษ</p>
-                                                                <p>{studentsNetwork?.vip}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* 3 */}
-                                                <div className="bg-gradient-to-br from-gray-50 border rounded-large p-6">
-
-                                                    <div style={{ boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px" }}
-                                                        className="mx-auto w-[6em] h-[6em] bg-white rounded-full flex justify-center items-center">
-                                                        <p className='text-3xl text-black'>{studentsWeb?.students?.length}</p>
-                                                    </div>
-                                                    <div className='mt-6 w-full grid grid-cols-1'>
-                                                        <h1 className='font-bold text-center'>Mobile and Web Application Development</h1>
-                                                        <div className='mt-3 flex flex-col md:flex-row items-center gap-4'>
-                                                            <div className='w-full flex flex-col justify-center items-center'>
-                                                                <p>โครงการปกติ</p>
-                                                                <p>{studentsWeb?.normal}</p>
-                                                            </div>
-                                                            <hr className='h-12 border' />
-                                                            <div className='w-full flex flex-col justify-center items-center'>
-                                                                <p>โครงการพิเศษ</p>
-                                                                <p>{studentsWeb?.vip}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            </>
                                     }
                                     <InsertSubjectModal
                                         cb={cb}
@@ -1088,7 +1092,7 @@ const Page = ({ params }) => {
                                                 }
                                                 <Tab
                                                     key="download"
-                                                    className='hover:border-b-2 border-blue-500'
+                                                    className='max-md:hidden hover:border-b-2 border-blue-500'
                                                     title={
                                                         <div
                                                             onClick={() => downloadTrack(trackSelect)}

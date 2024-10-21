@@ -146,10 +146,10 @@ const PetitionList = ({
                                                             <span className="w-full text-xs col-span-8 lg:col-span-2 font-medium text-gray-900 truncate">
                                                                  {petition.title}
                                                             </span>
-                                                            <span className="w-full text-xs col-span-8 lg:col-span-4 text-gray-500 truncate overflow-hidden">
+                                                            <span className="w-full text-xs col-span-8 lg:col-span-4 text-gray-500 truncate overflow-hidden max-md:hidden">
                                                                  {petition.detail}
                                                             </span>
-                                                            <span className="w-full col-span-4 lg:col-span-1 justify-start flex text-gray-500 truncate text-center">
+                                                            <span className="w-full col-span-4 lg:col-span-1 justify-start flex text-gray-500 truncate text-center max-md:hidden">
                                                                  <div className="flex items-center gap-1">
                                                                       <div className={`rounded-full w-2 h-2 ${petition?.status == 0 ? "bg-yellow-600" : petition?.status == 1 ? "bg-green-600" : "bg-red-600"}`}></div>
                                                                       <p className="text-xs">

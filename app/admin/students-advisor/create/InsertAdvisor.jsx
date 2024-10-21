@@ -28,7 +28,7 @@ const InsertAdvisor = ({ teacher }) => {
           const options = await getOptions(`/api/advisors/students/${stuID}`, "get")
           try {
                const data = (await axios(options)).data.data
-               return Object.keys(data)?.length > 0
+               return data?.Advisor || {}
           } catch {
                return false
           }
@@ -54,11 +54,11 @@ const InsertAdvisor = ({ teacher }) => {
                message.warning("เลือกนักศึกษา")
                return
           }
-          const hasAdvisor = await findStudentAdvisor(stu_id)
+          const advisor = await findStudentAdvisor(stu_id)
           const option = await getOptions(`/api/advisors/${teacher.id}/students/${stu_id}`, "POST")
-          if (hasAdvisor) {
+          if (Object.keys(advisor).length > 0) {
                swal.fire({
-                    text: `นักศึกษามีที่ปรึกษาแล้วต้องการแก้ไขหรือไม่ ?`,
+                    text: `นักศึกษามีที่ปรึกษาแล้วคือ ${advisor.prefix}${advisor.name} ${advisor.surname} ต้องการแก้ไขหรือไม่ ?`,
                     icon: "question",
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",

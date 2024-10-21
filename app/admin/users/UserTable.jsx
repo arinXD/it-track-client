@@ -160,51 +160,53 @@ const UserTable = ({ email }) => {
 
      return (
           <div className="space-y-4 p-4">
-               <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 space-y-2 lg:space-y-0">
                     <h2 className="text-2xl font-bold">ตารางบัญชีผู้ใช้</h2>
-                    <div className="flex space-x-4">
+                    <div className="max-lg:w-full flex flex-col max-lg:items-end lg:flex-row max-lg:gap-2 lg:space-x-4">
                          <Input
                               type="text"
                               placeholder="ค้นหาบัญชีหรือโรล"
                               value={searchTerm}
                               classNames={thinInputClass}
                               onValueChange={handleSearch}
-                              className="w-[300px] !text-xs"
+                              className="max-lg:w-full w-[300px] !text-xs"
                               startContent={<SearchIcon />}
                          />
-                         <Select
-                              classNames={{
-                                   label: "!text-xs",
-                                   trigger: "border-1 h-10 !text-xs",
-                              }}
-                              variant="bordered"
-                              placeholder="Filter by role"
-                              className="max-w-[150px]"
-                              selectedKeys={[roleFilter]}
-                              onChange={(e) => handleRoleFilter(e.target.value || "all")}
-                         >
-                              <SelectItem key="all">ทั้งหมด</SelectItem>
-                              <SelectItem key="admin">แอดมิน</SelectItem>
-                              <SelectItem key="teacher">อาจารย์</SelectItem>
-                              <SelectItem key="student">นักศึกษา</SelectItem>
-                              <SelectItem key="user">ผู้ใช้</SelectItem>
-                         </Select>
-                         <Select
-                              classNames={{
-                                   label: "!text-xs",
-                                   trigger: "border-1 h-10 !text-xs",
-                              }}
-                              variant="bordered"
-                              className="w-[150px]"
-                              selectedKeys={[rowsPerPage.toString()]}
-                              onChange={(e) => setRowsPerPage(Number(e.target.value) || 5)}
-                         >
-                              <SelectItem key="5">5 per page</SelectItem>
-                              <SelectItem key="10">10 per page</SelectItem>
-                              <SelectItem key="20">20 per page</SelectItem>
-                              <SelectItem key="50">50 per page</SelectItem>
-                         </Select>
-                         <div>
+                         <div className='max-lg:w-full flex flex-row gap-2'>
+                              <Select
+                                   classNames={{
+                                        label: "!text-xs",
+                                        trigger: "border-1 h-10 !text-xs",
+                                   }}
+                                   variant="bordered"
+                                   placeholder="Filter by role"
+                                   className="w-full lg:max-w-[150px]"
+                                   selectedKeys={[roleFilter]}
+                                   onChange={(e) => handleRoleFilter(e.target.value || "all")}
+                              >
+                                   <SelectItem key="all">ทั้งหมด</SelectItem>
+                                   <SelectItem key="admin">แอดมิน</SelectItem>
+                                   <SelectItem key="teacher">อาจารย์</SelectItem>
+                                   <SelectItem key="student">นักศึกษา</SelectItem>
+                                   <SelectItem key="user">ผู้ใช้</SelectItem>
+                              </Select>
+                              <Select
+                                   classNames={{
+                                        label: "!text-xs",
+                                        trigger: "border-1 h-10 !text-xs",
+                                   }}
+                                   variant="bordered"
+                                   className="w-full lg:w-[150px]"
+                                   selectedKeys={[rowsPerPage.toString()]}
+                                   onChange={(e) => setRowsPerPage(Number(e.target.value) || 5)}
+                              >
+                                   <SelectItem key="5">5 per page</SelectItem>
+                                   <SelectItem key="10">10 per page</SelectItem>
+                                   <SelectItem key="20">20 per page</SelectItem>
+                                   <SelectItem key="50">50 per page</SelectItem>
+                              </Select>
+                         </div>
+                         <div className='max-lg:w-1/2 max-lg:flex max-lg:justify-end'>
                               <Link href={"/admin/users/create"}>
                                    <Button
                                         className='bg-[#edf8f7] text-[#46bcaa]'
@@ -220,7 +222,7 @@ const UserTable = ({ email }) => {
                          isStriped
                          removeWrapper
                          aria-label="User management table"
-                         className="min-w-full">
+                         className="min-w-full overflow-x-auto">
                          <TableHeader columns={columns}>
                               {(column) => (
                                    <TableColumn key={column.key} className={`text-${column.align} text-sm font-semibold`}>

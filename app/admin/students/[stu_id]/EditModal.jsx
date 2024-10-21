@@ -246,7 +246,7 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
                                     <span className='text-base font-normal'>แบบฟอร์มแก้ไขรายชื่อนักศึกษา</span>
                                 </ModalHeader>
                                 <ModalBody>
-                                    <div className='flex flex-row gap-4 mt-0'>
+                                    <div className='flex max-md:flex-col flex-row gap-4 mt-0'>
                                         <Input
                                             type="text"
                                             variant="bordered"
@@ -271,7 +271,7 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
                                             isInvalid={invalid.email}
                                         />
                                     </div>
-                                    <div className='flex flex-row gap-4'>
+                                    <div className='flex max-md:flex-col flex-row gap-4'>
                                         <Input
                                             type="text"
                                             radius='sm'
@@ -295,11 +295,11 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
                                             isInvalid={invalid.last_name}
                                         />
                                     </div>
-                                    <div className='flex flex-row gap-4'>
+                                    <div className='flex max-md:flex-col flex-row gap-4'>
                                         {AutoCompleteAcadyear}
                                         {AutoCompleteProgram}
                                     </div>
-                                    <div className='flex flex-row gap-4'>
+                                    <div className='flex max-md:flex-col flex-row gap-4'>
                                         <div className='w-[100%]'>
                                             <p className='text-sm mb-2'>เลือกโครงการ</p>
                                             <RadioGroup

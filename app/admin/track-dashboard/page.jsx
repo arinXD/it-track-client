@@ -358,7 +358,7 @@ export default function Page() {
                         className="rounded-[5px]"
                         isLoading={searching}
                         isDisabled={searching}
-                        startContent={<SearchIcon className="w-5 h-5" />}
+                        startContent={<SearchIcon className="w-5 h-5 max-md:hidden" />}
                     >
                         ค้นหา
                     </Button>
@@ -393,7 +393,7 @@ export default function Page() {
                                             />
                                         </div>
                                         <Card
-                                            className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-full'
+                                            className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-full max-md:col-span-5'
                                         >
                                             <CardBody className='flex justify-center items-center'>
                                                 <section className='p-2 flex flex-col gap-3'>
@@ -406,7 +406,7 @@ export default function Page() {
                                             </CardBody>
                                         </Card>
                                         <Card
-                                            className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-full'
+                                            className='w-full rounded-[5px] border-1 border-gray-300 shadow-none h-full max-md:col-span-5'
                                         >
                                             <CardBody className='flex justify-center items-center'>
                                                 <section className='p-2 flex flex-col gap-3'>
@@ -421,7 +421,7 @@ export default function Page() {
                                         {filteredResults.map((rs, index) => (
                                             <Card
                                                 key={index}
-                                                className='w-full rounded-[5px] border-1 border-gray-300 shadow-none'
+                                                className='w-full rounded-[5px] border-1 border-gray-300 shadow-none max-md:col-span-5'
                                             >
                                                 <CardBody className='p-3 flex flex-col justify-between text-center'>
                                                     <p className='text-xs text-default-500 '>นักศึกษาสังกัดแทร็ก {rs.track?.split(" ")[0]}</p>
@@ -442,7 +442,7 @@ export default function Page() {
                                     <section className='w-full mt-6 grid grid-cols-5 gap-6'>
                                         <section className='col col-span-5 grid grid-cols-2 gap-6'>
                                             <Card
-                                                className='col-span-1 rounded-[5px] border-1 border-gray-300 shadow-none'
+                                                className='col-span-1 rounded-[5px] border-1 border-gray-300 shadow-none max-md:col-span-5'
                                             >
                                                 <CardBody>
                                                     <p className='text-center text-sm mb-7 mt-2'>แทร็กที่ถูกเลือกเยอะในปีการศึกษา {acadyear.value}</p>
@@ -453,7 +453,7 @@ export default function Page() {
                                                 </CardBody>
                                             </Card>
                                             <Card
-                                                className='col-span-1 rounded-[5px] border-1 border-gray-300 shadow-none'
+                                                className='col-span-1 rounded-[5px] border-1 border-gray-300 shadow-none max-md:col-span-5'
                                             >
                                                 <CardBody>
                                                     <p className='text-center text-sm mb-8 mt-2'>อัตราส่วนแทร็กที่ถูกเลือกเยอะที่สุด</p>
@@ -465,7 +465,7 @@ export default function Page() {
                                             </Card>
                                         </section>
                                         <div className='bg-white col-span-5 grid grid-cols-5 rounded-[5px] border-1 border-gray-300'>
-                                            <div className=' col-span-5 flex gap-4 items-end py-4 px-4'>
+                                            <div className='col-span-5 flex gap-4 items-end py-4 px-4 max-md:flex-col max-md:gap-2'>
                                                 <div className='w-full'>
                                                     <label className='text-[12px] text-default-500'>เริ่มต้น</label>
                                                     <Select
@@ -498,7 +498,7 @@ export default function Page() {
                                                         className="rounded-[5px]"
                                                         isLoading={searching}
                                                         isDisabled={searching}
-                                                        startContent={<SearchIcon className="w-4 h-4" />}
+                                                        startContent={<SearchIcon className="w-4 h-4 max-md:hidden" />}
                                                     >
                                                         ค้นหา
                                                     </Button>

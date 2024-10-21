@@ -252,7 +252,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
      const bottomContent = useMemo(() => {
           return (
                Object.keys(forms).length > 0 ?
-                    <div className="py-2 px-2 flex justify-center items-center">
+                    <div className="py-2 px-2 flex justify-center items-center mt-4">
                          <Pagination
                               isCompact
                               showControls
@@ -271,26 +271,16 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
      return (
           <div className='border p-4 rounded-[10px] w-full'>
                <div className="flex flex-col gap-4 mb-4">
-                    <div className="flex gap-4">
-                         <Link href="/admin/suggest-form/create">
+                    <div className="flex gap-4 max-md:w-full">
+                         <Link href="/admin/suggest-form/create" className='max-md:w-1/2'>
                               <Button
                                    radius='sm'
                                    size='sm'
-                                   className='bg-[#edf8f7] text-[#46bcaa]'
-                                   startContent={<PlusIcon className="w-5 h-5" />}>
+                                   className='bg-[#edf8f7] text-[#46bcaa] max-md:w-full'
+                                   startContent={<PlusIcon className="w-5 h-5 max-md:hidden" />}>
                                    เพิ่มแบบฟอร์ม
                               </Button>
                          </Link>
-                         {/* <Link href="/admin/track/restore">
-                              <Button
-                                   size="sm"
-                                   radius="sm"
-                                   color="default"
-                                   className='bg-[#edf0ff] text-[#4d69fa]'
-                                   startContent={<TbRestore className="w-4 h-4" />}>
-                                   รายการที่ถูกลบ
-                              </Button>
-                         </Link> */}
                          <Button
                               isDisabled={disableDeleteBtn || deleting}
                               isLoading={deleting}
@@ -298,8 +288,8 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
                               size='sm'
                               onClick={() => handleDelete(selectedTracks)}
                               color='danger'
-                              className='bg-red-400'
-                              startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                              className='bg-red-400 max-md:w-1/2'
+                              startContent={<DeleteIcon2 className="w-5 h-5 max-md:hidden" />}>
                               ลบ
                          </Button>
                     </div>
@@ -323,10 +313,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
                          },
                     }}
                     classNames={minimalTableClass}
-
-                    bottomContent={bottomContent}
-                    bottomContentPlacement="outside"
-
+                    className='overflow-x-auto'
                     isStriped
                     removeWrapper
                     selectionMode="multiple"
@@ -368,6 +355,7 @@ const SuggestFormTable = ({ forms, fetching, callBack }) => {
                          )}
                     </TableBody>
                </Table>
+               {bottomContent}
           </div>
      )
 }
