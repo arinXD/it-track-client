@@ -319,10 +319,10 @@ const StudentTrackTable = ({
                     </select>
                 </div>
             </div>
-            <div className='flex gap-4'>
+            <div className='flex max-md:flex-col gap-4'>
                 <Input
                     isClearable
-                    className="w-full h-fit mb-4"
+                    className="w-full h-fit md:mb-4"
                     classNames={thinInputClass}
                     placeholder="ค้นหานักศึกษา (รหัสนักศึกษา, ชื่อ, โครงการ, แทร็ก)"
                     size="sm"
@@ -333,7 +333,7 @@ const StudentTrackTable = ({
                     onValueChange={onSearchChange}
                 />
                 {isManagable &&
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 max-md:mb-4 max-md:w-full max-md:justify-end">
                         <Button
                             size="sm"
                             className={insertColor.color}
@@ -342,7 +342,7 @@ const StudentTrackTable = ({
                             startContent={<PlusIcon className="w-5 h-5" />}>
                             เพิ่มข้อมูล
                         </Button>
-                        <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
+                        <div className={`${disableSelectDelete ? "cursor-not-allowed" : ""}`}>
                             <Button
                                 radius="sm"
                                 size="sm"
@@ -350,7 +350,7 @@ const StudentTrackTable = ({
                                 isDisabled={disableSelectDelete}
                                 onPress={() => handleDeleted(selectedRecords)}
                                 color="danger"
-                                className={deleteColor.color}
+                                className={`${deleteColor.color} max-md:w-full`}
                                 startContent={<DeleteIcon2 className="w-5 h-5" />}>
                                 ลบรายการที่เลือก
                             </Button>

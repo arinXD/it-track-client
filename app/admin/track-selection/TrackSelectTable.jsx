@@ -213,7 +213,7 @@ const TrackSelectTable = ({ loading, trackSelection, handleOpen,
                                             size='sm'
                                             radius='sm'
                                             color='danger'
-                                            className="text-lg active:opacity-50">
+                                            className="text-lg bg-red-400 active:opacity-50">
                                             <DeleteIcon className="w-4 h-4" />
                                         </Button>
                                     </div>
