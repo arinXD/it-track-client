@@ -79,7 +79,7 @@ const Page = ({ params }) => {
                     <section>
                          {
                               fetching ?
-                                   <dix className="flex justify-center items-center my-4"><Spinner /></dix>
+                                   <dix className="flex justify-center items-center my-4"><Spinner label="กำลังโหลด..." /></dix>
                                    :
                                    <>
                                         <section className={`w-full ${current === 0 ? "block" : "hidden"}`}>

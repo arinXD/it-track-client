@@ -4,7 +4,7 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input,
 import { Empty, message } from 'antd';
 import axios from 'axios';
 import { thinInputClass } from '@/src/util/ComponentClass';
-import { DeleteIcon, EditIcon2, PlusIcon } from '@/app/components/icons';
+import { DeleteIcon, EditIcon2, PlusIcon, SearchIcon } from '@/app/components/icons';
 import { simpleDMY } from '@/src/util/simpleDateFormatter';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import { useSession } from 'next-auth/react';
@@ -170,6 +170,7 @@ const UserTable = ({ email }) => {
                               classNames={thinInputClass}
                               onValueChange={handleSearch}
                               className="w-[300px] !text-xs"
+                              startContent={<SearchIcon />}
                          />
                          <Select
                               classNames={{
@@ -188,6 +189,21 @@ const UserTable = ({ email }) => {
                               <SelectItem key="student">นักศึกษา</SelectItem>
                               <SelectItem key="user">ผู้ใช้</SelectItem>
                          </Select>
+                         <Select
+                              classNames={{
+                                   label: "!text-xs",
+                                   trigger: "border-1 h-10 !text-xs",
+                              }}
+                              variant="bordered"
+                              className="w-[150px]"
+                              selectedKeys={[rowsPerPage.toString()]}
+                              onChange={(e) => setRowsPerPage(Number(e.target.value) || 5)}
+                         >
+                              <SelectItem key="5">5 per page</SelectItem>
+                              <SelectItem key="10">10 per page</SelectItem>
+                              <SelectItem key="20">20 per page</SelectItem>
+                              <SelectItem key="50">50 per page</SelectItem>
+                         </Select>
                          <div>
                               <Link href={"/admin/users/create"}>
                                    <Button
@@ -199,101 +215,95 @@ const UserTable = ({ email }) => {
                          </div>
                     </div>
                </div>
-               <Table aria-label="User management table" className="min-w-full">
-                    <TableHeader columns={columns}>
-                         {(column) => (
-                              <TableColumn key={column.key} className={`text-${column.align} text-sm font-semibold`}>
-                                   {column.label}
-                              </TableColumn>
-                         )}
-                    </TableHeader>
-                    <TableBody
-                         loadingContent={<Spinner />}
-                         isLoading={fetching}
-                         emptyContent={
-                              <Empty
-                                   className='my-4'
-                                   description={
-                                        <span className='text-gray-300'>ไม่มีบัญชีผู้ใข้</span>
-                                   }
-                              />}
-                         items={items}>
-                         {(user) => (
-                              <TableRow key={user.id}>
-                                   <TableCell className='w-1/4'>
-                                        <div className="text-sm">{user.email}</div>
-                                   </TableCell>
-                                   <TableCell className='w-1/4'>
-                                        <div className="text-sm">{simpleDMY(user.createdAt)}</div>
-                                   </TableCell>
-                                   <TableCell className='w-1/6'>
-                                        <div className="text-sm font-medium">
-                                             {getRole(user.role)}
-                                        </div>
-                                   </TableCell>
-                                   <TableCell>
-                                        <div className='flex justify-center'>
-                                             <Select
-                                                  classNames={{
-                                                       trigger: "border-1 h-10 !text-xs",
-                                                  }}
-                                                  size="sm"
-                                                  placeholder="เลือกโรล"
-                                                  className="max-w-xs"
-                                                  disabledKeys={[user.role, ""]}
-                                                  onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                                             >
-                                                  {roleList.map(role => (
-                                                       <SelectItem key={role.key} value={role.key}>{role.value}</SelectItem>
-                                                  ))}
-                                             </Select>
-                                        </div>
-                                   </TableCell>
-                                   <TableCell className='w-1'>
-                                        <div className='flex justify-center items-center gap-2'>
-                                             <Button
-                                                  size="sm"
-                                                  color="primary"
-                                                  isDisabled={!user.newRole && user.newRole !== user.role}
-                                                  onClick={() => handleUpdateRole(user.id, user.newRole, user.email)}
-                                             >
-                                                  เปลี่ยนโรล
-                                             </Button>
-                                             <Button
-                                                  onClick={() => handleDelete(user.id)}
-                                                  size='sm'
-                                                  color='danger'
-                                                  isIconOnly
-                                                  aria-label="ลบ"
-                                                  className='p-2 bg-red-400'
-                                             >
-                                                  <DeleteIcon className="w-5 h-5" />
-                                             </Button>
-                                        </div>
-                                   </TableCell>
-                              </TableRow>
-                         )}
-                    </TableBody>
-               </Table>
+               <div className='p-4 rounded-[10px] border'>
+                    <Table
+                         isStriped
+                         removeWrapper
+                         aria-label="User management table"
+                         className="min-w-full">
+                         <TableHeader columns={columns}>
+                              {(column) => (
+                                   <TableColumn key={column.key} className={`text-${column.align} text-sm font-semibold`}>
+                                        {column.label}
+                                   </TableColumn>
+                              )}
+                         </TableHeader>
+                         <TableBody
+                              loadingContent={<Spinner />}
+                              isLoading={fetching}
+                              emptyContent={
+                                   <Empty
+                                        className='my-4'
+                                        description={
+                                             <span className='text-gray-300'>ไม่มีบัญชีผู้ใข้</span>
+                                        }
+                                   />}
+                              items={items}>
+                              {(user) => (
+                                   <TableRow key={user.id}>
+                                        <TableCell className='w-1/4'>
+                                             <div className="text-sm">{user.email}</div>
+                                        </TableCell>
+                                        <TableCell className='w-1/4'>
+                                             <div className="text-sm">{simpleDMY(user.createdAt)}</div>
+                                        </TableCell>
+                                        <TableCell className='w-1/6'>
+                                             <div className="text-sm font-medium">
+                                                  {getRole(user.role)}
+                                             </div>
+                                        </TableCell>
+                                        <TableCell>
+                                             <div className='flex justify-center'>
+                                                  <Select
+                                                       classNames={{
+                                                            trigger: "border-1 h-10 !text-xs",
+                                                       }}
+                                                       size="sm"
+                                                       placeholder="เลือกโรล"
+                                                       className="max-w-xs"
+                                                       disabledKeys={[user.role, ""]}
+                                                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                                  >
+                                                       {roleList.map(role => (
+                                                            <SelectItem key={role.key} value={role.key}>{role.value}</SelectItem>
+                                                       ))}
+                                                  </Select>
+                                             </div>
+                                        </TableCell>
+                                        <TableCell className='w-1'>
+                                             <div className='flex justify-center items-center gap-2'>
+                                                  <Button
+                                                       size="sm"
+                                                       color="primary"
+                                                       isDisabled={!user.newRole && user.newRole !== user.role}
+                                                       onClick={() => handleUpdateRole(user.id, user.newRole, user.email)}
+                                                  >
+                                                       เปลี่ยนโรล
+                                                  </Button>
+                                                  <Button
+                                                       onClick={() => handleDelete(user.id)}
+                                                       size='sm'
+                                                       color='danger'
+                                                       isIconOnly
+                                                       aria-label="ลบ"
+                                                       className='p-2 bg-red-400'
+                                                  >
+                                                       <DeleteIcon className="w-5 h-5" />
+                                                  </Button>
+                                             </div>
+                                        </TableCell>
+                                   </TableRow>
+                              )}
+                         </TableBody>
+                    </Table>
+               </div>
                {items?.length > 0 &&
-                    <div className="flex justify-between items-center">
-                         <Select
-                              variant='bordered'
-                              classNames={{
-                                   label: "!text-xs",
-                                   trigger: "border-1 h-10 !text-xs",
-                              }}
-                              size="sm"
-                              className="w-[130px]"
-                              selectedKeys={[rowsPerPage.toString()]}
-                              onChange={(e) => setRowsPerPage(Number(e.target.value) || 5)}
-                         >
-                              <SelectItem key="5">5 per page</SelectItem>
-                              <SelectItem key="10">10 per page</SelectItem>
-                              <SelectItem key="20">20 per page</SelectItem>
-                              <SelectItem key="50">50 per page</SelectItem>
-                         </Select>
+                    <div className="flex justify-end items-center">
                          <Pagination
+                              isCompact
+                              showControls
+                              showShadow
+                              color="primary"
                               total={pages}
                               page={page}
                               onChange={setPage}

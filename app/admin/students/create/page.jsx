@@ -12,7 +12,7 @@ import InsertAdvisor from "../InsertAdvisor"
 
 const Page = () => {
      const searchParams = useSearchParams()
-     const tab = searchParams.get('tab')
+     const tab = searchParams.get('tab') || "student-form"
 
      const tabItems = [
           { key: "student-form", label: "เพิ่มรายชื่อนักศึกษา", icon: <SiGoogleforms className="w-4 h-4 text-blue-600" /> },

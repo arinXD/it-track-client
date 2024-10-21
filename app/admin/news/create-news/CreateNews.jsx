@@ -96,7 +96,7 @@ const CreateNews = () => {
 
      return (
           <div className="border p-6 bg-white rounded-lg mt-8">
-               <h2 className="text-2xl font-bold mb-6 text-start text-gray-800">เพิ่มข่าวสาร</h2>
+               <h2 className="text-2xl font-bold mb-6 text-start text-gray-800">เพิ่ม</h2>
                <Form
                     form={form}
                     layout="vertical"

@@ -81,11 +81,11 @@ const InsertSubjectModal = ({ isOpen, onClose, track, callBack }) => {
 
     const handleSubmit = useCallback(async (trackSubj) => {
         if (trackSubj.length == 0) return
+        setInserting(true)
         const formData = trackSubj.map(subject => subject.subject_id)
         const url = `/api/subjects/tracks/${track}`
         const option = await getOptions(url, "POST", formData)
         try {
-            setInserting(true)
             const res = await axios(option)
             const { message: successMesg } = res.data
             message.success(successMesg)

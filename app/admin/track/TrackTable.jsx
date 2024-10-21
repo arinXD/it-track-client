@@ -244,12 +244,7 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
     const bottomContent = useMemo(() => {
         return (
             Object.keys(tracks).length > 0 ?
-                <div className="py-2 px-2 flex justify-between items-center">
-                    <span className="w-[30%] text-small text-default-400">
-                        {selectedKeys === "all"
-                            ? "All items selected"
-                            : `${selectedKeys?.size || 0} of ${filteredItems?.length || 0} selected`}
-                    </span>
+                <div className="py-2 px-2 flex justify-end items-center">
                     <Pagination
                         isCompact
                         showControls
@@ -259,14 +254,6 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
                         total={pages}
                         onChange={setPage}
                     />
-                    <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                        <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
-                            Previous
-                        </Button>
-                        <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
-                            Next
-                        </Button>
-                    </div>
                 </div>
                 :
                 undefined
@@ -274,8 +261,9 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
     return (
-        <div className='border p-4 rounded-[10px] w-full'>
-            <div className="flex flex-col gap-4 mb-4">
+        <div className="space-y-4 p-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+                <h2 className="text-2xl font-bold">ตารางข้อมูลแทร็ก</h2>
                 <div className="flex gap-4">
                     <Link href="/admin/track/insert-track">
                         <Button
@@ -304,73 +292,73 @@ const TrackTable = ({ tracks, fetching, callBack }) => {
                         onClick={() => handleDelete(selectedTracks)}
                         color='danger'
                         className='bg-red-400'
-                        startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                        startContent={<DeleteIcon className="w-4 h-4" />}>
                         ลบ
                     </Button>
                 </div>
-                <Input
-                    isClearable
-                    className="w-full h-fit"
-                    placeholder="ค้นหาแทร็ก"
-                    size="sm"
-                    classNames={inputClass}
-                    startContent={<SearchIcon />}
-                    value={filterValue}
-                    onClear={() => onClear()}
-                    onValueChange={onSearchChange}
-                />
             </div>
-            <Table
-                aria-label="Student Table"
-                checkboxesProps={{
-                    classNames: {
-                        wrapper: "after:bg-blue-500 after:text-background text-background",
-                    },
-                }}
-                classNames={minimalTableClass}
+            <Input
+                isClearable
+                className="w-full h-fit"
+                placeholder="ค้นหาแทร็ก"
+                size="sm"
+                classNames={inputClass}
+                startContent={<SearchIcon />}
+                value={filterValue}
+                onClear={() => onClear()}
+                onValueChange={onSearchChange}
+            />
+            <div className='p-4 border rounded-[10px]'>
+                <Table
+                    aria-label="Student Table"
+                    checkboxesProps={{
+                        classNames: {
+                            wrapper: "after:bg-blue-500 after:text-background text-background",
+                        },
+                    }}
+                    classNames={minimalTableClass}
 
-                bottomContent={bottomContent}
-                bottomContentPlacement="outside"
-
-                isStriped
-                removeWrapper
-                selectionMode="multiple"
-                sortDescriptor={sortDescriptor}
-                onSortChange={setSortDescriptor}
-                selectedKeys={selectedKeys}
-                onSelectionChange={setSelectedKeys}
-                onRowAction={() => { }}
-            >
-                <TableHeader columns={headerColumns}>
-                    {(column) => (
-                        <TableColumn
-                            key={column.uid}
-                            align={column.uid === "actions" ? "center" : "start"}
-                            allowsSorting={column.sortable}
-                        >
-                            {column.name}
-                        </TableColumn>
-                    )}
-                </TableHeader>
-                <TableBody
-                    isLoading={fetching}
-                    loadingContent={<Spinner />}
-                    emptyContent={
-                        <Empty
-                            className='my-4'
-                            description={
-                                <span className='text-gray-300'>ไม่มีข้อมูลแทร็ก</span>
-                            }
-                        />
-                    }
-                    items={sortedItems}>
-                    {(item) => (
-                        <TableRow key={item.track}>
-                            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+                    isStriped
+                    removeWrapper
+                    selectionMode="multiple"
+                    sortDescriptor={sortDescriptor}
+                    onSortChange={setSortDescriptor}
+                    selectedKeys={selectedKeys}
+                    onSelectionChange={setSelectedKeys}
+                    onRowAction={() => { }}
+                >
+                    <TableHeader columns={headerColumns}>
+                        {(column) => (
+                            <TableColumn
+                                key={column.uid}
+                                align={column.uid === "actions" ? "center" : "start"}
+                                allowsSorting={column.sortable}
+                            >
+                                {column.name}
+                            </TableColumn>
+                        )}
+                    </TableHeader>
+                    <TableBody
+                        isLoading={fetching}
+                        loadingContent={<Spinner />}
+                        emptyContent={
+                            <Empty
+                                className='my-4'
+                                description={
+                                    <span className='text-gray-300'>ไม่มีข้อมูลแทร็ก</span>
+                                }
+                            />
+                        }
+                        items={sortedItems}>
+                        {(item) => (
+                            <TableRow key={item.track}>
+                                {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+            {bottomContent}
         </div>
     )
 }

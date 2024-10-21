@@ -2,6 +2,7 @@ import './globals.css'
 import { AuthProvider } from './components'
 import '@radix-ui/themes/styles.css';
 import { Theme } from '@radix-ui/themes';
+import Footer from './components/Footer';
 
 export const metadata = {
     title: 'KKU IT',

@@ -21,14 +21,13 @@ export default function CategoryGrade({ catIndex, categorie, highestIndex }) {
     const [cumlaude, setCumLaude] = useState("")
     return (
         <>
-            <h2 className='bg-gray-200 border-gray-300 border-1 p-2 px-3 flex flex-row justify-between items-center mt-5 rounded-t-md text-lg text-default-800'>
+            <h2 className='border-gray-300 bg-gray-300 p-2 px-3 flex flex-row justify-between items-center mt-5 rounded-t-md text-lg text-default-800'>
                 {catIndex + highestIndex + 2}. {categorie.category.category_title}
             </h2>
-            <ul className='overflow-y-auto flex flex-col gap-1 p-2 border-1 rounded-md'>
+            <ul className='border p-4 overflow-y-auto flex flex-col gap-1 rounded-br-lg rounded-bl-lg'>
                 {categorie.subjectDetails.length > 0 ? (
-                    <div className='bg-gray-100 rounded-md relative gap-2'>
+                    <div className='bg-white rounded-md relative gap-2'>
                         <Table
-                            classNames={tableClass}
                             removeWrapper
                             onRowAction={() => { }}
                             aria-label="subjects table">

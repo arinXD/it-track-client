@@ -287,7 +287,7 @@ const InsertEnrollmentForm = ({ }) => {
                               Object.keys(subject) == 0 || subjectData?.length != 0 ? undefined :
                                    <>
                                         <div>
-                                             <p className='text-sm font-bold'>ข้อมูลนักศึกษา</p>
+                                             <p className='text-sm font-bold'>ข้อมูลวิชา</p>
                                              <p>
                                                   {subject?.subject_code} <span>{subject?.title_en}</span> <span>{subject?.title_th}</span> {subject?.credit} หน่วยกิต
                                              </p>
@@ -325,8 +325,8 @@ const InsertEnrollmentForm = ({ }) => {
                          }
                     </div>
                     <hr />
-                    <div className='flex flex-row gap-6 items-end'>
-                         <div className='flex flex-col w-[50%]'>
+                    <div className='flex flex-col md:flex-row gap-6 items-end'>
+                         <div className='flex flex-col w-full md:w-1/2'>
                               <label className='text-xs mb-0.5'>ปีการศึกษา</label>
                               <select
                                    defaultValue={""}
@@ -340,7 +340,7 @@ const InsertEnrollmentForm = ({ }) => {
                                    ))}
                               </select>
                          </div>
-                         <div className='flex flex-col w-[50%]'>
+                         <div className='flex flex-col w-full md:w-1/2'>
                               <label className='text-xs mb-0.5'>เกรด</label>
                               <select
                                    style={SELECT_STYLE}
@@ -365,7 +365,15 @@ const InsertEnrollmentForm = ({ }) => {
                               </select>
                          </div>
                     </div>
-                    <div className='flex gap-4 justify-start'>
+                    <div className='flex gap-4 justify-end'>
+                         <Button
+                              type='button'
+                              className='border-1 rounded-lg'
+                              color="primary"
+                              variant='bordered'
+                              onPress={closeForm}>
+                              ยกเลิก
+                         </Button>
                          <Button
                               onPress={() => insertEnroll(student?.stu_id, subject?.subject_id)}
                               isDisabled={inserting}
@@ -375,9 +383,6 @@ const InsertEnrollmentForm = ({ }) => {
                               color="primary"
                               variant='solid'>
                               บันทึก
-                         </Button>
-                         <Button type='button' className='border-1 rounded-lg' color="primary" variant='bordered' onPress={closeForm}>
-                              เคลียร์
                          </Button>
                     </div>
                </div>

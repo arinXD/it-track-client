@@ -210,9 +210,8 @@ const HomePage = ({ news = mockNews }) => {
                          </div>
                     </div>
                </section>
-
                <Footer />
-          </div >
+          </div>
      )
 }
 

@@ -36,6 +36,7 @@ import { jsPDF } from 'jspdf';
 import { FloatButton } from 'antd';
 import { CommentOutlined, CustomerServiceOutlined } from '@ant-design/icons';
 import { BsFiletypePdf } from "react-icons/bs";
+import TextUnderline from '@/app/components/TextUnderline';
 
 const Page = ({ params }) => {
     const { id } = params
@@ -185,7 +186,7 @@ const Page = ({ params }) => {
                 const categories = [
                     ...subject.SubgroupSubjects.map(subgroup => subgroup.SubGroup.Group.Categorie),
                     ...subject.GroupSubjects.map(group => group.Group.Categorie),
-                    ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SubGroup.Group.Categorie)
+                    ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SemiSubGroup.SubGroup.Group.Categorie)
                 ];
 
                 categories.forEach(categorie => {
@@ -1863,61 +1864,64 @@ const Page = ({ params }) => {
                                                                 </Tooltip>
                                                             </div>
                                                         </div>
-                                                        <Table
-                                                            aria-label="วิชาในเงื่อนไข"
-                                                            className={tableClassCondition}
-                                                        >
-                                                            <TableHeader>
-                                                                <TableColumn>รหัสวิชา</TableColumn>
-                                                                <TableColumn>ชื่อวิชา EN</TableColumn>
-                                                                <TableColumn>ชื่อวิชา TH</TableColumn>
-                                                                <TableColumn>หน่วยกิต</TableColumn>
-                                                                <TableColumn>เกรด</TableColumn>
-                                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                            </TableHeader>
+                                                        <div className='p-4 border overflow-x-auto border-t-orange-100 rounded-br-lg rounded-bl-lg'>
+                                                            <Table
+                                                                aria-label="วิชาในเงื่อนไข"
+                                                                removeWrapper
+                                                            >
+                                                                <TableHeader>
+                                                                    <TableColumn>รหัสวิชา</TableColumn>
+                                                                    <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                                    <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                                    <TableColumn>หน่วยกิต</TableColumn>
+                                                                    <TableColumn>เกรด</TableColumn>
+                                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                                </TableHeader>
 
-                                                            <TableBody>
-                                                                {insideTrack.map((subject, index) => (
-                                                                    <TableRow key={index}>
-                                                                        <TableCell>{subject?.subject?.subject_code}</TableCell>
-                                                                        <TableCell>{subject?.subject?.title_en}</TableCell>
-                                                                        <TableCell>{subject?.subject?.title_th}</TableCell>
-                                                                        <TableCell>{subject?.subject?.credit}</TableCell>
-                                                                        <TableCell>{subject?.gradeTrue}</TableCell>
-                                                                        <TableCell>{subject?.grade}</TableCell>
-                                                                    </TableRow>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                        <Table
-                                                            aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
-                                                            className={tableClassCondition}
-                                                        >
-                                                            <TableHeader>
-                                                                <TableColumn>#</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                            </TableHeader>
-
-                                                            <TableBody>
-                                                                {(() => {
-                                                                    const creditClassName = insideTrackStats.totalCredits < 12 ? 'bg-red-200' : '';
-                                                                    const creditClass = insideTrackStats.totalCredits < 12 ? '' : 'bg-green-200';
-
-                                                                    return (
-                                                                        <TableRow>
-                                                                            <TableCell>รวม</TableCell>
-                                                                            <TableCell>12</TableCell>
-                                                                            <TableCell className={creditClassName}>{insideTrackStats.totalCredits}</TableCell>
-                                                                            <TableCell>{insideTrackStats.totalScores}</TableCell>
-                                                                            <TableCell className={creditClass}>{(insideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
+                                                                <TableBody>
+                                                                    {insideTrack.map((subject, index) => (
+                                                                        <TableRow key={index}>
+                                                                            <TableCell>{subject?.subject?.subject_code}</TableCell>
+                                                                            <TableCell>{subject?.subject?.title_en}</TableCell>
+                                                                            <TableCell>{subject?.subject?.title_th}</TableCell>
+                                                                            <TableCell>{subject?.subject?.credit}</TableCell>
+                                                                            <TableCell>{subject?.gradeTrue}</TableCell>
+                                                                            <TableCell>{subject?.grade}</TableCell>
                                                                         </TableRow>
-                                                                    );
-                                                                })()}
-                                                            </TableBody>
-                                                        </Table>
+                                                                    ))}
+                                                                </TableBody>
+                                                            </Table>
+                                                            <Table
+                                                                aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
+                                                                removeWrapper
+                                                                className={"mt-4"}
+                                                            >
+                                                                <TableHeader>
+                                                                    <TableColumn>#</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                                </TableHeader>
+
+                                                                <TableBody>
+                                                                    {(() => {
+                                                                        const creditClassName = insideTrackStats.totalCredits < 12 ? 'bg-red-200' : '';
+                                                                        const creditClass = insideTrackStats.totalCredits < 12 ? '' : 'bg-green-200';
+
+                                                                        return (
+                                                                            <TableRow>
+                                                                                <TableCell>รวม</TableCell>
+                                                                                <TableCell>12</TableCell>
+                                                                                <TableCell className={creditClassName}>{insideTrackStats.totalCredits}</TableCell>
+                                                                                <TableCell>{insideTrackStats.totalScores}</TableCell>
+                                                                                <TableCell className={creditClass}>{(insideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
+                                                                            </TableRow>
+                                                                        );
+                                                                    })()}
+                                                                </TableBody>
+                                                            </Table>
+                                                        </div>
 
                                                         <div className='bg-orange-100 border-orange-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
                                                             <h2 className='text-lg text-default-800'>เงื่อนไขนอกแทร็ก</h2>
@@ -1936,62 +1940,66 @@ const Page = ({ params }) => {
                                                                 </Tooltip>
                                                             </div>
                                                         </div>
-                                                        <Table
-                                                            aria-label="วิชานอกเงื่อนไข"
-                                                            className={tableClassCondition}
-                                                        >
-                                                            <TableHeader>
-                                                                <TableColumn>รหัสวิชา</TableColumn>
-                                                                <TableColumn>ชื่อวิชา EN</TableColumn>
-                                                                <TableColumn>ชื่อวิชา TH</TableColumn>
-                                                                <TableColumn>หน่วยกิต</TableColumn>
-                                                                <TableColumn>เกรด</TableColumn>
-                                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                            </TableHeader>
+                                                        <div className='p-4 border overflow-x-auto border-t-orange-100 rounded-br-lg rounded-bl-lg'>
+                                                            <Table
+                                                                aria-label="วิชานอกเงื่อนไข"
+                                                                removeWrapper
+                                                            >
+                                                                <TableHeader>
+                                                                    <TableColumn>รหัสวิชา</TableColumn>
+                                                                    <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                                    <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                                    <TableColumn>หน่วยกิต</TableColumn>
+                                                                    <TableColumn>เกรด</TableColumn>
+                                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                                </TableHeader>
 
-                                                            <TableBody>
-                                                                {outsideTrack.map((subject, index) => (
-                                                                    <TableRow key={index}>
-                                                                        <TableCell>{subject?.subject?.subject_code}</TableCell>
-                                                                        <TableCell>{subject?.subject?.title_en}</TableCell>
-                                                                        <TableCell>{subject?.subject?.title_th}</TableCell>
-                                                                        <TableCell>{subject?.subject?.credit}</TableCell>
-                                                                        <TableCell>{subject?.gradeTrue}</TableCell>
-                                                                        <TableCell>{subject?.grade}</TableCell>
-                                                                    </TableRow>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-
-                                                        <Table
-                                                            aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
-                                                            className={tableClassCondition}
-                                                        >
-                                                            <TableHeader>
-                                                                <TableColumn>#</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                                <TableColumn>ค่าคะแนน</TableColumn>
-                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                            </TableHeader>
-
-                                                            <TableBody>
-                                                                {(() => {
-                                                                    const creditClassName = outsideTrackStats.totalCredits < 9 ? 'bg-red-200' : '';
-                                                                    const creditClass = outsideTrackStats.totalCredits < 9 ? '' : 'bg-green-200';
-
-                                                                    return (
-                                                                        <TableRow>
-                                                                            <TableCell>รวม</TableCell>
-                                                                            <TableCell>9</TableCell>
-                                                                            <TableCell className={creditClassName}>{outsideTrackStats.totalCredits}</TableCell>
-                                                                            <TableCell>{outsideTrackStats.totalScores}</TableCell>
-                                                                            <TableCell className={creditClass}>{(outsideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
+                                                                <TableBody>
+                                                                    {outsideTrack.map((subject, index) => (
+                                                                        <TableRow key={index}>
+                                                                            <TableCell>{subject?.subject?.subject_code}</TableCell>
+                                                                            <TableCell>{subject?.subject?.title_en}</TableCell>
+                                                                            <TableCell>{subject?.subject?.title_th}</TableCell>
+                                                                            <TableCell>{subject?.subject?.credit}</TableCell>
+                                                                            <TableCell>{subject?.gradeTrue}</TableCell>
+                                                                            <TableCell>{subject?.grade}</TableCell>
                                                                         </TableRow>
-                                                                    );
-                                                                })()}
-                                                            </TableBody>
-                                                        </Table>
+                                                                    ))}
+                                                                </TableBody>
+                                                            </Table>
+
+                                                            <Table
+                                                                aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
+                                                                removeWrapper
+                                                                className={"mt-4"}
+                                                            >
+                                                                <TableHeader>
+                                                                    <TableColumn>#</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                    <TableColumn>ค่าคะแนน</TableColumn>
+                                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                                </TableHeader>
+
+                                                                <TableBody>
+                                                                    {(() => {
+                                                                        const creditClassName = outsideTrackStats.totalCredits < 9 ? 'bg-red-200' : '';
+                                                                        const creditClass = outsideTrackStats.totalCredits < 9 ? 'bg-white' : 'bg-green-200';
+
+
+                                                                        return (
+                                                                            <TableRow>
+                                                                                <TableCell>รวม</TableCell>
+                                                                                <TableCell>9</TableCell>
+                                                                                <TableCell className={creditClassName}>{outsideTrackStats.totalCredits}</TableCell>
+                                                                                <TableCell>{outsideTrackStats.totalScores}</TableCell>
+                                                                                <TableCell className={creditClass}>{(outsideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
+                                                                            </TableRow>
+                                                                        );
+                                                                    })()}
+                                                                </TableBody>
+                                                            </Table>
+                                                        </div>
                                                     </>
                                                 )}
 

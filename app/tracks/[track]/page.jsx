@@ -5,8 +5,11 @@ import SubjectList from './SubjectList'
 import CoverImage from './CoverImage'
 import TeacherList from './TeacherList'
 import { Empty, Image } from 'antd'
+import PreviewGroup from "antd/lib/image/PreviewGroup"
 import TrackSection from './TrackSection'
 import { trackApply } from './apply'
+import { useMemo } from 'react'
+import ImageCarousel from '@/app/components/ImageCarousel'
 
 const getTrack = async (track) => {
     try {
@@ -55,6 +58,11 @@ const Page = async ({ params }) => {
     const track = trackParam.replaceAll("-", " ")
     const applyList = trackApply[String(trackParam)?.split("-")[0]]
     const [trackData, teachers, subjects, careers] = await Promise.all([getTrack(track), getTeachers(track), getSubjects(track), getCareers(track)])
+
+    const imagePaths = [1, 2, 3, 4, 5, 6, 7].map(
+        number => `/image/tracks/${String(trackParam)?.split("-")[0]}/${number}.png`
+    )
+
     return (
         <>
             <header>
@@ -66,7 +74,9 @@ const Page = async ({ params }) => {
                     <>
                         <CoverImage track={trackData} />
                         <TrackSection>
-                            <BreadCrumb />
+                            <section className='max-w-4xl mx-auto px-4'>
+                                <BreadCrumb />
+                            </section>
                             <TeacherList teachers={teachers} />
 
                             {/* information section */}
@@ -86,21 +96,29 @@ const Page = async ({ params }) => {
                                 </ul>
                             </section>
 
-                            {/* รูปอธิบายเพิ่มเติม */}
-                            <section className='max-w-4xl mx-auto px-4 mt-10 gap-1 grid grid-cols-6'>
-                                {[1, 2, 3, 4, 5, 6, 7].map(number => (
-                                    <div
-                                        key={`image-${number}`}
-                                        className={`${[1, 7].includes(number) ? "col-span-4" : "col-span-2"} h-[200px]`}>
-                                        <Image
-                                            src={`/image/tracks/${String(trackParam)?.split("-")[0]}/${number}.png`}
-                                            alt={`image-${String(trackParam)?.split("-")[0]}-${number}`}
-                                            className='w-full h-full object-cover'
-                                            width={"100%"}
-                                            height={200}
-                                        />
-                                    </div>
-                                ))}
+                            {/* รูปอธิบายเพิ่มเติม Mobile */}
+                            <section className='max-w-4xl mx-auto px-4 mt-10 gap-1 md:hidden'>
+                                <ImageCarousel images={imagePaths} />
+                            </section>
+
+                            {/* รูปอธิบายเพิ่มเติม Ipad, PC */}
+                            <section className='max-w-4xl mx-auto px-4 mt-10 gap-1 md:grid grid-cols-6 hidden'>
+                                <PreviewGroup>
+                                    {imagePaths.map((path, index) => (
+                                        <div
+                                            key={`image-${index + 1}`}
+                                            className={`col-span-6 ${[0, 6].includes(index) ? "md:col-span-4" : "md:col-span-2"} h-[200px]`}
+                                        >
+                                            <Image
+                                                src={path}
+                                                alt={`image-${String(trackParam)?.split("-")[0]}-${index + 1}`}
+                                                className='w-full object-cover'
+                                                width={"100%"}
+                                                height={200}
+                                            />
+                                        </div>
+                                    ))}
+                                </PreviewGroup>
                             </section>
 
                             {/* วิชา อาชีพ */}

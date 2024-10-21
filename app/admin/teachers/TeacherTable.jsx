@@ -4,7 +4,7 @@ import { Table, Button, Input, TableHeader, TableColumn, TableBody, TableCell, T
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import axios from 'axios';
 import { Empty, message } from 'antd';
-import { DeleteIcon, EditIcon2, PlusIcon } from '@/app/components/icons';
+import { DeleteIcon, EditIcon2, PlusIcon, SearchIcon } from '@/app/components/icons';
 import { thinInputClass } from '@/src/util/ComponentClass';
 import TeacherForm from './TeacherForm';
 import { swal } from '@/src/util/sweetyAlert';
@@ -88,6 +88,11 @@ export default function TeacherTable({ tracks }) {
           });
      }, [])
 
+     const onClear = useCallback(() => {
+          setSearch("")
+          setPage(1)
+     }, [])
+
      return (
           <div className="space-y-4 p-4">
                <TeacherForm
@@ -104,6 +109,8 @@ export default function TeacherTable({ tracks }) {
                               classNames={thinInputClass}
                               placeholder="ค้นหาข้อมูลอาจารย์ อีเมล ชื่อ นามสกุล"
                               value={search}
+                              startContent={<SearchIcon />}
+                              onClear={() => onClear()}
                               onChange={(e) => setSearch(e.target.value)}
                               className="w-[350px] !text-xs"
                          />
@@ -124,6 +131,22 @@ export default function TeacherTable({ tracks }) {
                                    </SelectItem>
                               ))}
                          </Select>
+                         <Select
+                              variant='bordered'
+                              classNames={{
+                                   label: "!text-xs",
+                                   trigger: "border-1 h-10 !text-xs",
+                              }}
+                              className="w-[150px]"
+                              selectedKeys={[rowsPerPage.toString()]}
+                              value={rowsPerPage}
+                              onChange={(e) => setRowsPerPage(Number(e.target.value) || 5)}
+                         >
+                              <SelectItem key="5">5 per page</SelectItem>
+                              <SelectItem key="10">10 per page</SelectItem>
+                              <SelectItem key="20">20 per page</SelectItem>
+                              <SelectItem key="50">50 per page</SelectItem>
+                         </Select>
                          <div>
                               <Button
                                    onClick={() => {
@@ -137,81 +160,72 @@ export default function TeacherTable({ tracks }) {
                          </div>
                     </div>
                </div>
-               <Table
-                    aria-label="Teachers table"
-                    className="min-w-full"
-               >
-                    <TableHeader>
-                         <TableColumn>EMAIL</TableColumn>
-                         <TableColumn>ชื่อ - สกุล</TableColumn>
-                         <TableColumn>แทร็ก</TableColumn>
-                         <TableColumn className='text-center'>ACTIONS</TableColumn>
-                    </TableHeader>
-                    <TableBody
-                         loadingContent={<Spinner />}
-                         isLoading={loading}
-                         emptyContent={
-                              <Empty
-                                   className='my-4'
-                                   description={
-                                        <span className='text-gray-300'>ไม่มีข้อมูลอาจารย์</span>
-                                   }
-                              />}
-                         items={paginatedTeachers}
+               <div className='p-4 rounded-[10px] border'>
+                    <Table
+                         isStriped
+                         removeWrapper
+                         aria-label="Teachers table"
+                         className="min-w-full"
                     >
-                         {(teacher) => (
-                              <TableRow key={teacher.id}>
-                                   <TableCell>{teacher.email}</TableCell>
-                                   <TableCell>{`${teacher.prefix || ""}${teacher.name || ""}${teacher.surname ? " " + teacher.surname : ""}`}</TableCell>
-                                   <TableCell>{teacher?.TeacherTrack?.track || "-"}</TableCell>
-                                   <TableCell>
-                                        <div className='flex justify-center items-center gap-2'>
-                                             <Button
-                                                  onClick={() => handleOpenModal(teacher)}
-                                                  size='sm'
-                                                  color='warning'
-                                                  isIconOnly
-                                                  aria-label="แก้ไข"
-                                                  className='p-2'
-                                             >
-                                                  <EditIcon2 className="w-5 h-5 text-yellow-600" />
-                                             </Button>
-                                             <Button
-                                                  onClick={() => handleDelete(teacher.id)}
-                                                  size='sm'
-                                                  color='danger'
-                                                  isIconOnly
-                                                  aria-label="ลบ"
-                                                  className='p-2 bg-red-400'
-                                             >
-                                                  <DeleteIcon className="w-5 h-5" />
-                                             </Button>
-                                        </div>
-                                   </TableCell>
-                              </TableRow>
-                         )}
-                    </TableBody>
-               </Table>
-               {paginatedTeachers?.length > 0 &&
-                    <div className="flex justify-between items-center">
-                         <Select
-                              variant='bordered'
-                              classNames={{
-                                   label: "!text-xs",
-                                   trigger: "border-1 h-10 !text-xs",
-                              }}
-                              size="sm"
-                              className="w-[130px]"
-                              selectedKeys={[rowsPerPage.toString()]}
-                              value={rowsPerPage}
-                              onChange={(e) => setRowsPerPage(Number(e.target.value) || 5)}
+                         <TableHeader>
+                              <TableColumn>EMAIL</TableColumn>
+                              <TableColumn>ชื่อ - สกุล</TableColumn>
+                              <TableColumn>แทร็ก</TableColumn>
+                              <TableColumn className='text-center'>ACTIONS</TableColumn>
+                         </TableHeader>
+                         <TableBody
+                              loadingContent={<Spinner />}
+                              isLoading={loading}
+                              emptyContent={
+                                   <Empty
+                                        className='my-4'
+                                        description={
+                                             <span className='text-gray-300'>ไม่มีข้อมูลอาจารย์</span>
+                                        }
+                                   />}
+                              items={paginatedTeachers}
                          >
-                              <SelectItem key="5">5 per page</SelectItem>
-                              <SelectItem key="10">10 per page</SelectItem>
-                              <SelectItem key="20">20 per page</SelectItem>
-                              <SelectItem key="50">50 per page</SelectItem>
-                         </Select>
+                              {(teacher) => (
+                                   <TableRow key={teacher.id}>
+                                        <TableCell>{teacher.email}</TableCell>
+                                        <TableCell>{`${teacher.prefix || ""}${teacher.name || ""}${teacher.surname ? " " + teacher.surname : ""}`}</TableCell>
+                                        <TableCell>{teacher?.TeacherTrack?.track || "-"}</TableCell>
+                                        <TableCell>
+                                             <div className='flex justify-center items-center gap-2'>
+                                                  <Button
+                                                       onClick={() => handleOpenModal(teacher)}
+                                                       size='sm'
+                                                       color='warning'
+                                                       isIconOnly
+                                                       aria-label="แก้ไข"
+                                                       className='p-2'
+                                                  >
+                                                       <EditIcon2 className="w-5 h-5 text-yellow-600" />
+                                                  </Button>
+                                                  <Button
+                                                       onClick={() => handleDelete(teacher.id)}
+                                                       size='sm'
+                                                       color='danger'
+                                                       isIconOnly
+                                                       aria-label="ลบ"
+                                                       className='p-2 bg-red-400'
+                                                  >
+                                                       <DeleteIcon className="w-5 h-5" />
+                                                  </Button>
+                                             </div>
+                                        </TableCell>
+                                   </TableRow>
+                              )}
+                         </TableBody>
+                    </Table>
+               </div>
+               {paginatedTeachers?.length > 0 &&
+                    <div className="flex justify-end items-center">
                          <Pagination
+                              isCompact
+                              showControls
+                              showShadow
+                              color="primary"
                               total={pages}
                               page={page}
                               onChange={setPage}

@@ -28,19 +28,20 @@ const TeacherList = ({ teachers }) => {
                                 <div
                                     data-aos="fade-up"
                                     data-aos-duration={duration + (index * 200)}
+                                    className="flex flex-col justify-center items-center gap-1"
                                     key={index}>
                                     <Image
                                         width={800}
                                         height={800}
                                         src={teacher?.TeacherTrack?.image || ""}
                                         alt={teacher?.name}
-                                        className="rounded-md w-[200px] h-[200px]"
+                                        className="rounded-md w-[120px] h-[120px] md:w-[150px] md:h-[150px] lg:w-[180px] lg:h-[180px]"
                                         onError={({ currentTarget }) => {
                                             currentTarget.onerror = null;
                                             currentTarget.src = "/image/error_image.png";
                                         }}
                                     />
-                                    <p className="text-center">{teacher.prefix}{teacher?.name || "N/A"} {teacher?.surname}</p>
+                                    <p className="text-xs md:text-sm lg:text-base text-center">{teacher.prefix}{teacher?.name || "N/A"} {teacher?.surname}</p>
                                 </div>
                             ))}
                         </div>

@@ -41,6 +41,7 @@ import { jsPDF } from 'jspdf';
 import { FloatButton } from 'antd';
 import { CommentOutlined, CustomerServiceOutlined } from '@ant-design/icons';
 import { BsFiletypePdf } from "react-icons/bs";
+import TextUnderline from '@/app/components/TextUnderline';
 
 const Page = () => {
     ////////////////////////from///////////////////////////////////
@@ -96,6 +97,8 @@ const Page = () => {
 
     const [subjectTrackGrade, setSubjectTrackGrade] = useState([]);
 
+    const toggleSideBar = useToggleSideBarStore((state) => state.toggle)
+
 
     //////////// ant design ////////////
 
@@ -128,8 +131,8 @@ const Page = () => {
 
     const openNotification = (placement) => {
         api.info({
-            message: `โปรดเลือกปีการศึกษา`,
-            description: 'โปรดเลือกปีการศึกษาก่อนกดยืนยัน',
+            message: `โปรดเลือกภาคการศึกษา`,
+            description: 'โปรดเลือกภาคการศึกษาก่อนกดยืนยัน',
             placement,
         });
     };
@@ -212,7 +215,7 @@ const Page = () => {
     const openNotificationTrack = (placement) => {
         const description = (
             <div>
-                <Link href={`/student/tracks`} target="_blank">
+                <Link href={`/student/tracks`} target="_blank" className='font-bold text-blue-600'>
                     คัดเลือกแทร็ก คลิก!
                 </Link>
             </div>
@@ -323,7 +326,6 @@ const Page = () => {
             const option = await getOptions(URL, "GET");
             const response = await axios(option);
             const data = response.data.data;
-            console.log(data);
 
             setUserData(data);
 
@@ -447,12 +449,13 @@ const Page = () => {
                 const categoryverifies = data.CategoryVerifies.map(categoryVerify => categoryVerify.Categorie);
                 setCategoryVerifies(categoryverifies);
 
+                // console.log(data.SubjectVerifies);
                 const subjectsByCategory = data.SubjectVerifies.reduce((acc, subjectVerify) => {
                     const subject = subjectVerify.Subject;
                     const categories = [...new Set([
-                        ...subject.SubgroupSubjects.map(subgroup => subgroup.SubGroup.Group.Categorie),
                         ...subject.GroupSubjects.map(group => group.Group.Categorie),
-                        ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SubGroup.Group.Categorie)
+                        ...subject.SubgroupSubjects.map(subgroup => subgroup.SubGroup.Group.Categorie),
+                        ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SemiSubGroup.SubGroup.Group.Categorie)
                     ])];
 
                     categories.forEach(categorie => {
@@ -469,10 +472,10 @@ const Page = () => {
                 }, {});
 
                 const categoryData = Object.values(subjectsByCategory);
+                console.log(categoryData);
 
                 setCategoryData(categoryData);
 
-                // console.log(categoryData);
 
                 const subgroupData = data.SubjectVerifies.map(subjectVerify => {
                     const subject = subjectVerify.Subject;
@@ -490,32 +493,10 @@ const Page = () => {
 
                 const semisubgroupData = data.SubjectVerifies.map(subjectVerify => {
                     const subject = subjectVerify.Subject;
-                    const semisubgroups = subject.SemiSubgroupSubjects.map(semisubgroupSubject => {
-                        // Create a new object without circular references
-                        const { SemiSubGroup, ...rest } = semisubgroupSubject;
-                        return {
-                            ...SemiSubGroup,
-                            ...rest,
-                            SubGroup: SemiSubGroup.SubGroup ? {
-                                id: SemiSubGroup.SubGroup.id,
-                                name: SemiSubGroup.SubGroup.name,
-                                Group: SemiSubGroup.SubGroup.Group ? {
-                                    id: SemiSubGroup.SubGroup.Group.id,
-                                    name: SemiSubGroup.SubGroup.Group.name,
-                                    Categorie: SemiSubGroup.SubGroup.Group.Categorie ? {
-                                        id: SemiSubGroup.SubGroup.Group.Categorie.id,
-                                        name: SemiSubGroup.SubGroup.Group.Categorie.name
-                                    } : null
-                                } : null
-                            } : null
-                        };
-                    });
-
-                    return { subject: { subject_id: subject.subject_id, subject_code: subject.subject_code }, semisubgroups };
-                });
-                // console.log(semisubgroupData);
-
-                setSemiSubgroupData(semisubgroupData);
+                    const semisubgroups = subject.SemiSubgroupSubjects?.map(semisubgroupSubject => semisubgroupSubject.SemiSubGroup);
+                    return { subject, semisubgroups };
+               });
+               setSemiSubgroupData(semisubgroupData);
 
                 if (data?.Subjects) {
                     setVerifySubjects(data.Subjects);
@@ -722,7 +703,7 @@ const Page = () => {
                     const categories = [
                         ...subject.SubgroupSubjects.map(subgroup => subgroup.SubGroup.Group.Categorie),
                         ...subject.GroupSubjects.map(group => group.Group.Categorie),
-                        ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SubGroup.Group.Categorie)
+                        ...subject.SemiSubgroupSubjects.map(semisubgroup => semisubgroup.SemiSubGroup.SubGroup.Group.Categorie)
                     ];
 
                     categories.forEach(categorie => {
@@ -1777,6 +1758,10 @@ const Page = () => {
             }
 
             if (userData.program === "IT") {
+                if (!userData?.Selection?.Track?.track || userData?.Selection?.Track?.track.length === 0) {
+                    openNotificationTrack('top');
+                    return;
+                }
                 if (insideTrackStats.totalCredits < 12) {
                     openNotificationInsideTrack('top');
                     return;
@@ -1788,7 +1773,7 @@ const Page = () => {
                 }
                 if (insufficientCreditIT !== 0) {
                     openNotificationConditionIT('top');
-                    return; // Exit early if there are insufficient credits for IT
+                    return;
                 }
             }
 
@@ -1870,7 +1855,7 @@ const Page = () => {
             // const message = error?.response?.data?.message || error.message;
             // showToastMessage(false, message);
         }
-    }, [ids, term, cumlaude, userData.stu_id, insertData, subData, conditionCategory, conditionSubgroup, conditions,
+    }, [ids, term, cumlaude, userData?.Selection?.Track?.track, userData.stu_id, insertData, subData, conditionCategory, conditionSubgroup, conditions,
         insufficientCreditCategories,
         insufficientCreditGroups,
         insufficientCreditSubGroups,
@@ -2145,6 +2130,8 @@ const Page = () => {
     // console.log(statusVerify);
 
     const getSubTrack = (subgroup, subgroupIndex) => {
+        // console.log(subgroup);
+
         if (subgroup?.subjects?.every(subject => subject?.SemiSubgroupSubjects?.some(e => e?.SemiSubGroup))) {
             const subjects = subgroup.subjects || [];
             const SemiSubjects = {};
@@ -2414,7 +2401,7 @@ const Page = () => {
                 <Navbar />
             </header>
             <Sidebar />
-            <div className={`p-4 md:p-8 md:ml-[240px]`}>
+            <div className={`p-4 md:p-8 md:ml-[240px] ${toggleSideBar ? 'md:ml-[240px]' : 'md:ml-[77px]'}`}>
                 {contextHolder}
                 {loading ?
                     <div className='w-full flex justify-center h-[70vh]'>
@@ -2426,44 +2413,49 @@ const Page = () => {
                             <p className='text-center font-bold text-lg my-28'>
                                 เร็วๆ นี้!
                             </p>
+                            <p>
+                                {JSON.stringify(verifySelect)}
+                            </p>
                         </>
                         :
                         <>
-                            <div className={`${status?.status === 3 ? 'block' : 'hidden max-xl:block'}`}>
-                                <FloatButton.Group
-                                    trigger="click"
-                                    type="primary"
-                                    style={{
-                                        insetInlineEnd: 24,
-                                    }}
-                                >
-                                    {(status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3) && (
-                                        <FloatButton
-                                            onClick={showDrawer}
-                                            icon={<TbMessage2Exclamation />}
-                                            tooltip={<div>สถานะการอนุมัติ</div>}
-                                            className='hidden max-xl:block'
-                                        />
-                                    )}
+                            {(status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3) && (
+                                <div className={`${status?.status === 3 ? 'block' : 'hidden max-xl:block'}`}>
+                                    <FloatButton.Group
+                                        trigger="click"
+                                        type="primary"
+                                        style={{
+                                            insetInlineEnd: 24,
+                                        }}
+                                    >
+                                        {(status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3) && (
+                                            <FloatButton
+                                                onClick={showDrawer}
+                                                icon={<TbMessage2Exclamation />}
+                                                tooltip={<div>สถานะการอนุมัติ</div>}
+                                                className='hidden max-xl:block'
+                                            />
+                                        )}
 
-                                    {(status?.status === 3) && (
-                                        <FloatButton
-                                            icon={<BsFiletypePdf />}
-                                            onClick={printDocument}
-                                            tooltip={<div>Print to PDF</div>}
-                                        />
-                                    )}
-                                </FloatButton.Group>
-                            </div>
+                                        {(status?.status === 3) && (
+                                            <FloatButton
+                                                icon={<BsFiletypePdf />}
+                                                onClick={printDocument}
+                                                tooltip={<div>Print to PDF</div>}
+                                            />
+                                        )}
+                                    </FloatButton.Group>
+                                </div>
+                            )}
 
                             <div className={`${status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3 ? 'flex relative' : ''}`}>
                                 <div id="divToPrint" ref={divToPrintRef} className={`my-[30px] ${status?.status === 0 || status?.status === 1 || status?.status === 2 || status?.status === 3 ? 'w-[80%] 2xl:px-30 xl:pr-20' : 'w-[100%] 2xl:px-44 xl:px-20'} mt-16 max-xl:w-[100%] relative`}>
                                     <div className=' text-xl text-black mb-5 px-5'>
                                         <h1 className='text-3xl text-center  leading-relaxed'>แบบฟอร์มตรวจสอบการสำเร็จการศึกษา <br /> หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชา{program.title_th} <br />(ตั้งแต่รหัสขึ้นต้นด้วย {verifySelect.acadyear.toString().slice(-2)} เป็นต้นไป)</h1>
                                         <div className='text-center mt-6'>
-                                            <p>ข้าพเจ้า {userData.first_name} {userData.last_name} รหัสประจำตัว {userData.stu_id}</p>
+                                            <p>ชื่อ-สกุล <TextUnderline>{`${userData.first_name} ${userData.last_name}`}</TextUnderline> รหัสประจำตัว <TextUnderline>{userData.stu_id}</TextUnderline></p>
                                             <div className='flex justify-center items-center'>
-                                                <p>คาดว่าจะได้รับปริญญาวิทยาศาสตรบัณฑิต  สาขาวิชา{program.title_th} เกียรตินิยมอันดับ</p>
+                                                <p>คาดว่าจะได้รับปริญญาวิทยาศาสตรบัณฑิต  สาขาวิชา<TextUnderline>{program.title_th}</TextUnderline> เกียรตินิยมอันดับ</p>
                                                 <div className="relative ml-2 w-[80px]">
                                                     <input
                                                         className="peer h-fit w-full rounded-md border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-3 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
@@ -2489,7 +2481,7 @@ const Page = () => {
                                                     <Radio value="ปลาย" className='ml-2' >ปลาย</Radio>
                                                     <Radio value="ฤดูร้อน" className='mx-2' >ฤดูร้อน</Radio>
                                                 </RadioGroup>
-                                                <p>ปีการศึกษา {verifyHaveGrade?.acadyear ? verifyHaveGrade.acadyear : userData.acadyear + 4}</p>
+                                                <p>ปีการศึกษา <TextUnderline>{verifyHaveGrade?.acadyear ? verifyHaveGrade.acadyear : userData.acadyear + 4}</TextUnderline></p>
                                             </div>
                                         </div>
                                         {/* {(() => {
@@ -2820,153 +2812,219 @@ const Page = () => {
 
                                     {userData.program === "IT" && (
                                         <>
-                                            <div className='bg-orange-100 border-orange-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
-                                                <h2 className='text-lg text-default-800'>เงื่อนไขในแทร็ก</h2>
+                                            {userData?.Selection?.Track?.track.length > 0 ? (
                                                 <div>
-                                                    <Tooltip showArrow={true}
-                                                        content={
-                                                            <div className="px-1 py-2">
-                                                                <div className="text-small font-bold">เก็บวิชาในแทร็กที่เกรดมากที่สุดไว้ 12 หน่วยกิต นอกเหนือจากนั้นจะถูกนำมาเป็นวิชานอกแทร็ก</div>
-                                                            </div>
-                                                        }
-                                                        size='lg'
-                                                    >
+                                                    <div className='bg-orange-100 border-orange-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                        <h2 className='text-lg text-default-800'>เงื่อนไขในแทร็ก</h2>
                                                         <div>
-                                                            <AiOutlineInfoCircle />
+                                                            <Tooltip showArrow={true}
+                                                                content={
+                                                                    <div className="px-1 py-2">
+                                                                        <div className="text-small font-bold">เก็บวิชาในแทร็กที่เกรดมากที่สุดไว้ 12 หน่วยกิต นอกเหนือจากนั้นจะถูกนำมาเป็นวิชานอกแทร็ก</div>
+                                                                    </div>
+                                                                }
+                                                                size='lg'
+                                                            >
+                                                                <div>
+                                                                    <AiOutlineInfoCircle />
+                                                                </div>
+                                                            </Tooltip>
                                                         </div>
-                                                    </Tooltip>
+                                                    </div>
+                                                    <div className='p-4 border overflow-x-auto border-t-orange-100 rounded-br-lg rounded-bl-lg'>
+                                                        <Table
+                                                            aria-label="วิชาในเงื่อนไข"
+                                                            removeWrapper
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>รหัสวิชา</TableColumn>
+                                                                <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                                <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                                <TableColumn>หน่วยกิต</TableColumn>
+                                                                <TableColumn>เกรด</TableColumn>
+                                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                            </TableHeader>
+
+                                                            <TableBody>
+                                                                {insideTrack.map((subject, index) => (
+                                                                    <TableRow key={index}>
+                                                                        <TableCell>{subject?.subject?.subject_code}</TableCell>
+                                                                        <TableCell>{subject?.subject?.title_en}</TableCell>
+                                                                        <TableCell>{subject?.subject?.title_th}</TableCell>
+                                                                        <TableCell>{subject?.subject?.credit}</TableCell>
+                                                                        <TableCell>{subject?.gradeTrue}</TableCell>
+                                                                        <TableCell>{subject?.grade}</TableCell>
+                                                                    </TableRow>
+                                                                ))}
+                                                            </TableBody>
+                                                        </Table>
+                                                        <Table
+                                                            aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
+                                                            removeWrapper
+                                                            className={"mt-4"}
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>#</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                            </TableHeader>
+
+                                                            <TableBody>
+                                                                {(() => {
+                                                                    const creditClassName = insideTrackStats.totalCredits < 12 ? 'bg-red-200' : '';
+                                                                    const creditClass = insideTrackStats.totalCredits < 12 ? '' : 'bg-green-200';
+
+                                                                    return (
+                                                                        <TableRow>
+                                                                            <TableCell>รวม</TableCell>
+                                                                            <TableCell>12</TableCell>
+                                                                            <TableCell className={creditClassName}>{insideTrackStats.totalCredits}</TableCell>
+                                                                            <TableCell>{insideTrackStats.totalScores}</TableCell>
+                                                                            <TableCell className={creditClass}>{(insideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
+                                                                        </TableRow>
+                                                                    );
+                                                                })()}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <Table
-                                                aria-label="วิชาในเงื่อนไข"
-                                                className={tableClassCondition}
-                                            >
-                                                <TableHeader>
-                                                    <TableColumn>รหัสวิชา</TableColumn>
-                                                    <TableColumn>ชื่อวิชา EN</TableColumn>
-                                                    <TableColumn>ชื่อวิชา TH</TableColumn>
-                                                    <TableColumn>หน่วยกิต</TableColumn>
-                                                    <TableColumn>เกรด</TableColumn>
-                                                    <TableColumn>ค่าคะแนน</TableColumn>
-                                                </TableHeader>
+                                            ) : (
+                                                <>
+                                                    <div className='bg-orange-100 border-orange-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                        <h2 className='text-lg text-default-800'>เงื่อนไขในแทร็ก</h2>
+                                                        <div>
+                                                            <Tooltip showArrow={true}
+                                                                content={
+                                                                    <div className="px-1 py-2">
+                                                                        <div className="text-small font-bold">เก็บวิชาในแทร็กที่เกรดมากที่สุดไว้ 12 หน่วยกิต นอกเหนือจากนั้นจะถูกนำมาเป็นวิชานอกแทร็ก</div>
+                                                                    </div>
+                                                                }
+                                                                size='lg'
+                                                            >
+                                                                <div>
+                                                                    <AiOutlineInfoCircle />
+                                                                </div>
+                                                            </Tooltip>
+                                                        </div>
+                                                    </div>
+                                                    <div className='border-1 flex justify-center items-center py-14 gap-1'>
+                                                        <p>กรุณาคัดเลือกแทร็ก</p>
+                                                        <Link href={`/student/tracks`} target="_blank" className='text-blue-600 font-semibold'>
+                                                            คลิก!
+                                                        </Link>
+                                                    </div>
+                                                </>
+                                            )}
 
-                                                <TableBody>
-                                                    {insideTrack.map((subject, index) => (
-                                                        <TableRow key={index}>
-                                                            <TableCell>{subject?.subject?.subject_code}</TableCell>
-                                                            <TableCell>{subject?.subject?.title_en}</TableCell>
-                                                            <TableCell>{subject?.subject?.title_th}</TableCell>
-                                                            <TableCell>{subject?.subject?.credit}</TableCell>
-                                                            <TableCell>{subject?.gradeTrue}</TableCell>
-                                                            <TableCell>{subject?.grade}</TableCell>
-                                                        </TableRow>
-                                                    ))}
-                                                </TableBody>
-                                            </Table>
-                                            <Table
-                                                aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
-                                                className={tableClassCondition}
-                                            >
-                                                <TableHeader>
-                                                    <TableColumn>#</TableColumn>
-                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                    <TableColumn>ค่าคะแนน</TableColumn>
-                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                </TableHeader>
-
-                                                <TableBody>
-                                                    {(() => {
-                                                        const creditClassName = insideTrackStats.totalCredits < 12 ? 'bg-red-200' : '';
-                                                        const creditClass = insideTrackStats.totalCredits < 12 ? '' : 'bg-green-200';
-
-                                                        return (
-                                                            <TableRow>
-                                                                <TableCell>รวม</TableCell>
-                                                                <TableCell>12</TableCell>
-                                                                <TableCell className={creditClassName}>{insideTrackStats.totalCredits}</TableCell>
-                                                                <TableCell>{insideTrackStats.totalScores}</TableCell>
-                                                                <TableCell className={creditClass}>{(insideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
-                                                            </TableRow>
-                                                        );
-                                                    })()}
-                                                </TableBody>
-                                            </Table>
-
-                                            <div className='bg-orange-100 border-orange-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
-                                                <h2 className='text-lg text-default-800'>เงื่อนไขนอกแทร็ก</h2>
+                                            {userData?.Selection?.Track?.track.length > 0 ? (
                                                 <div>
-                                                    <Tooltip showArrow={true}
-                                                        content={
-                                                            <div className="px-1 py-2">
-                                                                <div className="text-small font-bold">วิชานอกแทร็กอย่างน้อย 9 หน่วยกิต</div>
-                                                            </div>
-                                                        }
-                                                        size='lg'
-                                                    >
+                                                    <div className='bg-orange-100 border-orange-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                        <h2 className='text-lg text-default-800'>เงื่อนไขนอกแทร็ก</h2>
                                                         <div>
-                                                            <AiOutlineInfoCircle />
+                                                            <Tooltip showArrow={true}
+                                                                content={
+                                                                    <div className="px-1 py-2">
+                                                                        <div className="text-small font-bold">วิชานอกแทร็กอย่างน้อย 9 หน่วยกิต</div>
+                                                                    </div>
+                                                                }
+                                                                size='lg'
+                                                            >
+                                                                <div>
+                                                                    <AiOutlineInfoCircle />
+                                                                </div>
+                                                            </Tooltip>
                                                         </div>
-                                                    </Tooltip>
+                                                    </div>
+                                                    <div className='p-4 border overflow-x-auto border-t-orange-100 rounded-br-lg rounded-bl-lg'>
+                                                        <Table
+                                                            aria-label="วิชานอกเงื่อนไข"
+                                                            removeWrapper
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>รหัสวิชา</TableColumn>
+                                                                <TableColumn>ชื่อวิชา EN</TableColumn>
+                                                                <TableColumn>ชื่อวิชา TH</TableColumn>
+                                                                <TableColumn>หน่วยกิต</TableColumn>
+                                                                <TableColumn>เกรด</TableColumn>
+                                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                            </TableHeader>
+
+                                                            <TableBody>
+                                                                {outsideTrack.map((subject, index) => (
+                                                                    <TableRow key={index}>
+                                                                        <TableCell>{subject?.subject?.subject_code}</TableCell>
+                                                                        <TableCell>{subject?.subject?.title_en}</TableCell>
+                                                                        <TableCell>{subject?.subject?.title_th}</TableCell>
+                                                                        <TableCell>{subject?.subject?.credit}</TableCell>
+                                                                        <TableCell>{subject?.gradeTrue}</TableCell>
+                                                                        <TableCell>{subject?.grade}</TableCell>
+                                                                    </TableRow>
+                                                                ))}
+                                                            </TableBody>
+                                                        </Table>
+
+                                                        <Table
+                                                            aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
+                                                            removeWrapper
+                                                            className={"mt-4"}
+                                                        >
+                                                            <TableHeader>
+                                                                <TableColumn>#</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
+                                                                <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
+                                                                <TableColumn>ค่าคะแนน</TableColumn>
+                                                                <TableColumn>คะแนนเฉลี่ย</TableColumn>
+                                                            </TableHeader>
+
+                                                            <TableBody>
+                                                                {(() => {
+                                                                    const creditClassName = outsideTrackStats.totalCredits < 9 ? 'bg-red-200' : '';
+                                                                    const creditClass = outsideTrackStats.totalCredits < 9 ? 'bg-white' : 'bg-green-200';
+
+
+                                                                    return (
+                                                                        <TableRow>
+                                                                            <TableCell>รวม</TableCell>
+                                                                            <TableCell>9</TableCell>
+                                                                            <TableCell className={creditClassName}>{outsideTrackStats.totalCredits}</TableCell>
+                                                                            <TableCell>{outsideTrackStats.totalScores}</TableCell>
+                                                                            <TableCell className={creditClass}>{(outsideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
+                                                                        </TableRow>
+                                                                    );
+                                                                })()}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <Table
-                                                aria-label="วิชานอกเงื่อนไข"
-                                                className={tableClassCondition}
-                                            >
-                                                <TableHeader>
-                                                    <TableColumn>รหัสวิชา</TableColumn>
-                                                    <TableColumn>ชื่อวิชา EN</TableColumn>
-                                                    <TableColumn>ชื่อวิชา TH</TableColumn>
-                                                    <TableColumn>หน่วยกิต</TableColumn>
-                                                    <TableColumn>เกรด</TableColumn>
-                                                    <TableColumn>ค่าคะแนน</TableColumn>
-                                                </TableHeader>
-
-                                                <TableBody>
-                                                    {outsideTrack.map((subject, index) => (
-                                                        <TableRow key={index}>
-                                                            <TableCell>{subject?.subject?.subject_code}</TableCell>
-                                                            <TableCell>{subject?.subject?.title_en}</TableCell>
-                                                            <TableCell>{subject?.subject?.title_th}</TableCell>
-                                                            <TableCell>{subject?.subject?.credit}</TableCell>
-                                                            <TableCell>{subject?.gradeTrue}</TableCell>
-                                                            <TableCell>{subject?.grade}</TableCell>
-                                                        </TableRow>
-                                                    ))}
-                                                </TableBody>
-                                            </Table>
-
-                                            <Table
-                                                aria-label="รวมหน่วยกิตและค่าคะแนนของเงื่อนไข"
-                                                className={tableClassCondition}
-                                            >
-                                                <TableHeader>
-                                                    <TableColumn>#</TableColumn>
-                                                    <TableColumn>หน่วยกิตที่กำหนดเป็นอย่างน้อย</TableColumn>
-                                                    <TableColumn>หน่วยกิตที่ลงทะเบียนทั้งหมด</TableColumn>
-                                                    <TableColumn>ค่าคะแนน</TableColumn>
-                                                    <TableColumn>คะแนนเฉลี่ย</TableColumn>
-                                                </TableHeader>
-
-                                                <TableBody>
-                                                    {(() => {
-                                                        const creditClassName = outsideTrackStats.totalCredits < 9 ? 'bg-red-200' : '';
-                                                        const creditClass = outsideTrackStats.totalCredits < 9 ? 'bg-white' : 'bg-green-200';
-
-
-                                                        return (
-                                                            <TableRow>
-                                                                <TableCell>รวม</TableCell>
-                                                                <TableCell>9</TableCell>
-                                                                <TableCell className={creditClassName}>{outsideTrackStats.totalCredits}</TableCell>
-                                                                <TableCell>{outsideTrackStats.totalScores}</TableCell>
-                                                                <TableCell className={creditClass}>{(outsideTrackStats.averageScore || 0).toFixed(2)}</TableCell>
-                                                            </TableRow>
-                                                        );
-                                                    })()}
-                                                </TableBody>
-                                            </Table>
+                                            ) : (
+                                                <>
+                                                    <div className='bg-orange-100 border-orange-100 border-1 p-2 px-3 flex flex-row justify-between items-center rounded-t-large mt-5'>
+                                                        <h2 className='text-lg text-default-800'>เงื่อนไขนอกแทร็ก</h2>
+                                                        <div>
+                                                            <Tooltip showArrow={true}
+                                                                content={
+                                                                    <div className="px-1 py-2">
+                                                                        <div className="text-small font-bold">วิชานอกแทร็กอย่างน้อย 9 หน่วยกิต</div>
+                                                                    </div>
+                                                                }
+                                                                size='lg'
+                                                            >
+                                                                <div>
+                                                                    <AiOutlineInfoCircle />
+                                                                </div>
+                                                            </Tooltip>
+                                                        </div>
+                                                    </div>
+                                                    <div className='border-1 flex justify-center items-center py-14 gap-1'>
+                                                        <p>กรุณาคัดเลือกแทร็ก</p>
+                                                        <Link href={`/student/tracks`} target="_blank" className='text-blue-600 font-semibold'>
+                                                            คลิก!
+                                                        </Link>
+                                                    </div>
+                                                </>
+                                            )}
                                         </>
                                     )}
 

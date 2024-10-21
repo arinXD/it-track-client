@@ -15,8 +15,9 @@ import InsertModal from "./InsertModal";
 import { swal } from "@/src/util/sweetyAlert";
 import { getOptions } from "@/app/components/serverAction/TokenAction";
 import axios from "axios";
-import { MdOutlineFileDownload } from "react-icons/md";
+import { MdDoNotDisturb, MdOutlineFileDownload } from "react-icons/md";
 import { utils, writeFile } from "xlsx";
+import { useSession } from "next-auth/react";
 
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "score", "gpa", "result", "actions"];
 const columns = [{
@@ -60,6 +61,7 @@ const columns = [{
 },]
 
 const StudentTable = ({ }) => {
+     const { data: session } = useSession();
      const acadyears = useMemo(() => (getAcadyears()), [])
 
      const getTrackSelect = useCallback(async function (acadyear = acadyears[0]) {
@@ -287,40 +289,54 @@ const StudentTable = ({ }) => {
                case "actions":
                     return (
                          <div className="relative flex justify-center items-center gap-2">
-                              <Tooltip
-                                   content="แก้ไข"
-                              >
-                                   <Button
-                                        size='sm'
-                                        color='warning'
-                                        isIconOnly
-                                        aria-label="แก้ไข"
-                                        className='p-2'
-                                        onClick={() => handleEdit(select?.id)}
-                                   >
-                                        <EditIcon2 className="w-5 h-5 text-yellow-600" />
-                                   </Button>
-                              </Tooltip>
-                              <Tooltip
-                                   content="ลบ"
-                              >
-                                   <Button
-                                        onPress={() => handleDeleted([select?.id])}
-                                        size='sm'
-                                        color='danger'
-                                        isIconOnly
-                                        aria-label="ลบ"
-                                        className='p-2 bg-red-400'
-                                   >
-                                        <DeleteIcon className="w-5 h-5" />
-                                   </Button>
-                              </Tooltip>
+                              {session?.user?.role === "admin" ?
+                                   <>
+                                        <Tooltip content="แก้ไข">
+                                             <Button
+                                                  size='sm'
+                                                  color='warning'
+                                                  isIconOnly
+                                                  aria-label="แก้ไข"
+                                                  className='p-2'
+                                                  onClick={() => handleEdit(select?.id)}
+                                             >
+                                                  <EditIcon2 className="w-5 h-5 text-yellow-600" />
+                                             </Button>
+                                        </Tooltip>
+                                        <Tooltip content="ลบ">
+                                             <Button
+                                                  onPress={() => handleDeleted([select?.id])}
+                                                  size='sm'
+                                                  color='danger'
+                                                  isIconOnly
+                                                  aria-label="ลบ"
+                                                  className='p-2 bg-red-400'
+                                             >
+                                                  <DeleteIcon className="w-5 h-5" />
+                                             </Button>
+                                        </Tooltip>
+                                   </>
+                                   :
+                                   <Tooltip content="ไม่มีสิทธิ์เข้าถึง">
+                                        <Button
+                                             size='sm'
+                                             color='warning'
+                                             isIconOnly
+                                             aria-label="แก้ไข"
+                                             className='p-2'
+                                        >
+                                             <MdDoNotDisturb className="w-5 h-5 text-gray-500" />
+                                        </Button>
+                                   </Tooltip>
+
+                              }
+
                          </div>
                     );
                default:
                     return cellValue
           }
-     }, []);
+     }, [session?.user?.role]);
 
      const onRowsPerPageChange = useCallback((e) => {
           setRowsPerPage(Number(e.target.value));
@@ -513,29 +529,31 @@ const StudentTable = ({ }) => {
                                         onClear={() => onClear()}
                                         onValueChange={onSearchChange}
                                    />
-                                   <div className="flex gap-4">
-                                        <Button
-                                             size="sm"
-                                             className={insertColor.color}
-                                             radius="sm"
-                                             onClick={onInsertOpen}
-                                             startContent={<PlusIcon className="w-5 h-5" />}>
-                                             เพิ่มข้อมูล
-                                        </Button>
-                                        <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
+                                   {session?.user?.role === "admin" &&
+                                        <div className="flex gap-4">
                                              <Button
-                                                  radius="sm"
                                                   size="sm"
-                                                  isLoading={deleting}
-                                                  isDisabled={disableSelectDelete}
-                                                  onPress={() => handleDeleted(selectedRecords)}
-                                                  color="danger"
-                                                  className={deleteColor.color}
-                                                  startContent={<DeleteIcon2 className="w-5 h-5" />}>
-                                                  ลบรายการที่เลือก
+                                                  className={insertColor.color}
+                                                  radius="sm"
+                                                  onClick={onInsertOpen}
+                                                  startContent={<PlusIcon className="w-5 h-5" />}>
+                                                  เพิ่มข้อมูล
                                              </Button>
+                                             <div className={disableSelectDelete ? "cursor-not-allowed" : ""}>
+                                                  <Button
+                                                       radius="sm"
+                                                       size="sm"
+                                                       isLoading={deleting}
+                                                       isDisabled={disableSelectDelete}
+                                                       onPress={() => handleDeleted(selectedRecords)}
+                                                       color="danger"
+                                                       className={deleteColor.color}
+                                                       startContent={<DeleteIcon2 className="w-5 h-5" />}>
+                                                       ลบรายการที่เลือก
+                                                  </Button>
+                                             </div>
                                         </div>
-                                   </div>
+                                   }
                               </div>
                          </>)
                     }
@@ -557,6 +575,7 @@ const StudentTable = ({ }) => {
           countStudent,
           deleting,
           selectedRecords,
+          session?.user?.role
      ]);
 
      const bottomContent = useMemo(() => {

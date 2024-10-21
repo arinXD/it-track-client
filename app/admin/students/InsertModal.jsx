@@ -134,7 +134,7 @@ const InsertModal = ({ }) => {
           <section className='max-w-2xl mx-auto bg-white'>
                <form onSubmit={insertStudent} className='flex flex-col space-y-6 mt-6 border p-6 rounded-lg shadow'>
                     <div className='flex flex-col gap-6'>
-                         <div className='flex flex-row gap-6 mt-0'>
+                         <div className='flex flex-col md:flex-row gap-6 mt-0'>
                               <Input
                                    type="text"
                                    variant="bordered"
@@ -160,7 +160,7 @@ const InsertModal = ({ }) => {
                                    classNames={thinInputClass}
                               />
                          </div>
-                         <div className='flex flex-row gap-6'>
+                         <div className='flex flex-col md:flex-row gap-6'>
                               <Input
                                    type="text"
                                    radius='sm'
@@ -186,7 +186,7 @@ const InsertModal = ({ }) => {
                                    classNames={thinInputClass}
                               />
                          </div>
-                         <div className='w-full flex flex-row gap-6'>
+                         <div className='w-full flex flex-col md:flex-row gap-6'>
                               <Autocomplete
                                    inputProps={{
                                         classNames: {
@@ -252,12 +252,25 @@ const InsertModal = ({ }) => {
                               </RadioGroup>
                          </div>
                     </div>
-                    <div className='flex gap-4 justify-start'>
-                         <Button disabled={inserting} isLoading={inserting} type='submit' className='rounded-lg' color="primary" variant='solid'>
-                              บันทึก
+                    <div className='flex gap-4 justify-end'>
+                         <Button
+                              type='button'
+                              className='border-1 rounded-lg'
+                              color="primary"
+                              radius='sm'
+                              variant='bordered'
+                              onPress={closeForm}>
+                              ยกเลิก
                          </Button>
-                         <Button type='button' size='md' className='border-1 rounded-lg' color="primary" variant='bordered' onPress={closeForm}>
-                              เคลียร์
+                         <Button
+                              disabled={inserting}
+                              isLoading={inserting}
+                              type='submit'
+                              radius='sm'
+                              className='rounded-lg'
+                              color="primary"
+                              variant='solid'>
+                              บันทึก
                          </Button>
                     </div>
                </form>

@@ -61,6 +61,7 @@ const InsertTeacherModal = ({ emptyTeachers = [], isOpen, onClose, src = "", tra
 
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault()
+        setInserting(true)
         const formData = new FormData(e.target);
         const formDataObject = Object.fromEntries(formData.entries());
         console.log(formDataObject);
@@ -73,7 +74,6 @@ const InsertTeacherModal = ({ emptyTeachers = [], isOpen, onClose, src = "", tra
 
         if (uploadImageFile instanceof Blob || uploadImageFile instanceof File) {
             try {
-                setInserting(true)
                 await axios.post(`${hostname}${URL}`, formDataObject, {
                     headers,
                     onUploadProgress: (progressObj) => {
