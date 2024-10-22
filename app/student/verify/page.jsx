@@ -1592,7 +1592,7 @@ const Page = () => {
         setVerifySubj(data)
     }, [pickSubj])
 
-    /////////////////////////////////////////////////
+    ///////////////////////////////////////////////// เงื่อนไข Track
 
     const [insertData, setInsertData] = useState([]);
     const [insideTrack, setInsideTrack] = useState([]);
