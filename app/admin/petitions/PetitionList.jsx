@@ -78,10 +78,10 @@ const PetitionList = ({ current, fetching, title, data, emptyContent }) => {
                                                                  {petition?.Sender?.Student?.first_name}  {petition?.Sender?.Student?.last_name}
                                                             </p>
                                                        </span>
-                                                       <span className="w-full col-span-2 text-sm font-normal text-gray-900 truncate max-md:col-span-3">
+                                                       {/* <span className="w-full col-span-2 text-sm font-normal text-gray-900 truncate max-md:col-span-3">
                                                             {petition.title}
-                                                       </span>
-                                                       <span className="w-full col-span-2 xl:col-span-3 text-sm  text-gray-500 truncate overflow-hidden max-md:hidden">
+                                                       </span> */}
+                                                       <span className="w-full col-span-4 xl:col-span-5 text-sm  text-gray-500 truncate overflow-hidden max-md:col-span-3">
                                                             {petition.detail}
                                                        </span>
                                                        <span className="w-full col-span-2 xl:col-span-1 justify-center flex text-gray-500 truncate text-center max-md:hidden">

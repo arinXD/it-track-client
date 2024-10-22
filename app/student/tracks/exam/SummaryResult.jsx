@@ -257,9 +257,11 @@ const SummaryResult = ({ data }) => {
                               <h2 className="text-2xl font-semibold text-yellow-800 mb-4">คำแนะนำ</h2>
                               <ul className="text-gray-800 flex flex-col gap-4">
                                    {
-                                        recommendation.map((rec, recKey) => (
+                                        // recommendation[0].track === null ? :recommendation
+
+                                        recommendation.slice(0, recommendation[0].track === null ? 1 : recommendation.length).map((rec, recKey) => (
                                              <li key={recKey} className='flex gap-4'>
-                                                  <p className='w-[15px]'>{`${recKey + 1})`}</p>
+                                                  {recommendation.slice(0, recommendation[0].track === null ? 1 : recommendation.length).length > 1 ? <p className='w-[15px]'>{`${recKey + 1})`}</p> : undefined}
                                                   <p className='flex flex-col'>
                                                        <span>{rec.recText}</span>
                                                        <span>{rec.descText}</span>

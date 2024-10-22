@@ -12,7 +12,7 @@ export default function AccountCreationForm({ tracks, programs }) {
      const [showTrackInput, setShowTrackInput] = useState(false);
 
      const roles = useMemo(() => ([
-          { key: "admin", name: "แอดมิน" },
+          { key: "admin", name: "เจ้าหน้าที่" },
           { key: "teacher", name: "อาจารย์" },
           { key: "student", name: "นักศึกษา" },
      ]), [])

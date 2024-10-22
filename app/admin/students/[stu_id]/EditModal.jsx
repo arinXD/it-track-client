@@ -153,7 +153,7 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
             >
                 {(item) =>
                     <AutocompleteItem key={String(item.id)}>
-                        {String(item.id)}
+                        {String(item.description)}
                     </AutocompleteItem>}
             </Autocomplete>
         );

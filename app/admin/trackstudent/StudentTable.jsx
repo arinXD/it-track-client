@@ -20,11 +20,7 @@ import { utils, writeFile } from "xlsx";
 import { useSession } from "next-auth/react";
 
 const INITIAL_VISIBLE_COLUMNS = ["stu_id", "fullName", "courses_type", "score", "gpa", "result", "actions"];
-const columns = [{
-     name: "ID",
-     uid: "id",
-     sortable: true
-},
+const columns = [
 {
      name: "รหัสนักศึกษา",
      uid: "stu_id",
@@ -51,7 +47,7 @@ const columns = [{
      sortable: true
 },
 {
-     name: "Result",
+     name: "แทร็ก",
      uid: "result",
      sortable: true
 },
@@ -63,6 +59,53 @@ const columns = [{
 const StudentTable = ({ }) => {
      const { data: session } = useSession();
      const acadyears = useMemo(() => (getAcadyears()), [])
+     // State
+     const [tracks, setTracks] = useState([])
+     const [searching, setSearching] = useState(false)
+     const [fetching, setFetching] = useState(true)
+     const [selectAcadYear, setSelectAcadYear] = useState(acadyears[0])
+     const [trackSelect, setTrackSelect] = useState({})
+     const [selections, setSelections] = useState([])
+     const [countStudent, setCountStudent] = useState(0);
+     const [selectedTrack, setSelectedTrack] = useState("all");
+     const [selectedKeys, setSelectedKeys] = useState(new Set([]));
+     const [disableSelectDelete, setDisableSelectDelete] = useState(true)
+     const [selectionId, setSelectionId] = useState(null);
+     const [deleting, setDeleting] = useState(false);
+     const [selectedRecords, setSelectedRecords] = useState([]);
+
+     const { isOpen: isInsertOpen, onOpen: onInsertOpen, onClose: onInsertClose } = useDisclosure();
+     const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
+
+     const [filterValue, setFilterValue] = useState("");
+     const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
+     const [rowsPerPage, setRowsPerPage] = useState(50);
+     const [sortDescriptor, setSortDescriptor] = useState({
+          column: "id",
+          direction: "ascending",
+     });
+     const [page, setPage] = useState(1);
+     const hasSearchFilter = Boolean(filterValue);
+
+     const summaryStudentCount = useMemo(() => {
+          const result = [];
+          for (const sl of selections) {
+               const trackResult = sl.result;
+
+               const rs = result.find(r => r.name === trackResult);
+               if (rs) {
+                    rs.count++;
+               } else {
+                    const tt = {
+                         name: trackResult,
+                         count: 1,
+                    }
+                    result.push(tt);
+               }
+          }
+
+          return result.length > 0 ? result.sort((a, b) => b.count - a.count) : result;
+     }, [selections]);
 
      const getTrackSelect = useCallback(async function (acadyear = acadyears[0]) {
           localStorage.setItem("search-students-track", JSON.stringify({ acadyear }))
@@ -107,34 +150,6 @@ const StudentTable = ({ }) => {
           }
           init()
      }, [])
-
-     // State
-     const [tracks, setTracks] = useState([])
-     const [searching, setSearching] = useState(false)
-     const [fetching, setFetching] = useState(true)
-     const [selectAcadYear, setSelectAcadYear] = useState(acadyears[0])
-     const [trackSelect, setTrackSelect] = useState({})
-     const [selections, setSelections] = useState([])
-     const [countStudent, setCountStudent] = useState(0);
-     const [selectedTrack, setSelectedTrack] = useState("all");
-     const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-     const [disableSelectDelete, setDisableSelectDelete] = useState(true)
-     const [selectionId, setSelectionId] = useState(null);
-     const [deleting, setDeleting] = useState(false);
-     const [selectedRecords, setSelectedRecords] = useState([]);
-
-     const { isOpen: isInsertOpen, onOpen: onInsertOpen, onClose: onInsertClose } = useDisclosure();
-     const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
-
-     const [filterValue, setFilterValue] = useState("");
-     const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
-     const [rowsPerPage, setRowsPerPage] = useState(50);
-     const [sortDescriptor, setSortDescriptor] = useState({
-          column: "id",
-          direction: "ascending",
-     });
-     const [page, setPage] = useState(1);
-     const hasSearchFilter = Boolean(filterValue);
 
      useEffect(() => {
           let sl
@@ -461,7 +476,7 @@ const StudentTable = ({ }) => {
                <div className="flex flex-col gap-4 mb-4">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-end text-small text-default-400 gap-2">
                          <div>
-                              <p className="mb-1">คอลัมน์: </p>
+                              <p className="mb-1">การแสดงผล: </p>
                               <div className="flex gap-2 flex-wrap">
                                    {headerColumns.map(column => (
                                         <Chip
@@ -488,7 +503,7 @@ const StudentTable = ({ }) => {
                     {selections?.length > 0 &&
                          (<>
                               <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                                   <span className="text-default-400 text-small">นักศึกษาทั้งหมด {countStudent} คน</span>
+                                   <span className="text-black text-small">นักศึกษาทั้งหมด {countStudent} คน</span>
                                    <div className="flex items-center gap-4 flex-row-reverse max-md:w-full max-md:flex-col-reverse max-md:items-start max-md:mt-4">
                                         <Pagination
                                              className="max-md:hidden"
@@ -624,7 +639,7 @@ const StudentTable = ({ }) => {
                                    radius="sm"
                                    endContent={<ChevronDownIcon className="text-small" />}
                                    variant="flat">
-                                   คอลัมน์
+                                   การแสดงผล
                               </Button>
                          </DropdownTrigger>
                          <DropdownMenu
@@ -674,6 +689,14 @@ const StudentTable = ({ }) => {
                               ค้นหา
                          </Button>
                     </div>
+               </div>
+               <div className="grid grid-cols-3 gap-4 mb-4">
+                    {summaryStudentCount.map(track => (
+                         <div key={track.name} className="w-full border p-4 flex flex-col justify-center items-center rounded-md">
+                              <p>{track.name}</p>
+                              <p>{track.count}</p>
+                         </div>
+                    ))}
                </div>
                <div className="border p-4 rounded-[10px] w-full">
                     {!selections?.length ? null :

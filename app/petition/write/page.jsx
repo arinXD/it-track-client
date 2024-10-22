@@ -107,7 +107,7 @@ const Page = () => {
                <form onSubmit={handleSubmit} className="space-y-6">
                     <input readOnly type="hidden" name="senderEmail" value={session?.user?.email} />
 
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                          <label htmlFor="title" className="block text-sm font-medium text-gray-700">หัวเรื่อง</label>
                          <input
                               id="title"
@@ -118,18 +118,7 @@ const Page = () => {
                               value={title}
                               onInput={(e) => setTitle(e.target.value)}
                          />
-                    </div>
-
-                    <div className="space-y-2">
-                         <label htmlFor="detail" className="block text-sm font-medium text-gray-700">เหตุผล</label>
-                         <textarea
-                              id="detail"
-                              name="detail"
-                              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                              rows="5"
-                              placeholder="กรอกรายละเอียด"
-                         ></textarea>
-                    </div>
+                    </div> */}
 
                     <div className="space-y-2">
                          <label className="block text-sm font-medium text-gray-700">แทร็กเดิม</label>
@@ -156,6 +145,17 @@ const Page = () => {
                                         value={track}>{track}</option>
                               ))}
                          </select>
+                    </div>
+
+                    <div className="space-y-2">
+                         <label htmlFor="detail" className="block text-sm font-medium text-gray-700">เหตุผล</label>
+                         <textarea
+                              id="detail"
+                              name="detail"
+                              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                              rows="5"
+                              placeholder="กรอกรายละเอียด"
+                         ></textarea>
                     </div>
 
                     {fetching ? <p className="text-sm text-gray-400">กำลังโหลด...</p>

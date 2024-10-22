@@ -222,39 +222,6 @@ export default function Page({ params }) {
                                             <p className='text-sm text-default-600'>ข้อมูลนักศึกษา</p>
                                         </div>
                                     </div>
-                                    <div className='flex flex-col md:flex-row gap-3'>
-                                        <Button
-                                            type='button'
-                                            className={`${insertColor.color} border border-[${insertColor.onlyColor}]`}
-                                            radius='sm'
-                                            size='sm'
-                                            startContent={<PlusIcon width={4} height={4} />}
-                                            onPress={onOpenEnroll}>
-                                            เพิ่มรายวิชาที่ลงทะเบียน
-                                        </Button>
-                                        <Button
-                                            type='button'
-                                            className='text-yellow-700 border border-yellow-700'
-                                            radius='sm'
-                                            size='sm'
-                                            color='warning'
-                                            variant='solid'
-                                            startContent={<EditIcon2 className={"w-5 h-5 text-yellow-700"} />}
-                                            onPress={handleEdit}>
-                                            แก้ไขข้อมูลนักศึกษา
-                                        </Button>
-                                        <Button
-                                            type='button'
-                                            className='bg-red-400'
-                                            radius='sm'
-                                            size='sm'
-                                            color="danger"
-                                            startContent={<DeleteIcon className={"w-5 h-5"} />}
-                                            variant='solid'
-                                            onPress={delOnOpen}>
-                                            ลบรายชื่อนักศึกษา
-                                        </Button>
-                                    </div>
                                 </div>
                                 <div className='bg-white flex flex-col gap-8 p-6 border border-t-0 rounded-br-[10px] rounded-bl-[10px] md:flex-row'>
                                     <div className="w-full md:w-[30%] flex flex-col justify-center items-center">
