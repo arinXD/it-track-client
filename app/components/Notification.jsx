@@ -9,19 +9,15 @@ import axios from "axios"
 import { timeAgo } from "@/src/util/simpleDateFormatter"
 
 export default function Notification({ email = null }) {
-     const [fetching, setFetching] = useState(true);
      const [notifications, setNotifications] = useState([]);
 
      const getNotificationByEmail = useCallback(async (email) => {
           try {
-               setFetching(true)
                const option = await getOptions(`/api/notifications/${email}`, "get")
                const noti = (await axios(option)).data?.data
                setNotifications(noti)
           } catch (error) {
                setNotifications([])
-          } finally {
-               setFetching(false)
           }
      }, [])
 
@@ -70,7 +66,7 @@ export default function Notification({ email = null }) {
                          </DropdownTrigger>
                          <DropdownMenu
                               aria-label="Noti menu"
-                              disabledKeys={["empty", "loading"]}
+                              disabledKeys={["empty"]}
                               className="p-2"
                               variant="flat"
                               itemClasses={DROPDOWN_MENU_CLASS}
@@ -79,33 +75,30 @@ export default function Notification({ email = null }) {
                                    title="การแจ้งเตือน"
                                    aria-label="noti-items"
                                    className="mb-0">
-                                   {fetching ?
-                                        <DropdownItem key="loading">
-                                             <div className='flex flex-col justify-between gap-2 items-center my-2'>
-                                                  <span className='text-gray-600 text-sm'>Loading...</span>
-                                             </div>
+                                   {notifications?.length > 0 ?
+                                        <DropdownItem key="noti" className="hover:!bg-white transition-none p-0">
+                                             <ul className="max-h-[200px] overflow-y-auto flex flex-col gap-2">
+                                                  {notifications.map(noti => (
+                                                       <li
+                                                            className="flex flex-col cursor-pointer hover:bg-gray-100 rounded-md px-2 py-1"
+                                                            onClick={() => updateNotiRead(noti.id, noti.destination)}
+                                                            key={`notification-${noti.id}`}>
+                                                            <div className='flex gap-6 justify-between items-center'>
+                                                                 <p className="text-black">{noti.text}</p>
+                                                                 <div className='w-2 h-2 rounded-full bg-green-600'></div>
+                                                            </div>
+                                                            <p className="text-xs mt-0.5">{timeAgo(noti.createdAt)}</p>
+                                                       </li>
+                                                  ))}
+                                             </ul>
                                         </DropdownItem>
                                         :
-
-                                        notifications?.length > 0 ?
-                                             notifications.map(noti => (
-                                                  <DropdownItem
-                                                       onClick={() => updateNotiRead(noti.id, noti.destination)}
-                                                       key={`notification-${noti.id}`}>
-                                                       <div className='flex gap-6 justify-between items-center'>
-                                                            <p className="text-black">{noti.text}</p>
-                                                            <div className='w-2 h-2 rounded-full bg-green-600'></div>
-                                                       </div>
-                                                       <p className="text-xs mt-0.5">{timeAgo(noti.createdAt)}</p>
-                                                  </DropdownItem>
-                                             ))
-                                             :
-                                             <DropdownItem key="empty">
-                                                  <div className='flex flex-col justify-between gap-2 items-center my-2'>
-                                                       <IoNotificationsOutline className="w-6 h-6" />
-                                                       <span className='text-gray-600 text-sm'>ไม่มีการแจ้งเตือนใหม่</span>
-                                                  </div>
-                                             </DropdownItem>
+                                        <DropdownItem key="empty">
+                                             <div className='flex flex-col justify-between gap-2 items-center my-2'>
+                                                  <IoNotificationsOutline className="w-6 h-6" />
+                                                  <span className='text-gray-600 text-sm'>ไม่มีการแจ้งเตือนใหม่</span>
+                                             </div>
+                                        </DropdownItem>
                                    }
                               </DropdownSection>
                          </DropdownMenu>

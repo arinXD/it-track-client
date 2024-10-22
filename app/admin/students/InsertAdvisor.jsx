@@ -68,9 +68,11 @@ const InsertAdvisor = () => {
                message.warning("เลือกอาจารย์")
                return
           }
+          setInserting(true)
           const advisor = await findStudentAdvisor(stu_id)
           const option = await getOptions(`/api/advisors/${advisorId}/students/${stu_id}`, "POST")
           if (Object.keys(advisor).length > 0) {
+               setInserting(false)
                swal.fire({
                     text: `นักศึกษามีที่ปรึกษาแล้วคือ ${advisor.prefix}${advisor.name} ${advisor.surname} ต้องการแก้ไขหรือไม่ ?`,
                     icon: "question",
