@@ -21,45 +21,33 @@ const StudentTable = () => {
      const role = useMemo(() => session?.user?.role, [session])
 
      const INITIAL_VISIBLE_COLUMNS = useMemo(() => (
-          ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"]
+          ["stu_id", "fullName", "courses_type", "status_code", "actions"]
      ), [])
-     const columns = useMemo(() => ([{
-          name: "ID",
-          uid: "id",
-          sortable: true
-     },
-     {
-          name: "รหัสนักศึกษา",
-          uid: "stu_id",
-          sortable: true
-     },
-     {
-          name: "ชื่อ-สกุล",
-          uid: "fullName",
-          sortable: true
-     },
-     {
-          name: "โครงการ",
-          uid: "courses_type",
-          sortable: true
-     },
-     {
-          name: "หลักสูตร",
-          uid: "program"
-     },
-     {
-          name: "ปีการศึกษา",
-          uid: "acadyear",
-     },
-     {
-          name: "สถานะภาพ",
-          uid: "status_code",
-          sortable: true
-     },
-     {
-          name: "ACTIONS",
-          uid: "actions"
-     },
+     const columns = useMemo(() => ([
+          {
+               name: "รหัสนักศึกษา",
+               uid: "stu_id",
+               sortable: true
+          },
+          {
+               name: "ชื่อ-สกุล",
+               uid: "fullName",
+               sortable: true
+          },
+          {
+               name: "โครงการ",
+               uid: "courses_type",
+               sortable: true
+          },
+          {
+               name: "สถานะภาพ",
+               uid: "status_code",
+               sortable: true
+          },
+          {
+               name: "ACTIONS",
+               uid: "actions"
+          },
      ]), [])
 
      // Modal state
@@ -345,7 +333,7 @@ const StudentTable = () => {
                          <div className="flex flex-col text-small">
                               <div className="flex flex-col text-small mb-2 text-default-400 gap-2">
                                    <div>
-                                        <p className="mb-1">สถานะ:</p>
+                                        <p className="mb-1">สถานะภาพ:</p>
                                         <div className="flex gap-2 flex-wrap">
                                              {statusFilter == "all" ?
                                                   statusOptions.map(s => (
@@ -377,7 +365,7 @@ const StudentTable = () => {
                                         </div>
                                    </div>
                                    <div>
-                                        <p className="mb-1">คอลัมน์: </p>
+                                        <p className="mb-1">การแสดงผล: </p>
                                         <div className="flex gap-2 flex-wrap">
                                              {headerColumns.map(column => (
                                                   <Chip
@@ -610,7 +598,7 @@ const StudentTable = () => {
                                         radius="sm"
                                         endContent={<ChevronDownIcon className="text-small" />}
                                         variant="flat">
-                                        คอลัมน์
+                                        การแสดงผล
                                    </Button>
                               </DropdownTrigger>
                               <DropdownMenu
@@ -698,7 +686,7 @@ const StudentTable = () => {
 
                                         isCompact
                                         removeWrapper
-                                        selectionMode="multiple"
+                                        selectionMode={session.user.role === "admin" ? "multiple" : "none"}
                                         sortDescriptor={sortDescriptor}
                                         onSortChange={setSortDescriptor}
                                         selectedKeys={selectedKeys}

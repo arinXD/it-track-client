@@ -18,45 +18,45 @@ import { HiOutlineAcademicCap } from "react-icons/hi2";
 const StudentTable = ({ email }) => {
 
      const INITIAL_VISIBLE_COLUMNS = useMemo(() => (
-          ["stu_id", "fullName", "courses_type", "program", "acadyear", "status_code", "actions"]
+          ["stu_id", "fullName", "program", "gpa", "track", "actions"]
      ), [])
-     const columns = useMemo(() => ([{
-          name: "ID",
-          uid: "id",
-          sortable: true
-     },
-     {
-          name: "รหัสนักศึกษา",
-          uid: "stu_id",
-          sortable: true
-     },
-     {
-          name: "ชื่อ-สกุล",
-          uid: "fullName",
-          sortable: true
-     },
-     {
-          name: "โครงการ",
-          uid: "courses_type",
-          sortable: true
-     },
-     {
-          name: "หลักสูตร",
-          uid: "program"
-     },
-     {
-          name: "ปีการศึกษา",
-          uid: "acadyear",
-     },
-     {
-          name: "สถานะภาพ",
-          uid: "status_code",
-          sortable: true
-     },
-     {
-          name: "ACTIONS",
-          uid: "actions"
-     },
+     const columns = useMemo(() => ([
+          {
+               name: "รหัสนักศึกษา",
+               uid: "stu_id",
+               sortable: true
+          },
+          {
+               name: "ชื่อ-สกุล",
+               uid: "fullName",
+               sortable: true
+          },
+          {
+               name: "โครงการ",
+               uid: "courses_type",
+               sortable: true
+          },
+          {
+               name: "หลักสูตร",
+               uid: "program"
+          },
+          {
+               name: "สถานะภาพ",
+               uid: "status_code",
+               sortable: true
+          },
+          {
+               name: "เกรด",
+               uid: "gpa",
+          },
+          {
+               name: "แทร็ก",
+               uid: "track"
+          },
+          {
+               name: "ACTIONS",
+               uid: "actions"
+          },
      ]), [])
 
      // State
@@ -217,6 +217,12 @@ const StudentTable = ({ email }) => {
                               <p className="w-full text-bold text-small capitalize">{stu.last_name}</p>
                          </div>
                     );
+               case "track":
+                    return (
+                         String(stu?.program).toLowerCase() === "it" ?
+                              cellValue || "รอผลการคัดเลือก" :
+                              "-"
+                    );
                case "status_code":
                     return stu?.StudentStatus?.description
                case "actions":
@@ -250,23 +256,8 @@ const StudentTable = ({ email }) => {
                                         </Button>
                                    </Tooltip>
                               </Link>
-                              <Link href={`/admin/students-advisor/${stu?.stu_id}?edit=1`} target="_blank">
-                                   <Tooltip
-                                        content="แก้ไข"
-                                   >
-                                        <Button
-                                             size='sm'
-                                             color='warning'
-                                             isIconOnly
-                                             aria-label="แก้ไข"
-                                             className='p-2'
-                                        >
-                                             <EditIcon2 className="w-5 h-5 text-yellow-600" />
-                                        </Button>
-                                   </Tooltip>
-                              </Link>
                               <Tooltip
-                                   content="ลบ"
+                                   content="ลบออกจากที่ปรึกษา"
                               >
                                    <Button
                                         onPress={() => handleDelete([stu?.id])}
@@ -378,7 +369,7 @@ const StudentTable = ({ email }) => {
                          <div className="flex flex-col text-small">
                               <div className="flex flex-col text-small mb-2 text-default-400 gap-2">
                                    <div>
-                                        <p className="mb-1">สถานะ:</p>
+                                        <p className="mb-1">สถานะภาพ:</p>
                                         <div className="flex gap-2 flex-wrap">
                                              {statusFilter == "all" ?
                                                   statusOptions.map(s => (
@@ -410,7 +401,7 @@ const StudentTable = ({ email }) => {
                                         </div>
                                    </div>
                                    <div>
-                                        <p className="mb-1">คอลัมน์: </p>
+                                        <p className="mb-1">การแสดงผล: </p>
                                         <div className="flex gap-2 flex-wrap">
                                              {headerColumns.map(column => (
                                                   <Chip
@@ -497,7 +488,7 @@ const StudentTable = ({ email }) => {
                                         color="danger"
                                         className={deleteColor.color}
                                         startContent={<DeleteIcon2 className="w-5 h-5" />}>
-                                        ลบรายการที่เลือก
+                                        ลบออกจากที่ปรึกษา
                                    </Button>
                               </div>
                          </div>
@@ -588,7 +579,7 @@ const StudentTable = ({ email }) => {
                                                   radius="sm"
                                                   endContent={<ChevronDownIcon className="text-small" />}
                                                   variant="flat">
-                                                  คอลัมน์
+                                                  การแสดงผล
                                              </Button>
                                         </DropdownTrigger>
                                         <DropdownMenu
@@ -673,7 +664,7 @@ const StudentTable = ({ email }) => {
                                              classNames={minimalTableClass}
                                              bottomContent={bottomContent}
                                              bottomContentPlacement="outside"
-
+                                             className="overflow-x-auto"
                                              isCompact
                                              removeWrapper
                                              selectionMode="multiple"

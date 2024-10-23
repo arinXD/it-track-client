@@ -108,15 +108,15 @@ const UserTable = ({ email }) => {
      const columns = useMemo(() => [
           { key: "email", label: "อีเมล", "align": "start" },
           { key: "createdAt", label: "เข้าสู่ระบบ", "align": "start" },
-          { key: "role", label: "โรลปัจจุบัน", "align": "start" },
-          { key: "newRole", label: "โรลใหม่", "align": "center" },
+          { key: "role", label: "สิทธิ์การใช้งาน", "align": "start" },
+          { key: "newRole", label: "สิทธิ์การใช้งานใหม่", "align": "center" },
           { key: "actions", label: "ACTIONS", "align": "center" },
      ], []);
 
      const getRole = useCallback((engRole) => {
           const roles = {
                "all": "ทั้งหมด",
-               "admin": "แอดมิน",
+               "admin": "เจ้าหน้าที่",
                "teacher": "อาจารย์",
                "student": "นักศึกษา",
                "user": "ผู้ใช้",
@@ -125,7 +125,7 @@ const UserTable = ({ email }) => {
      }, []);
 
      const roleList = [
-          { "key": "admin", "value": "แอดมิน" },
+          { "key": "admin", "value": "เจ้าหน้าที่" },
           { "key": "teacher", "value": "อาจารย์", },
           { "key": "student", "value": "นักศึกษา", },
           { "key": "user", "value": "ผู้ใช้", },
@@ -185,7 +185,7 @@ const UserTable = ({ email }) => {
                                    onChange={(e) => handleRoleFilter(e.target.value || "all")}
                               >
                                    <SelectItem key="all">ทั้งหมด</SelectItem>
-                                   <SelectItem key="admin">แอดมิน</SelectItem>
+                                   <SelectItem key="admin">เจ้าหน้าที่</SelectItem>
                                    <SelectItem key="teacher">อาจารย์</SelectItem>
                                    <SelectItem key="student">นักศึกษา</SelectItem>
                                    <SelectItem key="user">ผู้ใช้</SelectItem>
