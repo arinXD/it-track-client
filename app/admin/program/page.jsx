@@ -71,7 +71,6 @@ export default function Program() {
 
             console.log(pro);
 
-
             setPrograms(pro);
 
         } catch (error) {

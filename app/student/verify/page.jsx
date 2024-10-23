@@ -967,7 +967,7 @@ const Page = () => {
         const subjectsWithGrades = group?.subjects
             .map(subject => {
                 const grade = groupDataGrade.length > 0 ? subject.grade : getEnrollmentGrade(subject.subject_code);
-                const credit = subject.credit;
+                const credit = subject?.credit;
 
                 // Check for invalid grades or low credits
                 if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
@@ -1004,7 +1004,7 @@ const Page = () => {
             .filter(subject => subject !== null);
 
         // Calculate total credits and grades
-        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject.credit, 0);
+        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject?.credit, 0);
         const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
         const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
 
@@ -1022,7 +1022,7 @@ const Page = () => {
         const subjectsWithGrades = group?.subjects
             .map(subject => {
                 const grade = groupDataGrade.length > 0 ? subject.grade : getEnrollmentGrade(subject.subject_code);
-                const credit = subject.credit;
+                const credit = subject?.credit;
 
                 // Check for invalid grades or low credits
                 if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
@@ -1080,7 +1080,7 @@ const Page = () => {
         const subjectsWithGrades = subgroup.subjects
             .map(subject => {
                 const grade = subgroupDataGrade.length > 0 ? subject.grade : getEnrollmentGrade(subject.subject_code);
-                const credit = subject.credit;
+                const credit = subject?.credit;
 
                 // Check for invalid grades or low credits
                 if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
@@ -1117,7 +1117,7 @@ const Page = () => {
             .filter(subject => subject !== null);
 
         // Calculate total credits and grades
-        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject.credit, 0);
+        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject?.credit, 0);
         const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
         const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
 
@@ -1138,7 +1138,7 @@ const Page = () => {
         const subjectsWithGrades = Array.isArray(subjects) ? subjects
             .map(subject => {
                 const grade = getEnrollmentGrade(subject.subject_code);
-                const credit = subject.credit;
+                const credit = subject?.credit;
 
                 // Check for invalid grades or low credits
                 if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
@@ -1231,7 +1231,7 @@ const Page = () => {
             .filter(subject => subject !== null);
 
         // Calculate total credits and grades
-        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject.credit, 0);
+        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject?.credit, 0);
         const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
         const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
 
@@ -1249,7 +1249,7 @@ const Page = () => {
         const subjectsWithGrades = category.verifySubj
             .map(subject => {
                 const grade = getEnrollmentGrade(subject.subject_code);
-                const credit = subject.credit;
+                const credit = subject?.credit;
 
                 // Check for invalid grades or low credits
                 if (grade === "ไม่มีเกรด" || grade === null || grade === undefined) {
@@ -1286,7 +1286,7 @@ const Page = () => {
             .filter(subject => subject !== null);
 
         // Calculate total credits and grades
-        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject.credit, 0);
+        const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject?.credit, 0);
         const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
         const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
 
@@ -1328,7 +1328,7 @@ const Page = () => {
         // If using itGrade, access subject and credit accordingly
         const isItGrade = itGrade.length && status?.status !== 0;
         const grade = isItGrade ? subject.grade : getEnrollmentGrade(subject.subject_code);
-        const credit = isItGrade ? subject.Subject.credit : subject.credit;
+        const credit = isItGrade ? subject.Subject.credit : subject?.credit;
 
         return {
             subject_id: isItGrade ? subject.Subject.subject_id : subject.subject_id,
@@ -1384,7 +1384,7 @@ const Page = () => {
         }).filter(item => item !== null);
 
         // Calculate total credits, total grades, and average grade
-        const totalCredits = subtrack.reduce((acc, subject) => acc + subject.credit, 0);
+        const totalCredits = subtrack.reduce((acc, subject) => acc + subject?.credit, 0);
         const totalGrades = subtrack.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
         const averageGrade = totalCredits ? (totalGrades / totalCredits) : 0;
 
@@ -1613,7 +1613,7 @@ const Page = () => {
                     subject,
                     grade: getEnrollmentGrade(subject.subject_code),
                     track: subject?.Track?.track || null,
-                    credit: subject.credit // Ensure you are pulling credit from the subject
+                    credit: subject?.credit // Ensure you are pulling credit from the subject
                 }));
             };
 
@@ -1685,7 +1685,7 @@ const Page = () => {
         setOutsideTrack(outsideTrackData);
 
         // Calculate stats for insideTrack
-        const insideTotalCredits = insideTrackData.reduce((sum, subject) => sum + subject.credit, 0);
+        const insideTotalCredits = insideTrackData.reduce((sum, subject) => sum + subject?.credit, 0);
         const insideTotalScores = insideTrackData.reduce((sum, subject) => sum + subject.grade, 0);
         const insideAverageScore = insideTotalCredits ? insideTotalScores / insideTotalCredits : 0;
 
@@ -1696,7 +1696,7 @@ const Page = () => {
         });
 
         // Calculate stats for outsideTrack
-        const outsideTotalCredits = outsideTrackData.reduce((sum, subject) => sum + subject.credit, 0);
+        const outsideTotalCredits = outsideTrackData.reduce((sum, subject) => sum + subject?.credit, 0);
         const outsideTotalScores = outsideTrackData.reduce((sum, subject) => sum + subject.grade, 0);
         const outsideAverageScore = outsideTotalCredits ? outsideTotalScores / outsideTotalCredits : 0;
 
@@ -2194,12 +2194,12 @@ const Page = () => {
                                             <TableCell className=''>{subject.subject_code}</TableCell>
                                             <TableCell className="w-1/3">{subject.title_en}</TableCell>
                                             <TableCell className="w-1/3">{subject.title_th}</TableCell>
-                                            <TableCell>{subject.credit}</TableCell>
+                                            <TableCell>{subject?.credit}</TableCell>
                                             <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
                                             <TableCell>
                                                 {(() => {
                                                     const grade = calGrade(getEnrollmentGrade(subject.subject_code));
-                                                    const credit = subject.credit;
+                                                    const credit = subject?.credit;
                                                     if (grade == null) {
                                                         return "-";
                                                     } else if (isNumber(grade)) {
@@ -2264,12 +2264,12 @@ const Page = () => {
                                             <TableCell className=''>{subject.subject_code}</TableCell>
                                             <TableCell className="w-1/3">{subject.title_en}</TableCell>
                                             <TableCell className="w-1/3">{subject.title_th}</TableCell>
-                                            <TableCell>{subject.credit}</TableCell>
+                                            <TableCell>{subject?.credit}</TableCell>
                                             <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
                                             <TableCell>
                                                 {(() => {
                                                     const grade = calGrade(getEnrollmentGrade(subject.subject_code));
-                                                    const credit = subject.credit;
+                                                    const credit = subject?.credit;
                                                     if (grade == null) {
                                                         return "-";
                                                     } else if (isNumber(grade)) {
@@ -2314,12 +2314,12 @@ const Page = () => {
                                     <TableCell className=''>{subject.subject_code}</TableCell>
                                     <TableCell className="w-1/3">{subject.title_en}</TableCell>
                                     <TableCell className="w-1/3">{subject.title_th}</TableCell>
-                                    <TableCell>{subject.credit}</TableCell>
+                                    <TableCell>{subject?.credit}</TableCell>
                                     <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
                                     <TableCell>
                                         {(() => {
                                             const grade = calGrade(getEnrollmentGrade(subject.subject_code));
-                                            const credit = subject.credit;
+                                            const credit = subject?.credit;
                                             if (grade == null) {
                                                 return "-";
                                             } else if (isNumber(grade)) {
@@ -2553,12 +2553,12 @@ const Page = () => {
                                                                                 <TableCell>{subject.subject_code}</TableCell>
                                                                                 <TableCell className="w-1/3">{subject.title_en}</TableCell>
                                                                                 <TableCell className="w-1/3">{subject.title_th}</TableCell>
-                                                                                <TableCell>{subject.credit}</TableCell>
+                                                                                <TableCell>{subject?.credit}</TableCell>
                                                                                 <TableCell>{getEnrollmentGrade(subject.subject_code)}</TableCell>
                                                                                 <TableCell>
                                                                                     {(() => {
                                                                                         const grade = calGrade(getEnrollmentGrade(subject.subject_code));
-                                                                                        const credit = subject.credit;
+                                                                                        const credit = subject?.credit;
                                                                                         if (grade == null) {
                                                                                             return "-";
                                                                                         } else if (isNumber(grade)) {
