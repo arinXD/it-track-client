@@ -1,8 +1,17 @@
 "use client"
+import { Progress } from "@nextui-org/react";
 
 const SearchFallback = () => {
      return (
-          <div>SearchFallback</div>
+          <div>
+               <Progress
+                    size="sm"
+                    label="Loading..."
+                    isIndeterminate
+                    aria-label="Loading..."
+                    className="max-w-md"
+               />
+          </div>
      )
 }
 
