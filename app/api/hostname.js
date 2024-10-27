@@ -1,3 +1,4 @@
+require("dotenv").config();
 
 const hostNameStage = {
     dev: "http://localhost:4000",
@@ -5,13 +6,13 @@ const hostNameStage = {
 };
 
 const getHostname = () => {
-    const stage = process.env.STAGE || 'dev';
+    const stage = process.env.STAGE || "prod";
     return hostNameStage[stage];
 };
 
 export const hostname = getHostname();
 
 export const getServerSideHostname = () => {
-    const stage = process.env.STAGE || 'dev';
+    const stage = process.env.STAGE;
     return hostNameStage[stage];
 };
