@@ -6,9 +6,10 @@ import { useSearchParams } from 'next/navigation'
 import InsertModal from "../InsertModal"
 import InsertEnrollmentForm from "../InsertEnrollmentForm"
 import InsertExcel from "@/app/components/InsertExcel."
-import { useCallback } from "react"
-import { getOptions, getToken } from "@/app/components/serverAction/TokenAction"
+import { Suspense, useCallback } from "react"
+import { getOptions } from "@/app/components/serverAction/TokenAction"
 import InsertAdvisor from "../InsertAdvisor"
+import SearchFallback from "@/app/components/SearchFallback"
 
 const Page = () => {
      const searchParams = useSearchParams()
@@ -72,7 +73,7 @@ const Page = () => {
      }, [])
 
      return (
-          <div>
+          <Suspense fallback={<SearchFallback />}>
                <TabsComponent
                     current={tab}
                     tabs={tabItems} />
@@ -178,7 +179,7 @@ const Page = () => {
                          hook={insertAdvisorsExcel}
                     />
                }
-          </div>
+          </Suspense>
      )
 }
 

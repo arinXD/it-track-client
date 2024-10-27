@@ -2,6 +2,8 @@
 import { useSearchParams } from "next/navigation";
 import { BreadCrumb, ContentWrap, Navbar, Sidebar } from '@/app/components'
 import ManageForm from "../ManageForm";
+import { Suspense } from "react";
+import SearchFallback from "@/app/components/SearchFallback";
 
 const Page = () => {
      const formId = useSearchParams().get('id')
@@ -14,7 +16,9 @@ const Page = () => {
                <ContentWrap>
                     <div className='flex flex-col justify-center items-center w-full'>
                          <BreadCrumb />
-                         <ManageForm formId={formId} />
+                         <Suspense fallback={<SearchFallback />}>
+                              <ManageForm formId={formId} />
+                         </Suspense>
 
                     </div>
                </ContentWrap>

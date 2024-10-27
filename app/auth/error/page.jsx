@@ -1,7 +1,8 @@
 'use client'
-import React from 'react'
+import React, { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { SignInButton } from '@/app/components'
+import SearchFallback from '@/app/components/SearchFallback'
 
 const Page = () => {
     const searchParams = useSearchParams()
@@ -11,9 +12,11 @@ const Page = () => {
             <h1>
                 Error
             </h1>
-            <p>
-                error: {error}
-            </p>
+            <Suspense fallback={<SearchFallback />}>
+                <p>
+                    error: {error}
+                </p>
+            </Suspense>
             <SignInButton />
         </div>
     )

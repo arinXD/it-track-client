@@ -1,5 +1,5 @@
 "use client"
-import { useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { BreadCrumb, ContentWrap, Navbar, Sidebar } from '@/app/components'
 import { Empty } from 'antd';
@@ -9,6 +9,7 @@ import TrackSubject from './TrackSubject';
 import { getOptions } from '@/app/components/serverAction/TokenAction';
 import axios from 'axios';
 import CareerTable from './CareerTable';
+import SearchFallback from '@/app/components/SearchFallback';
 
 const Page = () => {
     const queryTrack = useSearchParams().get('track')
@@ -38,20 +39,22 @@ const Page = () => {
                                 description="ไม่พบข้อมูลแทร็ก"
                                 className='my-16' />
                             :
-                            <div className='w-full space-y-6'>
-                                <TrackForm track={queryTrack} />
-                                <div className='w-full flex gap-6 flex-col lg:flex-row'>
-                                    <div className="w-full lg:w-[50%]">
-                                        <TrackSubject track={queryTrack} />
+                            <Suspense fallback={<SearchFallback />}>
+                                <div className='w-full space-y-6'>
+                                    <TrackForm track={queryTrack} />
+                                    <div className='w-full flex gap-6 flex-col lg:flex-row'>
+                                        <div className="w-full lg:w-[50%]">
+                                            <TrackSubject track={queryTrack} />
+                                        </div>
+                                        <div className="w-full lg:w-[50%]">
+                                            <TeacherTrack track={queryTrack} />
+                                        </div>
                                     </div>
-                                    <div className="w-full lg:w-[50%]">
-                                        <TeacherTrack track={queryTrack} />
+                                    <div className='border p-6 rounded-[10px] w-full'>
+                                        <CareerTable track={queryTrack} />
                                     </div>
                                 </div>
-                                <div className='border p-6 rounded-[10px] w-full'>
-                                    <CareerTable track={queryTrack} />
-                                </div>
-                            </div>
+                            </Suspense>
 
                     }
                 </div>
