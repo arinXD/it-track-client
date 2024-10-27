@@ -6,7 +6,7 @@ const hostNameStage = {
 };
 
 const getHostname = () => {
-    const stage = process.env.STAGE;
+    const stage = process.env.STAGE || "prod";
     return hostNameStage[stage];
 };
 
