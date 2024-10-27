@@ -16,8 +16,10 @@ import axios from 'axios';
 import { hostname } from '@/app/api/hostname';
 import { Empty, message } from 'antd';
 import { floorGpa, calGrade, isNumber } from '@/src/util/grade';
-import Chart from "react-apexcharts";
 import { tableClass, tableClassCondition } from '@/src/util/ComponentClass'
+import dynamic from 'next/dynamic';
+
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const Page = () => {
 
@@ -156,7 +158,7 @@ const Page = () => {
 
     // Prepare chart data for ApexCharts
 
-    const colors = ['#F4538A',"#7EA1FF", '#FAA300', "#BBF7D0"]
+    const colors = ['#F4538A', "#7EA1FF", '#FAA300', "#BBF7D0"]
     const chartData = {
         series: [
             {
@@ -245,7 +247,7 @@ const Page = () => {
 
 
     return (
-        <div className='p-16'>
+        <div className='mt-6'>
             <select
                 name="select-acadyear"
                 id="selectAcadyear"
@@ -280,56 +282,59 @@ const Page = () => {
                 ))}
             </select>
 
-            <div style={{ marginTop: '20px' }}>
-                <Chart
-                    options={chartData.options}
-                    series={chartData.series}
-                    type="bar"
-                    height={chartData.options.chart.height}
-                />
+            <div className='grid grid-cols-1 lg:grid-cols-2 mt-[20px]'>
+                <div>
+                    <Chart
+                        options={chartData.options}
+                        series={chartData.series}
+                        type="bar"
+                        height={chartData.options.chart.height}
+                    />
+                </div>
+                <div>
+                    <Chart
+                        options={chartDatafrom.options}
+                        series={chartDatafrom.series}
+                        type="bar"
+                        height={chartDatafrom.options.chart.height}
+
+                    />
+                </div>
             </div>
-            <div style={{ marginTop: '20px' }}>
-                <Chart
-                    options={chartDatafrom.options}
-                    series={chartDatafrom.series}
-                    type="bar"
-                    height={chartDatafrom.options.chart.height}
 
-                />
+            <p className='mb-3 mt-[20px]'>จำนวนนักศึกษาที่ยื่นเข้ามา : {verifyselect.length}</p>
+            <div className='p-4 rounded-[10px] border'>
+                <Table
+                    className='overflow-x-auto'
+                    removeWrapper
+                    onRowAction={() => { }}
+                    aria-label="subjects table"
+                >
+                    <TableHeader>
+                        <TableColumn>รหัสนักศึกษา</TableColumn>
+                        <TableColumn>ชื่อ</TableColumn>
+                        <TableColumn>นามสกุล</TableColumn>
+                        <TableColumn>หลักสูตร</TableColumn>
+                        <TableColumn>อีเมล</TableColumn>
+                    </TableHeader>
+                    {verifyselect.length > 0 ? (
+                        <TableBody>
+                            {verifyselect.map(({ Student }, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>{Student.stu_id}</TableCell>
+                                    <TableCell>{Student.first_name}</TableCell>
+                                    <TableCell>{Student.last_name}</TableCell>
+                                    <TableCell>{Student.program}</TableCell>
+                                    <TableCell>{Student.email}</TableCell>
+
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    ) : (
+                        <TableBody emptyContent={"ไม่มีนักศึกษากรอกแบบฟอร์ม"}>{[]}</TableBody>
+                    )}
+                </Table>
             </div>
-            <p className='mb-3'>จำนวนนักศึกษาที่ยื่นเข้ามา : {verifyselect.length}</p>
-
-            <Table
-                classNames={tableClass}
-                className='overflow-x-auto'
-                removeWrapper
-                onRowAction={() => { }}
-                aria-label="subjects table"
-            >
-                <TableHeader>
-                    <TableColumn>รหัสนักศึกษา</TableColumn>
-                    <TableColumn>ชื่อ</TableColumn>
-                    <TableColumn>นามสกุล</TableColumn>
-                    <TableColumn>หลักสูตร</TableColumn>
-                    <TableColumn>อีเมล</TableColumn>
-                </TableHeader>
-                {verifyselect.length > 0 ? (
-                    <TableBody>
-                        {verifyselect.map(({ Student }, index) => (
-                            <TableRow key={index}>
-                                <TableCell>{Student.stu_id}</TableCell>
-                                <TableCell>{Student.first_name}</TableCell>
-                                <TableCell>{Student.last_name}</TableCell>
-                                <TableCell>{Student.program}</TableCell>
-                                <TableCell>{Student.email}</TableCell>
-
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                ) : (
-                    <TableBody emptyContent={"ไม่มีนักศึกษากรอกแบบฟอร์ม"}>{[]}</TableBody>
-                )}
-            </Table>
         </div>
     );
 }

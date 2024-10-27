@@ -83,6 +83,7 @@ const AdminList = ({ }) => {
                links: [
                     { href: "/admin/verify", label: "แบบฟอร์มตรวจสอบจบการศึกษา", icon: HiOutlineAcademicCap },
                     { href: "/admin/verify-selection", label: "อนุมัติจบการศึกษา", icon: TbCheckupList },
+                    { href: "/admin/verify-dashboard", label: "สรุปผลตรวจสอบสำเร็จการศึกษา", icon: IoBarChartOutline },
                ]
           }
      ]
