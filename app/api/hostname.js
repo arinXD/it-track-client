@@ -1,3 +1,4 @@
+require("dotenv").config();
 
 const hostNameStage = {
     dev: "http://localhost:4000",

@@ -38,6 +38,7 @@
     "culori": "4.0.1",
     "date-fns": "2.30.0",
     "dayjs": "1.11.10",
+    "dotenv": "^16.4.5",
     "eslint": "8.52.0",
     "eslint-config-next": "14.0.0",
     "framer-motion": "10.18.0",
