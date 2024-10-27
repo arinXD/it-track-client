@@ -3,7 +3,7 @@ import { Progress } from "@nextui-org/react";
 
 const SearchFallback = () => {
      return (
-          <div>
+          <div className="w-full flex justify-center items-center">
                <Progress
                     size="sm"
                     label="Loading..."
