@@ -10,7 +10,7 @@ import { MailIcon } from '@/app/components/icons/MailIcon';
 import { CiStar } from "react-icons/ci";
 import { BiSolidIdCard } from "react-icons/bi";
 import { MdOutlinePersonOutline } from "react-icons/md";
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { updateTeacherData } from './profileAction';
 import "./style.css"
 
@@ -18,6 +18,55 @@ const UserProfile = ({ userData, tracks }) => {
      const { email, username, role, sign_in_type, createdAt, Student, Teacher, Admin } = userData;
      const [teacherTrack, setTeacherTrack] = useState(Teacher?.TeacherTrack?.track || "");
      const [submiting, setSubmiting] = useState(false);
+
+     const prefixes = useMemo(() => ([
+          {
+               prefix: "ศาสตราจารย์ ดร. (ศ. ดร.)",
+               value: "ศ. ดร."
+          },
+          {
+               prefix: "รองศาสตราจารย์ ดร. (รศ. ดร.)",
+               value: "รศ. ดร."
+          },
+          {
+               prefix: "ผู้ช่วยศาสตราจารย์ ดร. (ผศ. ดร.)",
+               value: "ผศ. ดร."
+          },
+          {
+               prefix: "ผู้ช่วยศาสตราจารย์ (ผศ.)",
+               value: "ผศ."
+          },
+          {
+               prefix: "อาจารย์ ดร. (อ. ดร.)",
+               value: "อ. ดร."
+          },
+          {
+               prefix: "อาจารย์ (อ.)",
+               value: "อ."
+          },
+          {
+               prefix: "นาย",
+               value: "นาย"
+          },
+          {
+               prefix: "นาง",
+               value: "นาง"
+          },
+          {
+               prefix: "นางสาว",
+               value: "นางสาว"
+          },
+     ]), [])
+
+     const [prefix, setPrefix] = useState();
+
+     useEffect(() => {
+          if (Admin) {
+               setPrefix(Admin.prefix)
+          } else {
+               setPrefix(Teacher.prefix)
+          }
+     }, [role])
 
      const columns = [
           {
@@ -153,23 +202,32 @@ const UserProfile = ({ userData, tracks }) => {
                                              <p className='text-sm text-default-600'>ข้อมูลเจ้าหน้าที่</p>
                                         </div>
                                    </div>
-                                   <div className='grid grid-cols-5 gap-4'>
+                                   <div className='grid grid-cols-6 gap-4'>
                                         <input type="hidden" name="id" value={Admin.id} readOnly />
                                         <input type="hidden" name="role" value="admin" readOnly />
-                                        <Input
+                                        <Select
+                                             isRequired
+                                             className='w-full text-sm col-span-5 md:col-span-2'
+                                             variant='bordered'
                                              classNames={{
-                                                  label: "text-black/50 text-[.9em]",
-                                                  inputWrapper: ["rounded-md", "p-2", "border-1"],
-                                                  input: "text-[1em]"
+                                                  trigger: "border-1 rounded-md",
                                              }}
-                                             className='w-full text-sm col-span-5 md:col-span-1'
-                                             variant="bordered"
-                                             type="text"
-                                             label="คำนำหน้า"
                                              name='prefix'
-                                             labelPlacement="outside"
-                                             defaultValue={Admin.prefix || ""}
-                                        />
+                                             labelPlacement='outside'
+                                             label="คำนำหน้า"
+                                             placeholder="เลือกคำนำหน้า"
+                                             selectedKeys={[prefix || Admin.prefix]}
+                                             onChange={(e) => setPrefix(e.target.value || Admin.prefix)}
+                                             scrollShadowProps={{
+                                                  isEnabled: false
+                                             }}
+                                        >
+                                             {prefixes.map((prefix) => (
+                                                  <SelectItem key={prefix.value} value={prefix.value}>
+                                                       {prefix.value}
+                                                  </SelectItem>
+                                             ))}
+                                        </Select>
                                         <Input
                                              classNames={{
                                                   label: "text-black/50 text-[.9em]",
@@ -225,23 +283,32 @@ const UserProfile = ({ userData, tracks }) => {
                                                   <p className='text-sm text-default-600'>ข้อมูลอาจารย์</p>
                                              </div>
                                         </div>
-                                        <div className='grid grid-cols-5 gap-4'>
+                                        <div className='grid grid-cols-6 gap-4'>
                                              <input type="hidden" name="id" value={Teacher.id} readOnly />
                                              <input type="hidden" name="role" value="teacher" readOnly />
-                                             <Input
+                                             <Select
+                                                  isRequired
+                                                  className='w-full text-sm col-span-5 md:col-span-2'
+                                                  variant='bordered'
                                                   classNames={{
-                                                       label: "text-black/50 text-[.9em]",
-                                                       inputWrapper: ["rounded-md", "p-2", "border-1"],
-                                                       input: "text-[1em]"
+                                                       trigger: "border-1 rounded-md",
                                                   }}
-                                                  className='w-full text-sm col-span-5 lg:col-span-1'
-                                                  variant="bordered"
-                                                  type="text"
-                                                  label="คำนำหน้า"
                                                   name='prefix'
-                                                  labelPlacement="outside"
-                                                  defaultValue={Teacher.prefix || ""}
-                                             />
+                                                  labelPlacement='outside'
+                                                  label="คำนำหน้า"
+                                                  placeholder="เลือกคำนำหน้า"
+                                                  selectedKeys={[prefix || Teacher.prefix]}
+                                                  onChange={(e) => setPrefix(e.target.value || Teacher.prefix)}
+                                                  scrollShadowProps={{
+                                                       isEnabled: false
+                                                  }}
+                                             >
+                                                  {prefixes.map((prefix) => (
+                                                       <SelectItem key={prefix.value} value={prefix.value}>
+                                                            {prefix.value}
+                                                       </SelectItem>
+                                                  ))}
+                                             </Select>
                                              <Input
                                                   classNames={{
                                                        label: "text-black/50 text-[.9em]",

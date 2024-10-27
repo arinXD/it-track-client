@@ -12,6 +12,45 @@ const TeacherForm = ({ tracks = [], teacher = {}, isOpen, onClose, fn }) => {
      const [showTrackInput, setShowTrackInput] = useState(false);
      const [loading, setLoading] = useState(false);
 
+     const prefixes = useMemo(() => ([
+          {
+               prefix: "ศาสตราจารย์ ดร. (ศ. ดร.)",
+               value: "ศ. ดร."
+          },
+          {
+               prefix: "รองศาสตราจารย์ ดร. (รศ. ดร.)",
+               value: "รศ. ดร."
+          },
+          {
+               prefix: "ผู้ช่วยศาสตราจารย์ ดร. (ผศ. ดร.)",
+               value: "ผศ. ดร."
+          },
+          {
+               prefix: "ผู้ช่วยศาสตราจารย์ (ผศ.)",
+               value: "ผศ."
+          },
+          {
+               prefix: "อาจารย์ ดร. (อ. ดร.)",
+               value: "อ. ดร."
+          },
+          {
+               prefix: "อาจารย์ (อ.)",
+               value: "อ."
+          },
+          {
+               prefix: "นาย",
+               value: "นาย"
+          },
+          {
+               prefix: "นาง",
+               value: "นาง"
+          },
+          {
+               prefix: "นางสาว",
+               value: "นางสาว"
+          },
+     ]), [])
+
      useEffect(() => {
           if (isOpen) {
                setLoading(true);
@@ -54,7 +93,7 @@ const TeacherForm = ({ tracks = [], teacher = {}, isOpen, onClose, fn }) => {
           }
           const data = { role: "teacher", ...formData }
           console.log(data);
-          
+
           const option = await getOptions("/api/users", "post", data)
           try {
                await axios(option)
@@ -108,15 +147,29 @@ const TeacherForm = ({ tracks = [], teacher = {}, isOpen, onClose, fn }) => {
                                                                       value={formData.email || ""}
                                                                       onChange={(e) => handleInputChange("email", e.target.value)}
                                                                  />
-                                                                 <Input
+                                                                 <Select
                                                                       isRequired
-                                                                      labelPlacement="outside"
-                                                                      classNames={thinInputClass}
+                                                                      className='col-span-3'
+                                                                      variant='bordered'
+                                                                      classNames={{
+                                                                           trigger: "border-1",
+                                                                      }}
+                                                                      name='prefix'
+                                                                      labelPlacement='outside'
                                                                       label="คำนำหน้า"
-                                                                      placeholder="กรอกคำนำหน้า"
-                                                                      value={formData.prefix || ""}
-                                                                      onChange={(e) => handleInputChange("prefix", e.target.value)}
-                                                                 />
+                                                                      placeholder="เลือกคำนำหน้า"
+                                                                      selectedKeys={[formData.prefix || prefixes[0].value]}
+                                                                      onChange={(e) => handleInputChange("prefix", e.target.value || formData.prefix)}
+                                                                      scrollShadowProps={{
+                                                                           isEnabled: false
+                                                                      }}
+                                                                 >
+                                                                      {prefixes.map((prefix) => (
+                                                                           <SelectItem key={prefix.value} value={prefix.value}>
+                                                                                {prefix.prefix}
+                                                                           </SelectItem>
+                                                                      ))}
+                                                                 </Select>
                                                                  <Input
                                                                       isRequired
                                                                       labelPlacement="outside"

@@ -11,6 +11,45 @@ export default function AccountCreationForm({ tracks, programs }) {
      const [formData, setFormData] = useState({});
      const [showTrackInput, setShowTrackInput] = useState(false);
 
+     const prefixes = useMemo(() => ([
+          {
+               prefix: "ศาสตราจารย์ ดร. (ศ. ดร.)",
+               value: "ศ. ดร."
+          },
+          {
+               prefix: "รองศาสตราจารย์ ดร. (รศ. ดร.)",
+               value: "รศ. ดร."
+          },
+          {
+               prefix: "ผู้ช่วยศาสตราจารย์ ดร. (ผศ. ดร.)",
+               value: "ผศ. ดร."
+          },
+          {
+               prefix: "ผู้ช่วยศาสตราจารย์ (ผศ.)",
+               value: "ผศ."
+          },
+          {
+               prefix: "อาจารย์ ดร. (อ. ดร.)",
+               value: "อ. ดร."
+          },
+          {
+               prefix: "อาจารย์ (อ.)",
+               value: "อ."
+          },
+          {
+               prefix: "นาย",
+               value: "นาย"
+          },
+          {
+               prefix: "นาง",
+               value: "นาง"
+          },
+          {
+               prefix: "นางสาว",
+               value: "นางสาว"
+          },
+     ]), [])
+
      const roles = useMemo(() => ([
           { key: "admin", name: "เจ้าหน้าที่" },
           { key: "teacher", name: "อาจารย์" },
@@ -46,6 +85,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                     return (
                          <section className="space-y-9">
                               <Input
+                                   isRequired
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
                                    name='email'
@@ -56,6 +96,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    onChange={(e) => handleInputChange("email", e.target.value)}
                               />
                               <Input
+                                   isRequired
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
                                    name='password'
@@ -65,16 +106,30 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    value={formData.password || ""}
                                    onChange={(e) => handleInputChange("password", e.target.value)}
                               />
-                              <Input
-                                   labelPlacement="outside"
-                                   classNames={thinInputClass}
+                              <Select
+                                   isRequired
+                                   className='col-span-3'
+                                   variant='bordered'
+                                   classNames={{
+                                        trigger: "border-1",
+                                   }}
                                    name='prefix'
+                                   labelPlacement='outside'
                                    label="คำนำหน้า"
-                                   placeholder="กรอกคำนำหน้า"
-                                   value={formData.prefix || ""}
+                                   placeholder="เลือกคำนำหน้า"
                                    onChange={(e) => handleInputChange("prefix", e.target.value)}
-                              />
+                                   scrollShadowProps={{
+                                        isEnabled: false
+                                   }}
+                              >
+                                   {prefixes.map((prefix) => (
+                                        <SelectItem key={prefix.value} value={prefix.value}>
+                                             {prefix.prefix}
+                                        </SelectItem>
+                                   ))}
+                              </Select>
                               <Input
+                                   isRequired
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
                                    name='name'
@@ -84,6 +139,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    onChange={(e) => handleInputChange("name", e.target.value)}
                               />
                               <Input
+                                   isRequired
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
                                    name='surname'
@@ -99,6 +155,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                          <section className="space-y-6">
                               <div className='space-y-9'>
                                    <Input
+                                        isRequired
                                         labelPlacement="outside"
                                         classNames={thinInputClass}
                                         type="email"
@@ -108,16 +165,29 @@ export default function AccountCreationForm({ tracks, programs }) {
                                         value={formData.email || ""}
                                         onChange={(e) => handleInputChange("email", e.target.value)}
                                    />
-                                   <Input
-                                        labelPlacement="outside"
-                                        classNames={thinInputClass}
+                                   <Select
+                                        isRequired
+                                        variant='bordered'
+                                        classNames={{
+                                             trigger: "border-1",
+                                        }}
                                         name='prefix'
+                                        labelPlacement='outside'
                                         label="คำนำหน้า"
-                                        placeholder="กรอกคำนำหน้า"
-                                        value={formData.prefix || ""}
+                                        placeholder="เลือกคำนำหน้า"
                                         onChange={(e) => handleInputChange("prefix", e.target.value)}
-                                   />
+                                        scrollShadowProps={{
+                                             isEnabled: false
+                                        }}
+                                   >
+                                        {prefixes.map((prefix) => (
+                                             <SelectItem key={prefix.value} value={prefix.value}>
+                                                  {prefix.prefix}
+                                             </SelectItem>
+                                        ))}
+                                   </Select>
                                    <Input
+                                        isRequired
                                         labelPlacement="outside"
                                         classNames={thinInputClass}
                                         name='name'
@@ -127,6 +197,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                         onChange={(e) => handleInputChange("name", e.target.value)}
                                    />
                                    <Input
+                                        isRequired
                                         labelPlacement="outside"
                                         classNames={thinInputClass}
                                         name='surname'
@@ -162,6 +233,9 @@ export default function AccountCreationForm({ tracks, programs }) {
                                                   label="แทร็ก"
                                                   placeholder="เลือกแทร็ก"
                                                   onChange={(e) => handleInputChange("track", e.target.value)}
+                                                  scrollShadowProps={{
+                                                       isEnabled: false
+                                                  }}
                                              >
                                                   {trackItems.map((track) => (
                                                        <SelectItem key={track.key} value={track.key}>
@@ -179,6 +253,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                     return (
                          <section className="space-y-9">
                               <Input
+                                   isRequired
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
                                    label="อีเมล"
@@ -189,6 +264,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    onChange={(e) => handleInputChange("email", e.target.value)}
                               />
                               <Input
+                                   isRequired
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
                                    name='std-id'
@@ -198,6 +274,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    onChange={(e) => handleInputChange("stu_id", e.target.value)}
                               />
                               <Input
+                                   isRequired
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
                                    name='name'
@@ -207,6 +284,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    onChange={(e) => handleInputChange("first_name", e.target.value)}
                               />
                               <Input
+                                   isRequired
                                    labelPlacement="outside"
                                    classNames={thinInputClass}
                                    name='surname'
@@ -216,6 +294,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    onChange={(e) => handleInputChange("last_name", e.target.value)}
                               />
                               <Select
+                                   isRequired
                                    variant='bordered'
                                    classNames={{
                                         trigger: "border-1",
@@ -225,6 +304,9 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    label="โครงการ"
                                    placeholder="เลือกโครงการ"
                                    onChange={(e) => handleInputChange("courses_type", e.target.value)}
+                                   scrollShadowProps={{
+                                        isEnabled: false
+                                   }}
                               >
                                    {ctype.map((type) => (
                                         <SelectItem key={type.key} value={type.key}>
@@ -233,6 +315,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    ))}
                               </Select>
                               <Select
+                                   isRequired
                                    variant='bordered'
                                    classNames={{
                                         trigger: "border-1",
@@ -300,7 +383,7 @@ export default function AccountCreationForm({ tracks, programs }) {
                                    label: "!text-xs",
                                    trigger: "border-1 h-10 !text-xs rounded-xl !py-6",
                               }}
-                              label="เลือกโรล"
+                              label="เลือกสิทธิ์การเข้าใช้"
                               placeholder="Choose a role"
                               selectedKeys={[selectedRole || "admin"]}
                               onChange={(e) => handleRoleChange(e.target.value || "admin")}
