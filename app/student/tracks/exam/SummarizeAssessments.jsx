@@ -6,11 +6,11 @@ const BarChart = dynamic(() => import('@/app/components/charts/ApexBarChart'), {
 
 const SummarizeAssessments = ({ next, prev, data }) => {
     const scoreRate = {
-        "5": "มากที่สุด",
-        "4": "มาก",
-        "3": "ปานกลาง",
-        "2": "น้อย",
-        "1": "น้อยที่สุด",
+        "4": "มากที่สุด",
+        "3": "มาก",
+        "2": "ปานกลาง",
+        "1": "น้อย",
+        "0": "น้อยที่สุด",
     }
     const { assessmentScores, trackSummaries } = data;
     const option = useMemo(() => ({
