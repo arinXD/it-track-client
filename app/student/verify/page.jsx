@@ -1005,7 +1005,7 @@ const Page = () => {
 
         // Calculate total credits and grades
         const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject?.credit, 0);
-        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
+        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject?.numericGrade || 0), 0);
         const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
 
         return {
@@ -1118,7 +1118,7 @@ const Page = () => {
 
         // Calculate total credits and grades
         const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject?.credit, 0);
-        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
+        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject?.numericGrade || 0), 0);
         const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
 
         return {
@@ -1232,7 +1232,7 @@ const Page = () => {
 
         // Calculate total credits and grades
         const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject?.credit, 0);
-        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
+        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject?.numericGrade || 0), 0);
         const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
 
         return {
@@ -1287,7 +1287,7 @@ const Page = () => {
 
         // Calculate total credits and grades
         const totalCredits = subjectsWithGrades.reduce((acc, subject) => acc + subject?.credit, 0);
-        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
+        const totalGrades = subjectsWithGrades.reduce((acc, subject) => acc + (subject?.numericGrade || 0), 0);
         const averageGrade = subjectsWithGrades.length ? (totalGrades / totalCredits) : 0;
 
         return {
@@ -1385,7 +1385,7 @@ const Page = () => {
 
         // Calculate total credits, total grades, and average grade
         const totalCredits = subtrack.reduce((acc, subject) => acc + subject?.credit, 0);
-        const totalGrades = subtrack.reduce((acc, subject) => acc + (subject.numericGrade || 0), 0);
+        const totalGrades = subtrack.reduce((acc, subject) => acc + (subject?.numericGrade || 0), 0);
         const averageGrade = totalCredits ? (totalGrades / totalCredits) : 0;
 
         // Calculate missing credits based on the required credits (e.g. 21)
