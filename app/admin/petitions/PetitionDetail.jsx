@@ -107,7 +107,7 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                                                   <div
                                                        className="w-10 h-10 max-lg:hidden"
                                                   />
-                                                  <h1 className="text-2xl ">{petition?.title}</h1>
+                                                  <h1 className="text-2xl">คำร้องการย้ายแทร็ก</h1>
                                              </div>
 
                                              <div className="flex flex-col lg:flex-row justify-start items-start gap-6">
@@ -123,7 +123,7 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                                                   />
                                                   <div
                                                        className="w-full">
-                                                       <div className="flex max-lg:gap-2 flex-col lg:flex-row lg:justify-between items-start lg:items-center">
+                                                       <div className="flex max-md:gap-2 flex-col md:flex-row items-start md:justify-between md:items-center">
                                                             <input type="hidden" name="id" readOnly value={petition?.id} />
                                                             <div className="w-full flex gap-4">
                                                                  <Image
@@ -136,12 +136,12 @@ const PetitionDetail = ({ id, current, isApprovable = false }) => {
                                                                            currentTarget.src = "/image/error_image.png";
                                                                       }}
                                                                  />
-                                                                 <div className="w-full flex flex-col lg:flex-row lg:gap-2 items-start lg:items-center overflow-x-clip">
-                                                                      <p className="w-full font-bold">{petition?.Sender?.Student?.first_name} {petition?.Sender?.Student?.last_name}</p>
-                                                                      <p className="w-full text-sm text-default-400 text-ellipsis">{`<${petition?.Sender?.email}>`}</p>
-                                                                 </div>
+                                                                 <h1 className="flex flex-col lg:flex-row lg:gap-2 items-start lg:items-center">
+                                                                      <span className="font-bold">{petition?.Sender?.Student?.first_name} {petition?.Sender?.Student?.last_name}</span>
+                                                                      <span className="text-sm text-default-400">{`<${petition?.Sender?.email}>`}</span>
+                                                                 </h1>
                                                             </div>
-                                                            <div>
+                                                            <div class="w-full flex justify-start md:justify-end">
                                                                  <div className="flex items-center gap-1">
                                                                       <div className={`rounded-full w-3 h-3 ${petition?.status == 0 ? "bg-yellow-600" : petition?.status == 1 ? "bg-green-600" : "bg-red-600"}`}></div>
                                                                       <p className="text-xs">

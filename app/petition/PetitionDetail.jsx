@@ -134,16 +134,7 @@ const PetitionDetail = ({
                                              onSubmit={handleEdit}>
                                              {/* {JSON.stringify(petition)} */}
                                              <div className="flex justify-start items-start gap-6 mb-2">
-                                                  {isEditing ?
-                                                       <input
-                                                            className="text-2xl border-b pb-1 w-full focus:outline-none"
-                                                            type="text"
-                                                            name="title"
-                                                            value={petition.title}
-                                                            onChange={handleInputChange} />
-                                                       :
-                                                       <h1 className="text-2xl ">{petition?.title}</h1>
-                                                  }
+                                                  <h1 className="text-2xl ">คำร้องการย้ายแทร็ก</h1>
                                              </div>
 
                                              <div className="flex justify-start items-start gap-6">
