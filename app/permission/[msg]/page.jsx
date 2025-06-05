@@ -29,7 +29,7 @@ const PagePermission = async ({ params }) => {
                                     <li><Link href="/" className='underline'>แทร็ก</Link></li>
                                     <li><Link href="/" className='underline'>คัดเลือกแทร็ก</Link></li>
                                     <li><Link href="/" className='underline'>แนะนำแทร็ก</Link></li>
-                                    <li><Link href="/" className='underline'>ตรวจสอบสำเร็จการศึกษา</Link></li>
+                                    {/* <li><Link href="/" className='underline'>ตรวจสอบสำเร็จการศึกษา</Link></li> */}
                                 </ul>
                             </div>
                         </div>

@@ -242,7 +242,7 @@ const StudentTable = ({ email }) => {
                                         </Button>
                                    </Tooltip>
                               </Link>
-                              <Link href={`/admin/students-advisor/verify?std_id=${stu?.stu_id}`} target="_blank">
+                              {/* <Link href={`/admin/students-advisor/verify?std_id=${stu?.stu_id}`} target="_blank">
                                    <Tooltip
                                         content="ตรวจสอบสำเร็จการศึกษา"
                                    >
@@ -255,7 +255,7 @@ const StudentTable = ({ email }) => {
                                              <HiOutlineAcademicCap className="w-5 h-5 text-blue-500" />
                                         </Button>
                                    </Tooltip>
-                              </Link>
+                              </Link> */}
                               <Tooltip
                                    content="ลบออกจากที่ปรึกษา"
                               >

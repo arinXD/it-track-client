@@ -25,7 +25,7 @@ const BreadCrumb = () => {
         "students": "รายชื่อนักศึกษา",
         "restore": "รายการที่ถูกลบ",
         "trackstudent": "รายชื่อนักศึกษาภายในแทร็ก",
-        "verify": "แบบฟอร์มตรวจสอบสำเร็จการศึกษา",
+        // "verify": "แบบฟอร์มตรวจสอบสำเร็จการศึกษา",
         "verify-selection": "อนุมัติสำเร็จการศึกษา",
         "detail": "รายละเอียด",
         "tracks": "แทร็ก",
@@ -40,7 +40,7 @@ const BreadCrumb = () => {
         "teachers": "ข้อมูลอาจารย์",
         "students-advisor": "รายชื่อนักศึกษาในที่ปรึกษา",
         "create-news": "เพิ่มข่าว",
-        "verify-dashboard": "สรุปผลการตรวจสอบสำเร็จการศึกษา",
+        // "verify-dashboard": "สรุปผลการตรวจสอบสำเร็จการศึกษา",
     }
     const url = usePathname();
     const urls = useMemo(() => (url.split("/").filter(e => e)), [url])

@@ -78,14 +78,14 @@ const AdminList = ({ }) => {
                     { href: "/admin/suggest-form", label: "จัดการแบบฟอร์มแนะนำแทร็ก", icon: LuTextSelect },
                ]
           },
-          {
-               title: "ตรวจสอบจบ",
-               links: [
-                    { href: "/admin/verify", label: "แบบฟอร์มตรวจสอบจบการศึกษา", icon: HiOutlineAcademicCap },
-                    { href: "/admin/verify-selection", label: "อนุมัติจบการศึกษา", icon: TbCheckupList },
-                    { href: "/admin/verify-dashboard", label: "สรุปผลตรวจสอบสำเร็จการศึกษา", icon: IoBarChartOutline },
-               ]
-          }
+          // {
+          //      title: "ตรวจสอบจบ",
+          //      links: [
+          //           { href: "/admin/verify", label: "แบบฟอร์มตรวจสอบจบการศึกษา", icon: HiOutlineAcademicCap },
+          //           { href: "/admin/verify-selection", label: "อนุมัติจบการศึกษา", icon: TbCheckupList },
+          //           { href: "/admin/verify-dashboard", label: "สรุปผลตรวจสอบสำเร็จการศึกษา", icon: IoBarChartOutline },
+          //      ]
+          // }
      ]
 
      const categories = useMemo(() => {

@@ -17,7 +17,7 @@ const Footer = () => {
                                    <li><a href="/" className="text-gray-300 hover:text-white transition">หน้าหลัก</a></li>
                                    <li><a href="/tracks" className="text-gray-300 hover:text-white transition">แทร็ก</a></li>
                                    <li><a href="/student/tracks/exam" className="text-gray-300 hover:text-white transition">แนะนำแทร็ก</a></li>
-                                   <li><a href="/student/verify" className="text-gray-300 hover:text-white transition">ตรวจสอบสำเร็จการศึกษา</a></li>
+                                   {/* <li><a href="/student/verify" className="text-gray-300 hover:text-white transition">ตรวจสอบสำเร็จการศึกษา</a></li> */}
                               </ul>
                          </div>
                          <div>

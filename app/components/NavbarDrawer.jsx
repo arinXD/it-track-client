@@ -62,13 +62,13 @@ const SidebarDrawer = () => {
                label: session?.user?.role === "admin" ? "Admin Panel" : "Teacher Panel",
                condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
           },
-          {
-               href: "/student/verify",
-               activeIcon: <HiAcademicCap className="w-5 h-5" />,
-               icon: <HiOutlineAcademicCap className="w-5 h-5" />,
-               label: "ตรวจสอบสำเร็จการศึกษา",
-               condition: session?.user?.role === "student"
-          },
+          // {
+          //      href: "/student/verify",
+          //      activeIcon: <HiAcademicCap className="w-5 h-5" />,
+          //      icon: <HiOutlineAcademicCap className="w-5 h-5" />,
+          //      label: "ตรวจสอบสำเร็จการศึกษา",
+          //      condition: session?.user?.role === "student"
+          // },
           {
                href: "/tracks",
                activeIcon: <HiUserGroup className="w-5 h-5" />,
@@ -103,11 +103,11 @@ const SidebarDrawer = () => {
                label: "Admin Panel",
                condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
           },
-          {
-               href: "/student/verify",
-               label: "ตรวจสอบสำเร็จการศึกษา",
-               condition: session?.user?.role === "student"
-          },
+          // {
+          //      href: "/student/verify",
+          //      label: "ตรวจสอบสำเร็จการศึกษา",
+          //      condition: session?.user?.role === "student"
+          // },
           {
                href: "/tracks",
                label: "แทร็ก",

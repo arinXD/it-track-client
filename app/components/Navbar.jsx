@@ -37,11 +37,11 @@ const Navbar = () => {
             label: session?.user?.role === "admin" ? "Admin Panel" : "Teacher Panel",
             condition: session?.user?.role === "admin" || session?.user?.role === "teacher"
         },
-        {
-            href: "/student/verify",
-            label: "ตรวจสอบสำเร็จการศึกษา",
-            condition: session?.user?.role === "student"
-        },
+        // {
+        //     href: "/student/verify",
+        //     label: "ตรวจสอบสำเร็จการศึกษา",
+        //     condition: session?.user?.role === "student"
+        // },
         {
             href: "/tracks",
             label: "แทร็ก",

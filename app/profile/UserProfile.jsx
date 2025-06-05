@@ -62,9 +62,9 @@ const UserProfile = ({ userData, tracks }) => {
 
      useEffect(() => {
           if (Admin) {
-               setPrefix(Admin.prefix)
+               setPrefix(Admin?.prefix)
           } else {
-               setPrefix(Teacher.prefix)
+               setPrefix(Teacher?.prefix)
           }
      }, [role])
 
@@ -297,8 +297,8 @@ const UserProfile = ({ userData, tracks }) => {
                                                   labelPlacement='outside'
                                                   label="คำนำหน้า"
                                                   placeholder="เลือกคำนำหน้า"
-                                                  selectedKeys={[prefix || Teacher.prefix]}
-                                                  onChange={(e) => setPrefix(e.target.value || Teacher.prefix)}
+                                                  selectedKeys={[prefix || Teacher?.prefix]}
+                                                  onChange={(e) => setPrefix(e.target.value || Teacher?.prefix)}
                                                   scrollShadowProps={{
                                                        isEnabled: false
                                                   }}
