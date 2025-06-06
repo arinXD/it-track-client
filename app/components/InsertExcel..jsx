@@ -72,7 +72,7 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
 
                          if (filteredData.length > 1) {
                               const headers = isFileFromREG ?
-                                   ["No.", "STUDENTCODE", "STUDENTNAME", "KKUMAIL", "PROGRAM"] :
+                                   ["STUDENTCODE", "STUDENTNAME", "KKUMAIL", "PROGRAM"] :
                                    filteredData[0];
                               const rows = filteredData.slice(1);
 
@@ -88,8 +88,8 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                                              return {}
                                         }
                                    } else {
+                                        console.log(rowData);
                                         return rowData;
-
                                    }
                               }));
 
