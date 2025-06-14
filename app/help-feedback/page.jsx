@@ -10,7 +10,7 @@ const ContactInfo = ({ name, facebookUrl, email }) => {
                     <IoLogoFacebook className='text-blue-700 w-5 h-5' />
                     <Link
                          className="text-blue-500 hover:underline"
-                         href={facebookUrl}
+                         href="#"
                          target='_blank'
                          rel="noopener noreferrer"
                     >
@@ -21,7 +21,7 @@ const ContactInfo = ({ name, facebookUrl, email }) => {
                     <BiLogoGmail className='text-red-700 w-5 h-5' />
                     <Link
                          className="text-blue-500 hover:underline"
-                         href={`https://mail.google.com/mail/?view=cm&fs=1&to=${email}&authuser=1`}
+                         href="#"
                          target='_blank'
                          rel="noopener noreferrer"
                     >
@@ -43,14 +43,9 @@ const Page = async () => {
                     <h1 className='text-2xl font-bold mb-6'>ข้อมูลส่วนตัวผิดพลาด แจ้งปัญหาได้ที่</h1>
                     <div className='space-y-4'>
                          <ContactInfo
-                              name="เจ้าหน้าที่ 1"
-                              facebookUrl="https://www.facebook.com/admin1"
-                              email="admin1k@kkumail.com"
-                         />
-                         <ContactInfo
-                              name="เจ้าหน้าที่ 2"
-                              facebookUrl="https://www.facebook.com/admin2"
-                              email="admin2@kkumail.com"
+                              name="-"
+                              facebookUrl="-"
+                              email="-"
                          />
                     </div>
                </ContentWrap>
