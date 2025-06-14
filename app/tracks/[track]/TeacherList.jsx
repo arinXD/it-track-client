@@ -35,7 +35,7 @@ const TeacherList = ({ teachers }) => {
                                         height={800}
                                         src={teacher?.TeacherTrack?.image || ""}
                                         alt={teacher?.name}
-                                        className="rounded-md w-[120px] h-[120px] md:w-[150px] md:h-[150px] lg:w-[180px] lg:h-[180px]"
+                                        className="rounded-md w-[120px] h-[120px] md:w-[150px] md:h-[150px] lg:w-[180px] lg:h-[180px] object-cover"
                                         onError={({ currentTarget }) => {
                                             currentTarget.onerror = null;
                                             currentTarget.src = "/image/error_image.png";
