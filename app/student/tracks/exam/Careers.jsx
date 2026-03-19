@@ -1,8 +1,7 @@
 "use client"
-import Image from "next/image"
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { useCallback, useState } from "react";
-import { Tooltip } from "antd";
+import { Image } from 'antd'
 import { MdOutlineQuestionMark } from "react-icons/md";
 import { Popover, PopoverTrigger, PopoverContent, Button } from "@nextui-org/react";
 import dynamic from "next/dynamic";
@@ -53,7 +52,7 @@ const Careers = ({ next, prev, careers, setCareers, allCareers, }) => {
                                         onClick={() => handleSelectCareer(career.id)}
                                         className={`relative flex flex-col justify-center items-center ${careers.includes(career.id) && "!border-blue-700"} text-center h-full border-2 p-4 rounded-[5px] cursor-pointer hover:border-blue-500/50 focus:scale-95 active:scale-95`}
                                    >
-                                        <img
+                                        <Image
                                              src={career.image}
                                              width={120}
                                              height={120}
