@@ -84,7 +84,7 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                                    if (isFileFromREG) {
                                         if (Object.values(rowData).filter(val => val).length === headers.length) {
                                              return rowData;
-                                        }else{
+                                        } else {
                                              return {}
                                         }
                                    } else {
@@ -302,6 +302,60 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                     className="App"
                     onDragOver={(e) => e.preventDefault()}
                >
+                    <details className="group mb-4 rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                         <summary className="flex items-center justify-between cursor-pointer select-none bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-3 text-white font-semibold tracking-wide list-none [&::-webkit-details-marker]:hidden">
+                              <span>คำแนะนำในการเตรียมไฟล์</span>
+                              <svg
+                                   className="w-5 h-5 transition-transform duration-300 group-open:rotate-180"
+                                   fill="none"
+                                   stroke="currentColor"
+                                   viewBox="0 0 24 24"
+                              >
+                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                         </summary>
+                         <table className="w-full text-sm text-left">
+                              <thead>
+                                   <tr className="bg-gray-50 border-b border-gray-200">
+                                        <th className="px-4 py-2.5 font-semibold text-gray-700 text-xs uppercase tracking-wider">ชื่อคอลัมน์</th>
+                                        <th className="px-4 py-2.5 font-semibold text-gray-700 text-xs uppercase tracking-wider">คำอธิบาย</th>
+                                        <th className="px-4 py-2.5 font-semibold text-gray-700 text-xs uppercase tracking-wider">ตัวอย่าง</th>
+                                   </tr>
+                              </thead>
+                              <tbody className="divide-y divide-gray-100">
+                                   {headers.map((header) => {
+                                        const items = header.items.map((item, itemIndex) => (
+                                             <tr key={`item-${itemIndex}`} className="hover:bg-gray-50 transition-colors duration-150 even:bg-gray-50/50">
+                                                  <td className="px-4 py-2.5">
+                                                       <div className="flex items-center gap-1">
+                                                            {item?.required ? <span className="text-red-500 text-xs font-bold">*</span> : <span className="w-2"></span>}
+                                                            <span className="text-gray-800 font-medium">{item.label}</span>
+                                                       </div>
+                                                  </td>
+                                                  <td className="px-4 py-2.5 text-gray-600">{item.desc}</td>
+                                                  <td className="px-4 py-2.5">
+                                                       {item.example && <code className="text-xs bg-gray-100 text-blue-600 px-2 py-0.5 rounded-md font-mono">{item.example}</code>}
+                                                  </td>
+                                             </tr>
+                                        ))
+                                        const row = (
+                                             <>
+                                                  <tr key={header.groupTitle}>
+                                                       <td
+                                                            colSpan={3}
+                                                            className="px-4 py-2.5 font-semibold text-blue-700 text-xs uppercase tracking-wider bg-gray-200"
+                                                       >
+                                                            {header.groupTitle}
+                                                       </td>
+                                                  </tr>
+                                                  {items}
+                                             </>
+                                        )
+                                        return row;
+                                   })}
+                              </tbody>
+                         </table>
+                    </details>
                     <div className={`drop-container ${data.length == 0 ? "flex" : "!hidden"}`} id="dropcontainer">
                          {!uploadingFile ?
                               <>
@@ -341,29 +395,6 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                     )}
                     {data.length > 0 && (
                          <section>
-                              <div className="flex flex-col mb-4">
-                                   <h1 className="text-xs mb-2">ข้อมูลที่ต้องการ ( <span className="text-red-500">*</span> หมายถึงจำเป็นต้องมี )</h1>
-                                   <div className={`grid grid-cols-3 gap-4`}>
-                                        {headers.map((header, index) => (
-                                             <div key={index} className="w-full border rounded-md p-2 col-span-3 lg:col-span-1 text-sm text-left rtl:text-right text-gray-500">
-                                                  <div>
-                                                       <p className="text-black mb-1 text-sm">{header.groupTitle}</p>
-                                                       <ul>
-                                                            {header.items.map(item => (
-                                                                 <li key={`header-${item.label}`} scope="col" className="">
-                                                                      <p className="flex gap-1">
-                                                                           {item?.required ? <span className="text-red-500 w-2">*</span> : <span className="w-2"></span>}
-                                                                           <span className="text-black">{item.label}</span>
-                                                                           <span className="text-default-800"> ({item.desc})</span>
-                                                                      </p>
-                                                                 </li>
-                                                            ))}
-                                                       </ul>
-                                                  </div>
-                                             </div>
-                                        ))}
-                                   </div>
-                              </div>
                               <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
                                    <div className="flex justify-start w-full">
                                         <div className="flex justify-center items-center rounded-e-none py-2 px-3 text-sm text-gray-900 rounded-lg bg-gray-100">
