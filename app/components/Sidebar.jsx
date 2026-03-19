@@ -1,7 +1,8 @@
 'use client';
+import pkg from '@/package.json';
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
-import { HiOutlineUserGroup, HiUserGroup, HiAcademicCap, HiOutlineAcademicCap } from "react-icons/hi2";
+import { HiOutlineUserGroup, HiUserGroup } from "react-icons/hi2";
 import { GoHome, GoHomeFill } from "react-icons/go";
 import { MdAdminPanelSettings, MdOutlineAdminPanelSettings, MdOutlineQuiz, MdQuiz } from "react-icons/md";
 import { useSession } from "next-auth/react"
@@ -9,6 +10,8 @@ import { AiFillEdit, AiOutlineEdit } from 'react-icons/ai';
 import { useToggleSideBarStore } from '@/src/store';
 import { Tooltip } from 'antd';
 import { useMemo } from 'react';
+
+const { version } = pkg;
 
 const SidebarLink = ({ href, activeIcon, icon, label, isActive, toggleSideBar }) => (
     <Tooltip placement="right" title={!toggleSideBar && label}>
@@ -76,11 +79,11 @@ const Sidebar = () => {
         <aside
             style={{ top: "65px" }}
             id="default-sidebar"
-            className={`border-r border-r-gray-200/80 fixed top-16 left-0 z-50 ${toggleSideBar ? "w-[240px]" : ""} h-screen transition-transform -translate-x-full md:translate-x-0`}
+            className={`border-r border-r-gray-200/80 fixed top-16 left-0 z-50 ${toggleSideBar ? "w-[240px]" : ""} h-[calc(100vh-65px)] transition-transform -translate-x-full md:translate-x-0`}
             aria-label="Sidebar"
         >
-            <div className="h-full px-4 py-4 overflow-y-auto bg-white">
-                <ul className="font-medium space-y-1">
+            <div className="h-full px-4 py-4 overflow-y-auto bg-white flex flex-col">
+                <ul className="font-medium space-y-1 flex-1">
                     {links.map((link, index) => {
                         if (!link.condition) return null;
                         const isActive = url === link.href || (url.startsWith("/admin") && link.href.includes("/admin"));
@@ -98,6 +101,11 @@ const Sidebar = () => {
                         );
                     })}
                 </ul>
+                <div className="pt-4 border-t border-gray-100 mt-4">
+                    <p className={`text-gray-400 text-[11px] text-center`}>
+                        {toggleSideBar ? `Version ${version}` : `v${version}`}
+                    </p>
+                </div>
             </div>
         </aside>
     );

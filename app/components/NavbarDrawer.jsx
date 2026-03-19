@@ -1,4 +1,5 @@
 'use client';
+import pkg from '@/package.json';
 import { useCallback, useMemo, useState } from 'react'
 import { signOut } from "next-auth/react"
 import Image from 'next/image'
@@ -21,6 +22,8 @@ import { Drawer } from 'antd';
 import Notification from './Notification';
 import { DROPDOWN_MENU_CLASS } from '@/src/util/ComponentClass';
 import { FaHistory } from 'react-icons/fa';
+
+const { version } = pkg;
 
 const SidebarLink = ({ href, activeIcon, icon, label, isActive, closeDrawer }) => (
      <Link
@@ -283,11 +286,12 @@ const SidebarDrawer = () => {
                     crawl={true}
                />
                <Drawer
-                    width={240}
-                    placement={"left"}
-                    closable={false}
-                    onClose={closeDrawer}
-                    open={open}>
+                     width={240}
+                     placement={"left"}
+                     closable={false}
+                     onClose={closeDrawer}
+                     open={open}
+                     styles={{ body: { padding: 0, display: 'flex', flexDirection: 'column' } }}>
                     <div className="px-2 z-50 relative bg-white/60 backdrop-blur-md shadow-sm">
                          <div className='relative h-16 flex items-center justify-between p-2'>
                               <div className="flex flex-1 items-center justify-start gap-0">
@@ -308,24 +312,32 @@ const SidebarDrawer = () => {
                               </div>
                          </div>
                     </div>
-                    <ul className="p-4 font-medium space-y-1">
-                         {linksSidebar.map((link, index) => {
-                              if (!link.condition) return null;
-                              const isActive = url === link.href || (url.startsWith("/admin") && link.href.includes("/admin"));
-                              return (
-                                   <li key={index}>
-                                        <SidebarLink
-                                             href={link.href}
-                                             activeIcon={link.activeIcon}
-                                             icon={link.icon}
-                                             label={link.label}
-                                             isActive={isActive}
-                                             closeDrawer={closeDrawer}
-                                        />
-                                   </li>
-                              );
-                         })}
-                    </ul>
+                    <div className="flex-1 px-4 py-4 overflow-y-auto">
+                         <ul className="font-medium space-y-1">
+                              {linksSidebar.map((link, index) => {
+                                   if (!link.condition) return null;
+                                   const isActive = url === link.href || (url.startsWith("/admin") && link.href.includes("/admin"));
+                                   return (
+                                        <li key={index}>
+                                             <SidebarLink
+                                                  href={link.href}
+                                                  activeIcon={link.activeIcon}
+                                                  icon={link.icon}
+                                                  label={link.label}
+                                                  isActive={isActive}
+                                                  closeDrawer={closeDrawer}
+                                             />
+                                        </li>
+                                   );
+                              })}
+                         </ul>
+                    </div>
+                    <hr className='border-t border-gray-100 mx-4' />
+                    <div className="px-4 py-3">
+                         <p className="text-gray-400 text-[11px] text-center">
+                              {`Version ${version}`}
+                         </p>
+                    </div>
                </Drawer>
                <div className="px-2 z-50 relative bg-white/80 backdrop-blur-md shadow-sm">
                     <div className="relative flex h-16 items-center justify-between p-2">
