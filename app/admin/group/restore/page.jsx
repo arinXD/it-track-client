@@ -63,11 +63,7 @@ export default function RestoreProgramCode() {
             const option = await getOptions(URL, "GET");
             const response = await axios(option);
             const g = response.data.data;
-
-            console.log(g);
-
             setRestores(g);
-
         } catch (error) {
             console.log("fetch error:", error);
         }

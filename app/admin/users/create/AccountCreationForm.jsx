@@ -351,8 +351,6 @@ export default function AccountCreationForm({ tracks, programs }) {
                return;
           }
           if (selectedRole === "student" && (!formData.stu_id || !formData.courses_type || !formData.program)) {
-               console.log(formData);
-
                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
                return;
           }

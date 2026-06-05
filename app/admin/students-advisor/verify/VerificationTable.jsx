@@ -185,7 +185,6 @@ const VerificationTable = ({ stdID }) => {
                const option = await getOptions(URL, "GET");
                const response = await axios(option);
                const data = response.data.data;
-               console.log(data);
 
                setUserData(data);
 

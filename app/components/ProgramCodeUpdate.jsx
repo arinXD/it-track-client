@@ -78,7 +78,6 @@ export default function ProgramCodeUpdate({ isOpen, onClose, onUpdate, programCo
 
                 const selectedAcadyear = acadyearOptions.find(option => option.value === data?.version);
                 setSelectedAcadyears(selectedAcadyear);
-                console.log(selectedAcadyear);
 
             } catch (error) {
                 console.error('Error fetching program code:', error);

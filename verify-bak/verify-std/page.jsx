@@ -472,8 +472,6 @@ const Page = () => {
                 }, {});
 
                 const categoryData = Object.values(subjectsByCategory);
-                console.log(categoryData);
-
                 setCategoryData(categoryData);
 
 

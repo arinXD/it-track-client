@@ -116,9 +116,6 @@ const Page = () => {
             const option = await getOptions(URL, "GET");
             const response = await axios(option);
             const pro = response.data.data;
-
-            console.log(pro);
-
             setPrograms(pro);
 
         } catch (error) {

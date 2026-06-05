@@ -66,7 +66,6 @@ const PetitionDetail = ({
           e.preventDefault()
           const formData = new FormData(e.target);
           const formDataObject = Object.fromEntries(formData.entries());
-          console.log(formDataObject);
 
           if (Object.values(formDataObject).filter(value => !value).length > 0) {
                message.error("กรอกข้อมูลให้ครบทุกช่อง")

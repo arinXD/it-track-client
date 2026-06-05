@@ -30,7 +30,6 @@ const VerifyEmail = ({ decoded }) => {
                 // console.log(res.data);
             }).catch(err => {
                 const data = err.response.data
-                console.log(data);
                 if (data.verified) {
                     Router.push("/")
                     Router.refresh()

@@ -48,7 +48,6 @@ const Page = () => {
      useEffect(() => {
           const stuId = session?.user?.stu_id
           if (stuId != undefined && !oldTrack) {
-               console.log(stuId);
                init(stuId)
           }
      }, [session?.user?.stu_id, oldTrack])

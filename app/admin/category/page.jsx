@@ -67,9 +67,7 @@ export default function Category() {
 
             setCategories(cat);
 
-        } catch (error) {
-            console.log("fetch error:", error);
-        }
+        } catch (error) {}
     }, []);
 
     useEffect(() => {

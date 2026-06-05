@@ -89,8 +89,6 @@ const Page = () => {
             const response = await axios(option);
             const data = response.data.data;
 
-            console.log(data);
-
             setVerifyByAdmin(data);
 
         } catch (error) {

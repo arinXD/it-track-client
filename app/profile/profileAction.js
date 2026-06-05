@@ -7,7 +7,6 @@ export async function updateTeacherData(formData) {
      const formDataObj = {};
      formData.forEach((value, key) => (formDataObj[key] = value));
      formDataObj.track = formDataObj.track || null
-     console.log(formDataObj);
      
      const option = await getOptions("/api/users", "post", formDataObj)
      try {

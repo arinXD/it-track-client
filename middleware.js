@@ -34,7 +34,6 @@ export default async function middleware(req, event) {
         if (path.startsWith("/student") && !["student", ...accessRoles].includes(userRole)) {
             return NextResponse.rewrite(new URL("/permission/kkumail.com", req.url));
         }
-        console.log(path);
         if (studentPaths.includes(path) && accessRoles.includes(userRole)) {
             return NextResponse.rewrite(new URL("/permission/Student-account", req.url));
         }

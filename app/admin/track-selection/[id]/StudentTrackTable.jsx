@@ -110,11 +110,6 @@ const StudentTrackTable = ({
                 const orderedSelectionDetails = subjects
                     .map(sbj => student?.SelectionDetails?.find(detail => detail?.Subject?.subject_code === sbj?.uid))
                     .filter(Boolean);
-                console.log(subjects);
-                console.log('new order');
-                console.log(orderedSelectionDetails);
-                
-
                 orderedSelectionDetails.forEach(element => {
                     const g = {}
                     g[element?.Subject?.subject_code] = element.grade

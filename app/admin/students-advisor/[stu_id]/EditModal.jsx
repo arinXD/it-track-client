@@ -180,7 +180,6 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
 
         try {
             const token = await getToken()
-            console.log(formData);
             const options = {
                 url: `${hostname}/api/students/${stu_id}`,
                 method: 'PUT',

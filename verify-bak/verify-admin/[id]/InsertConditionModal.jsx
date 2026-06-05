@@ -67,8 +67,6 @@ export default function InsertConditionModal({ isOpen, onClose, verify_id, onDat
         }
     }, []);
 
-    console.log(conditionCategory);
-
 
     const fetchConditions = useCallback(async (verifyId) => {
         // console.log(verifyId);

@@ -332,7 +332,6 @@ const Page = () => {
     const removeStatusFilter = useCallback((id) => {
         setStatusFilter((prev) => {
             const newStatusFilter = [...prev]
-            console.log(id, newStatusFilter);
             const index = newStatusFilter.indexOf(String(id));
             if (index > -1) {
                 newStatusFilter.splice(index, 1)

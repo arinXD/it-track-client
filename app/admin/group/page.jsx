@@ -65,9 +65,6 @@ export default function Group() {
             const option = await getOptions(URL, "GET");
             const response = await axios(option);
             const g = response.data.data;
-
-            console.log(g);
-
             setGroups(g);
 
         } catch (error) {

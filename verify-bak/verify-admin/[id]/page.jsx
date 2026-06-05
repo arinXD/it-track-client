@@ -367,7 +367,6 @@ const Page = ({ params }) => {
 
      const handleDeleteSemi = async (sgt, idtest, semiId) => {
           // console.log(`Deleting SubGroupSubjectAndTrack with id: ${sgt}`);
-          console.log(semiId);
 
 
           const url = `/api/verify/semisubgroup/${sgt}/${idss}`

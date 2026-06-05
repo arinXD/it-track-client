@@ -73,8 +73,6 @@ export function simpleDMYHM(date) {
 }
 export function simpleDMY(date) {
      if(!date) return ""
-     console.log(date);
-     
      const { day, thaiMonth, year } = getDateProperty(date)
      return `${day} ${thaiMonth} ${year}`;
 }

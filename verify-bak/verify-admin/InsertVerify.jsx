@@ -95,7 +95,6 @@ export default function InsertVerify({ isOpen, onClose, onDataInserted }) {
                 if (prevTitle.includes(acadValue)) {
                     prevTitle = prevTitle.replace(new RegExp(acadValue, 'g'), newAcad);
                     prevTitle = prevTitle.replace(new RegExp(lastValue, 'g'), lastAcad);
-                    console.log(prevTitle);
                     return prevTitle;
                 } else {
                     return prevTitle + " " + newAcad;

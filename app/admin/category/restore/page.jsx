@@ -67,9 +67,7 @@ export default function RestoreProgramCode() {
 
             setRestores(cat);
 
-        } catch (error) {
-            console.log("fetch error:", error);
-        }
+        } catch (error) {}
     }, []);
 
     useEffect(() => {

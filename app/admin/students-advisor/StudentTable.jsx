@@ -103,7 +103,6 @@ const StudentTable = ({ email }) => {
                     };
                     return order[a.courses_type] - order[b.courses_type];
                });
-               console.log(students);
                setStudents(students);
           } catch (error) {
                setStudents([]);
@@ -165,7 +164,6 @@ const StudentTable = ({ email }) => {
                     Array.from(statusFilter).includes(String(stu.status_code)),
                );
           }
-          console.log(filteredUsers);
           return filteredUsers;
      }, [students, filterValue, statusFilter]);
 
@@ -181,7 +179,6 @@ const StudentTable = ({ email }) => {
 
      // Sorting data
      const sortedItems = useMemo(() => {
-          console.log(items);
           return [...items].sort((a, b) => {
                const first = a[sortDescriptor.column];
                const second = b[sortDescriptor.column];
