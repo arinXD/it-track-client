@@ -185,6 +185,9 @@ const Page = ({ params }) => {
                     announcementDate,
                     has_finished: hasFinished,
                 }
+                console.log(startAt);
+                console.log(expiredAt);
+                
                 const options = await getOptions(url, "PUT", data)
                 try {
                     const result = await axios(options)
