@@ -146,9 +146,9 @@ const Page = ({ params }) => {
     useEffect(() => {
         if (Object.keys(trackSelect).length > 0) {
             setTitle(trackSelect.title)
-            setStartAt(format(new Date(trackSelect?.startAt), 'yyyy-MM-dd HH:mm'))
-            setExpiredAt(format(new Date(trackSelect?.expiredAt), 'yyyy-MM-dd HH:mm'))
-            const announcement = trackSelect?.announcementDate ? moment(trackSelect?.announcementDate).format('YYYY-MM-DD HH:mm') : null
+            setStartAt(format(new Date(trackSelect?.startAt), "yyyy-MM-dd'T'HH:mm"))
+            setExpiredAt(format(new Date(trackSelect?.expiredAt), "yyyy-MM-dd'T'HH:mm"))
+            const announcement = trackSelect?.announcementDate ? moment(trackSelect?.announcementDate).format('YYYY-MM-DDTHH:mm') : null
             setAnnouncementDate(announcement)
             setHasFinished(trackSelect.has_finished)
 
@@ -180,9 +180,9 @@ const Page = ({ params }) => {
                 const url = `/api/tracks/selects/${id}`
                 const data = {
                     title,
-                    startAt,
-                    expiredAt,
-                    announcementDate,
+                    startAt: new Date(startAt),
+                    expiredAt: new Date(expiredAt),
+                    announcementDate: announcementDate ? new Date(announcementDate) : null,
                     has_finished: hasFinished,
                 }
                 console.log(startAt);
@@ -275,9 +275,9 @@ const Page = ({ params }) => {
 
     const handleUnsave = useCallback(function () {
         setTitle(trackSelect.title)
-        setStartAt(moment(trackSelect.startAt).format('YYYY-MM-DD HH:mm'))
-        setExpiredAt(moment(trackSelect.expiredAt).format('YYYY-MM-DD HH:mm'))
-        const announcement = trackSelect.announcementDate ? moment(trackSelect.announcementDate).format('YYYY-MM-DD HH:mm') : null
+        setStartAt(moment(trackSelect.startAt).format('YYYY-MM-DDTHH:mm'))
+        setExpiredAt(moment(trackSelect.expiredAt).format('YYYY-MM-DDTHH:mm'))
+        const announcement = trackSelect.announcementDate ? moment(trackSelect.announcementDate).format('YYYY-MM-DDTHH:mm') : null
         setAnnouncementDate(announcement)
         document.querySelector("#announcementDate").value = null
         setHasFinished(trackSelect.has_finished)
