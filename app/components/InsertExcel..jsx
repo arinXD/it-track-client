@@ -172,8 +172,7 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                          if (formattedData.length <= 250) {
                               options.data = formattedData
                               try {
-                                   return
-                                   // const result = await axios(options)
+                                   const result = await axios(options)
                                    const { message: msg } = result.data
                                    message.success(msg);
                               } catch (error) {
