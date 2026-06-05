@@ -88,7 +88,6 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                                              return {}
                                         }
                                    } else {
-                                        console.log(rowData);
                                         return rowData;
                                    }
                               }));
@@ -124,7 +123,6 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                const start = i * batchSize;
                const end = Math.min((i + 1) * batchSize, formattedData.length);
                const chunk = formattedData.slice(start, end);
-               console.log(chunk);
                const requestOptions = { ...options, data: chunk };
                batchPromises.push(axios(requestOptions));
           }
@@ -153,6 +151,7 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                let formattedData = data.map(row => {
                     const formattedRow = {};
                     displayHeaders.forEach((header, index) => {
+                         if (!header) return;
                          const headerTrim = header.trim()
                          formattedRow[headerTrim] = row[originalHeaders[index]];
                     });
@@ -165,7 +164,6 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                          Object.entries(row).map(([key, value]) => [key.toLowerCase(), value])
                     );
                });
-               console.log(formattedData);
 
                try {
                     const { status, options } = await hook(formattedData)
@@ -174,7 +172,8 @@ const InsertExcel = ({ headers, hook, templateFileName, startRow = 0, isFileFrom
                          if (formattedData.length <= 250) {
                               options.data = formattedData
                               try {
-                                   const result = await axios(options)
+                                   return
+                                   // const result = await axios(options)
                                    const { message: msg } = result.data
                                    message.success(msg);
                               } catch (error) {
