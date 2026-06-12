@@ -93,6 +93,9 @@ const Page = ({ params }) => {
             // moment.tz.setDefault('Asia/Bangkok');
             const option = await getOptions(`/api/tracks/selects/${id}/subjects/students`, "GET")
             const result = (await axios(option)).data.data
+            if (result && Array.isArray(result.Selections)) {
+                result.Selections = result.Selections.filter(select => select?.Student);
+            }
             setTrackSelect(result)
             setTrackSubj(result?.Subjects)
         } catch (err) {
