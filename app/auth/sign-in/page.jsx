@@ -7,7 +7,7 @@ import { thinInputClass } from '@/src/util/ComponentClass';
 import { Button, Input, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
 import { message } from 'antd';
 import { FaInfoCircle } from 'react-icons/fa';
-import Image from 'next/image';
+import Maintenance from '@/app/components/Maintenance';
 
 const Page = () => {
     const searchParams = useSearchParams()
@@ -66,6 +66,11 @@ const Page = () => {
             message.error(searchParams.get('error'))
         }
     }, [])
+
+    const isMaintenance = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true';
+    if (isMaintenance) {
+        return <Maintenance />;
+    }
 
     return (
         <section className="absolute w-full p-5 max-h-full max-w-full h-[calc(100%)]">

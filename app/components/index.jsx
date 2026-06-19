@@ -26,9 +26,12 @@ import ProgramCodeInsert from "./ProgramCodeInsert"
 import ProgramCodeUpdate from "./ProgramCodeUpdate"
 import Loading from "./Loading"
 import BreadCrumb from "./BreadCrumb"
+import Maintenance from "./Maintenance"
+
 export {
     Loading,
     BreadCrumb,
+    Maintenance,
     ContentWrap,
     VerifyLogin,
     VerifyEmail,
@@ -52,5 +55,4 @@ export {
     ProgramCodeUpdate,
     SubjectInsert,
     SubjectUpdate
-
 }
