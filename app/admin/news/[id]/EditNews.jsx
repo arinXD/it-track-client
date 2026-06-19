@@ -32,7 +32,9 @@ const EditNews = ({ id }) => {
 
      const fetchNewsDetails = async () => {
           try {
-               const response = await axios.get(`${hostname}/api/news/${id}`);
+               const response = await axios.get(`${hostname}/api/news/${id}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+               });
                const newsData = response.data;
                form.setFieldsValue({
                     title: newsData.title,
@@ -100,7 +102,10 @@ const EditNews = ({ id }) => {
 
           try {
                await axios.put(`${hostname}/api/news/${id}`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
+                    headers: { 
+                         'Content-Type': 'multipart/form-data',
+                         'ngrok-skip-browser-warning': 'true'
+                    },
                });
                message.success('News updated successfully');
                setTimeout(() => {

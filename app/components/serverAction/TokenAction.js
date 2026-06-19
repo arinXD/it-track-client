@@ -34,6 +34,7 @@ export async function getOptions(url, method = "GET", data = {}) {
             'Accept': 'application/json',
             'authorization': `${token}`,
             'Content-Type': 'application/json;charset=UTF-8',
+            'ngrok-skip-browser-warning': 'true',
         },
         withCredentials: true,
         data

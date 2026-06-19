@@ -16,6 +16,7 @@ export async function createAcadYear(formData) {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
                 "authorization": `${token}`,
+                'ngrok-skip-browser-warning': 'true',
             },
             data: {
                 acadyear: acadyearArr
@@ -45,6 +46,7 @@ export async function updateAcadYear(formData) {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
                 "authorization": `${token}`,
+                'ngrok-skip-browser-warning': 'true',
             },
             data: {
                 acadyear
@@ -64,6 +66,7 @@ export async function destroyAcadYear(id) {
         const result = await axios.delete(`${hostname}/api/acadyear/${id}`, {
             headers: {
                 "authorization": `${token}`,
+                'ngrok-skip-browser-warning': 'true',
             },
         });
         revalidatePath("/admin/acadyears");
@@ -84,6 +87,7 @@ export async function destroyMultipleAcadYear(formData) {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
                 "authorization": `${token}`,
+                'ngrok-skip-browser-warning': 'true',
             },
             data: {
                 acadyears: formData

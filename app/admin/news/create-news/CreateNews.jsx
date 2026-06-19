@@ -82,7 +82,10 @@ const CreateNews = () => {
 
           try {
                await axios.post(`${hostname}/api/news/`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
+                    headers: { 
+                         'Content-Type': 'multipart/form-data',
+                         'ngrok-skip-browser-warning': 'true'
+                    },
                });
                setTimeout(() => {
                     window.location.href = "/admin/news"

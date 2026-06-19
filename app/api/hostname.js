@@ -1,3 +1,8 @@
+import axios from 'axios';
+
+// Skip ngrok/Cloudflare browser warning page for all axios requests
+axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'true';
+
 const STAGE = process.env.NEXT_PUBLIC_STAGE
 const HOSTNAME_STAGES = {
     dev: process.env.NEXT_PUBLIC_BACKEND_API_DEV,

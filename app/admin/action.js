@@ -10,6 +10,7 @@ export async function fetchData(url) {
             headers: {
                 'Content-Type': 'application/json',
                 'authorization': `${token}`,
+                'ngrok-skip-browser-warning': 'true',
             },
             withCredentials: true,
             signal: AbortController.signal
@@ -31,6 +32,7 @@ export async function fetchDataObj(url) {
             headers: {
                 'Content-Type': 'application/json',
                 'authorization': `${token}`,
+                'ngrok-skip-browser-warning': 'true',
             },
             withCredentials: true,
         })

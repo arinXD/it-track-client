@@ -25,7 +25,8 @@ const handler = NextAuth({
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
-                            'Content-Type': 'application/json;charset=UTF-8'
+                            'Content-Type': 'application/json;charset=UTF-8',
+                            'ngrok-skip-browser-warning': 'true'
                         },
                         withCredentials: true,
                         data: {
@@ -62,6 +63,7 @@ const handler = NextAuth({
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json;charset=UTF-8',
+                        'ngrok-skip-browser-warning': 'true',
                     },
                     withCredentials: true,
                     data: credentials
@@ -108,6 +110,7 @@ const handler = NextAuth({
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json;charset=UTF-8',
+                        'ngrok-skip-browser-warning': 'true',
                     },
                     withCredentials: true,
                     data: {

@@ -187,6 +187,7 @@ const EditModal = ({ status, programs, showToastMessage, getStudentData, student
                     'Accept': 'application/json',
                     'authorization': `${token}`,
                     'Content-Type': 'application/json;charset=UTF-8',
+                    'ngrok-skip-browser-warning': 'true',
                 },
                 data: formData
             };
